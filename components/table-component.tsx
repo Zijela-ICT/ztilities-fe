@@ -119,7 +119,7 @@ export default function TableComponent({ data, type }: TableProps) {
                     {column === "status" ? (
                       <span
                         className={`px-2.5 py-1 ${
-                          row[column] === "Active"
+                          row[column] === "Approved"
                             ? "text-[#036B26] bg-[#E7F6EC]"
                             : "text-[#B76E00] bg-[#FFAB0014]"
                         } rounded-full `}
