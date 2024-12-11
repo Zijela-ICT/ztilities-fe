@@ -32,7 +32,7 @@ export default function CompleteRegistration() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 2000);
+    }, 3000);
     return () => clearInterval(timer);
   }, []);
   return (
@@ -67,7 +67,7 @@ export default function CompleteRegistration() {
             />
 
             <ButtonComponent
-              text="Proceed"
+              text={newPassword === "" ? "Proceed" : "Log in"}
               disabled={newPassword === ""}
               className="mt-12"
             />
@@ -82,7 +82,7 @@ export default function CompleteRegistration() {
           />
         </div>
       </div>
-      <FooterComponent/>
+      <FooterComponent />
     </div>
   );
 }

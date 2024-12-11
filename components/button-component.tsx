@@ -17,7 +17,7 @@ export default function ButtonComponent({
     <button
       disabled={disabled}
       onClick={onClick}
-      className={`w-full ${className} flex items-center justify-center h-[3.3rem] px-3 border border-none rounded-lg font-semibold text-black text-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 disabled:cursor-not-allowed disabled:text-gray-500 disabled:opacity-85 ${
+      className={`w-full ${className} flex items-center justify-center h-[3.3rem] px-3 border border-none rounded-lg font-semibold text-black text-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 disabled:cursor-not-allowed disabled:text-gray-500 disabled:opacity-85 ${
         disabled ? "bg-gray-300" : "bg-[#A8353A] text-white"
       }`}
     >

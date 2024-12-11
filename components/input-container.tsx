@@ -1,5 +1,5 @@
 interface InputProps {
-    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void; 
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   value: string;
   className?: string;
   disabled?: boolean;
@@ -12,7 +12,7 @@ export default function InputComponent({
   onChange,
   value,
   className = "mt-4",
-  type="text",
+  type = "text",
   placeholder,
   disabled,
   show,
@@ -25,7 +25,7 @@ export default function InputComponent({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`${className} w-full h-14 px-4 pr-10 border border-none rounded-lg bg-gray-100 text-gray-400 text-sm placeholder-gray-400 focus:outline-none`}
+          className={`${className} w-full h-14 px-4 pr-10 border border-none rounded-lg bg-gray-100 font-bold text-base text-gray-400 text-sm placeholder-gray-400  focus:outline-none`}
         />
 
         {show && (
