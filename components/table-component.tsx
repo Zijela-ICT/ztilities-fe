@@ -4,9 +4,18 @@ import { useState } from "react";
 interface TableProps {
   data: Record<string, any>[];
   type?: string;
+  setModalStateUser?: any;
+  setModalStateRole?: any;
+  setModalStateBulkUser?: any;
 }
 
-export default function TableComponent({ data, type }: TableProps) {
+export default function TableComponent({
+  data,
+  type,
+  setModalStateUser,
+  setModalStateRole,
+  setModalStateBulkUser
+}: TableProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -83,16 +92,22 @@ export default function TableComponent({ data, type }: TableProps) {
 
         {type === "users" && (
           <>
-            <button className="flex-1 px-4 py-3 text-white bg-[#A8353A] rounded-md w-full ">
+            <button
+              onClick={setModalStateUser}
+              className="flex-1 px-4 py-3 text-white bg-[#A8353A] rounded-md w-full "
+            >
               Create User
             </button>
-            <button className="flex-1 px-4 py-3 text-[#A8353A] bg-white rounded-md w-full border border-[#A8353A] ">
+            <button
+              onClick={setModalStateBulkUser}
+              className="flex-1 px-4 py-3 text-[#A8353A] bg-white rounded-md w-full border border-[#A8353A] "
+            >
               Bulk User
             </button>
           </>
         )}
         {type === "roles" && (
-          <button className="flex-1 px-4 py-3 text-white bg-[#A8353A] rounded-md w-full  ">
+          <button    onClick={setModalStateRole} className="flex-1 px-4 py-3 text-white bg-[#A8353A] rounded-md w-full  ">
             Create Role
           </button>
         )}

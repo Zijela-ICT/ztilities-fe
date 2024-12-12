@@ -4,7 +4,9 @@ import ButtonComponent from "@/components/button-component";
 import FooterComponent from "@/components/footer-component";
 import InputComponent from "@/components/input-container";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const Logo = "/assets/logo.png";
 const images = [
@@ -14,6 +16,7 @@ const images = [
 ];
 
 export default function LogIn() {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const [email, setEmail] = useState("");
@@ -27,6 +30,17 @@ export default function LogIn() {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+      const response = await axios.post("/auth/login", {
+        email,
+        password,
+      });
+      localStorage.setItem("authToken", response.data.access); // Store the token
+      router.push("/dashboard");
+    
   };
 
   useEffect(() => {
@@ -44,7 +58,7 @@ export default function LogIn() {
           <h1 className="text-2xl font-semibold mt-8 mb-2">Sign In</h1>
           <h5 className="text-gray-500">Enter your details to log in</h5>
 
-          <form className="my-10">
+          <form className="my-10" onSubmit={handleSubmit} > 
             <InputComponent
               type="email"
               value={email}

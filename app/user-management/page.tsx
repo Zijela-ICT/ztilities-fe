@@ -3,6 +3,9 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
+import ModalCompoenent from "@/components/modal-component";
+import CreateUser from "@/components/create-user";
+import CreateRole from "@/components/create-role";
 
 export default function UserManagement() {
   const tabs = ["All Users", "Role", "Permissions"];
@@ -70,6 +73,10 @@ export default function UserManagement() {
     },
   ];
 
+  const [userModalState, setModalStateUser] = useState<boolean>(false);
+  const [bulkuserModalState, setModalStateBulkUser] = useState<boolean>(false);
+  const [roleModalState, setModalStateRole] = useState<boolean>(false);
+
   const [selectedTab, setSelectedTab] = useState<string>("All Users");
 
   return (
@@ -77,6 +84,33 @@ export default function UserManagement() {
       title="User Management"
       detail="Manage all users and their roles."
     >
+      <ModalCompoenent
+        title="Create User"
+        detail="You can create and manage users access here"
+        modalState={userModalState}
+        setModalState={(state: boolean) => setModalStateUser(state)}
+      >
+        <CreateUser />
+      </ModalCompoenent>
+
+      <ModalCompoenent
+        title="Create Role"
+        detail="You can manage user acess here"
+        modalState={roleModalState}
+        setModalState={(state: boolean) => setModalStateRole(state)}
+      >
+        <CreateRole />
+      </ModalCompoenent>
+
+      <ModalCompoenent
+        title="Upload Bulk User"
+        detail="Import CSV/Excel file"
+        modalState={bulkuserModalState}
+        setModalState={(state: boolean) => setModalStateBulkUser(state)}
+      >
+        Upload Bulk User
+      </ModalCompoenent>
+
       <div className="relative bg-white rounded-2xl p-4">
         <div className="flex space-x-4 pb-2">
           {tabs.map((tab) => (
@@ -100,10 +134,21 @@ export default function UserManagement() {
 
       <div className="relative bg-white rounded-2xl p-4 mt-4">
         {selectedTab === "All Users" && (
-          <TableComponent data={data} type="users" />
+          <TableComponent
+            data={data}
+            type="users"
+            setModalStateUser={(state: boolean) => setModalStateUser(state)}
+            setModalStateBulkUser={(state: boolean) =>
+              setModalStateBulkUser(state)
+            }
+          />
         )}
         {selectedTab === "Role" && (
-          <TableComponent data={roleData} type="roles" />
+          <TableComponent
+            data={roleData}
+            type="roles"
+            setModalStateRole={(state: boolean) => setModalStateRole(state)}
+          />
         )}
         {selectedTab === "Permissions" && (
           <>

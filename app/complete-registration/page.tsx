@@ -4,7 +4,9 @@ import ButtonComponent from "@/components/button-component";
 import FooterComponent from "@/components/footer-component";
 import InputComponent from "@/components/input-container";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const Logo = "/assets/logo.png";
 const images = [
@@ -14,6 +16,7 @@ const images = [
 ];
 
 export default function CompleteRegistration() {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const [password, setPassword] = useState("");
@@ -27,6 +30,15 @@ export default function CompleteRegistration() {
   const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setNewPassword(value);
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const response = await axios.post("/users/reset-password/user", {
+      password: newPassword,
+    });
+    localStorage.setItem("authToken", response.data.access); // Store the token
+    router.push("/dashboard");
   };
 
   useEffect(() => {
@@ -48,7 +60,7 @@ export default function CompleteRegistration() {
             Your email has been verified. kindly enter your password.
           </h5>
 
-          <form className="my-10">
+          <form className="my-10" onSubmit={handleSubmit}>
             <InputComponent
               type="password"
               value={password}

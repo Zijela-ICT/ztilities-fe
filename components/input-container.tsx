@@ -49,3 +49,38 @@ export default function InputComponent({
     </>
   );
 }
+
+interface LabelInputProps {
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string;
+  name: string;
+  className?: string;
+  type: string;
+  placeholder?: string;
+  label: string;
+}
+
+export function LabelInputComponent({
+  onChange,
+  value,
+  name,
+  className,
+  type = "text",
+  label,
+}: LabelInputProps) {
+  return (
+    <>
+      <input
+        type={type}
+        name={name}
+        placeholder=""
+        value={value}
+        onChange={onChange}
+        className="peer w-full rounded-lg px-4 pt-6 pb-2 text-base text-gray-900 outline-none bg-gray-100"
+      />
+      <label className="absolute left-4 top-2 text-gray-600 text-sm transition-all duration-200 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-focus:top-2">
+        {label}
+      </label>
+    </>
+  );
+}
