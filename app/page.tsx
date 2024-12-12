@@ -53,8 +53,8 @@ export default function LogIn() {
   }, []);
   return (
     <div className="relative h-full p-24 bg-transparent">
-      <div className="rounded-2xl w-full bg-white flex min-h-[90vh]">
-        <div className="w-1/2 py-24 px-24">
+      <div className="rounded-2xl w-full bg-white flex  flex-col md:flex-row min-h-[90vh]">
+        <div className="md:w-1/2 w-full py-24 sm:px-24 px-8">
           <Image src={Logo} alt="logo" width={93} height={60} />
 
           <h1 className="text-2xl font-semibold mt-8 mb-2">Sign In</h1>
