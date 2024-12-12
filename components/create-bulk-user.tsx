@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState, useEffect } from "react";
-import { LabelInputComponent } from "./input-container";
 import axiosInstance from "@/utils/api";
 import { DownloadArrow, DownloadIcon } from "@/utils/svg";
 import ButtonComponent from "./button-component";
