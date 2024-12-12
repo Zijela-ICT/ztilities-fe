@@ -6,6 +6,7 @@ import TableComponent from "@/components/table-component";
 import ModalCompoenent from "@/components/modal-component";
 import CreateUser from "@/components/create-user";
 import CreateRole from "@/components/create-role";
+import CreateBulkUser from "@/components/create-bulk-user";
 
 export default function UserManagement() {
   const tabs = ["All Users", "Role", "Permissions"];
@@ -107,8 +108,9 @@ export default function UserManagement() {
         detail="Import CSV/Excel file"
         modalState={bulkuserModalState}
         setModalState={(state: boolean) => setModalStateBulkUser(state)}
+        bulk
       >
-        Upload Bulk User
+        <CreateBulkUser />
       </ModalCompoenent>
 
       <div className="relative bg-white rounded-2xl p-4">

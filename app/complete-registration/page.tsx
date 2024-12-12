@@ -85,7 +85,7 @@ export default function CompleteRegistration() {
             />
           </form>
         </div>
-        <div className="flex-1 bg-[#FBC2B61A] rounded-2xl min-h-full flex justify-center items-center ">
+        <div className="flex-1 bg-[#A8353A] rounded-2xl min-h-full flex justify-center items-center ">
           <Image
             src={images[currentIndex]}
             alt={`House logo ${currentIndex + 1}`}

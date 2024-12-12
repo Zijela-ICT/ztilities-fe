@@ -34,13 +34,15 @@ export default function LogIn() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-      const response = await axios.post("/auth/login", {
+    const response = await axios.post(
+      "http://172.206.195.10/api/v1/auth/login",
+      {
         email,
         password,
-      });
-      localStorage.setItem("authToken", response.data.access); // Store the token
-      router.push("/dashboard");
-    
+      }
+    );
+    localStorage.setItem("authToken", response.data.access_token); // Store the token
+    router.push("/dashboard");
   };
 
   useEffect(() => {
@@ -58,7 +60,7 @@ export default function LogIn() {
           <h1 className="text-2xl font-semibold mt-8 mb-2">Sign In</h1>
           <h5 className="text-gray-500">Enter your details to log in</h5>
 
-          <form className="my-10" onSubmit={handleSubmit} > 
+          <form className="my-10" onSubmit={handleSubmit}>
             <InputComponent
               type="email"
               value={email}

@@ -5,6 +5,7 @@ interface ModalProps {
   className?: string;
   modalState?: boolean;
   children?: any;
+  bulk?:any
 }
 
 export default function ModalCompoenent({
@@ -13,7 +14,7 @@ export default function ModalCompoenent({
   detail,
   modalState,
   setModalState,
-  className
+  bulk
 }: ModalProps) {
   return (
     <>
@@ -27,10 +28,10 @@ export default function ModalCompoenent({
       >
         <div className="relative p-4 w-full max-w-2xl max-h-full mx-auto">
           {/* Modal content */}
-          <div className="relative bg-white rounded-xl shadow dark:bg-gray-700">
+          <div className={`relative ${bulk ? "bg-[#FBFBFC]" : "bg-white" } rounded-xl shadow`}>
             {/* Modal header */}
             <div className="flex items-center justify-between pt-10 pb-2 px-4 md:px-5 rounded-t">
-              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-2xl font-semibold text-gray-900 ">
                 {title}
               </h3>
               <button
