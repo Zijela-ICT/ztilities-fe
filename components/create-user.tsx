@@ -66,7 +66,7 @@ export default function CreateUser({ roles, setModalState, activeRowId }) {
         lastName: user.lastName || "",
         password: user.password,
         email: user.email || "",
-        role:  user.roles?.[0]?.id ? String(user.roles[0].id) : "",
+        role: user.roles && user.roles.length > 0 ? String(user.roles[0].id) : "",
       });
     }
   }, [user]);
