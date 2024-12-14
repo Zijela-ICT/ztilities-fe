@@ -11,14 +11,16 @@ import CreateRole from "@/components/create-role";
 import CreateBulkUser from "@/components/create-bulk-user";
 import axiosInstance from "@/utils/api";
 import ResetPassword from "@/components/reset-password";
+import { DropDownArrow } from "@/utils/svg";
 
 export default function UserManagement() {
   const tabs = ["All Users", "Role", "Permissions"];
 
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
+  const [activeRowIdRole, setActiveRowIdRole] = useState<string | null>(null); // Track active row
   const toggleActions = (rowId: string) => {
     if (selectedTab === "Role") {
-      setActiveRowId(rowId);
+      setActiveRowIdRole(rowId);
       setDeleteActionModalStateRole(true);
     } else {
       setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
@@ -42,7 +44,7 @@ export default function UserManagement() {
     setRoles(response.data.data);
   };
   const deleteRole = async (id: number) => {
-    const response = await axiosInstance.delete(`/roles/${activeRowId}`);
+    const response = await axiosInstance.delete(`/roles/${activeRowIdRole}`);
     getRoles();
     setDeleteActionModalStateRole(false);
   };
@@ -66,7 +68,31 @@ export default function UserManagement() {
 
   const [selectedTab, setSelectedTab] = useState<string>("All Users");
 
-  console.log(activeRowId);
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+  // Group permissions by their category
+  const groupPermissions = (permissions: Permission[]) => {
+    return permissions.reduce((groups, permission) => {
+      // Get the part of the permission string after the underscore
+      const category = permission.permissionString.split(":")[0].split("_")[1];
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(permission);
+      return groups;
+    }, {} as Record<string, Permission[]>);
+  };
+
+  const getPermissions = async () => {
+    const response = await axiosInstance.get("/permissions");
+    setPermissions(response.data.data);
+  };
+
+  useEffect(() => {
+    getPermissions();
+  }, []);
+
+  const groupedPermissions = groupPermissions(permissions);
+
   return (
     <DashboardLayout
       title="User Management"
@@ -190,60 +216,37 @@ export default function UserManagement() {
         )}
         {selectedTab === "Permissions" && (
           <>
-            <details className="border border-gray-200 rounded-lg px-4 py-5  relative group">
-              <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
-                Users
-                <span className="transform transition-transform duration-100 group-open:rotate-180">
-                  <svg
-                    width="14"
-                    height="8"
-                    viewBox="0 0 14 8"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M7.7998 7.4998L13.3998 1.7998C13.7998 1.3998 13.7998 0.799804 13.3998 0.399804C12.9998 -0.00019598 12.3998 -0.00019598 11.9998 0.399804L6.9998 5.2998L1.9998 0.399804C1.5998 -0.00019598 0.999804 -0.00019598 0.599804 0.399804C0.399804 0.599804 0.299805 0.799805 0.299805 1.0998C0.299805 1.39981 0.399804 1.5998 0.599804 1.7998L6.1998 7.4998C6.6998 7.8998 7.2998 7.8998 7.7998 7.4998C7.6998 7.4998 7.6998 7.4998 7.7998 7.4998Z"
-                      fill="#A8353A"
-                    />
-                  </svg>
-                </span>
-              </summary>
-              <nav className="mt-4 pt-9 pb-6 border-t border-gray-300">
-                <ul className="flex flex-wrap space-x-6 cursor-pointer">
-                  <li className="ml-2 mb-2">View Users</li>
-                  <li>Add Users</li>
-                  <li>Delete Users</li>
-                  <li>Manage Users</li>
-                </ul>
-              </nav>
-            </details>
-            <details className="border border-gray-200 rounded-lg px-4 py-5  relative group mt-4">
-              <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
-                Roles
-                <span className="transform transition-transform duration-100 group-open:rotate-180">
-                  <svg
-                    width="14"
-                    height="8"
-                    viewBox="0 0 14 8"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M7.7998 7.4998L13.3998 1.7998C13.7998 1.3998 13.7998 0.799804 13.3998 0.399804C12.9998 -0.00019598 12.3998 -0.00019598 11.9998 0.399804L6.9998 5.2998L1.9998 0.399804C1.5998 -0.00019598 0.999804 -0.00019598 0.599804 0.399804C0.399804 0.599804 0.299805 0.799805 0.299805 1.0998C0.299805 1.39981 0.399804 1.5998 0.599804 1.7998L6.1998 7.4998C6.6998 7.8998 7.2998 7.8998 7.7998 7.4998C7.6998 7.4998 7.6998 7.4998 7.7998 7.4998Z"
-                      fill="#A8353A"
-                    />
-                  </svg>
-                </span>
-              </summary>
-              <nav className="mt-4 pt-9 pb-6 border-t border-gray-300">
-                <ul className="flex flex-wrap space-x-6 cursor-pointer">
-                  <li className="ml-2 mb-2">Add New Role</li>
-                  <li>Assign Users to Roles</li>
-                  <li>Delete Roles</li>
-                  <li>Add Permission</li>
-                </ul>
-              </nav>
-            </details>
+            {Object.keys(groupedPermissions).map((category) => (
+              <details
+                key={category}
+                className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4"
+              >
+                <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
+                  {category.charAt(0).toUpperCase() + category.slice(1)}{" "}
+                  {/* Capitalize category name */}
+                  <span className="transform transition-transform duration-100 group-open:rotate-180">
+                    <DropDownArrow />
+                  </span>
+                </summary>
+                <nav className="mt-4 pt-9 pb-6 border-t border-gray-300">
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {groupedPermissions[category].map((permission) => (
+                      <li
+                        key={permission.id}
+                        className="flex items-start space-x-3"
+                      >
+                        <span
+                          className="text-sm text-gray-700 flex-1 overflow-hidden overflow-ellipsis whitespace-normal"
+                          title={permission.permissionString} // Tooltip for full text
+                        >
+                          {permission.permissionString}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              </details>
+            ))}
           </>
         )}
       </div>

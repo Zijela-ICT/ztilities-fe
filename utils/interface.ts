@@ -17,3 +17,10 @@ interface Permission {
   id: number;
   permissionString: string;
 }
+
+interface RoleData {
+  id: number;
+  name: string;
+  permissions: Permission[];
+  users: User[];
+}

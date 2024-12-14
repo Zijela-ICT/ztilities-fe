@@ -1,5 +1,6 @@
 "use client";
 import { SearchIcon, TrashIcon, TripleDotsIcon } from "@/utils/svg";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface TableProps {
@@ -27,6 +28,8 @@ export default function TableComponent({
   setActiveRowId,
   deleteAction,
 }: TableProps) {
+  const router = useRouter(); // Get the dynamic route parameters
+
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -91,6 +94,7 @@ export default function TableComponent({
           />
         </div>
 
+        {/* Buttons based on types */}
         {type === "users" && (
           <>
             <button
@@ -162,6 +166,7 @@ export default function TableComponent({
                   </td>
                 ))}
 
+                {/* Actions based on type */}
                 <td className="py-3 px-4">
                   {type === "users" ? (
                     <>
@@ -176,7 +181,7 @@ export default function TableComponent({
 
                         {/* Dropdown Menu */}
                         {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
+                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-lg shadow-lg">
                             <ul className="py-2">
                               <li>
                                 <button
@@ -210,7 +215,12 @@ export default function TableComponent({
                   ) : (
                     <>
                       <div className="flex items-center space-x-2">
-                        <button className="px-2.5 py-1 text-gray-700 font-semibold bg-white border border-gray-200 rounded-md   ">
+                        <button
+                          onClick={() =>
+                            router.push(`/user-management/${row?.id}`)
+                          }
+                          className="px-2.5 py-1 text-gray-700 font-semibold bg-white border border-gray-200 rounded-md   "
+                        >
                           View Users
                         </button>
                         <div onClick={() => toggleActions(row.id)}>

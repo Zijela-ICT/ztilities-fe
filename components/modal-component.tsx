@@ -10,6 +10,7 @@ interface ModalProps {
   modalState?: boolean;
   children?: any;
   bulk?: any;
+  activeRowId?: number;
 }
 
 export default function ModalCompoenent({
@@ -46,7 +47,9 @@ export default function ModalCompoenent({
                 className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                 data-modal-toggle="crud-modal"
               >
-                <CancelIcon />
+                <div className="w-3 h-3">
+                  <CancelIcon />
+                </div>
                 <span className="sr-only">Close modal</span>
               </button>
             </div>
@@ -70,7 +73,7 @@ interface ActionModalProps {
   modalState?: boolean;
   children?: any;
   bulk?: any;
-  takeAction?:any
+  takeAction?: any;
 }
 
 export function ActionModalCompoenent({
@@ -80,7 +83,7 @@ export function ActionModalCompoenent({
   modalState,
   setModalState,
   bulk,
-  takeAction
+  takeAction,
 }: ActionModalProps) {
   return (
     <>
@@ -118,7 +121,11 @@ export function ActionModalCompoenent({
                 className="bg-white text-[#A8353A] border border-[#A8353A]"
                 onClick={() => setModalState(false)}
               />
-              <ButtonComponent text="Yes" className="text-white" onClick ={takeAction} />
+              <ButtonComponent
+                text="Yes"
+                className="text-white"
+                onClick={takeAction}
+              />
             </div>
 
             <button
@@ -127,7 +134,10 @@ export function ActionModalCompoenent({
               className="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
               data-modal-toggle="crud-modal"
             >
-              <CancelIcon />
+              <div className="w-3 h-3">
+                <CancelIcon />
+              </div>
+
               <span className="sr-only">Close modal</span>
             </button>
           </div>
