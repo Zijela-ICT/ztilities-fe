@@ -46,6 +46,11 @@ export default function CreateRole({setModalState}) {
       name: formData.name,
       permissions: formData.permissions,
     });
+  
+    setFormData({
+      name: "",
+      permissions: [],
+    });
     setModalState()
   };
 
