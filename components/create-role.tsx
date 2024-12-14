@@ -84,6 +84,7 @@ export default function CreateRole({setModalState}) {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             label="Name of Role"
+            required
           />
         </div>
 

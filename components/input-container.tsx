@@ -58,7 +58,8 @@ interface LabelInputProps {
   type: string;
   placeholder?: string;
   label: string;
-  readOnly? : any
+  readOnly? : boolean
+  required? : boolean
 }
 
 export function LabelInputComponent({
@@ -68,7 +69,8 @@ export function LabelInputComponent({
   className,
   type = "text",
   label,
-  readOnly
+  readOnly,
+  required
 }: LabelInputProps) {
   return (
     <>
@@ -79,6 +81,7 @@ export function LabelInputComponent({
         value={value}
         onChange={onChange}
         readOnly={readOnly}
+        required={required}
         className="peer w-full rounded-lg px-4 pt-6 pb-2 text-base text-gray-900 outline-none bg-gray-100"
       />
       <label className="absolute left-4 top-2 text-gray-600 text-sm transition-all duration-200 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-focus:top-2">

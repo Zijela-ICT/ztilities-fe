@@ -85,6 +85,7 @@ export default function CreateUser({ roles, setModalState, activeRowId }) {
               value={formData.firstName}
               onChange={handleChange}
               label="First Name"
+              required
             />
           </div>
           <div className="relative w-1/2">
@@ -94,6 +95,7 @@ export default function CreateUser({ roles, setModalState, activeRowId }) {
               value={formData.lastName}
               onChange={handleChange}
               label="Last Name"
+              required
             />
           </div>
         </div>
