@@ -7,6 +7,7 @@ import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import axiosInstance from "@/utils/api";
 
 const Logo = "/assets/logo.png";
 const images = [
@@ -34,14 +35,12 @@ export default function LogIn() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await axios.post(
-      "http://172.206.195.10/api/v1/auth/login",
-      {
-        email,
-        password,
-      }
-    );
-    localStorage.setItem("authToken", response.data.access_token); // Store the token
+    const response = await axiosInstance.post("auth/login", {
+      email,
+      password,
+    });
+    console.log(response.data);
+    localStorage.setItem("authToken", response.data.data.access_token);
     router.push("/dashboard");
   };
 
@@ -86,7 +85,7 @@ export default function LogIn() {
             <ButtonComponent
               text={password === "" ? "Proceed" : "Log in"}
               disabled={password === ""}
-              className="mt-12"
+              className="mt-12 text-white"
             />
           </form>
         </div>

@@ -3,29 +3,71 @@
 import { FormEvent, useState, useEffect } from "react";
 import { LabelInputComponent } from "./input-container";
 import axiosInstance from "@/utils/api";
+import { DropDownArrow } from "@/utils/svg";
 
-export default function CreateRole() {
+interface Permission {
+  id: number;
+  permissionString: string;
+}
+
+export default function CreateRole({setModalState}) {
   const [formData, setFormData] = useState({
-    name: "", // Default state
+    name: "",
+    permissions: [] as number[],
   });
 
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+
+  // Group permissions by their category
+  const groupPermissions = (permissions: Permission[]) => {
+    return permissions.reduce((groups, permission) => {
+      // Get the part of the permission string after the underscore
+      const category = permission.permissionString.split(":")[0].split("_")[1];
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(permission);
+      return groups;
+    }, {} as Record<string, Permission[]>);
+  };
+
+  const getPermissions = async () => {
+    const response = await axiosInstance.get("/permissions");
+    setPermissions(response.data.data);
+  };
+
   useEffect(() => {
-    setFormData({ name: "Superadmin" }); // Set default value
+    getPermissions();
   }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
-    // Handle form submission logic here
-    const response = await axiosInstance.post("/users/pre-register", {
-      formData,
+    const response = await axiosInstance.post("/roles", {
+      name: formData.name,
+      permissions: formData.permissions,
+    });
+    setModalState()
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    permissionId: number
+  ) => {
+    const { checked } = e.target;
+
+    setFormData((prevState) => {
+      const updatedPermissions = checked
+        ? [...prevState.permissions, permissionId] // Add permission if checked
+        : prevState.permissions.filter((id) => id !== permissionId); // Remove permission if unchecked
+
+      return {
+        ...prevState,
+        permissions: updatedPermissions,
+      };
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  const groupedPermissions = groupPermissions(permissions);
 
   return (
     <div className="mt-12 px-6 max-w-full sm:mt-6 pb-12">
@@ -35,95 +77,51 @@ export default function CreateRole() {
             type="text"
             name="name"
             value={formData.name}
-            onChange={handleChange}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             label="Name of Role"
           />
         </div>
 
-        {/* ticking */}
-        <>
-          <div className="font-semibold text-md mt-10 mb-4">
-            Permission Menu
-          </div>
-          <details className="border border-gray-200 rounded-lg px-4 py-5 relative group">
+        {/* Ticking part with grouped permissions */}
+        <div className="font-semibold text-md mt-10 mb-4">Permission Menu</div>
+
+        {Object.keys(groupedPermissions).map((category) => (
+          <details
+            key={category}
+            className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4"
+          >
             <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
-              Users
+              {category.charAt(0).toUpperCase() + category.slice(1)}{" "}
+              {/* Capitalize category name */}
               <span className="transform transition-transform duration-100 group-open:rotate-180">
-                <svg
-                  width="14"
-                  height="8"
-                  viewBox="0 0 14 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7.7998 7.4998L13.3998 1.7998C13.7998 1.3998 13.7998 0.799804 13.3998 0.399804C12.9998 -0.00019598 12.3998 -0.00019598 11.9998 0.399804L6.9998 5.2998L1.9998 0.399804C1.5998 -0.00019598 0.999804 -0.00019598 0.599804 0.399804C0.399804 0.599804 0.299805 0.799805 0.299805 1.0998C0.299805 1.39981 0.399804 1.5998 0.599804 1.7998L6.1998 7.4998C6.6998 7.8998 7.2998 7.8998 7.7998 7.4998C7.6998 7.4998 7.6998 7.4998 7.7998 7.4998Z"
-                    fill="#A8353A"
-                  />
-                </svg>
+                <DropDownArrow />
               </span>
             </summary>
             <nav className="mt-4 pt-9 pb-6 border-t border-gray-300">
-              <ul className="flex flex-wrap space-x-6 cursor-pointer">
-                <li className="flex items-center ">
-                  <input type="checkbox" className="mr-2" />
-                  View Users
-                </li>
-                <li className="flex items-center">
-                  <input type="checkbox" className="mr-2" />
-                  Add Users
-                </li>
-                <li className="flex items-center">
-                  <input type="checkbox" className="mr-2" />
-                  Delete Users
-                </li>
-                <li className="flex items-center">
-                  <input type="checkbox" className="mr-2" />
-                  Manage Users
-                </li>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {groupedPermissions[category].map((permission) => (
+                  <li
+                    key={permission.id}
+                    className="flex items-start space-x-3"
+                  >
+                    <input
+                      type="checkbox"
+                      className="form-checkbox h-4 w-4 text-[#A8353A] border-gray-300 rounded focus:ring-[#A8353A]"
+                      checked={formData.permissions.includes(permission.id)}
+                      onChange={(e) => handleChange(e, permission.id)}
+                    />
+                    <span
+                      className="text-sm text-gray-700 flex-1 overflow-hidden overflow-ellipsis whitespace-normal"
+                      title={permission.permissionString} // Tooltip for full text
+                    >
+                      {permission.permissionString}
+                    </span>
+                  </li>
+                ))}
               </ul>
             </nav>
           </details>
-          <details className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4">
-            <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
-              Roles
-              <span className="transform transition-transform duration-100 group-open:rotate-180">
-                <svg
-                  width="14"
-                  height="8"
-                  viewBox="0 0 14 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7.7998 7.4998L13.3998 1.7998C13.7998 1.3998 13.7998 0.799804 13.3998 0.399804C12.9998 -0.00019598 12.3998 -0.00019598 11.9998 0.399804L6.9998 5.2998L1.9998 0.399804C1.5998 -0.00019598 0.999804 -0.00019598 0.599804 0.399804C0.399804 0.599804 0.299805 0.799805 0.299805 1.0998C0.299805 1.39981 0.399804 1.5998 0.599804 1.7998L6.1998 7.4998C6.6998 7.8998 7.2998 7.8998 7.7998 7.4998C7.6998 7.4998 7.6998 7.4998 7.7998 7.4998Z"
-                    fill="#A8353A"
-                  />
-                </svg>
-              </span>
-            </summary>
-            <nav className="mt-4 pt-9 pb-6 border-t border-gray-300">
-              <ul className="flex flex-wrap space-x-6 cursor-pointer">
-                <li className="flex items-center ">
-                  <input type="checkbox" className="mr-2" />
-                  Add New Role
-                </li>
-                <li className="flex items-center">
-                  <input type="checkbox" className="mr-2" />
-                  Assign Users to Roles
-                </li>
-                <li className="flex items-center">
-                  <input type="checkbox" className="mr-2" />
-                  Delete Roles
-                </li>
-                <li className="flex items-center">
-                  <input type="checkbox" className="mr-2" />
-                  Add Permission
-                </li>
-              </ul>
-            </nav>
-          </details>
-        </>
+        ))}
 
         <div className="mt-6 flex justify-end">
           <button

@@ -1,17 +1,16 @@
-
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { LabelInputComponent } from "./input-container";
 import axiosInstance from "@/utils/api";
 
-export default function CreateUser() {
+export default function CreateUser({ roles, setModalState, activeRowId }) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    phoneNumber: "",
+    password: "",
     email: "",
-    role: "", // Added role here
+    role: "",
   });
 
   const handleChange = (
@@ -23,12 +22,54 @@ export default function CreateUser() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
-    // Handle form submission logic here
-    const response = await axiosInstance.post("/users/pre-register", {
-      formData,
+
+    console.log(activeRowId);
+    if (activeRowId) {
+      // If user exists, perform a PATCH request
+      const response = await axiosInstance.patch(`/users/${user.id}`, {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      });
+    } else {
+      // If no user, perform a POST request
+      const response = await axiosInstance.post("/users/pre-register", {
+        ...formData,
+        role: Number(formData.role),
+      });
+    }
+    setFormData({
+      firstName: "",
+      lastName: "",
+      password: "",
+      email: "",
+      role: "",
     });
+    setModalState();
   };
+
+  const [user, setUser] = useState<User | null>(null);
+  const getAUsers = async () => {
+    const response = await axiosInstance.get(`/users/${activeRowId}`);
+    if (response.data.data) {
+      setUser(response.data.data);
+    }
+  };
+
+  useEffect(() => {
+    if (activeRowId !== null) getAUsers();
+  }, [activeRowId]);
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        password: user.password,
+        email: user.email || "",
+        role: String(user?.roles[0]?.id!),
+      });
+    }
+  }, [user]);
 
   return (
     <div>
@@ -58,11 +99,11 @@ export default function CreateUser() {
         </div>
         <div className="relative w-full mt-6">
           <LabelInputComponent
-            type="text"
-            name="phoneNumber"
-            value={formData.phoneNumber}
+            type="tel"
+            name="password"
+            value={formData.password}
             onChange={handleChange}
-            label="Phone Number"
+            label="Password"
           />
         </div>
         <div className="relative w-full mt-6">
@@ -74,25 +115,8 @@ export default function CreateUser() {
             label="Email"
           />
         </div>
-        {/* Role select input */}
-        {/* <div className="relative w-full mt-6">
-          <label className="absolute left-3 top-2 text-gray-500 text-sm transition-all peer-placeholder-shown:top-6 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400">
-            Role
-          </label>
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            className="peer w-full rounded-lg px-2 pt-6 pb-3 text-base text-gray-900 outline-none bg-gray-100"
-          >
-            <option value="" disabled hidden>
-              Select a role
-            </option>
-            <option value="Admin">Admin</option>
-          </select>
-        </div> */}
 
-<div className="relative w-full mt-6">
+        <div className="relative w-full mt-6">
           <label className="absolute left-3 top-2 text-gray-500 text-sm transition-all peer-placeholder-shown:top-6 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400">
             Role
           </label>
@@ -105,7 +129,13 @@ export default function CreateUser() {
             <option value="" disabled hidden>
               Select a role
             </option>
-            <option value="Admin">Admin</option>
+            {roles?.map((role) => {
+              return (
+                <option key={role.id} value={role.id}>
+                  {role.name}
+                </option>
+              );
+            })}
           </select>
           <svg
             className="absolute right-3 top-6 pointer-events-none"
@@ -122,13 +152,12 @@ export default function CreateUser() {
           </svg>
         </div>
 
-
         <div className="mt-10 flex w-full justify-end">
           <button
             type="submit"
             className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-base font-semibold text-white"
           >
-            Create User
+            {activeRowId ? "Edit User" : "Create User"}
           </button>
         </div>
       </form>
