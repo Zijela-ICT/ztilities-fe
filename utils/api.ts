@@ -22,29 +22,30 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
-    toast.error("An error occurred while sending the request.");
+    // No toast for request error in case of GET requests
     return Promise.reject(error);
   }
 );
 
 axiosInstance.interceptors.response.use(
   (response: any) => {
-    // Show success toast only if the endpoint is in the list and method is not GET
-    if (
-      response.config.method !== "get" &&
-      successToastEndpoints.some((endpoint) =>
-        response.config.url.includes(endpoint)
-      )
-    ) {
-      const successMessage = response.data?.message || "Request successful!";
-      toast.success(successMessage);
+    // Skip toasts for GET requests
+    if (response.config.method !== "get") {
+      // Show success toast only if the endpoint is in the list
+      if (
+        successToastEndpoints.some((endpoint) =>
+          response.config.url.includes(endpoint)
+        )
+      ) {
+        const successMessage = response.data?.message || "Request successful!";
+        toast.success(successMessage);
+      }
     }
     return response;
   },
   (error) => {
-    if (error.response) {
+    if (error.response && error.config.method !== "get") {
       const { data } = error.response;
-      // If there are specific error messages, toast them
       if (Array.isArray(data.message)) {
         data.message.forEach((msg: string) => {
           toast.error(msg);
@@ -52,8 +53,6 @@ axiosInstance.interceptors.response.use(
       } else {
         toast.error(data.message || "An unexpected error occurred.");
       }
-    } else {
-      toast.error("An unexpected error occurred.");
     }
     return Promise.reject(error);
   }

@@ -1,5 +1,7 @@
 import { ArrowLeft } from "@/utils/svg";
 import Navigation from "./navigation-component";
+import ProtectedRoute from "./auth/protected-routes";
+
 
 export default function DashboardLayout({
   children,
@@ -16,6 +18,7 @@ export default function DashboardLayout({
 }) {
   return (
     <>
+    <ProtectedRoute>
       <div className="md:flex">
         <Navigation />
         <div className="min-h-screen bg-gray-50 text-medium text-gray-500 dark:text-gray-400 dark:bg-gray-800 w-full md:w-4/5">
@@ -40,6 +43,8 @@ export default function DashboardLayout({
           <div className="bg-gray-100 h-full p-6">{children}</div>
         </div>
       </div>
+      </ProtectedRoute>
     </>
+    
   );
 }
