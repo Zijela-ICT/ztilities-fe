@@ -33,6 +33,7 @@ export default function RootLayout({
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
         />
         <link href="https://fonts.cdnfonts.com/css/satoshi" rel="stylesheet" />
+        <link rel="icon" href="/assets/logo.png" type="image/x-icon" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-satoshi antialiased`}
