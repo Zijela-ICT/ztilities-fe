@@ -10,7 +10,7 @@ interface Permission {
   permissionString: string;
 }
 
-export default function CreateRole({setModalState}) {
+export default function CreateRole({ setModalState, setSuccessState }) {
   const [formData, setFormData] = useState({
     name: "",
     permissions: [] as number[],
@@ -46,12 +46,17 @@ export default function CreateRole({setModalState}) {
       name: formData.name,
       permissions: formData.permissions,
     });
-  
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully created this role",
+      status :true
+    });
+
     setFormData({
       name: "",
       permissions: [],
     });
-    setModalState()
+    setModalState();
   };
 
   const handleChange = (

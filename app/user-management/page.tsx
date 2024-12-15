@@ -5,6 +5,7 @@ import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
 import ModalCompoenent, {
   ActionModalCompoenent,
+  SuccessModalCompoenent,
 } from "@/components/modal-component";
 import CreateUser from "@/components/create-user";
 import CreateRole from "@/components/create-role";
@@ -15,6 +16,12 @@ import { DropDownArrow } from "@/utils/svg";
 
 export default function UserManagement() {
   const tabs = ["All Users", "Role", "Permissions"];
+
+  const [successState, setSuccessState] = useState({
+    title: "",
+    detail: "",
+    status: false,
+  });
 
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [activeRowIdRole, setActiveRowIdRole] = useState<string | null>(null); // Track active row
@@ -36,6 +43,11 @@ export default function UserManagement() {
     const response = await axiosInstance.delete(`/users/${activeRowId}`);
     getUsers();
     setDeleteActionModalState(false);
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully deleted this user",
+      status: true,
+    });
   };
 
   const [roles, setRoles] = useState<Role[]>();
@@ -47,6 +59,11 @@ export default function UserManagement() {
     const response = await axiosInstance.delete(`/roles/${activeRowIdRole}`);
     getRoles();
     setDeleteActionModalStateRole(false);
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully deleted this role",
+      status: true,
+    });
   };
 
   const [userModalState, setModalStateUser] = useState<boolean>(false);
@@ -98,6 +115,15 @@ export default function UserManagement() {
       title="User Management"
       detail="Manage all users and their roles."
     >
+      <SuccessModalCompoenent
+        title={successState.title}
+        detail={successState.detail}
+        modalState={successState.status}
+        setModalState={(state: boolean) =>
+          setSuccessState((prevState) => ({ ...prevState, status: state }))
+        }
+      ></SuccessModalCompoenent>
+
       <ActionModalCompoenent
         title="Delete User"
         detail="Are you sure you want to delete this user"
@@ -128,6 +154,7 @@ export default function UserManagement() {
           roles={roles}
           setModalState={(state: boolean) => setModalStateUser(state)}
           activeRowId={activeRowId}
+          setSuccessState={setSuccessState}
         />
       </ModalCompoenent>
 
@@ -141,6 +168,7 @@ export default function UserManagement() {
           roles={roles}
           setModalState={(state: boolean) => setModalStatePasswordReset(state)}
           activeRowId={activeRowId}
+          setSuccessState={setSuccessState}
         />
       </ModalCompoenent>
 
@@ -152,6 +180,7 @@ export default function UserManagement() {
       >
         <CreateRole
           setModalState={(state: boolean) => setModalStateRole(state)}
+          setSuccessState={setSuccessState}
         />
       </ModalCompoenent>
 
@@ -191,15 +220,13 @@ export default function UserManagement() {
           <TableComponent
             data={users}
             type="users"
-            setModalStateUser={(state: boolean) => {
+            setModalState1={(state: boolean) => {
               setModalStateUser(state);
             }}
-            setModalStateResetPassword={(state: boolean) =>
+            setModalState4={(state: boolean) =>
               setModalStatePasswordReset(state)
             }
-            setModalStateBulkUser={(state: boolean) =>
-              setModalStateBulkUser(state)
-            }
+            setModalState2={(state: boolean) => setModalStateBulkUser(state)}
             toggleActions={toggleActions}
             activeRowId={activeRowId}
             setActiveRowId={(state: any) => setActiveRowId(state)}
@@ -210,7 +237,7 @@ export default function UserManagement() {
           <TableComponent
             data={roles}
             type="roles"
-            setModalStateRole={(state: boolean) => setModalStateRole(state)}
+            setModalState3={(state: boolean) => setModalStateRole(state)}
             toggleActions={toggleActions}
           />
         )}

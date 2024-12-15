@@ -5,15 +5,23 @@ import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
 import ModalCompoenent, {
   ActionModalCompoenent,
+  SuccessModalCompoenent,
 } from "@/components/modal-component";
 import CreateUser from "@/components/create-user";
 import CreateBulkUser from "@/components/create-bulk-user";
 import axiosInstance from "@/utils/api";
 import ResetPassword from "@/components/reset-password";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function UserManagement() {
+  const [successState, setSuccessState] = useState({
+    title: "",
+    detail: "",
+    status: false,
+  });
+
   const params = useParams();
+  const router = useRouter();
   const { id } = params;
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const toggleActions = (rowId: string) => {
@@ -23,6 +31,11 @@ export default function UserManagement() {
     const response = await axiosInstance.delete(`/users/${activeRowId}`);
     getARole();
     setDeleteActionModalState(false);
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully deleted this user",
+      status: true,
+    });
   };
 
   const [roles, setRoles] = useState<Role[]>();
@@ -61,9 +74,20 @@ export default function UserManagement() {
 
   return (
     <DashboardLayout
-      title={formatRoleName(role?.name)}
+      title={role?.name ? formatRoleName(role?.name) : "...."}
       detail="User Management"
+      dynamic
+      onclick={() => router.back()}
     >
+      <SuccessModalCompoenent
+        title={successState.title}
+        detail={successState.detail}
+        modalState={successState.status}
+        setModalState={(state: boolean) =>
+          setSuccessState((prevState) => ({ ...prevState, status: state }))
+        }
+      ></SuccessModalCompoenent>
+
       <ActionModalCompoenent
         title="Delete User"
         detail="Are you sure you want to delete this user"
@@ -86,6 +110,7 @@ export default function UserManagement() {
           roles={roles}
           setModalState={(state: boolean) => setModalStateUser(state)}
           activeRowId={activeRowId}
+          setSuccessState={setSuccessState}
         />
       </ModalCompoenent>
 
@@ -99,6 +124,7 @@ export default function UserManagement() {
           roles={roles}
           setModalState={(state: boolean) => setModalStatePasswordReset(state)}
           activeRowId={activeRowId}
+          setSuccessState={setSuccessState}
         />
       </ModalCompoenent>
 
@@ -116,15 +142,11 @@ export default function UserManagement() {
         <TableComponent
           data={role?.users}
           type="users"
-          setModalStateUser={(state: boolean) => {
+          setModalState1={(state: boolean) => {
             setModalStateUser(state);
           }}
-          setModalStateResetPassword={(state: boolean) =>
-            setModalStatePasswordReset(state)
-          }
-          setModalStateBulkUser={(state: boolean) =>
-            setModalStateBulkUser(state)
-          }
+          setModalState4={(state: boolean) => setModalStatePasswordReset(state)}
+          setModalState2={(state: boolean) => setModalStateBulkUser(state)}
           toggleActions={toggleActions}
           activeRowId={activeRowId}
           setActiveRowId={(state: any) => setActiveRowId(state)}

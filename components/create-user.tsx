@@ -4,7 +4,12 @@ import { FormEvent, useEffect, useState } from "react";
 import { LabelInputComponent } from "./input-container";
 import axiosInstance from "@/utils/api";
 
-export default function CreateUser({ roles, setModalState, activeRowId }) {
+export default function CreateUser({
+  roles,
+  setModalState,
+  activeRowId,
+  setSuccessState,
+}) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -22,8 +27,6 @@ export default function CreateUser({ roles, setModalState, activeRowId }) {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    console.log(activeRowId);
     if (activeRowId) {
       // If user exists, perform a PATCH request
       const response = await axiosInstance.patch(`/users/${user.id}`, {
@@ -45,6 +48,13 @@ export default function CreateUser({ roles, setModalState, activeRowId }) {
       role: "",
     });
     setModalState();
+    setSuccessState({
+      title: "Successful",
+      detail: `You have successfully ${
+        activeRowId ? "edited" : "created"
+      } this user`,
+      status: true,
+    });
   };
 
   const [user, setUser] = useState<User | null>(null);
@@ -66,7 +76,8 @@ export default function CreateUser({ roles, setModalState, activeRowId }) {
         lastName: user.lastName || "",
         password: user.password,
         email: user.email || "",
-        role: user.roles && user.roles.length > 0 ? String(user.roles[0].id) : "",
+        role:
+          user.roles && user.roles.length > 0 ? String(user.roles[0].id) : "",
       });
     }
   }, [user]);

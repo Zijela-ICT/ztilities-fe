@@ -28,7 +28,7 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-  (response:any) => {
+  (response: any) => {
     // Show success toast only if the endpoint is in the list and method is not GET
     if (
       response.config.method !== "get" &&
@@ -43,12 +43,17 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     if (error.response) {
-      const { config, status, data } = error.response;
-      if (status === 401) {
-        toast.error("Unauthorized access - please log in again.");
+      const { data } = error.response;
+      // If there are specific error messages, toast them
+      if (Array.isArray(data.message)) {
+        data.message.forEach((msg: string) => {
+          toast.error(msg);
+        });
       } else {
         toast.error(data.message || "An unexpected error occurred.");
       }
+    } else {
+      toast.error("An unexpected error occurred.");
     }
     return Promise.reject(error);
   }

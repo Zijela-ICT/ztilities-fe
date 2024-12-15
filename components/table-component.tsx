@@ -6,10 +6,10 @@ import { useState } from "react";
 interface TableProps {
   data: Record<string, any>[];
   type?: string;
-  setModalStateUser?: any;
-  setModalStateResetPassword?: any;
-  setModalStateRole?: any;
-  setModalStateBulkUser?: any;
+  setModalState1?: any;
+  setModalState2?: any;
+  setModalState3?: any;
+  setModalState4?: any;
   toggleActions?: any;
   activeRowId?: any;
   setActiveRowId?: any;
@@ -19,10 +19,11 @@ interface TableProps {
 export default function TableComponent({
   data,
   type,
-  setModalStateUser,
-  setModalStateResetPassword,
-  setModalStateRole,
-  setModalStateBulkUser,
+  setModalState1,
+  setModalState2,
+  setModalState3,
+  setModalState4,
+
   toggleActions,
   activeRowId,
   setActiveRowId,
@@ -99,7 +100,7 @@ export default function TableComponent({
           <>
             <button
               onClick={() => {
-                setModalStateUser(true);
+                setModalState1(true);
                 setActiveRowId(null);
               }}
               className="flex-1 px-4 py-3 text-white bg-[#A8353A] rounded-md w-full "
@@ -107,7 +108,7 @@ export default function TableComponent({
               Create User
             </button>
             <button
-              onClick={setModalStateBulkUser}
+              onClick={setModalState2}
               className="flex-1 px-4 py-3 text-[#A8353A] bg-white rounded-md w-full border border-[#A8353A] "
             >
               Bulk User
@@ -116,7 +117,7 @@ export default function TableComponent({
         )}
         {type === "roles" && (
           <button
-            onClick={setModalStateRole}
+            onClick={setModalState3}
             className="flex-1 px-4 py-3 text-white bg-[#A8353A] rounded-md w-full  "
           >
             Create Role
@@ -129,42 +130,46 @@ export default function TableComponent({
         <table className="min-w-full table-auto">
           <thead className="bg-gray-100 text-left">
             <tr>
-              {columns.map((column) => (
-                <th key={column} className="py-3 px-4">
-                  {column.charAt(0).toUpperCase() + column.slice(1)}
-                </th>
-              ))}
+              {columns
+                .filter((column) => column !== "id") // Exclude the 'id' column
+                .map((column) => (
+                  <th key={column} className="py-3 px-4">
+                    {column.charAt(0).toUpperCase() + column.slice(1)}
+                  </th>
+                ))}
               <th className="py-3 px-4">Actions</th>
             </tr>
           </thead>
           <tbody>
             {currentItems?.map((row: any, index) => (
               <tr key={index} className="border-b border-gray-100 h-24">
-                {columns.map((column) => (
-                  <td key={column} className="py-3 px-4">
-                    {Array.isArray(row[column]) ? (
-                      // Handle array case, join all names if array exists
-                      row[column].map((item: any) => item.name).join(", ")
-                    ) : row[column]?.name ? (
-                      // Handle single object case
-                      row[column].name
-                    ) : column === "status" ? (
-                      // Handle status column
-                      <span
-                        className={`px-2.5 py-1 ${
-                          row[column] === "Approved"
-                            ? "text-[#036B26] bg-[#E7F6EC]"
-                            : "text-[#B76E00] bg-[#FFAB0014]"
-                        } rounded-full `}
-                      >
-                        {row[column]}
-                      </span>
-                    ) : (
-                      // Default case for other columns
-                      row[column]?.toString()
-                    )}
-                  </td>
-                ))}
+                {columns
+                  .filter((column) => column !== "id")
+                  .map((column) => (
+                    <td key={column} className="py-3 px-4">
+                      {Array.isArray(row[column]) ? (
+                        // Handle array case, join all names if array exists
+                        row[column].map((item: any) => item.name).join(", ")
+                      ) : row[column]?.name ? (
+                        // Handle single object case
+                        row[column].name
+                      ) : column === "status" ? (
+                        // Handle status column
+                        <span
+                          className={`px-2.5 py-1 ${
+                            row[column] === "Approved"
+                              ? "text-[#036B26] bg-[#E7F6EC]"
+                              : "text-[#B76E00] bg-[#FFAB0014]"
+                          } rounded-full `}
+                        >
+                          {row[column]}
+                        </span>
+                      ) : (
+                        // Default case for other columns
+                        row[column]?.toString()
+                      )}
+                    </td>
+                  ))}
 
                 {/* Actions based on type */}
                 <td className="py-3 px-4">
@@ -181,12 +186,12 @@ export default function TableComponent({
 
                         {/* Dropdown Menu */}
                         {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-lg shadow-lg">
+                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
                             <ul className="py-2">
                               <li>
                                 <button
                                   className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={setModalStateUser}
+                                  onClick={setModalState1}
                                 >
                                   Edit User
                                 </button>
@@ -194,7 +199,7 @@ export default function TableComponent({
                               <li>
                                 <button
                                   className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={setModalStateResetPassword}
+                                  onClick={setModalState4}
                                 >
                                   Reset Password
                                 </button>

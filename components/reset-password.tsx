@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { LabelInputComponent } from "./input-container";
 import axiosInstance from "@/utils/api";
 
-export default function ResetPassword({ roles, setModalState, activeRowId }) {
+export default function ResetPassword({ roles, setModalState, activeRowId,setSuccessState }) {
   const [formData, setFormData] = useState({
     user: "",
     password: "",
@@ -25,6 +25,11 @@ export default function ResetPassword({ roles, setModalState, activeRowId }) {
       password: formData.password,
     });
     setModalState();
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully reset the password for this user",
+      status :true
+    });
   };
 
   const [user, setUser] = useState<User | null>(null);
