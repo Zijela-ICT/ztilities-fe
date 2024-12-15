@@ -110,15 +110,20 @@ export default function CreateUser({
             />
           </div>
         </div>
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="tel"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            label="Password"
-          />
-        </div>
+        {activeRowId ? (
+          <></>
+        ) : (
+          <div className="relative w-full mt-6">
+            <LabelInputComponent
+              type="tel"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              label="Password"
+            />
+          </div>
+        )}
+
         <div className="relative w-full mt-6">
           <LabelInputComponent
             type="email"

@@ -1,9 +1,6 @@
-
-
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Router from "next/router"; // Import Next.js Router
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -16,7 +13,7 @@ const axiosInstance = axios.create({
 const successToastEndpoints: string[] = [];
 
 axiosInstance.interceptors.request.use(
-  async (config) => {
+  (config) => {
     const token = localStorage.getItem("authToken");
 
     if (token) {
@@ -25,13 +22,12 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
-    // No toast for request error in case of GET requests
-    return Promise.reject(error);
+    return Promise.reject(error); // No toast for request errors
   }
 );
 
 axiosInstance.interceptors.response.use(
-  (response: any) => {
+  (response) => {
     // Skip toasts for GET requests
     if (response.config.method !== "get") {
       // Show success toast only if the endpoint is in the list
@@ -49,12 +45,24 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response) {
       const { status, data, config } = error.response;
-console.log(config.url)
-      // Handle 401 errors by redirecting to "/"
-      if (status === 401 && !config.url.includes("auth/login")) {
-        toast.error("Session expired. Redirecting to login...");
-        Router.push("/"); // Redirect to "/"
-      } else if (config.method !== "get") {
+
+      // Skip error toasts for GET requests
+      if (config.method === "get") {
+        return Promise.reject(error);
+      }
+
+      // Handle 401 errors
+      if (status === 401) {
+        if (config.url.includes("auth/login")) {
+          // For `/auth/login`, show a toast and skip redirection
+          toast.error(data.message || "Invalid login credentials.");
+        } else {
+          // For all other 401 responses, clear token and redirect
+          toast.error("Session expired. Redirecting to login...");
+          localStorage.removeItem("authToken");
+          window.location.href = "/"; // Redirect to "/"
+        }
+      } else {
         // Handle other errors and show error toasts
         if (Array.isArray(data.message)) {
           data.message.forEach((msg: string) => {

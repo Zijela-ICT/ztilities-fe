@@ -22,15 +22,12 @@ export default function Navigation() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <ul className="px-4 py-4 space-y-4 text-sm font-medium text-gray-500 dark:text-gray-400 w-full lg:w-1/5 bg-white">
+    <ul className="px-4 py-4 space-y-4 text-sm font-medium text-gray-500  w-full lg:w-1/5 bg-white">
       <div className="flex items-center justify-between">
         <li className="w-full px-4 ml-4">
           <Image src={Logo} alt="logo" width={100} height={70} />
         </li>
-        <button
-          onClick={toggleMenu}
-          className="md:hidden text-gray-500 dark:text-gray-400"
-        >
+        <button onClick={toggleMenu} className="md:hidden text-gray-500 ">
           <svg
             className="w-6 h-6"
             fill="none"
@@ -109,17 +106,13 @@ export default function Navigation() {
             <Link
               href={href}
               className={`inline-flex items-center w-full px-4 py-2 rounded-md font-bold text-base ${
-                isActive(href)
-                  ? "bg-[#FBC2B61A] text-[#A8353A] "
-                  : "dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white"
+                isActive(href) ? "bg-[#FBC2B61A] text-[#A8353A] " : ""
               }`}
               aria-current={isActive(href) ? "page" : undefined}
             >
               <svg
                 className={`w-10 h-10 me-2 ${
-                  isActive(href)
-                    ? "text-[#A8353A]"
-                    : "text-gray-500 dark:text-gray-400"
+                  isActive(href) ? "text-[#A8353A]" : "text-gray-500 "
                 }`}
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +136,7 @@ export default function Navigation() {
         <li className="w-full px-4 pt-4">
           <button
             onClick={logout}
-            className="inline-flex items-center justify-between w-full pl-4 py-4 pr-20 text-base rounded-lg text-white bg-[#A8353A] dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white"
+            className="inline-flex items-center justify-between w-full pl-4 py-4 pr-20 text-base rounded-lg text-white bg-[#A8353A] "
           >
             <svg
               width="24"
