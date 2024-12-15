@@ -1,6 +1,9 @@
+
+
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Router from "next/router"; // Import Next.js Router
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -44,14 +47,22 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && error.config.method !== "get") {
-      const { data } = error.response;
-      if (Array.isArray(data.message)) {
-        data.message.forEach((msg: string) => {
-          toast.error(msg);
-        });
-      } else {
-        toast.error(data.message || "An unexpected error occurred.");
+    if (error.response) {
+      const { status, data, config } = error.response;
+console.log(config.url)
+      // Handle 401 errors by redirecting to "/"
+      if (status === 401 && !config.url.includes("auth/login")) {
+        toast.error("Session expired. Redirecting to login...");
+        Router.push("/"); // Redirect to "/"
+      } else if (config.method !== "get") {
+        // Handle other errors and show error toasts
+        if (Array.isArray(data.message)) {
+          data.message.forEach((msg: string) => {
+            toast.error(msg);
+          });
+        } else {
+          toast.error(data.message || "An unexpected error occurred.");
+        }
       }
     }
     return Promise.reject(error);
