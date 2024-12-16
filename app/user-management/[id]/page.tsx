@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
 import ModalCompoenent, {
@@ -14,56 +14,118 @@ import ResetPassword from "@/components/reset-password";
 import { useParams, useRouter } from "next/navigation";
 
 export default function UserManagement() {
+  const params = useParams();
+  const router = useRouter();
+  const { id } = params;
+  
+  // Success state
   const [successState, setSuccessState] = useState({
     title: "",
     detail: "",
     status: false,
   });
-
-  const params = useParams();
-  const router = useRouter();
-  const { id } = params;
-  const [activeRowId, setActiveRowId] = useState<string | null>(null);
-  const toggleActions = (rowId: string) => {
-    setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
-  };
+  
+  // Delete user function
   const deleteUser = async () => {
-    const response = await axiosInstance.delete(`/users/${activeRowId}`);
-    getARole();
-    setDeleteActionModalState(false);
+    await axiosInstance.delete(`/users/${activeRowId}`);
+    setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
       detail: "You have successfully deleted this user",
       status: true,
     });
   };
-
+  
+  // Roles state and fetch function
   const [roles, setRoles] = useState<Role[]>();
   const getRoles = async () => {
     const response = await axiosInstance.get("/roles");
     setRoles(response.data.data);
   };
-
+  
+  // Single role state and fetch function
   const [role, setRole] = useState<RoleData>();
   const getARole = async () => {
     const response = await axiosInstance.get(`/roles/${id}`);
     setRole(response.data.data);
   };
-
-  const [userModalState, setModalStateUser] = useState<boolean>(false);
-  const [passwordResetModalState, setModalStatePasswordReset] =
-    useState<boolean>(false);
-  const [bulkuserModalState, setModalStateBulkUser] = useState<boolean>(false);
-  const [deleteActionModalState, setDeleteActionModalState] =
-    useState<boolean>(false);
-
+  
+  // Active row tracking
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const toggleActions = (rowId: string) => {
+    setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
+  };
+  
+  // Central states for managing actions
+  const [centralState, setCentralState] = useState<string>();
+  const [centralStateDelete, setCentralStateDelete] = useState<string>();
+  
+  // Fetch roles and role data on centralState/centralStateDelete change
   useEffect(() => {
     const fetchData = async () => {
       await Promise.all([getRoles(), getARole()]);
     };
     fetchData();
-  }, [userModalState, bulkuserModalState]);
-
+  }, [centralState, centralStateDelete]);
+  
+  // Dynamic title logic
+  const getTitle = () => {
+    if (centralState === "createUser") {
+      return activeRowId ? "Edit User" : "Create User";
+    }
+    if (centralState === "createBulkUser") {
+      return "Upload Bulk User";
+    }
+    if (centralState === "resetPassword") {
+      return "Reset Password";
+    }
+    if (centralStateDelete === "deleteUser") {
+      return "Delete User";
+    }
+    return "Zijela";
+  };
+  
+  // Dynamic detail logic
+  const getDetail = () => {
+    if (centralState === "createUser") {
+      return activeRowId
+        ? "You can edit user details here."
+        : "You can create and manage users' access here.";
+    }
+    if (centralState === "createBulkUser") {
+      return "Import CSV/Excel file";
+    }
+    if (centralState === "resetPassword") {
+      return "Change the password for this user";
+    }
+    if (centralStateDelete === "deleteUser") {
+      return "Are you sure you want to delete this user";
+    }
+    return "Zijela";
+  };
+  
+  // Component mapping for central state
+  const componentMap: Record<string, JSX.Element> = {
+    createUser: (
+      <CreateUser
+        roles={roles}
+        setModalState={setCentralState}
+        activeRowId={activeRowId}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    createBulkUser: <CreateBulkUser />,
+    resetPassword: (
+      <ResetPassword
+        roles={roles}
+        setModalState={setCentralState}
+        activeRowId={activeRowId}
+        setSuccessState={setSuccessState}
+      />
+    ),
+  };
+  
+  // Utility function to format role names
   function formatRoleName(roleName: string): string {
     return `${roleName
       ?.replace(/_/g, " ")
@@ -71,7 +133,7 @@ export default function UserManagement() {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ")} Role`;
   }
-
+  
   return (
     <DashboardLayout
       title={role?.name ? formatRoleName(role?.name) : "...."}
@@ -89,68 +151,31 @@ export default function UserManagement() {
       ></SuccessModalCompoenent>
 
       <ActionModalCompoenent
-        title="Delete User"
-        detail="Are you sure you want to delete this user"
-        modalState={deleteActionModalState}
-        setModalState={(state: boolean) => setDeleteActionModalState(state)}
+        title={getTitle()}
+        detail={getDetail()}
+        modalState={centralStateDelete}
+        setModalState={setCentralStateDelete}
         takeAction={deleteUser}
       ></ActionModalCompoenent>
 
       <ModalCompoenent
-        title={activeRowId ? "Edit User" : "Create User"}
-        detail={
-          activeRowId
-            ? "You can edit user here"
-            : "You can create and manage users access here "
-        }
-        modalState={userModalState}
-        setModalState={(state: boolean) => setModalStateUser(state)}
+        title={getTitle()}
+        detail={getDetail()}
+        modalState={centralState}
+        setModalState={() => setCentralState("")}
       >
-        <CreateUser
-          roles={roles}
-          setModalState={(state: boolean) => setModalStateUser(state)}
-          activeRowId={activeRowId}
-          setSuccessState={setSuccessState}
-        />
+        {componentMap[centralState]}
       </ModalCompoenent>
-
-      <ModalCompoenent
-        title="Reset Password"
-        detail="Change the password for this user"
-        modalState={passwordResetModalState}
-        setModalState={(state: boolean) => setModalStatePasswordReset(state)}
-      >
-        <ResetPassword
-          roles={roles}
-          setModalState={(state: boolean) => setModalStatePasswordReset(state)}
-          activeRowId={activeRowId}
-          setSuccessState={setSuccessState}
-        />
-      </ModalCompoenent>
-
-      <ModalCompoenent
-        title="Upload Bulk User"
-        detail="Import CSV/Excel file"
-        modalState={bulkuserModalState}
-        setModalState={(state: boolean) => setModalStateBulkUser(state)}
-        bulk
-      >
-        <CreateBulkUser />
-      </ModalCompoenent>
-
       <div className="relative bg-white rounded-2xl p-4 mt-4">
         <TableComponent
           data={role?.users}
           type="users"
-          setModalState1={(state: boolean) => {
-            setModalStateUser(state);
-          }}
-          setModalState4={(state: boolean) => setModalStatePasswordReset(state)}
-          setModalState2={(state: boolean) => setModalStateBulkUser(state)}
+          setModalState={setCentralState}
+          setModalStateDelete={setCentralStateDelete}
           toggleActions={toggleActions}
           activeRowId={activeRowId}
-          setActiveRowId={(state: any) => setActiveRowId(state)}
-          deleteAction={() => setDeleteActionModalState(true)}
+          setActiveRowId={setActiveRowId}
+          deleteAction={setCentralStateDelete}
         />
       </div>
     </DashboardLayout>

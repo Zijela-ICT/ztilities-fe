@@ -7,7 +7,7 @@ interface ModalProps {
   title: string;
   detail?: string;
   className?: string;
-  modalState?: boolean;
+  modalState?: any;
   children?: any;
   bulk?: any;
   activeRowId?: number;
@@ -42,7 +42,7 @@ export default function ModalCompoenent({
             <div className="flex items-center justify-between pt-10 pb-2 px-4 md:px-5 rounded-t">
               <h3 className="text-2xl font-semibold text-gray-900 ">{title}</h3>
               <button
-                onClick={() => setModalState(false)}
+                onClick={setModalState}
                 type="button"
                 className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                 data-modal-toggle="crud-modal"
@@ -70,7 +70,7 @@ interface ActionModalProps {
   title: string;
   detail?: string;
   className?: string;
-  modalState?: boolean;
+  modalState?: any;
   children?: any;
   bulk?: any;
   takeAction?: any;
@@ -119,7 +119,7 @@ export function ActionModalCompoenent({
               <ButtonComponent
                 text="Cancel"
                 className="bg-white text-[#A8353A] border border-[#A8353A]"
-                onClick={() => setModalState(false)}
+                onClick={() => setModalState("")}
               />
               <ButtonComponent
                 text="Yes"
@@ -129,7 +129,7 @@ export function ActionModalCompoenent({
             </div>
 
             <button
-              onClick={() => setModalState(false)}
+              onClick={() => setModalState("")}
               type="button"
               className="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
               data-modal-toggle="crud-modal"

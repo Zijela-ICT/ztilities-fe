@@ -24,7 +24,7 @@ export default function ResetPassword({ roles, setModalState, activeRowId,setSuc
       userId: user.id,
       password: formData.password,
     });
-    setModalState();
+    setModalState("");
     setSuccessState({
       title: "Successful",
       detail: "You have successfully reset the password for this user",

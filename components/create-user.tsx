@@ -47,7 +47,7 @@ export default function CreateUser({
       email: "",
       role: "",
     });
-    setModalState();
+    setModalState("");
     setSuccessState({
       title: "Successful",
       detail: `You have successfully ${

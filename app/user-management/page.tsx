@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
 import ModalCompoenent, {
@@ -13,6 +13,7 @@ import CreateBulkUser from "@/components/create-bulk-user";
 import axiosInstance from "@/utils/api";
 import ResetPassword from "@/components/reset-password";
 import { DropDownArrow } from "@/utils/svg";
+import PermissionList from "@/components/view-permissions";
 
 export default function UserManagement() {
   const tabs = ["All Users", "Role", "Permissions"];
@@ -23,26 +24,41 @@ export default function UserManagement() {
     status: false,
   });
 
-  const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
-  const [activeRowIdRole, setActiveRowIdRole] = useState<string | null>(null); // Track active row
-  const toggleActions = (rowId: string) => {
-    if (selectedTab === "Role") {
-      setActiveRowIdRole(rowId);
-      setDeleteActionModalStateRole(true);
-    } else {
-      setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
-    }
-  };
-
   const [users, setUsers] = useState<User[]>();
+  const [roles, setRoles] = useState<Role[]>();
+  const [role, setRole] = useState<RoleData>();
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
+  const [centralState, setCentralState] = useState<string>();
+  const [centralStateDelete, setCentralStateDelete] = useState<string>();
+  const [selectedTab, setSelectedTab] = useState<string>("All Users");
+
+  // Fetch data functions
   const getUsers = async () => {
     const response = await axiosInstance.get("/users");
     setUsers(response.data.data);
   };
+
+  const getRoles = async () => {
+    const response = await axiosInstance.get("/roles");
+    setRoles(response.data.data);
+  };
+
+  const getARole = async () => {
+    console.log(activeRowId);
+    const response = await axiosInstance.get(`/roles/${activeRowId}`);
+    setRole(response.data.data);
+  };
+
+  const getPermissions = async () => {
+    const response = await axiosInstance.get("/permissions");
+    setPermissions(response.data.data);
+  };
+
+  // Delete functions
   const deleteUser = async () => {
-    const response = await axiosInstance.delete(`/users/${activeRowId}`);
-    getUsers();
-    setDeleteActionModalState(false);
+    await axiosInstance.delete(`/users/${activeRowId}`);
+    setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
       detail: "You have successfully deleted this user",
@@ -50,15 +66,9 @@ export default function UserManagement() {
     });
   };
 
-  const [roles, setRoles] = useState<Role[]>();
-  const getRoles = async () => {
-    const response = await axiosInstance.get("/roles");
-    setRoles(response.data.data);
-  };
   const deleteRole = async (id: number) => {
-    const response = await axiosInstance.delete(`/roles/${activeRowIdRole}`);
-    getRoles();
-    setDeleteActionModalStateRole(false);
+    await axiosInstance.delete(`/roles/${activeRowId}`);
+    setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
       detail: "You have successfully deleted this role",
@@ -66,31 +76,12 @@ export default function UserManagement() {
     });
   };
 
-  const [userModalState, setModalStateUser] = useState<boolean>(false);
-  const [passwordResetModalState, setModalStatePasswordReset] =
-    useState<boolean>(false);
-  const [bulkuserModalState, setModalStateBulkUser] = useState<boolean>(false);
-  const [roleModalState, setModalStateRole] = useState<boolean>(false);
-  const [deleteActionModalState, setDeleteActionModalState] =
-    useState<boolean>(false);
-  const [deleteActionModalStateRole, setDeleteActionModalStateRole] =
-    useState<boolean>(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([getUsers(), getRoles()]);
-    };
-    fetchData();
-  }, [userModalState, bulkuserModalState, roleModalState]);
-
-  const [selectedTab, setSelectedTab] = useState<string>("All Users");
-
-  const [permissions, setPermissions] = useState<Permission[]>([]);
-  // Group permissions by their category
+  // Group permissions by category
   const groupPermissions = (permissions: Permission[]) => {
-    return permissions.reduce((groups, permission) => {
-      // Get the part of the permission string after the underscore
-      const category = permission.permissionString.split(":")[0].split("_")[1];
+    return permissions?.reduce((groups, permission) => {
+      const category = permission?.permissionString
+        ?.split(":")[0]
+        .split("_")[1];
       if (!groups[category]) {
         groups[category] = [];
       }
@@ -99,16 +90,119 @@ export default function UserManagement() {
     }, {} as Record<string, Permission[]>);
   };
 
-  const getPermissions = async () => {
-    const response = await axiosInstance.get("/permissions");
-    setPermissions(response.data.data);
+  const groupedPermissions = groupPermissions(permissions);
+  const groupedPermissionsByUser = groupPermissions(role?.permissions);
+
+  // Toggle actions
+  const toggleActions = (rowId: string) => {
+    setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
   };
+
+  // Dynamic title and detail logic
+  const getTitle = () => {
+    if (centralState === "createUser") {
+      return activeRowId ? "Edit User" : "Create User";
+    }
+    if (centralState === "createRole") {
+      return activeRowId ? "Edit Role" : "Create Role";
+    }
+    if (centralState === "createBulkUser") {
+      return "Upload Bulk User";
+    }
+    if (centralState === "resetPassword") {
+      return "Reset Password";
+    }
+    if (centralStateDelete === "deleteUser") {
+      return "Delete User";
+    }
+    if (centralStateDelete === "deleteRole") {
+      return "Delete Role";
+    }
+    if (centralState === "viewPermissions") {
+      return `Role permissions`;
+    }
+    return "Zijela";
+  };
+
+  const getDetail = () => {
+    if (centralState === "createUser") {
+      return activeRowId
+        ? "You can edit user details here."
+        : "You can create and manage users' access here.";
+    }
+    if (centralState === "createRole") {
+      return activeRowId
+        ? "You can edit role details here."
+        : "You can manage users' access here.";
+    }
+    if (centralState === "createBulkUser") {
+      return "Import CSV/Excel file";
+    }
+    if (centralState === "resetPassword") {
+      return "Change the password for this user";
+    }
+    if (centralStateDelete === "deleteUser") {
+      return "Are you sure you want to delete this user";
+    }
+    if (centralStateDelete === "deleteRole") {
+      return "Are you sure you want to delete this role";
+    }
+    if (centralState === "viewPermissions") {
+      return "All perissions available for this role";
+    }
+    return "Zijela";
+  };
+
+  // Mapping centralState values to components
+  const componentMap: Record<string, JSX.Element> = {
+    createUser: (
+      <CreateUser
+        roles={roles}
+        setModalState={setCentralState}
+        activeRowId={activeRowId}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    createBulkUser: <CreateBulkUser />,
+    createRole: (
+      <CreateRole
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        activeRowId={activeRowId}
+      />
+    ),
+    resetPassword: (
+      <ResetPassword
+        roles={roles}
+        setModalState={setCentralState}
+        activeRowId={activeRowId}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    viewPermissions: (
+      <div className="p-4">
+        <PermissionList groupedPermissions={groupedPermissionsByUser || []} />
+      </div>
+    ),
+  };
+
+  // useEffect hooks
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([getUsers(), getRoles()]);
+    };
+    fetchData();
+  }, [centralState, centralStateDelete]);
+
+  useEffect(() => {
+    if (centralState === "viewPermissions") {
+      getARole();
+    }
+  }, [centralState]);
 
   useEffect(() => {
     getPermissions();
   }, []);
-
-  const groupedPermissions = groupPermissions(permissions);
 
   return (
     <DashboardLayout
@@ -125,73 +219,25 @@ export default function UserManagement() {
       ></SuccessModalCompoenent>
 
       <ActionModalCompoenent
-        title="Delete User"
-        detail="Are you sure you want to delete this user"
-        modalState={deleteActionModalState}
-        setModalState={(state: boolean) => setDeleteActionModalState(state)}
-        takeAction={deleteUser}
-      ></ActionModalCompoenent>
-
-      <ActionModalCompoenent
-        title="Delete Role"
-        detail="Are you sure you want to delete this role"
-        modalState={deleteActionModalStateRole}
-        setModalState={(state: boolean) => setDeleteActionModalStateRole(state)}
-        takeAction={deleteRole}
-      ></ActionModalCompoenent>
-
-      <ModalCompoenent
-        title={activeRowId ? "Edit User" : "Create User"}
-        detail={
-          activeRowId
-            ? "You can edit user here"
-            : "You can create and manage users access here "
+        title={getTitle()}
+        detail={getDetail()}
+        modalState={centralStateDelete}
+        setModalState={setCentralStateDelete}
+        takeAction={
+          centralStateDelete === "deleteRole" ? deleteRole : deleteUser
         }
-        modalState={userModalState}
-        setModalState={(state: boolean) => setModalStateUser(state)}
-      >
-        <CreateUser
-          roles={roles}
-          setModalState={(state: boolean) => setModalStateUser(state)}
-          activeRowId={activeRowId}
-          setSuccessState={setSuccessState}
-        />
-      </ModalCompoenent>
+      ></ActionModalCompoenent>
 
       <ModalCompoenent
-        title="Reset Password"
-        detail="Change the password for this user"
-        modalState={passwordResetModalState}
-        setModalState={(state: boolean) => setModalStatePasswordReset(state)}
+        title={getTitle()}
+        detail={getDetail()}
+        modalState={centralState}
+        setModalState={() => {
+          setCentralState("");
+          setActiveRowId(null);
+        }}
       >
-        <ResetPassword
-          roles={roles}
-          setModalState={(state: boolean) => setModalStatePasswordReset(state)}
-          activeRowId={activeRowId}
-          setSuccessState={setSuccessState}
-        />
-      </ModalCompoenent>
-
-      <ModalCompoenent
-        title="Create Role"
-        detail="You can manage user acess here"
-        modalState={roleModalState}
-        setModalState={(state: boolean) => setModalStateRole(state)}
-      >
-        <CreateRole
-          setModalState={(state: boolean) => setModalStateRole(state)}
-          setSuccessState={setSuccessState}
-        />
-      </ModalCompoenent>
-
-      <ModalCompoenent
-        title="Upload Bulk User"
-        detail="Import CSV/Excel file"
-        modalState={bulkuserModalState}
-        setModalState={(state: boolean) => setModalStateBulkUser(state)}
-        bulk
-      >
-        <CreateBulkUser />
+        {componentMap[centralState]}
       </ModalCompoenent>
 
       <div className="relative bg-white rounded-2xl p-4">
@@ -220,61 +266,25 @@ export default function UserManagement() {
           <TableComponent
             data={users}
             type="users"
-            setModalState1={(state: boolean) => {
-              setModalStateUser(state);
-            }}
-            setModalState4={(state: boolean) =>
-              setModalStatePasswordReset(state)
-            }
-            setModalState2={(state: boolean) => setModalStateBulkUser(state)}
+            setModalState={setCentralState}
+            setModalStateDelete={setCentralStateDelete}
             toggleActions={toggleActions}
             activeRowId={activeRowId}
-            setActiveRowId={(state: any) => setActiveRowId(state)}
-            deleteAction={() => setDeleteActionModalState(true)}
+            setActiveRowId={setActiveRowId}
+            deleteAction={setCentralStateDelete}
           />
         )}
         {selectedTab === "Role" && (
           <TableComponent
             data={roles}
             type="roles"
-            setModalState3={(state: boolean) => setModalStateRole(state)}
+            setModalState={setCentralState}
+            setModalStateDelete={setCentralStateDelete}
             toggleActions={toggleActions}
           />
         )}
         {selectedTab === "Permissions" && (
-          <>
-            {Object.keys(groupedPermissions).map((category) => (
-              <details
-                key={category}
-                className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4"
-              >
-                <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
-                  {category.charAt(0).toUpperCase() + category.slice(1)}{" "}
-                  {/* Capitalize category name */}
-                  <span className="transform transition-transform duration-100 group-open:rotate-180">
-                    <DropDownArrow />
-                  </span>
-                </summary>
-                <nav className="mt-4 pt-9 pb-6 border-t border-gray-300">
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {groupedPermissions[category].map((permission) => (
-                      <li
-                        key={permission.id}
-                        className="flex items-start space-x-3"
-                      >
-                        <span
-                          className="text-sm text-gray-700 flex-1 overflow-hidden overflow-ellipsis whitespace-normal"
-                          title={permission.permissionString} // Tooltip for full text
-                        >
-                          {permission.permissionString}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-              </details>
-            ))}
-          </>
+          <PermissionList groupedPermissions={groupedPermissions} />
         )}
       </div>
     </DashboardLayout>

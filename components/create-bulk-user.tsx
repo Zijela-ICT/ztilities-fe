@@ -57,7 +57,7 @@ export default function CreateBulkUser() {
           </label>
         </div>
 
-        <ButtonComponent text={"Submit"} className="mt-2" />
+        <ButtonComponent text={"Submit"} className="mt-2 text-white" />
       </form>
     </div>
   );

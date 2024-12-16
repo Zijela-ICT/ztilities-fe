@@ -6,10 +6,8 @@ import { useState } from "react";
 interface TableProps {
   data: Record<string, any>[];
   type?: string;
-  setModalState1?: any;
-  setModalState2?: any;
-  setModalState3?: any;
-  setModalState4?: any;
+  setModalState?: any;
+  setModalStateDelete?: any;
   toggleActions?: any;
   activeRowId?: any;
   setActiveRowId?: any;
@@ -19,15 +17,11 @@ interface TableProps {
 export default function TableComponent({
   data,
   type,
-  setModalState1,
-  setModalState2,
-  setModalState3,
-  setModalState4,
-
+  setModalState,
+  setModalStateDelete,
   toggleActions,
   activeRowId,
   setActiveRowId,
-  deleteAction,
 }: TableProps) {
   const router = useRouter(); // Get the dynamic route parameters
 
@@ -100,7 +94,7 @@ export default function TableComponent({
           <>
             <button
               onClick={() => {
-                setModalState1(true);
+                setModalState("createUser");
                 setActiveRowId(null);
               }}
               className="flex-1 px-4 py-3 text-white bg-[#A8353A] rounded-md w-full "
@@ -108,7 +102,7 @@ export default function TableComponent({
               Create User
             </button>
             <button
-              onClick={setModalState2}
+              onClick={() => setModalState("createBulkUser")}
               className="flex-1 px-4 py-3 text-[#A8353A] bg-white rounded-md w-full border border-[#A8353A] "
             >
               Bulk User
@@ -117,7 +111,7 @@ export default function TableComponent({
         )}
         {type === "roles" && (
           <button
-            onClick={setModalState3}
+            onClick={() => setModalState("createRole")}
             className="flex-1 px-4 py-3 text-white bg-[#A8353A] rounded-md w-full  "
           >
             Create Role
@@ -191,7 +185,7 @@ export default function TableComponent({
                               <li>
                                 <button
                                   className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={setModalState1}
+                                  onClick={() => setModalState("createUser")}
                                 >
                                   Edit User
                                 </button>
@@ -199,7 +193,7 @@ export default function TableComponent({
                               <li>
                                 <button
                                   className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={setModalState4}
+                                  onClick={() => setModalState("resetPassword")}
                                 >
                                   Reset Password
                                 </button>
@@ -207,7 +201,9 @@ export default function TableComponent({
                               <li>
                                 <button
                                   className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={deleteAction}
+                                  onClick={() =>
+                                    setModalStateDelete("deleteUser")
+                                  }
                                 >
                                   Delete User
                                 </button>
@@ -228,7 +224,30 @@ export default function TableComponent({
                         >
                           View Users
                         </button>
-                        <div onClick={() => toggleActions(row.id)}>
+                        <button
+                          onClick={() => {
+                            toggleActions(row.id);
+                            setModalState("viewPermissions");
+                          }}
+                          className="px-2.5 py-1 text-gray-700 font-semibold bg-white border border-gray-200 rounded-md   "
+                        >
+                          View Permissions
+                        </button>
+                        <button
+                          onClick={() => {
+                            toggleActions(row.id);
+                            setModalState("createRole");
+                          }}
+                          className="px-2.5 py-1 text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md   "
+                        >
+                          Edit Role
+                        </button>
+                        <div
+                          onClick={() => {
+                            toggleActions(row.id);
+                            setModalStateDelete("deleteRole");
+                          }}
+                        >
                           <TrashIcon />
                         </div>
                       </div>
