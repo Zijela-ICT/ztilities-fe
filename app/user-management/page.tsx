@@ -12,10 +12,12 @@ import CreateRole from "@/components/create-role";
 import CreateBulkUser from "@/components/create-bulk-user";
 import axiosInstance from "@/utils/api";
 import ResetPassword from "@/components/reset-password";
-import { DropDownArrow } from "@/utils/svg";
 import PermissionList from "@/components/view-permissions";
+import withPermissions from "@/components/auth/permission-protected-routes";
+import PermissionGuard from "@/components/auth/permission-protected-components";
+import { useDataPermission } from "@/context";
 
-export default function UserManagement() {
+function UserManagement() {
   const tabs = ["All Users", "Role", "Permissions"];
 
   const [successState, setSuccessState] = useState({
@@ -31,7 +33,6 @@ export default function UserManagement() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
-  const [selectedTab, setSelectedTab] = useState<string>("All Users");
 
   // Fetch data functions
   const getUsers = async () => {
@@ -45,7 +46,6 @@ export default function UserManagement() {
   };
 
   const getARole = async () => {
-    console.log(activeRowId);
     const response = await axiosInstance.get(`/roles/${activeRowId}`);
     setRole(response.data.data);
   };
@@ -204,6 +204,36 @@ export default function UserManagement() {
     getPermissions();
   }, []);
 
+  const tabPermissions: { [key: string]: string[] } = {
+    "All Users": ["read_users"], // Permission to view "All Users"
+    Role: ["read_roles"], // Permission to view "Role"
+    Permissions: ["read_permissions"], // Permission to view "Permissions"
+  };
+
+  // const getDefaultTab = () => {
+  //   return tabs.find((tab) =>
+  //     (tabPermissions[tab] || []).every((permission) =>
+  //       ["read_roles"].includes(permission)
+  //     )
+  //   );
+  // };
+
+  // const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
+  const { userPermissions } = useDataPermission();
+  const getDefaultTab = () => {
+    // Extract the permission strings into a clean array
+    const userPermissionStrings = userPermissions.map(
+      (perm) => perm.permissionString
+    );
+
+    return tabs.find((tab) =>
+      (tabPermissions[tab] || []).every((permission) =>
+        userPermissionStrings.includes(permission)
+      )
+    );
+  };
+
+  const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
   return (
     <DashboardLayout
       title="User Management"
@@ -240,53 +270,68 @@ export default function UserManagement() {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      <div className="relative bg-white rounded-2xl p-4">
-        <div className="flex space-x-4 pb-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setSelectedTab(tab)}
-              className={`relative text-gray-500 hover:text-gray-900 px-4 py-2 font-medium focus:outline-none group ${
-                selectedTab === tab
-                  ? "text-[#A8353A] font-semibold" // Active tab styles
-                  : ""
-              }`}
-            >
-              {tab}
-              {selectedTab === tab && (
-                <span className="absolute left-0 bottom-[-5px] w-full h-[2px] bg-[#A8353A]"></span>
-              )}
-            </button>
-          ))}
+      <PermissionGuard
+        requiredPermissions={["read_users", "read_permission", "read_roles"]}
+      >
+        <div className="relative bg-white rounded-2xl p-4">
+          <div className="flex space-x-4 pb-2">
+            {tabs.map((tab) => (
+              <PermissionGuard
+                key={tab}
+                requiredPermissions={tabPermissions[tab] || []} // Match tab to permissions
+              >
+                <button
+                  key={tab}
+                  onClick={() => setSelectedTab(tab)}
+                  className={`relative text-gray-500 hover:text-gray-900 px-4 py-2 font-medium focus:outline-none group ${
+                    selectedTab === tab
+                      ? "text-[#A8353A] font-semibold" // Active tab styles
+                      : ""
+                  }`}
+                >
+                  {tab}
+                  {selectedTab === tab && (
+                    <span className="absolute left-0 bottom-[-5px] w-full h-[2px] bg-[#A8353A]"></span>
+                  )}
+                </button>
+              </PermissionGuard>
+            ))}
+          </div>
         </div>
-      </div>
+      </PermissionGuard>
 
-      <div className="relative bg-white rounded-2xl p-4 mt-4">
-        {selectedTab === "All Users" && (
-          <TableComponent
-            data={users}
-            type="users"
-            setModalState={setCentralState}
-            setModalStateDelete={setCentralStateDelete}
-            toggleActions={toggleActions}
-            activeRowId={activeRowId}
-            setActiveRowId={setActiveRowId}
-            deleteAction={setCentralStateDelete}
-          />
-        )}
-        {selectedTab === "Role" && (
-          <TableComponent
-            data={roles}
-            type="roles"
-            setModalState={setCentralState}
-            setModalStateDelete={setCentralStateDelete}
-            toggleActions={toggleActions}
-          />
-        )}
-        {selectedTab === "Permissions" && (
-          <PermissionList groupedPermissions={groupedPermissions} />
-        )}
-      </div>
+      <PermissionGuard
+        requiredPermissions={["read_users", "read_permission", "read_roles"]}
+      >
+        <div className="relative bg-white rounded-2xl p-4 mt-4">
+          {selectedTab === "All Users" && (
+            <TableComponent
+              data={users}
+              type="users"
+              setModalState={setCentralState}
+              setModalStateDelete={setCentralStateDelete}
+              toggleActions={toggleActions}
+              activeRowId={activeRowId}
+              setActiveRowId={setActiveRowId}
+              deleteAction={setCentralStateDelete}
+            />
+          )}
+          {selectedTab === "Role" && (
+            <TableComponent
+              data={roles}
+              type="roles"
+              setModalState={setCentralState}
+              setModalStateDelete={setCentralStateDelete}
+              toggleActions={toggleActions}
+            />
+          )}
+          {selectedTab === "Permissions" && (
+            <PermissionList groupedPermissions={groupedPermissions} />
+          )}
+        </div>
+      </PermissionGuard>
     </DashboardLayout>
   );
 }
+
+export default withPermissions(UserManagement, ["users", "roles"]);

@@ -1,9 +1,12 @@
+import PermissionGuard from "./auth/permission-protected-components";
+
 interface ButtonProps {
   onClick?: () => void;
   text: string;
   className?: string;
   disabled?: boolean;
   loading?: boolean;
+  permissions? : string[]
 }
 
 export default function ButtonComponent({
@@ -12,8 +15,10 @@ export default function ButtonComponent({
   className = "",
   disabled = false,
   loading = false,
+  permissions
 }: ButtonProps) {
   return (
+    <PermissionGuard requiredPermissions={permissions}>
     <button
       disabled={disabled}
       onClick={onClick}
@@ -75,5 +80,34 @@ export default function ButtonComponent({
         text
       )}
     </button>
+    </PermissionGuard>
+  );
+}
+
+interface ButtonProps {
+  onClick?: () => void;
+  text: string;
+  className?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  permissions? : string[]
+}
+
+export function DropdownButtonComponent({
+  onClick,
+  text,
+  className = "",
+  loading = false,
+  permissions
+}: ButtonProps) {
+  return (
+    <PermissionGuard requiredPermissions={permissions}>
+    <button
+      className={` ${className} w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100`}
+      onClick={onClick}
+    >
+      {text}
+    </button>
+    </PermissionGuard>
   );
 }

@@ -89,7 +89,10 @@ export default function LogIn() {
                 onClick={() => setToggleView(!toggleView)}
               />
               <div className="text-right w-full">
-                <span className="text-[#A8353A] font-semibold cursor-pointer">
+                <span
+                  onClick={() => router.push(`/forgot-password`)}
+                  className="text-[#A8353A] font-semibold cursor-pointer"
+                >
                   Forgot Password?
                 </span>
               </div>

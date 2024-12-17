@@ -13,6 +13,23 @@ interface User {
   roles: Role[];
 }
 
+interface AuthUser {
+  id: number;
+  username: string;
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+  resetToken: string | null;
+  emailConfirmToken: string | null;
+  isEmailConfirmed: boolean;
+  twoFASecret: string | null;
+  isTwoFAEnabled: boolean;
+  needPasswordReset: boolean;
+  isVendor: boolean;
+  isDeactivated: boolean;
+}
+
+
 interface Permission {
   id: number;
   permissionString: string;

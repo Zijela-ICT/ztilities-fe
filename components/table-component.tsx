@@ -1,7 +1,14 @@
 "use client";
-import { SearchIcon, TrashIcon, TripleDotsIcon } from "@/utils/svg";
+import {
+  DropDownArrow,
+  SearchIcon,
+  TrashIcon,
+  TripleDotsIcon,
+} from "@/utils/svg";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import ButtonComponent, { DropdownButtonComponent } from "./button-component";
+import PermissionGuard from "./auth/permission-protected-components";
 
 interface TableProps {
   data: Record<string, any>[];
@@ -37,7 +44,7 @@ export default function TableComponent({
   // Filtered data based on search query
   const filteredData = data?.filter((row) =>
     Object.values(row).some((value) =>
-      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+      value?.toString().toLowerCase().includes(searchQuery?.toLowerCase())
     )
   );
 
@@ -92,30 +99,30 @@ export default function TableComponent({
         {/* Buttons based on types */}
         {type === "users" && (
           <>
-            <button
+            <ButtonComponent
+              text="Create User"
               onClick={() => {
                 setModalState("createUser");
                 setActiveRowId(null);
               }}
-              className="flex-1 px-4 py-3 text-white bg-[#A8353A] rounded-md w-full "
-            >
-              Create User
-            </button>
-            <button
+              className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
+              permissions={["create_users", "create_users:pre-register"]}
+            />
+            <ButtonComponent
+              text="Bulk User "
               onClick={() => setModalState("createBulkUser")}
-              className="flex-1 px-4 py-3 text-[#A8353A] bg-white rounded-md w-full border border-[#A8353A] "
-            >
-              Bulk User
-            </button>
+              className="flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A] "
+              permissions={["create_users", "create_users:pre-register"]}
+            />
           </>
         )}
         {type === "roles" && (
-          <button
+          <ButtonComponent
+            text="Create Role"
             onClick={() => setModalState("createRole")}
-            className="flex-1 px-4 py-3 text-white bg-[#A8353A] rounded-md w-full  "
-          >
-            Create Role
-          </button>
+            className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
+            permissions={["create_roles"]}
+          />
         )}
       </div>
 
@@ -171,42 +178,49 @@ export default function TableComponent({
                     <>
                       <div className="relative">
                         {/* Button */}
-                        <button
-                          onClick={() => toggleActions(row.id)}
-                          className="text-blue-500 hover:text-blue-700"
+                        <PermissionGuard
+                          requiredPermissions={[
+                            "delete_users:id",
+                            "update_users:id",
+                            "update_users:reset-password/admin",
+                          ]}
                         >
-                          <TripleDotsIcon />
-                        </button>
+                          <button
+                            onClick={() => toggleActions(row.id)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <TripleDotsIcon />
+                          </button>
+                        </PermissionGuard>
 
                         {/* Dropdown Menu */}
                         {activeRowId === row.id && (
                           <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
                             <ul className="py-2">
                               <li>
-                                <button
-                                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                <DropdownButtonComponent
+                                  text="Edit User"
                                   onClick={() => setModalState("createUser")}
-                                >
-                                  Edit User
-                                </button>
+                                  permissions={["update_users:id"]}
+                                />
                               </li>
                               <li>
-                                <button
-                                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                <DropdownButtonComponent
+                                  text="Reset Password"
                                   onClick={() => setModalState("resetPassword")}
-                                >
-                                  Reset Password
-                                </button>
+                                  permissions={[
+                                    "update_users:reset-password/admin",
+                                  ]}
+                                />
                               </li>
                               <li>
-                                <button
-                                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                <DropdownButtonComponent
+                                  text="Delete User"
                                   onClick={() =>
                                     setModalStateDelete("deleteUser")
                                   }
-                                >
-                                  Delete User
-                                </button>
+                                  permissions={["delete_users:id"]}
+                                />
                               </li>
                             </ul>
                           </div>
@@ -216,40 +230,47 @@ export default function TableComponent({
                   ) : (
                     <>
                       <div className="flex items-center space-x-2">
-                        <button
+                        <ButtonComponent
+                          text="View Users"
                           onClick={() =>
                             router.push(`/user-management/${row?.id}`)
                           }
-                          className="px-2.5 py-1 text-gray-700 font-semibold bg-white border border-gray-200 rounded-md   "
-                        >
-                          View Users
-                        </button>
-                        <button
+                          permissions={["read_roles:id"]}
+                          className="px-2.5 py-1 text-gray-700 font-semibold bg-white border border-gray-200   "
+                        />
+
+                        <ButtonComponent
+                          text="View Persmissions"
                           onClick={() => {
                             toggleActions(row.id);
                             setModalState("viewPermissions");
                           }}
-                          className="px-2.5 py-1 text-gray-700 font-semibold bg-white border border-gray-200 rounded-md   "
-                        >
-                          View Permissions
-                        </button>
-                        <button
+                          permissions={["read_permissions"]}
+                          className="px-2.5 py-1 text-gray-700 font-semibold bg-white border border-gray-200   "
+                        />
+
+                        <ButtonComponent
+                          text="Edit Role"
                           onClick={() => {
                             toggleActions(row.id);
                             setModalState("createRole");
                           }}
+                          permissions={["update_roles:id"]}
                           className="px-2.5 py-1 text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md   "
+                        />
+
+                        <PermissionGuard
+                          requiredPermissions={["delete_roles:id"]}
                         >
-                          Edit Role
-                        </button>
-                        <div
-                          onClick={() => {
-                            toggleActions(row.id);
-                            setModalStateDelete("deleteRole");
-                          }}
-                        >
-                          <TrashIcon />
-                        </div>
+                          <div
+                            onClick={() => {
+                              toggleActions(row.id);
+                              setModalStateDelete("deleteRole");
+                            }}
+                          >
+                            <TrashIcon />
+                          </div>
+                        </PermissionGuard>
                       </div>
                     </>
                   )}

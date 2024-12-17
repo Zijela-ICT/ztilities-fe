@@ -74,10 +74,10 @@ interface ActionModalProps {
   children?: any;
   bulk?: any;
   takeAction?: any;
+  customAction?: any;
 }
 
 export function ActionModalCompoenent({
-  children,
   title,
   detail,
   modalState,
@@ -148,13 +148,12 @@ export function ActionModalCompoenent({
 }
 
 export function SuccessModalCompoenent({
-  children,
   title,
   detail,
   modalState,
   setModalState,
   bulk,
-  takeAction,
+  customAction,
 }: ActionModalProps) {
   return (
     <>
@@ -190,7 +189,9 @@ export function SuccessModalCompoenent({
               <ButtonComponent
                 text="Done"
                 className="text-white"
-                onClick={() => setModalState(false)}
+                onClick={() =>
+                  customAction ? customAction() : setModalState(false)
+                }
               />
             </div>
 

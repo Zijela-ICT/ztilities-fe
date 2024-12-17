@@ -12,8 +12,9 @@ import CreateBulkUser from "@/components/create-bulk-user";
 import axiosInstance from "@/utils/api";
 import ResetPassword from "@/components/reset-password";
 import { useParams, useRouter } from "next/navigation";
+import withPermissions from "@/components/auth/permission-protected-routes";
 
-export default function UserManagement() {
+ function UserManagement() {
   const params = useParams();
   const router = useRouter();
   const { id } = params;
@@ -181,3 +182,4 @@ export default function UserManagement() {
     </DashboardLayout>
   );
 }
+export default withPermissions(UserManagement, ["users", "roles"]);
