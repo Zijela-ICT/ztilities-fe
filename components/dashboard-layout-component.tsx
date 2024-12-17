@@ -27,7 +27,7 @@ export default function DashboardLayout({
       <ModalCompoenent
         title={"Reset Password"}
         detail={"Reset your password"}
-        modalState={!user?.needPasswordReset  }
+        modalState={user?.needPasswordReset  }
         setModalState={() => setCentralState("")}
       >
         <ChangeMyPassword />
