@@ -186,23 +186,11 @@ function UserManagement() {
     ),
   };
 
-  // useEffect hooks
-  useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([getUsers(), getRoles()]);
-    };
-    fetchData();
-  }, [centralState, centralStateDelete]);
-
   useEffect(() => {
     if (centralState === "viewPermissions") {
       getARole();
     }
   }, [centralState]);
-
-  useEffect(() => {
-    getPermissions();
-  }, []);
 
   const tabPermissions: { [key: string]: string[] } = {
     "All Users": ["read_users"], // Permission to view "All Users"
@@ -210,15 +198,6 @@ function UserManagement() {
     Permissions: ["read_permissions"], // Permission to view "Permissions"
   };
 
-  // const getDefaultTab = () => {
-  //   return tabs.find((tab) =>
-  //     (tabPermissions[tab] || []).every((permission) =>
-  //       ["read_roles"].includes(permission)
-  //     )
-  //   );
-  // };
-
-  // const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
   const { userPermissions } = useDataPermission();
   const getDefaultTab = () => {
     // Extract the permission strings into a clean array
@@ -234,6 +213,20 @@ function UserManagement() {
   };
 
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
+
+  useEffect(() => {
+    if (selectedTab === "Role") {
+      getRoles();
+    } else if (selectedTab === "Permissions") {
+      getPermissions();
+    } else {
+      const fetchData = async () => {
+        await Promise.all([getUsers(), getRoles()]);
+      };
+      fetchData();
+    }
+  }, [centralState, centralStateDelete, selectedTab]);
+
   return (
     <DashboardLayout
       title="User Management"

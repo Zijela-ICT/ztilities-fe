@@ -69,7 +69,7 @@ export default function ResetPassword({ roles, setModalState, activeRowId,setSuc
             readOnly={true}
           />
         </div>
-        <div className="relative w-full mt-6">
+        {/* <div className="relative w-full mt-6">
           <LabelInputComponent
             type="password"
             name="password"
@@ -77,7 +77,7 @@ export default function ResetPassword({ roles, setModalState, activeRowId,setSuc
             onChange={handleChange}
             label="New Password"
           />
-        </div>
+        </div> */}
 
         <div className="mt-10 flex w-full justify-end">
           <button

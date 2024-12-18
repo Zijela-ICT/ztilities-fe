@@ -132,7 +132,12 @@ export default function TableComponent({
           <thead className="bg-gray-100 text-left">
             <tr>
               {columns
-                .filter((column) => column !== "id") // Exclude the 'id' column
+                .filter(
+                  (column) =>
+                    column !== "id" &&
+                    column !== "createdAt" &&
+                    column !== "updatedAt"
+                ) // Exclude the 'id' column
                 .map((column) => (
                   <th key={column} className="py-3 px-4">
                     {column.charAt(0).toUpperCase() + column.slice(1)}
@@ -145,7 +150,12 @@ export default function TableComponent({
             {currentItems?.map((row: any, index) => (
               <tr key={index} className="border-b border-gray-100 h-24">
                 {columns
-                  .filter((column) => column !== "id")
+                  .filter(
+                    (column) =>
+                      column !== "id" &&
+                      column !== "createdAt" &&
+                      column !== "updatedAt"
+                  )
                   .map((column) => (
                     <td key={column} className="py-3 px-4">
                       {Array.isArray(row[column]) ? (
@@ -236,7 +246,7 @@ export default function TableComponent({
                             router.push(`/user-management/${row?.id}`)
                           }
                           permissions={["read_roles:id"]}
-                          className="px-2.5 py-1 text-gray-700 font-semibold bg-white border border-gray-200   "
+                          className="px-2.5 py-1 h-[2.3rem] text-gray-700 font-semibold text-sm bg-white border border-gray-200   "
                         />
 
                         <ButtonComponent
@@ -246,7 +256,7 @@ export default function TableComponent({
                             setModalState("viewPermissions");
                           }}
                           permissions={["read_permissions"]}
-                          className="px-2.5 py-1 text-gray-700 font-semibold bg-white border border-gray-200   "
+                          className="px-2.5 py-1 h-[2.3rem] text-gray-700 font-semibold text-sm bg-white border border-gray-200   "
                         />
 
                         <ButtonComponent
@@ -256,7 +266,7 @@ export default function TableComponent({
                             setModalState("createRole");
                           }}
                           permissions={["update_roles:id"]}
-                          className="px-2.5 py-1 text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md   "
+                          className="px-2.5 py-1 h-[2.3rem] text-gray-700 font-semibold text-sm bg-[#A8353A] text-white border border-gray-200 rounded-md   "
                         />
 
                         <PermissionGuard

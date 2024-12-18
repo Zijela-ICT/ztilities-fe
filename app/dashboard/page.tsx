@@ -33,7 +33,7 @@ export default function Dashboard() {
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
 
-  console.log(userPermissions, "rrrrr");
+
   return (
     <DashboardLayout
       title="Dashboard"

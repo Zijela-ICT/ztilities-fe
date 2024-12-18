@@ -127,7 +127,7 @@ export default function CreateUser({
             />
           </div>
         </div>
-        {activeRowId ? (
+        {/* {activeRowId ? (
           <></>
         ) : (
           <div className="relative w-full mt-6">
@@ -139,7 +139,7 @@ export default function CreateUser({
               label="Password"
             />
           </div>
-        )}
+        )} */}
 
         <div className="relative w-full mt-6">
           <LabelInputComponent
