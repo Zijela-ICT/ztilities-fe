@@ -3,6 +3,7 @@ import {
   DropDownArrow,
   SearchIcon,
   TrashIcon,
+  TrashIconGray,
   TripleDotsIcon,
 } from "@/utils/svg";
 import { useRouter } from "next/navigation";
@@ -272,14 +273,20 @@ export default function TableComponent({
                         <PermissionGuard
                           requiredPermissions={["delete_roles:id"]}
                         >
-                          <div
-                            onClick={() => {
-                              toggleActions(row.id);
-                              setModalStateDelete("deleteRole");
-                            }}
-                          >
-                            <TrashIcon />
-                          </div>
+                          {row.users > 0 ? (
+                            <div>
+                              <TrashIconGray />
+                            </div>
+                          ) : (
+                            <div
+                              onClick={() => {
+                                toggleActions(row.id);
+                                setModalStateDelete("deleteRole");
+                              }}
+                            >
+                              <TrashIcon />
+                            </div>
+                          )}
                         </PermissionGuard>
                       </div>
                     </>

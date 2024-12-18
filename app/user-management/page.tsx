@@ -95,7 +95,12 @@ function UserManagement() {
 
   // Toggle actions
   const toggleActions = (rowId: string) => {
-    setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
+    if(selectedTab === "All Users"){
+      setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
+    }else {
+      setActiveRowId(rowId)
+    }
+
   };
 
   // Dynamic title and detail logic
