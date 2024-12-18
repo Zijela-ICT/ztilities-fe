@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from "react";
 import axiosInstance from "@/utils/api";
 import { SuccessModalCompoenent } from "@/components/modal-component";
 import { useDataPermission } from "@/context";
+import { toast } from "react-toastify";
 
 export default function ChangeMyPassword() {
   const { user, setUser } = useDataPermission();
@@ -13,6 +14,7 @@ export default function ChangeMyPassword() {
 
   const [hash, setHash] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [modalState, setModalState] = useState(false);
 
@@ -29,6 +31,13 @@ export default function ChangeMyPassword() {
     setPassword(value);
   };
 
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+  };
+
   const getMe = async () => {
     const response = await axiosInstance.get("/auth/me");
     setUser(response.data.data.user);
@@ -36,6 +45,10 @@ export default function ChangeMyPassword() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
     const response = await axiosInstance.patch("/users/reset-password/user", {
       token: hash,
       password: password,
@@ -63,9 +76,19 @@ export default function ChangeMyPassword() {
             toggleView={toggleView}
             onClick={() => setToggleView(!toggleView)}
           />
+          <InputComponent
+            type={!toggleView ? "password" : "text"}
+            value={confirmPassword}
+            onChange={handleConfirmPasswordChange}
+            placeholder="Confirm Password"
+            className=""
+            show
+            toggleView={toggleView}
+            onClick={() => setToggleView(!toggleView)}
+          />
           <ButtonComponent
             text={password === "" ? "Proceed" : "Change"}
-            disabled={password === ""}
+            disabled={password === "" || confirmPassword === ""}
             className="mt-12 text-white"
           />
         </form>
