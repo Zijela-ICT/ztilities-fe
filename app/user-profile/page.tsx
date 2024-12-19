@@ -108,6 +108,7 @@ export default function UserProfile() {
     }));
   };
 
+  const avatar = "/assets/avatar.png";
   return (
     <DashboardLayout title="Profile" detail="Manage your account details here">
       <SuccessModalCompoenent
@@ -122,7 +123,7 @@ export default function UserProfile() {
           <div className="relative">
             <div className="w-44 h-44 bg-red-500 rounded-full flex items-center justify-center mb-4 overflow-hidden">
               <Image
-                src={user?.avatar}
+                src={user?.avatar || avatar}
                 alt="User Avatar"
                 className="w-full h-full object-cover"
                 width={40}
@@ -135,7 +136,7 @@ export default function UserProfile() {
 
               <input
                 type="file"
-                className="absolute inset-0 opacity-0 cursor-pointer" // Makes input invisible but keeps it clickable
+                className="absolute inset-0 opacity-0 cursor-pointer"
                 accept="image/*"
                 onChange={handleFileChange}
               />
@@ -225,7 +226,7 @@ export default function UserProfile() {
                       handleToggle(setting.key as keyof typeof settings)
                     }
                   />
-                  <div className="w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-9 h-5 bg-gray-900 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
                 </label>
               </div>
             ))}
