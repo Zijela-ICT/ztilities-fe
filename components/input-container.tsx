@@ -8,10 +8,12 @@ interface InputProps {
   onClick?: any;
   show?: boolean;
   toggleView?: boolean;
+  name?: string;
 }
 
 export default function InputComponent({
   onChange,
+  name,
   value,
   className = "mt-4",
   type = "text",
@@ -25,10 +27,11 @@ export default function InputComponent({
       <div className="relative mb-2">
         <input
           type={type}
+          name={name}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`${className} w-full h-14 px-4 pr-10 border border-none rounded-lg bg-gray-100 font-bold text-base text-gray-400 text-sm placeholder-gray-400  focus:outline-none`}
+          className={`${className} w-full h-14 px-4 pr-10 border rounded-lg bg-gray-100 font-bold text-base text-gray-400 text-sm placeholder-gray-400  focus:outline-none`}
         />
 
         {show && (

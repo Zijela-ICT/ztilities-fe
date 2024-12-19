@@ -15,6 +15,7 @@ interface User {
 
 interface AuthUser {
   id: number;
+  avatar : any;
   username: string;
   firstName: string | null;
   lastName: string | null;

@@ -137,13 +137,17 @@ export default function TableComponent({
                   (column) =>
                     column !== "id" &&
                     column !== "createdAt" &&
-                    column !== "updatedAt"
-                ) // Exclude the 'id' column
+                    column !== "updatedAt" &&
+                    column !== "avatar"
+                ) // Exclude the specified columns
                 .map((column) => (
                   <th key={column} className="py-3 px-4">
-                    {column.charAt(0).toUpperCase() + column.slice(1)}
+                    {column === "isDeactivated"
+                      ? "Status"
+                      : column.charAt(0).toUpperCase() + column.slice(1)}
                   </th>
                 ))}
+
               <th className="py-3 px-4">Actions</th>
             </tr>
           </thead>
@@ -155,7 +159,8 @@ export default function TableComponent({
                     (column) =>
                       column !== "id" &&
                       column !== "createdAt" &&
-                      column !== "updatedAt"
+                      column !== "updatedAt" &&
+                      column !== "avatar"
                   )
                   .map((column) => (
                     <td key={column} className="py-3 px-4">
@@ -165,16 +170,16 @@ export default function TableComponent({
                       ) : row[column]?.name ? (
                         // Handle single object case
                         row[column].name
-                      ) : column === "status" ? (
+                      ) : column === "isDeactivated" ? (
                         // Handle status column
                         <span
                           className={`px-2.5 py-1 ${
-                            row[column] === "Approved"
+                            row[column] === false
                               ? "text-[#036B26] bg-[#E7F6EC]"
                               : "text-[#B76E00] bg-[#FFAB0014]"
                           } rounded-full `}
                         >
-                          {row[column]}
+                          {row[column] === true ? "Inactive" : "Active"}
                         </span>
                       ) : (
                         // Default case for other columns
@@ -225,13 +230,15 @@ export default function TableComponent({
                                 />
                               </li>
                               <li>
-                                <DropdownButtonComponent
-                                  text="Delete User"
-                                  onClick={() =>
-                                    setModalStateDelete("deleteUser")
-                                  }
-                                  permissions={["delete_users:id"]}
-                                />
+                                {row.isDeactivated === false && (
+                                  <DropdownButtonComponent
+                                    text="De-acivate User"
+                                    onClick={() =>
+                                      setModalStateDelete("deleteUser")
+                                    }
+                                    permissions={["delete_users:id"]}
+                                  />
+                                )}
                               </li>
                             </ul>
                           </div>

@@ -32,7 +32,7 @@ import withPermissions from "@/components/auth/permission-protected-routes";
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully deleted this user",
+      detail: "You have successfully de-activated this user",
       status: true,
     });
   };
@@ -81,7 +81,7 @@ import withPermissions from "@/components/auth/permission-protected-routes";
       return "Reset Password";
     }
     if (centralStateDelete === "deleteUser") {
-      return "Delete User";
+      return "De-activate User";
     }
     return "Zijela";
   };
@@ -100,7 +100,7 @@ import withPermissions from "@/components/auth/permission-protected-routes";
       return "Change the password for this user";
     }
     if (centralStateDelete === "deleteUser") {
-      return "Are you sure you want to delete this user";
+      return "Are you sure you want to de-activate this user";
     }
     return "Zijela";
   };

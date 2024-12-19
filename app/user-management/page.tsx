@@ -61,7 +61,7 @@ function UserManagement() {
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully deleted this user",
+      detail: "You have successfully de-activated this user",
       status: true,
     });
   };
@@ -95,12 +95,11 @@ function UserManagement() {
 
   // Toggle actions
   const toggleActions = (rowId: string) => {
-    if(selectedTab === "All Users"){
+    if (selectedTab === "All Users") {
       setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
-    }else {
-      setActiveRowId(rowId)
+    } else {
+      setActiveRowId(rowId);
     }
-
   };
 
   // Dynamic title and detail logic
@@ -118,7 +117,7 @@ function UserManagement() {
       return "Reset Password";
     }
     if (centralStateDelete === "deleteUser") {
-      return "Delete User";
+      return "De-activate User";
     }
     if (centralStateDelete === "deleteRole") {
       return "Delete Role";
@@ -147,7 +146,7 @@ function UserManagement() {
       return "Change the password for this user";
     }
     if (centralStateDelete === "deleteUser") {
-      return "Are you sure you want to delete this user";
+      return "Are you sure you want to de-activate this user";
     }
     if (centralStateDelete === "deleteRole") {
       return "Are you sure you want to delete this role";

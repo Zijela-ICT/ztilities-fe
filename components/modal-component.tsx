@@ -44,7 +44,7 @@ export default function ModalCompoenent({
               <button
                 onClick={setModalState}
                 type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
                 data-modal-toggle="crud-modal"
               >
                 <div className="w-3 h-3">
@@ -131,7 +131,7 @@ export function ActionModalCompoenent({
             <button
               onClick={() => setModalState("")}
               type="button"
-              className="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+              className="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center "
               data-modal-toggle="crud-modal"
             >
               <div className="w-3 h-3">
@@ -198,7 +198,7 @@ export function SuccessModalCompoenent({
             <button
               onClick={() => setModalState(false)}
               type="button"
-              className="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+              className="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center "
               data-modal-toggle="crud-modal"
             >
               <div className="w-3 h-3">

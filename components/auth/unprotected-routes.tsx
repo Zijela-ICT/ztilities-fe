@@ -10,7 +10,7 @@ export default function UnprotectedRoute({ children }) {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (token) {
-      router.back(); // Redirect the user to the previous page they were on
+      router.push('/dashboard'); // Redirect the user to the previous page they were on
     } else {
       setIsAuthenticated(true); // Show the unprotected content if not authenticated
     }
