@@ -38,7 +38,7 @@ export default function CreateUser({
         ...formData,
         roles: formData.roles,
       });
-      console.log(formData.roles);
+
     } else {
       // If no user, perform a POST request
       const response = await axiosInstance.post("/users/pre-register", {

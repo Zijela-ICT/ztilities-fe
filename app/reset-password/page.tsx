@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import axiosInstance from "@/utils/api";
 import UnprotectedRoute from "@/components/auth/unprotected-routes";
 import { SuccessModalCompoenent } from "@/components/modal-component";
+import { toast } from "react-toastify";
 
 const Logo = "/assets/logo.png";
 const images = [
@@ -25,6 +26,7 @@ export default function ResetPassword() {
 
   const [hash, setHash] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [modalState, setModalState] = useState(false);
 
@@ -37,16 +39,27 @@ export default function ResetPassword() {
   }, []);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setPassword(value);
+    setPassword(e.target.value);
+  };
+
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setConfirmPassword(e.target.value);
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
     const response = await axiosInstance.post("/auth/reset-password", {
       token: hash,
       newPassword: password,
     });
+    setModalState(true)
+    // router.push("/");
   };
 
   useEffect(() => {
@@ -87,9 +100,19 @@ export default function ResetPassword() {
                   toggleView={toggleView}
                   onClick={() => setToggleView(!toggleView)}
                 />
+                <InputComponent
+                  type={!toggleView ? "password" : "text"}
+                  value={confirmPassword}
+                  onChange={handleConfirmPasswordChange}
+                  placeholder="Confirm Password"
+                  className="mt-6"
+                  show
+                  toggleView={toggleView}
+                  onClick={() => setToggleView(!toggleView)}
+                />
                 <ButtonComponent
                   text={password === "" ? "Proceed" : "Reset"}
-                  disabled={password === ""}
+                  disabled={password === "" || confirmPassword === ""}
                   className="mt-12 text-white"
                 />
               </form>

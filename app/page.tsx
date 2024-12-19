@@ -49,7 +49,7 @@ export default function LogIn() {
       email,
       password,
     });
-    console.log(response.data);
+
     localStorage.setItem("authToken", response.data.data.access_token);
     router.push("/dashboard");
   };

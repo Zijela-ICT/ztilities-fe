@@ -19,7 +19,7 @@ export default function ResetPassword({ roles, setModalState, activeRowId,setSuc
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+
     const response = await axiosInstance.patch("/users/reset-password/admin", {
       userId: user.id,
       password: formData.password,
