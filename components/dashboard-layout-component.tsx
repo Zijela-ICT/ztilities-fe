@@ -57,7 +57,7 @@ export default function DashboardLayout({
                       <ArrowLeft />
                     </div>
                   )}
-                  <h1 className="text-lg text-gray-500 font-light">{detail}</h1>
+                  <h1 className="text-base text-gray-500 font-light">{detail}</h1>
                 </div>
               </div>
               <div className="flex space-x-6 mr-14">
@@ -74,7 +74,7 @@ export default function DashboardLayout({
             </div>
 
             {/* Children content */}
-            <div className="bg-gray-100 h-full p-6">{children}</div>
+            <div className="bg-gray-100 h-full text-sm p-6">{children}</div>
           </div>
         </div>
       </ProtectedRoute>

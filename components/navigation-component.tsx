@@ -109,7 +109,7 @@ export default function Navigation() {
               <li key={href} className="w-full px-4">
                 <Link
                   href={href}
-                  className={`inline-flex items-center w-full px-4 py-2 rounded-md font-bold text-base ${
+                  className={`inline-flex items-center w-full px-4 py-2 rounded-md font-thin text-md ${
                     isActive(href) ? "bg-[#FBC2B61A] text-[#A8353A] " : ""
                   }`}
                   aria-current={isActive(href) ? "page" : undefined}
@@ -131,7 +131,7 @@ export default function Navigation() {
             )
         )}
 
-        <div className="flex items-center px-4 pt-24 ">
+        <div className="flex items-center px-4 pt-32 ">
           <div>
             <Image src={ZijelaLogo} alt="logo" width={25} height={25} />{" "}
           </div>
@@ -141,7 +141,7 @@ export default function Navigation() {
         <li className="w-full px-4 pt-4">
           <button
             onClick={logout}
-            className="inline-flex items-center justify-between w-full pl-4 py-4 pr-20 text-base rounded-lg text-white bg-[#A8353A] "
+            className="inline-flex items-center justify-between w-full pl-4 py-3 pr-20 text-sm rounded-lg text-white bg-[#A8353A] "
           >
             <LogoutIcon />
             Logout

@@ -36,7 +36,7 @@ export default function TableComponent({
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 7;
 
   const handleSearch = (event: any) => {
     setSearchQuery(event.target.value);
@@ -76,7 +76,7 @@ export default function TableComponent({
 
   return (
     <div className="p-4">
-      <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0  font-semibold text-base mb-4">
+      <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0  font-semibold text-md mb-4">
         <div
           className={`flex items-center border rounded-md focus-within:ring-2 focus-within:ring-blue-500 w-full ${
             type === "users" ? "sm:w-[65%]" : "sm:w-[75%]"
@@ -129,7 +129,7 @@ export default function TableComponent({
 
       {/* Table */}
       <div className="overflow-x-auto bg-white rounded-lg border border-gray-100 min-h-[60vh]">
-        <table className="min-w-full table-auto">
+        <table className="min-w-full table-auto text-sm">
           <thead className="bg-gray-100 text-left">
             <tr>
               {columns
@@ -153,7 +153,7 @@ export default function TableComponent({
           </thead>
           <tbody>
             {currentItems?.map((row: any, index) => (
-              <tr key={index} className="border-b border-gray-100 h-24">
+              <tr key={index} className="border-b border-gray-100 h-20">
                 {columns
                   .filter(
                     (column) =>
@@ -254,7 +254,7 @@ export default function TableComponent({
                             router.push(`/user-management/${row?.id}`)
                           }
                           permissions={["read_roles:id"]}
-                          className="px-2.5 py-1 h-[2.3rem] text-gray-700 font-semibold text-sm bg-white border border-gray-200   "
+                          className="px-2.5 py-1 h-[2.1rem] w-[10rem] text-sm text-gray-700 font-semibold  bg-white border border-gray-200   "
                         />
 
                         <ButtonComponent
@@ -264,7 +264,7 @@ export default function TableComponent({
                             setModalState("viewPermissions");
                           }}
                           permissions={["read_permissions"]}
-                          className="px-2.5 py-1 h-[2.3rem] text-gray-700 font-semibold text-sm bg-white border border-gray-200   "
+                          className="px-2.5 py-1 h-[2.1rem] w-[10rem] text-sm text-gray-700 font-semibold  bg-white border border-gray-200   "
                         />
 
                         <ButtonComponent
@@ -274,7 +274,7 @@ export default function TableComponent({
                             setModalState("createRole");
                           }}
                           permissions={["update_roles:id"]}
-                          className="px-2.5 py-1 h-[2.3rem] text-gray-700 font-semibold text-sm bg-[#A8353A] text-white border border-gray-200 rounded-md   "
+                          className="px-2.5 py-1 h-[2.1rem] w-[10rem] text-sm  text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md   "
                         />
 
                         <PermissionGuard
@@ -306,7 +306,7 @@ export default function TableComponent({
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex justify-center space-x-4 mt-4">
+      <div className="flex justify-center text-sm space-x-4 mt-4">
         <button
           onClick={handlePrevious}
           disabled={currentPage === 1}

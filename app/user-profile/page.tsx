@@ -118,10 +118,12 @@ export default function UserProfile() {
         setModalState={setModalState}
       ></SuccessModalCompoenent>
 
-      <div className="flex flex-col md:flex-row bg-gray-100 p-6">
-        <div className="md:w-[35%] bg-white shadow-sm rounded-xl rounded-lg p-6 flex flex-col items-center relative">
+      <h1 className="text-xl font-bold text-black ml-2 mt-4" >My Account</h1>
+
+      <div className="flex flex-col md:flex-row bg-gray-100 py-6 px-2">
+        <div className="md:w-[38%] bg-white shadow-sm rounded-xl rounded-lg p-6 pt-16 flex flex-col items-center relative">
           <div className="relative">
-            <div className="w-44 h-44 bg-red-500 rounded-full flex items-center justify-center mb-4 overflow-hidden">
+            <div className="w-44 h-44 bg-gray-500 rounded-full flex items-center justify-center mb-4 overflow-hidden">
               <Image
                 src={user?.avatar || avatar}
                 alt="User Avatar"
@@ -143,14 +145,14 @@ export default function UserProfile() {
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-xl font-bold text-gray-800">
             {user?.firstName} {"   "} {user?.lastName}{" "}
           </h2>
-          <p className="text-gray-600 text-lg">{user?.email}</p>
+          <p className="text-gray-600 text-base">{user?.email}</p>
         </div>
 
-        <div className="md:w-[65%] mt-6 md:mt-0 md:ml-6 bg-white shadow-sm rounded-xl rounded-lg p-6 h-auto">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className="md:w-[62%] mt-6 md:mt-0 md:ml-6 bg-white shadow-sm rounded-xl rounded-lg p-6 h-auto">
+          <h3 className="text-base font-semibold text-gray-800 mb-4">
             Change Password
           </h3>
           <form onSubmit={handleSubmit}>
@@ -193,7 +195,9 @@ export default function UserProfile() {
             />
           </form>
 
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Settings</h3>
+          <h3 className="text-base font-semibold text-gray-800 mb-4">
+            Settings
+          </h3>
 
           {/* Settings Toggles */}
           <div className="w-full p-4 border border-gray-200 rounded-xl mb-4">
@@ -214,7 +218,7 @@ export default function UserProfile() {
                     : ""
                 }`}
               >
-                <span className="text-gray-500 font-medium">
+                <span className="text-gray-500 font-light text-sm">
                   {setting.label}
                 </span>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -226,7 +230,7 @@ export default function UserProfile() {
                       handleToggle(setting.key as keyof typeof settings)
                     }
                   />
-                  <div className="w-9 h-5 bg-gray-900 rounded-full peer peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
+                  <div className="w-8 h-4 bg-gray-900 rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-green-600"></div>
                 </label>
               </div>
             ))}
