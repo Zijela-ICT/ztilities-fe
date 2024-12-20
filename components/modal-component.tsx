@@ -11,6 +11,7 @@ interface ModalProps {
   children?: any;
   bulk?: any;
   activeRowId?: number;
+  width?: string
 }
 
 export default function ModalCompoenent({
@@ -20,6 +21,7 @@ export default function ModalCompoenent({
   modalState,
   setModalState,
   bulk,
+  width
 }: ModalProps) {
   return (
     <>
@@ -31,7 +33,7 @@ export default function ModalCompoenent({
           modalState ? "block" : "hidden"
         } fixed inset-0 z-50 flex justify-center items-center overflow-y-auto `}
       >
-        <div className="relative p-4 w-full max-w-2xl max-h-full mx-auto">
+        <div className={`relative p-4 w-full ${width ? width :"max-w-2xl" } max-h-full mx-auto`}>
           {/* Modal content */}
           <div
             className={`relative ${
