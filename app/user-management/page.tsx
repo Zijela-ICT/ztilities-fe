@@ -119,6 +119,9 @@ function UserManagement() {
     if (centralStateDelete === "deleteUser") {
       return "De-activate User";
     }
+    if (centralStateDelete === "activateUser") {
+      return "Re-activate User";
+    }
     if (centralStateDelete === "deleteRole") {
       return "Delete Role";
     }
@@ -144,6 +147,9 @@ function UserManagement() {
     }
     if (centralState === "resetPassword") {
       return "Change the password for this user";
+    }
+    if (centralStateDelete === "activateUser") {
+      return "Are you sure you want to Re-activate this user";
     }
     if (centralStateDelete === "deleteUser") {
       return "Are you sure you want to de-activate this user";

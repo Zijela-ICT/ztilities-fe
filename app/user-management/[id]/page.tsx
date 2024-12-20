@@ -83,6 +83,9 @@ import withPermissions from "@/components/auth/permission-protected-routes";
     if (centralStateDelete === "deleteUser") {
       return "De-activate User";
     }
+    if (centralStateDelete === "activateUser") {
+      return "Re-activate User";
+    }
     return "Zijela";
   };
   
@@ -101,6 +104,9 @@ import withPermissions from "@/components/auth/permission-protected-routes";
     }
     if (centralStateDelete === "deleteUser") {
       return "Are you sure you want to de-activate this user";
+    }
+    if (centralStateDelete === "activateUser") {
+      return "Are you sure you want to Re-activate this user";
     }
     return "Zijela";
   };

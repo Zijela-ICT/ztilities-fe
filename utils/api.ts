@@ -46,10 +46,10 @@ axiosInstance.interceptors.response.use(
     if (error.response) {
       const { status, data, config } = error.response;
 
-      // Skip error toasts for GET requests
-      if (config.method === "get") {
-        return Promise.reject(error);
-      }
+      // // Skip error toasts for GET requests
+      // if (config.method === "get") {
+      //   return Promise.reject(error);
+      // }
 
       // Handle 401 errors
       if (status === 401) {

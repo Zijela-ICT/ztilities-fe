@@ -128,7 +128,7 @@ export default function TableComponent({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto bg-white rounded-lg border border-gray-100 min-h-[60vh]">
+      <div className="overflow-x-auto bg-white rounded-lg border border-gray-100 min-h-[80vh]">
         <table className="min-w-full table-auto text-sm">
           <thead className="bg-gray-100 text-left">
             <tr>
@@ -230,11 +230,19 @@ export default function TableComponent({
                                 />
                               </li>
                               <li>
-                                {row.isDeactivated === false && (
+                                {row.isDeactivated === false ? (
                                   <DropdownButtonComponent
                                     text="De-acivate User"
                                     onClick={() =>
                                       setModalStateDelete("deleteUser")
+                                    }
+                                    permissions={["delete_users:id"]}
+                                  />
+                                ) : (
+                                  <DropdownButtonComponent
+                                    text="Re-acivate User"
+                                    onClick={() =>
+                                      setModalStateDelete("activateUser")
                                     }
                                     permissions={["delete_users:id"]}
                                   />
@@ -247,24 +255,24 @@ export default function TableComponent({
                     </>
                   ) : (
                     <>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 w-full md:w-4/5 ">
                         <ButtonComponent
                           text="View Users"
                           onClick={() =>
                             router.push(`/user-management/${row?.id}`)
                           }
                           permissions={["read_roles:id"]}
-                          className="px-2.5 py-1 h-[2.1rem] w-[10rem] text-sm text-gray-700 font-semibold  bg-white border border-gray-200   "
+                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-white border border-gray-200"
                         />
 
                         <ButtonComponent
-                          text="View Persmissions"
+                          text="View Permissions"
                           onClick={() => {
                             toggleActions(row.id);
                             setModalState("viewPermissions");
                           }}
                           permissions={["read_permissions"]}
-                          className="px-2.5 py-1 h-[2.1rem] w-[10rem] text-sm text-gray-700 font-semibold  bg-white border border-gray-200   "
+                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-white border border-gray-200"
                         />
 
                         <ButtonComponent
@@ -274,14 +282,14 @@ export default function TableComponent({
                             setModalState("createRole");
                           }}
                           permissions={["update_roles:id"]}
-                          className="px-2.5 py-1 h-[2.1rem] w-[10rem] text-sm  text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md   "
+                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
                         />
 
                         <PermissionGuard
                           requiredPermissions={["delete_roles:id"]}
                         >
                           {row.users > 0 ? (
-                            <div>
+                            <div className="h-[2.5rem] md:h-[2rem]">
                               <TrashIconGray />
                             </div>
                           ) : (
