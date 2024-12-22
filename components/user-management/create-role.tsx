@@ -151,7 +151,7 @@
 "use client";
 
 import { FormEvent, useState, useEffect } from "react";
-import { LabelInputComponent } from "./input-container";
+import { LabelInputComponent } from "../input-container";
 import axiosInstance from "@/utils/api";
 import { DropDownArrow } from "@/utils/svg";
 

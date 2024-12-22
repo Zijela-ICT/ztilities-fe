@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
-import { LabelInputComponent } from "./input-container";
+import { LabelInputComponent } from "../input-container";
 import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 

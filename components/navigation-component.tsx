@@ -1,3 +1,4 @@
+import { useDataPermission } from "@/context";
 import { paths } from "@/utils/ojects";
 import { LogoutIcon } from "@/utils/svg";
 import Image from "next/image";
@@ -5,27 +6,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-const userPermissions = [
-  { id: 9, permissionString: "create_users:validate-2fa" },
-  { id: 10, permissionString: "create_wallets" },
-  { id: 11, permissionString: "read_wallets:walletId/balance" },
-  { id: 12, permissionString: "create_wallets:walletId/credit" },
-  { id: 13, permissionString: "create_wallets:walletId/debit" },
-  { id: 14, permissionString: "read_wallets:user/userId" },
-  { id: 15, permissionString: "update_wallets:walletId/toggle-status" },
-  { id: 16, permissionString: "read_app-settings" },
-  { id: 17, permissionString: "read_app-settings:key" },
-  { id: 18, permissionString: "create_app-settings:default-wallets" },
-  { id: 19, permissionString: "read_app-settings:default-wallets" },
-  { id: 20, permissionString: "create_app-settings:maximum-withdrawal-limit" },
-];
-
 const Logo = "/assets/logo.png";
 const ZijelaLogo = "/assets/zijela-logo.png";
 
 export default function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
+
+  const { userPermissions } = useDataPermission();
 
   const isActive = useCallback((path: string) => pathname === path, [pathname]);
 
@@ -148,8 +136,6 @@ export default function Navigation() {
           </button>
         </li>
       </div>
-
-
     </ul>
   );
 }

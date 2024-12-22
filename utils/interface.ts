@@ -8,14 +8,14 @@ interface User {
   id: number;
   firstName: string | null;
   lastName: string | null;
-  password:string| null;
+  password: string | null;
   email: string;
   roles: Role[];
 }
 
 interface AuthUser {
   id: number;
-  avatar : any;
+  avatar: any;
   username: string;
   firstName: string | null;
   lastName: string | null;
@@ -30,7 +30,6 @@ interface AuthUser {
   isDeactivated: boolean;
 }
 
-
 interface Permission {
   id: number;
   permissionString: string;
@@ -41,4 +40,28 @@ interface RoleData {
   name: string;
   permissions: Permission[];
   users: User[];
+}
+
+//Fcailities
+interface Facility {
+  id: number;
+  name: string | null;
+  type: string | null;
+  code: string | null;
+  address: string | null;
+  contactName: string | null;
+  email: string;
+  phone: string | null;
+}
+
+interface Block {
+  id: number;
+  blockNumber: string;
+  code: string;
+  officer: string;
+  phone: string;
+  email: string;
+  type: string;
+  address: string;
+  status: string;
 }

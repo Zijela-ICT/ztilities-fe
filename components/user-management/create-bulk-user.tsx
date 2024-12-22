@@ -3,7 +3,7 @@
 import { FormEvent, useState, useEffect } from "react";
 import axiosInstance from "@/utils/api";
 import { DownloadArrow, DownloadIcon } from "@/utils/svg";
-import ButtonComponent from "./button-component";
+import ButtonComponent from "../button-component";
 
 export default function CreateBulkUser() {
   const [formData, setFormData] = useState({

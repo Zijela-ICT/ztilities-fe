@@ -7,10 +7,10 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import CreateUser from "@/components/create-user";
-import CreateBulkUser from "@/components/create-bulk-user";
+import CreateUser from "@/components/user-management/create-user";
+import CreateBulkUser from "@/components/user-management/create-bulk-user";
 import axiosInstance from "@/utils/api";
-import ResetPassword from "@/components/reset-password";
+import ResetPassword from "@/components/user-management/reset-password";
 import { useParams, useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
 

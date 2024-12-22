@@ -7,12 +7,12 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import CreateUser from "@/components/create-user";
-import CreateRole from "@/components/create-role";
-import CreateBulkUser from "@/components/create-bulk-user";
+import CreateUser from "@/components/user-management/create-user";
+import CreateRole from "@/components/user-management/create-role";
+import CreateBulkUser from "@/components/user-management/create-bulk-user";
 import axiosInstance from "@/utils/api";
-import ResetPassword from "@/components/reset-password";
-import PermissionList from "@/components/view-permissions";
+import ResetPassword from "@/components/user-management/reset-password";
+import PermissionList from "@/components/user-management/view-permissions";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
