@@ -80,6 +80,12 @@ export default function Navigation() {
             iconPath: paths.path2,
           },
           {
+            href: "/vendor-management",
+            label: "Vendor & Tech Management",
+            permissions: ["vendors"],
+            iconPath: paths.path5,
+          },
+          {
             href: "/user-management",
             label: "User Management",
             permissions: ["roles", "users", "permissions", "auth"],

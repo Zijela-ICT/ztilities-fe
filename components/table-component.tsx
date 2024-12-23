@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ButtonComponent, { DropdownButtonComponent } from "./button-component";
 import PermissionGuard from "./auth/permission-protected-components";
+import { tableMainButtonConfigs } from "@/utils/tableConfig";
 
 interface TableProps {
   data: Record<string, any>[];
@@ -97,93 +98,21 @@ export default function TableComponent({
           />
         </div>
 
-        {/* Buttons based on types */}
-        {type === "users" && (
-          <>
-            <ButtonComponent
-              text="Create User"
-              onClick={() => {
-                setModalState("createUser");
-                setActiveRowId(null);
-              }}
-              className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
-              permissions={["create_users", "create_users:pre-register"]}
-            />
-            <ButtonComponent
-              text="Bulk User "
-              onClick={() => setModalState("createBulkUser")}
-              className="flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A] "
-              permissions={["create_users", "create_users:pre-register"]}
-            />
-          </>
-        )}
-        {type === "roles" && (
+        {/* button here based on types */}
+        {tableMainButtonConfigs[type]?.map((button, index) => (
           <ButtonComponent
-            text="Create Role"
-            onClick={() => setModalState("createRole")}
-            className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
-            permissions={["create_roles"]}
+            key={index}
+            text={button.text}
+            onClick={() => {
+              setModalState(button.action);
+              setActiveRowId(null);
+            }}
+            className={button.className}
+            permissions={button.permissions}
           />
-        )}
-        {type === "facilities" && (
-          <>
-            <ButtonComponent
-              text="Create Facility"
-              onClick={() => {
-                setModalState("createFacility");
-                setActiveRowId(null);
-              }}
-              className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
-              permissions={["create_facilities"]}
-            />
-            <ButtonComponent
-              text="Bulk Facility"
-              onClick={() => setModalState("createBulkFacility")}
-              className="flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A] "
-              permissions={["create_facilities"]}
-            />
-          </>
-        )}
-        {type === "blocks" && (
-          <>
-            <ButtonComponent
-              text="Create Block"
-              onClick={() => {
-                setModalState("createBlock");
-                setActiveRowId(null);
-              }}
-              className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
-              permissions={["create_blocks"]}
-            />
-          </>
-        )}
-        {type === "units" && (
-          <>
-            <ButtonComponent
-              text="Add New Units"
-              onClick={() => {
-                setModalState("createUnit");
-                setActiveRowId(null);
-              }}
-              className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
-              permissions={["create_units"]}
-            />
-          </>
-        )}
-        {type === "assets" && (
-          <>
-            <ButtonComponent
-              text="Add New assets"
-              onClick={() => {
-                setModalState("createAsset");
-                setActiveRowId(null);
-              }}
-              className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
-              permissions={["create_facilities"]}
-            />
-          </>
-        )}
+        ))}
       </div>
+      {/* button here based on types */}
 
       {/* Table */}
       <div className="overflow-x-auto bg-white rounded-lg border border-gray-100 min-h-auto">
@@ -563,6 +492,66 @@ export default function TableComponent({
                                       setModalStateDelete("deleteUnit")
                                     }
                                     permissions={["delete_units:id"]}
+                                  />
+                                )}
+                              </li>
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : type === "vendors" ? (
+                    <>
+                      <div className="relative">
+                        {/* Button */}
+                        <PermissionGuard
+                          requiredPermissions={[
+                            "delete_vendors:id",
+                            "update_vendors:id",
+                          ]}
+                        >
+                          <button
+                            onClick={() => toggleActions(row.id)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <TripleDotsIcon />
+                          </button>
+                        </PermissionGuard>
+
+                        {/* Dropdown Menu */}
+                        {activeRowId === row.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                            <ul className="py-2">
+                              {/* <li>
+                                <DropdownButtonComponent
+                                  text="View"
+                                  onClick={() => setModalState("viewBlock")}
+                                  permissions={["update_users:id"]}
+                                />
+                              </li> */}
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Edit"
+                                  onClick={() => setModalState("createVendor")}
+                                  permissions={["update_vendors:id"]}
+                                />
+                              </li>
+                              <li>
+                                {row.isDeactivated === false ? (
+                                  <DropdownButtonComponent
+                                    text="De-activate"
+                                    onClick={() =>
+                                      setModalStateDelete("deactivateVendor")
+                                    }
+                                    permissions={["delete_vendors:id"]}
+                                  />
+                                ) : (
+                                  <DropdownButtonComponent
+                                    text="Re-activate"
+                                    onClick={() =>
+                                      setModalStateDelete("activateVendors")
+                                    }
+                                    permissions={["delete_vendors:id"]}
                                   />
                                 )}
                               </li>

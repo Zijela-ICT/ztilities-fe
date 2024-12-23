@@ -84,3 +84,15 @@ interface Unit {
 interface Asset {
   id: number;
 }
+
+//Vendor
+interface Vendor {
+  id: number;
+  vendorCode: string;
+  vendorName: string;
+  vendorType: string;
+  category: string;
+  phoneNumber: string;
+  email: string;
+  address: string;
+}
