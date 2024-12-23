@@ -134,13 +134,13 @@ export default function TableComponent({
                 setActiveRowId(null);
               }}
               className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
-              permissions={["create_users", "create_users:pre-register"]}
+              permissions={["create_facilities"]}
             />
             <ButtonComponent
               text="Bulk Facility"
               onClick={() => setModalState("createBulkFacility")}
               className="flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A] "
-              permissions={["create_users", "create_users:pre-register"]}
+              permissions={["create_facilities"]}
             />
           </>
         )}
@@ -153,7 +153,7 @@ export default function TableComponent({
                 setActiveRowId(null);
               }}
               className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
-              permissions={["create_users", "create_users:pre-register"]}
+              permissions={["create_blocks"]}
             />
           </>
         )}
@@ -162,11 +162,11 @@ export default function TableComponent({
             <ButtonComponent
               text="Add New Units"
               onClick={() => {
-                setModalState("createUnits");
+                setModalState("createUnit");
                 setActiveRowId(null);
               }}
               className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
-              permissions={["create_users", "create_users:pre-register"]}
+              permissions={["create_units"]}
             />
           </>
         )}
@@ -175,21 +175,21 @@ export default function TableComponent({
             <ButtonComponent
               text="Add New assets"
               onClick={() => {
-                setModalState("createAssets");
+                setModalState("createAsset");
                 setActiveRowId(null);
               }}
               className="flex-1 px-4 py-3 text-white bg-[#A8353A]  "
-              permissions={["create_users", "create_users:pre-register"]}
+              permissions={["create_facilities"]}
             />
           </>
         )}
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto bg-white rounded-lg border border-gray-100 min-h-[80vh]">
+      <div className="overflow-x-auto bg-white rounded-lg border border-gray-100 min-h-auto">
         <table className="min-w-full table-auto text-sm">
           <thead className="bg-gray-100 text-left">
-            <tr>
+            <tr className="relative">
               {columns
                 .filter(
                   (column) =>
@@ -206,7 +206,7 @@ export default function TableComponent({
                   </th>
                 ))}
 
-              <th className="py-3 px-4">Actions</th>
+              <th className="py-3 px-4 ">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -223,13 +223,24 @@ export default function TableComponent({
                   .map((column) => (
                     <td key={column} className="py-3 px-4">
                       {Array.isArray(row[column]) ? (
-                        // Handle array case, join all names if array exists
-                        row[column].map((item: any) => item.name).join(", ")
-                      ) : row[column]?.name ? (
-                        // Handle single object case
-                        row[column].name
+                        // Handle array case, extract specific properties
+                        row[column]
+                          .map((item: any) =>
+                            ["name", "blockNumber", "unitNumber, assetNumber"]
+                              .map((prop) => item[prop])
+                              .filter(Boolean)
+                              .join(", ")
+                          )
+                          .join(", ")
+                      ) : typeof row[column] === "object" &&
+                        row[column] !== null ? (
+                        // Handle single object case, extract specific properties
+                        ["name", "blockNumber", "unitNumber, assetNumber"]
+                          .map((prop) => row[column][prop])
+                          .filter(Boolean)
+                          .join(", ")
                       ) : column === "isDeactivated" ? (
-                        // Handle status column
+                        // Handle isDeactivated column
                         <span
                           className={`px-2.5 py-1 ${
                             row[column] === false
@@ -380,9 +391,10 @@ export default function TableComponent({
                         {/* Button */}
                         <PermissionGuard
                           requiredPermissions={[
-                            "delete_users:id",
-                            "update_users:id",
-                            "update_users:reset-password/admin",
+                            "delete_facilities:id",
+                            "update_facilities:id",
+                            "update_facilities:id/assign",
+                            "read_facilities:id",
                           ]}
                         >
                           <button
@@ -401,7 +413,7 @@ export default function TableComponent({
                                 <DropdownButtonComponent
                                   text="View"
                                   onClick={() => setModalState("viewFacility")}
-                                  permissions={["update_users:id"]}
+                                  permissions={["read_facilities"]}
                                 />
                               </li>
                               <li>
@@ -410,9 +422,7 @@ export default function TableComponent({
                                   onClick={() =>
                                     setModalState("createFacility")
                                   }
-                                  permissions={[
-                                    "update_users:reset-password/admin",
-                                  ]}
+                                  permissions={["update_facilities:id"]}
                                 />
                               </li>
                               <li>
@@ -422,7 +432,7 @@ export default function TableComponent({
                                     onClick={() =>
                                       setModalStateDelete("deleteFacility")
                                     }
-                                    permissions={["delete_users:id"]}
+                                    permissions={["delete_facilities:id"]}
                                   />
                                 ) : (
                                   <DropdownButtonComponent
@@ -430,7 +440,7 @@ export default function TableComponent({
                                     onClick={() =>
                                       setModalStateDelete("deleteFacility")
                                     }
-                                    permissions={["delete_users:id"]}
+                                    permissions={["delete_facilities:id"]}
                                   />
                                 )}
                               </li>
@@ -445,9 +455,9 @@ export default function TableComponent({
                         {/* Button */}
                         <PermissionGuard
                           requiredPermissions={[
-                            "delete_users:id",
-                            "update_users:id",
-                            "update_users:reset-password/admin",
+                            "delete_blocks:id",
+                            "update_blocks:id",
+                            "read_blocks:id",
                           ]}
                         >
                           <button
@@ -473,9 +483,7 @@ export default function TableComponent({
                                 <DropdownButtonComponent
                                   text="Edit"
                                   onClick={() => setModalState("createBlock")}
-                                  permissions={[
-                                    "update_users:reset-password/admin",
-                                  ]}
+                                  permissions={["update_blocks:id"]}
                                 />
                               </li>
                               <li>
@@ -485,7 +493,7 @@ export default function TableComponent({
                                     onClick={() =>
                                       setModalStateDelete("deleteBlock")
                                     }
-                                    permissions={["delete_users:id"]}
+                                    permissions={["delete_blocks:id"]}
                                   />
                                 ) : (
                                   <DropdownButtonComponent
@@ -493,7 +501,68 @@ export default function TableComponent({
                                     onClick={() =>
                                       setModalStateDelete("deleteBlock")
                                     }
-                                    permissions={["delete_users:id"]}
+                                    permissions={["delete_blocks:id"]}
+                                  />
+                                )}
+                              </li>
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : type === "units" ? (
+                    <>
+                      <div className="relative">
+                        {/* Button */}
+                        <PermissionGuard
+                          requiredPermissions={[
+                            "delete_units:id",
+                            "update_units:id",
+                            "read_units:id",
+                          ]}
+                        >
+                          <button
+                            onClick={() => toggleActions(row.id)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <TripleDotsIcon />
+                          </button>
+                        </PermissionGuard>
+
+                        {/* Dropdown Menu */}
+                        {activeRowId === row.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                            <ul className="py-2">
+                              {/* <li>
+                                <DropdownButtonComponent
+                                  text="View"
+                                  onClick={() => setModalState("viewBlock")}
+                                  permissions={["update_users:id"]}
+                                />
+                              </li> */}
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Edit"
+                                  onClick={() => setModalState("createUnit")}
+                                  permissions={["update_units:id"]}
+                                />
+                              </li>
+                              <li>
+                                {row.isDeactivated === false ? (
+                                  <DropdownButtonComponent
+                                    text="Delete"
+                                    onClick={() =>
+                                      setModalStateDelete("deleteUnit")
+                                    }
+                                    permissions={["delete_units:id"]}
+                                  />
+                                ) : (
+                                  <DropdownButtonComponent
+                                    text="Delete"
+                                    onClick={() =>
+                                      setModalStateDelete("deleteUnit")
+                                    }
+                                    permissions={["delete_units:id"]}
                                   />
                                 )}
                               </li>

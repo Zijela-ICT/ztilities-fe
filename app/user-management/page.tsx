@@ -25,7 +25,7 @@ function UserManagement() {
     detail: "",
     status: false,
   });
-
+  
   const [users, setUsers] = useState<User[]>();
   const [roles, setRoles] = useState<Role[]>();
   const [role, setRole] = useState<RoleData>();
@@ -33,28 +33,28 @@ function UserManagement() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
-
+  
   // Fetch data functions
   const getUsers = async () => {
     const response = await axiosInstance.get("/users");
     setUsers(response.data.data);
   };
-
+  
   const getRoles = async () => {
     const response = await axiosInstance.get("/roles");
     setRoles(response.data.data);
   };
-
+  
   const getARole = async () => {
     const response = await axiosInstance.get(`/roles/${activeRowId}`);
     setRole(response.data.data);
   };
-
+  
   const getPermissions = async () => {
     const response = await axiosInstance.get("/permissions");
     setPermissions(response.data.data);
   };
-
+  
   // Delete functions
   const deleteUser = async () => {
     await axiosInstance.delete(`/users/${activeRowId}`);
@@ -65,7 +65,7 @@ function UserManagement() {
       status: true,
     });
   };
-
+  
   const deleteRole = async (id: number) => {
     await axiosInstance.delete(`/roles/${activeRowId}`);
     setCentralStateDelete("");
@@ -75,13 +75,11 @@ function UserManagement() {
       status: true,
     });
   };
-
+  
   // Group permissions by category
   const groupPermissions = (permissions: Permission[]) => {
     return permissions?.reduce((groups, permission) => {
-      const category = permission?.permissionString
-        ?.split(":")[0]
-        .split("_")[1];
+      const category = permission?.permissionString?.split(":")[0]?.split("_")[1];
       if (!groups[category]) {
         groups[category] = [];
       }
@@ -89,10 +87,10 @@ function UserManagement() {
       return groups;
     }, {} as Record<string, Permission[]>);
   };
-
+  
   const groupedPermissions = groupPermissions(permissions);
   const groupedPermissionsByUser = groupPermissions(role?.permissions);
-
+  
   // Toggle actions
   const toggleActions = (rowId: string) => {
     if (selectedTab === "All Users") {
@@ -101,68 +99,60 @@ function UserManagement() {
       setActiveRowId(rowId);
     }
   };
-
+  
   // Dynamic title and detail logic
   const getTitle = () => {
-    if (centralState === "createUser") {
-      return activeRowId ? "Edit User" : "Create User";
+    switch (centralState) {
+      case "createUser":
+        return activeRowId ? "Edit User" : "Create User";
+      case "createRole":
+        return activeRowId ? "Edit Role" : "Create Role";
+      case "createBulkUser":
+        return "Upload Bulk User";
+      case "resetPassword":
+        return "Reset Password";
+      case "viewPermissions":
+        return "Role permissions";
     }
-    if (centralState === "createRole") {
-      return activeRowId ? "Edit Role" : "Create Role";
-    }
-    if (centralState === "createBulkUser") {
-      return "Upload Bulk User";
-    }
-    if (centralState === "resetPassword") {
-      return "Reset Password";
-    }
-    if (centralStateDelete === "deleteUser") {
-      return "De-activate User";
-    }
-    if (centralStateDelete === "activateUser") {
-      return "Re-activate User";
-    }
-    if (centralStateDelete === "deleteRole") {
-      return "Delete Role";
-    }
-    if (centralState === "viewPermissions") {
-      return `Role permissions`;
+    switch (centralStateDelete) {
+      case "deleteUser":
+        return "De-activate User";
+      case "activateUser":
+        return "Re-activate User";
+      case "deleteRole":
+        return "Delete Role";
     }
     return "Zijela";
   };
-
+  
   const getDetail = () => {
-    if (centralState === "createUser") {
-      return activeRowId
-        ? "You can edit user details here."
-        : "You can create and manage users' access here.";
+    switch (centralState) {
+      case "createUser":
+        return activeRowId
+          ? "You can edit user details here."
+          : "You can create and manage users' access here.";
+      case "createRole":
+        return activeRowId
+          ? "You can edit role details here."
+          : "You can manage users' access here.";
+      case "createBulkUser":
+        return "Import CSV/Excel file";
+      case "resetPassword":
+        return "Change the password for this user";
+      case "viewPermissions":
+        return "All permissions available for this role";
     }
-    if (centralState === "createRole") {
-      return activeRowId
-        ? "You can edit role details here."
-        : "You can manage users' access here.";
-    }
-    if (centralState === "createBulkUser") {
-      return "Import CSV/Excel file";
-    }
-    if (centralState === "resetPassword") {
-      return "Change the password for this user";
-    }
-    if (centralStateDelete === "activateUser") {
-      return "Are you sure you want to Re-activate this user";
-    }
-    if (centralStateDelete === "deleteUser") {
-      return "Are you sure you want to de-activate this user";
-    }
-    if (centralStateDelete === "deleteRole") {
-      return "Are you sure you want to delete this role";
-    }
-    if (centralState === "viewPermissions") {
-      return "All perissions available for this role";
+    switch (centralStateDelete) {
+      case "activateUser":
+        return "Are you sure you want to Re-activate this user";
+      case "deleteUser":
+        return "Are you sure you want to de-activate this user";
+      case "deleteRole":
+        return "Are you sure you want to delete this role";
     }
     return "Zijela";
   };
-
+  
   // Mapping centralState values to components
   const componentMap: Record<string, JSX.Element> = {
     createUser: (
@@ -195,35 +185,35 @@ function UserManagement() {
       </div>
     ),
   };
-
+  
   useEffect(() => {
     if (centralState === "viewPermissions") {
       getARole();
     }
   }, [centralState]);
-
+  
   const tabPermissions: { [key: string]: string[] } = {
     "All Users": ["read_users"], // Permission to view "All Users"
     Role: ["read_roles"], // Permission to view "Role"
     Permissions: ["read_permissions"], // Permission to view "Permissions"
   };
-
+  
   const { userPermissions } = useDataPermission();
+  
   const getDefaultTab = () => {
-    // Extract the permission strings into a clean array
     const userPermissionStrings = userPermissions.map(
       (perm) => perm.permissionString
     );
-
+  
     return tabs.find((tab) =>
       (tabPermissions[tab] || []).every((permission) =>
         userPermissionStrings.includes(permission)
       )
     );
   };
-
+  
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
-
+  
   useEffect(() => {
     if (selectedTab === "Role") {
       getRoles();
@@ -236,6 +226,7 @@ function UserManagement() {
       fetchData();
     }
   }, [centralState, centralStateDelete, selectedTab]);
+  
 
   return (
     <DashboardLayout

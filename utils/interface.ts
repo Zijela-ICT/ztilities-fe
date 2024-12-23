@@ -49,19 +49,38 @@ interface Facility {
   type: string | null;
   code: string | null;
   address: string | null;
-  contactName: string | null;
   email: string;
   phone: string | null;
+  blocks: Block[];
+  units: Unit[];
+  assets: Asset[];
 }
 
 interface Block {
   id: number;
-  blockNumber: string;
-  code: string;
-  officer: string;
-  phone: string;
-  email: string;
-  type: string;
-  address: string;
-  status: string;
+  blockNumber: string | null;
+  code: string | null;
+  facilityOfficer: string | null;
+  phone: string | null;
+  email: string | null;
+  type: string | null;
+  address: string | null;
+  units: Unit[];
+  assets: Asset[];
+}
+
+interface Unit {
+  id: number;
+  unitNumber: string | null;
+  type: string | null;
+  ownership: string | null;
+  description: string | null;
+  bookable: string | null;
+  commonArea: string | null;
+  address: string | null;
+  assets: Asset[];
+}
+
+interface Asset {
+  id: number;
 }

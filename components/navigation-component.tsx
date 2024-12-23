@@ -37,9 +37,9 @@ export default function Navigation() {
   return (
     <ul className="px-4 py-4 space-y-4 text-sm font-medium text-gray-500  w-full lg:w-1/5 bg-white">
       <div className="flex items-center justify-between">
-        <li className="w-full px-4 ml-4">
+        <Link href={`/dashboard`} className="w-full px-4 ml-4">
           <Image src={Logo} alt="logo" width={100} height={70} />
-        </li>
+        </Link>
         <button onClick={toggleMenu} className="md:hidden text-gray-500 ">
           <svg
             className="w-6 h-6"
@@ -76,7 +76,7 @@ export default function Navigation() {
           {
             href: "/facility-management",
             label: "Facility Management",
-            permissions: ["unit", "block", "facilities"],
+            permissions: ["units", "blocks", "facilities"],
             iconPath: paths.path2,
           },
           {

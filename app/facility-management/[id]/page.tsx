@@ -10,11 +10,11 @@ import ModalCompoenent, {
 import CreateUser from "@/components/user-management/create-user";
 import CreateBulkUser from "@/components/user-management/create-bulk-user";
 import axiosInstance from "@/utils/api";
-import ResetPassword from "@/components/user-management/reset-password";
+
 import { useParams, useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
 
-function UserManagement() {
+ function FacilityManagement() {
   const params = useParams();
   const router = useRouter();
   const { id } = params;
@@ -71,45 +71,43 @@ function UserManagement() {
   
   // Dynamic title logic
   const getTitle = () => {
-    switch (centralState) {
-      case "createUser":
-        return activeRowId ? "Edit User" : "Create User";
-      case "createBulkUser":
-        return "Upload Bulk User";
-      case "resetPassword":
-        return "Reset Password";
+    if (centralState === "createUser") {
+      return activeRowId ? "Edit User" : "Create User";
     }
-  
-    switch (centralStateDelete) {
-      case "deleteUser":
-        return "De-activate User";
-      case "activateUser":
-        return "Re-activate User";
+    if (centralState === "createBulkUser") {
+      return "Upload Bulk User";
     }
-  
+    if (centralState === "resetPassword") {
+      return "Reset Password";
+    }
+    if (centralStateDelete === "deleteUser") {
+      return "De-activate User";
+    }
+    if (centralStateDelete === "activateUser") {
+      return "Re-activate User";
+    }
     return "Zijela";
   };
   
   // Dynamic detail logic
   const getDetail = () => {
-    switch (centralState) {
-      case "createUser":
-        return activeRowId
-          ? "You can edit user details here."
-          : "You can create and manage users' access here.";
-      case "createBulkUser":
-        return "Import CSV/Excel file";
-      case "resetPassword":
-        return "Change the password for this user";
+    if (centralState === "createUser") {
+      return activeRowId
+        ? "You can edit user details here."
+        : "You can create and manage users' access here.";
     }
-  
-    switch (centralStateDelete) {
-      case "deleteUser":
-        return "Are you sure you want to de-activate this user";
-      case "activateUser":
-        return "Are you sure you want to Re-activate this user";
+    if (centralState === "createBulkUser") {
+      return "Import CSV/Excel file";
     }
-  
+    if (centralState === "resetPassword") {
+      return "Change the password for this user";
+    }
+    if (centralStateDelete === "deleteUser") {
+      return "Are you sure you want to de-activate this user";
+    }
+    if (centralStateDelete === "activateUser") {
+      return "Are you sure you want to Re-activate this user";
+    }
     return "Zijela";
   };
   
@@ -124,14 +122,6 @@ function UserManagement() {
       />
     ),
     createBulkUser: <CreateBulkUser />,
-    resetPassword: (
-      <ResetPassword
-        roles={roles}
-        setModalState={setCentralState}
-        activeRowId={activeRowId}
-        setSuccessState={setSuccessState}
-      />
-    ),
   };
   
   // Utility function to format role names
@@ -190,4 +180,4 @@ function UserManagement() {
     </DashboardLayout>
   );
 }
-export default withPermissions(UserManagement, ["users", "roles"]);
+export default withPermissions(FacilityManagement, ["users", "roles"]);

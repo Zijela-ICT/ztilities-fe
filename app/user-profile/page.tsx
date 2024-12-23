@@ -328,14 +328,6 @@ export default function UserProfile() {
   const router = useRouter();
   const { user, setUser } = useDataPermission();
   const [centralState, setCentralState] = useState<string>();
-  // State for user avatar
-  const avatar = "/assets/avatar.png";
-  const [myuser, setMyUser] = useState({
-    avatar: "",
-  });
-  useEffect(() => {
-    setMyUser({ ...myuser, avatar: user?.avatar || avatar });
-  }, []);
 
   // State for password inputs
   const [password, setPassword] = useState({
@@ -343,7 +335,9 @@ export default function UserProfile() {
     confirmPassword: "",
     oldPassword: "",
   });
+
   const [modalState, setModalState] = useState(false);
+
   // State for various toggles
   const [settings, setSettings] = useState({
     isTwoFactorEnabled: false,
@@ -352,24 +346,20 @@ export default function UserProfile() {
     isBiometricLoginEnabled: false,
   });
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (password.newPassword !== password.confirmPassword) {
-      toast.error("Passwords do not match!");
-      return;
-    }
-    const response = await axiosInstance.patch("/auth/change-password", {
-      newPassword: password.newPassword,
-      oldPassword: password.oldPassword,
-    });
-    setModalState(true);
-    setPassword({
-      oldPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-  };
+  // State for user avatar
+  const avatar = "/assets/avatar.png";
+  const [myuser, setMyUser] = useState({
+    avatar: "",
+  });
 
+  // State for form data and file handling
+  const [formData, setFormData] = useState<FormData>();
+  const [saveAvatar, setSaveAvatar] = useState<boolean>(false);
+  const [scale, setScale] = useState(1);
+  const [croppedImage, setCroppedImage] = useState(null);
+  const editorRef = useRef(null);
+
+  // Fetch user data on mount
   const getMe = async () => {
     const response = await axiosInstance.get("/auth/me");
     setUser(response.data.data.user);
@@ -378,11 +368,30 @@ export default function UserProfile() {
     getMe();
   }, []);
 
-  const [formData, setFormData] = useState<FormData>();
+  // Handle password change submission
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (password.newPassword !== password.confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+    await axiosInstance.post("/auth/change-password", {
+      newPassword: password.newPassword,
+      oldPassword: password.oldPassword,
+    });
+    setCentralState("");
+    setModalState(true);
+    setPassword({
+      oldPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+  };
+
+  // Handle file change for avatar
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-
       const reader = new FileReader();
       reader.onload = () => {
         setMyUser((prev) => ({ ...prev, avatar: reader.result as string }));
@@ -399,9 +408,38 @@ export default function UserProfile() {
     }
   };
 
+  // Handle image cropping
+  const handleCrop = () => {
+    if (editorRef.current) {
+      const canvas = editorRef.current.getImageScaledToCanvas().toDataURL();
+
+      // Convert base64 to Blob
+      const byteString = atob(canvas.split(",")[1]);
+      const mimeString = canvas.split(",")[0].split(":")[1].split(";")[0];
+      const arrayBuffer = new Uint8Array(byteString.length);
+
+      for (let i = 0; i < byteString.length; i++) {
+        arrayBuffer[i] = byteString.charCodeAt(i);
+      }
+
+      const croppedBlob = new Blob([arrayBuffer], { type: mimeString });
+
+      // Update formData
+      const croppedFormData = new FormData();
+      croppedFormData.append("file", croppedBlob, "cropped_image.png");
+      setFormData(croppedFormData);
+
+      // Update the avatar preview
+      setCroppedImage(canvas);
+      setMyUser((prev) => ({ ...prev, avatar: canvas }));
+      setSaveAvatar(true);
+    }
+  };
+
+  // Change profile avatar on server
   const changeProfileAvatar = async () => {
-    const response = await axiosInstance.post(
-      "/files/upload/user-avatar",
+    const response = await axiosInstance.patch(
+      "/users/avatar/upload",
       formData,
       {
         headers: {
@@ -412,14 +450,17 @@ export default function UserProfile() {
     getMe();
     toast.success(response.data?.message);
     setCentralState("");
+    setSaveAvatar(false);
+    setCroppedImage(null);
   };
 
+  // Handle password input change
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPassword((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Toggle settings
+  // Toggle settings state
   const handleToggle = (setting: keyof typeof settings) => {
     setSettings((prev) => ({
       ...prev,
@@ -427,21 +468,10 @@ export default function UserProfile() {
     }));
   };
 
+  // Handle logout
   const logout = async () => {
     localStorage.removeItem("authToken"); // Remove the token
     router.push("/");
-  };
-
-  const [scale, setScale] = useState(1);
-  const [croppedImage, setCroppedImage] = useState(null);
-  const editorRef = useRef(null);
-
-  const handleCrop = () => {
-    if (editorRef.current) {
-      const canvas = editorRef.current.getImageScaledToCanvas().toDataURL();
-      setCroppedImage(canvas);
-      setMyUser((prev) => ({ ...prev, avatar: canvas }));
-    }
   };
 
   return (
@@ -454,59 +484,112 @@ export default function UserProfile() {
       ></SuccessModalCompoenent>
 
       <ModalCompoenent
-        title={"Update Avatar"}
+        title={
+          centralState === "Uploaded" ? "Update Avatar" : "Change Password"
+        }
         detail={""}
         modalState={centralState}
         width="max-w-md"
         setModalState={() => {
           setCentralState("");
+          setMyUser(() => ({ ...formData, avatar: "" }));
+          setCroppedImage(null);
         }}
       >
-        <div className="p-6 flex flex-col items-center">
-          <AvatarEditor
-            ref={editorRef}
-            image={myuser?.avatar} // Provide a fallback avatar
-            width={200}
-            height={200}
-            border={50}
-            borderRadius={100} // Makes it circular
-            scale={scale}
-            rotate={0}
-          />
-          <div className="w-full mt-4">
-            <label className="block text-sm font-medium mb-2">Zoom</label>
-            <input
-              type="range"
-              min={1}
-              max={3}
-              step={0.1}
-              value={scale}
-              onChange={(e) => setScale(parseFloat(e.target.value))}
-              className="w-full"
-            />
-          </div>
-          <div className="flex justify-between mt-6 w-full">
-            {/* <ButtonComponent
-              text="Crop & Save"
-              className="text-white"
-              onClick={handleCrop}
-            /> */}
-            <ButtonComponent
-              text="Upload Avatar"
-              className="text-white"
-              onClick={changeProfileAvatar}
-            />
-          </div>
-          {croppedImage && (
-            <div className="mt-4">
-              <img
-                src={croppedImage}
-                alt="Cropped"
-                className="w-20 h-20 rounded-full"
-              />
+        {centralState === "Uploaded" ? (
+          <>
+            <div className="p-6 flex flex-col items-center">
+              {saveAvatar ? (
+                <div className="mt-4">
+                  <img
+                    src={croppedImage}
+                    alt="Cropped"
+                    className=" rounded-full"
+                    width={200}
+                    height={200}
+                  />
+                </div>
+              ) : (
+                <AvatarEditor
+                  ref={editorRef}
+                  image={myuser.avatar} // Provide a fallback avatar
+                  width={200}
+                  height={200}
+                  border={50}
+                  borderRadius={100} // Makes it circular
+                  scale={scale}
+                  rotate={0}
+                />
+              )}
+
+              <div className="w-full mt-4">
+                <label className="block text-sm font-medium mb-2">Zoom</label>
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  value={scale}
+                  onChange={(e) => setScale(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+              <div className="flex justify-between mt-6 w-full">
+                {saveAvatar === false && (
+                  <ButtonComponent
+                    text="Crop & Save"
+                    className="text-white"
+                    onClick={handleCrop}
+                  />
+                )}
+                {saveAvatar && (
+                  <ButtonComponent
+                    text="Upload Avatar"
+                    className="text-white"
+                    onClick={changeProfileAvatar}
+                  />
+                )}
+              </div>
             </div>
-          )}
-        </div>
+          </>
+        ) : (
+          <div className="p-8">
+            <form onSubmit={handleSubmit}>
+              <InputComponent
+                type="password"
+                name="oldPassword"
+                value={password.oldPassword}
+                onChange={handlePasswordChange}
+                placeholder="Enter old password"
+                className="mb-4 bg-white border-gray-200"
+              />
+
+              <InputComponent
+                type="password"
+                name="newPassword"
+                value={password.newPassword}
+                onChange={handlePasswordChange}
+                placeholder="Enter new password"
+                className="mb-4 bg-white border-gray-200"
+              />
+              <InputComponent
+                type="password"
+                name="confirmPassword"
+                value={password.confirmPassword}
+                onChange={handlePasswordChange}
+                placeholder="Confirm new password"
+                className="mb-4 bg-white border-gray-200"
+              />
+              <ButtonComponent
+                text={password.newPassword === "" ? "Change" : "Change"}
+                disabled={
+                  password.newPassword === "" || password.confirmPassword === ""
+                }
+                className="mb-4 text-white"
+              />
+            </form>
+          </div>
+        )}
       </ModalCompoenent>
 
       <h1 className="text-xl font-bold text-black ml-2 mt-4">My Account</h1>
@@ -516,11 +599,11 @@ export default function UserProfile() {
           <div className="relative">
             <div className="w-44 h-44 bg-gray-500 rounded-full flex items-center justify-center mb-4 overflow-hidden">
               <Image
-                src={user?.avatar || myuser.avatar}
+                src={user?.avatar ? user?.avatar : avatar}
                 alt="User Avatar"
-                className="w-full h-full object-cover"
-                width={40}
-                height={40}
+                className="w-44 h-44 object-cover"
+                width={176}
+                height={176}
               />
             </div>
 
@@ -544,48 +627,32 @@ export default function UserProfile() {
 
         <div className="md:w-[62%] mt-6 md:mt-0 md:ml-6 bg-white shadow-sm rounded-xl rounded-lg p-6 h-auto">
           <h3 className="text-base font-semibold text-gray-800 mb-4">
-            Change Password
+            Password and Details
           </h3>
 
-          <form onSubmit={handleSubmit}>
-            <InputComponent
-              type="password"
-              name="oldPassword"
-              value={password.oldPassword}
-              onChange={handlePasswordChange}
-              placeholder="Enter old password"
-              className="mb-4 bg-white border-gray-200"
-            />
-            {password.oldPassword !== "" && (
-              <>
-                {" "}
-                <InputComponent
-                  type="password"
-                  name="newPassword"
-                  value={password.newPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="Enter new password"
-                  className="mb-4 bg-white border-gray-200"
+          <div
+            onClick={() => setCentralState("changePassword")}
+            className="flex items-center cursor-pointer justify-between py-4 px-6 border rounded-xl border-gray-200"
+          >
+            <div className="text-gray-800">Change Password</div>
+            <div>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5.3335 2.66675L10.6668 8.00008L5.3335 13.3334"
+                  stroke="#000"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
-                <InputComponent
-                  type="password"
-                  name="confirmPassword"
-                  value={password.confirmPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="Confirm new password"
-                  className="mb-4 bg-white border-gray-200"
-                />
-              </>
-            )}
-
-            <ButtonComponent
-              text={password.newPassword === "" ? "Change" : "Change"}
-              disabled={
-                password.newPassword === "" || password.confirmPassword === ""
-              }
-              className="mb-4 text-white"
-            />
-          </form>
+              </svg>
+            </div>
+          </div>
 
           <h3 className="text-base font-semibold text-gray-800 mb-4">
             Settings
