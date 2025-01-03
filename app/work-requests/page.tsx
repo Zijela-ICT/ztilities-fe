@@ -7,14 +7,18 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
+
 import axiosInstance from "@/utils/api";
+
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
+
+import CreateWorkRequest from "@/components/work-request/create-work-request";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 
-function VendorManagement() {
-  const tabs = ["Vendors", "Technicians"];
+function WorkRequests() {
+  const tabs = ["Assigned Work Request", "Other Work Request"];
 
   const [successState, setSuccessState] = useState({
     title: "",
@@ -22,22 +26,26 @@ function VendorManagement() {
     status: false,
   });
 
-  const [vendors, setVendors] = useState<Vendor[]>();
-  const [technicians, setTechnicians] = useState<Role[]>();
+  const [assignedworkRequests, setAssignedWorkRequests] = useState<Vendor[]>();
+  const [otherWorkRequests, setOtherWorkRequests] = useState<Role[]>();
   const [role, setRole] = useState<RoleData>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
+  const [facilities, setFacilities] = useState<Facility[]>();
+  const [blocks, setBlocks] = useState<Block[]>();
+  const [units, setUnits] = useState<Unit[]>();
+  const [assets, setAssets] = useState<Asset[]>();
 
   // Fetch data functions
-  const getVendors = async () => {
-    const response = await axiosInstance.get("/vendors");
-    setVendors(response.data.data);
+  const getAssignedWorkRequests = async () => {
+    const response = await axiosInstance.get("/work-requests");
+    setAssignedWorkRequests(response.data.data);
   };
 
-  const getTechnicians = async () => {
-    const response = await axiosInstance.get("/technicians");
-    setTechnicians(response.data.data);
+  const getOtherWorkRequests = async () => {
+    const response = await axiosInstance.get("/work-requests");
+    setOtherWorkRequests(response.data.data);
   };
 
   const getARole = async () => {
@@ -46,8 +54,8 @@ function VendorManagement() {
   };
 
   // Delete functions
-  const deleteVendor = async () => {
-    await axiosInstance.delete(`/vendors/${activeRowId}`);
+  const deleteWorkRequests = async () => {
+    await axiosInstance.delete(`/work-requests/${activeRowId}`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
@@ -56,19 +64,32 @@ function VendorManagement() {
     });
   };
 
-  const deleteTechnician = async (id: number) => {
-    await axiosInstance.delete(`/technicians/${activeRowId}`);
-    setCentralStateDelete("");
-    setSuccessState({
-      title: "Successful",
-      detail: "You have successfully deleted this technician",
-      status: true,
-    });
+  const getFacilities = async () => {
+    const response = await axiosInstance.get("/facilities");
+    setFacilities(response.data.data);
+  };
+
+  const getBlocks = async () => {
+    const response = await axiosInstance.get("/blocks");
+    setBlocks(response.data.data);
+  };
+
+  const getUnits = async () => {
+    const response = await axiosInstance.get("/units");
+    setUnits(response.data.data);
+  };
+
+  const getAssets = async () => {
+    const response = await axiosInstance.get("/assets");
+    setAssets(response.data.data);
   };
 
   // Toggle actions
   const toggleActions = (rowId: string) => {
-    if (selectedTab === "Vendors" || selectedTab === "Technicians") {
+    if (
+      selectedTab === "Assigned Work Request" ||
+      selectedTab === "Other Work Request"
+    ) {
       setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
     } else {
       setActiveRowId(rowId);
@@ -78,66 +99,100 @@ function VendorManagement() {
   // Dynamic title and detail logic
   const getTitle = () => {
     switch (centralState) {
-      case "createVendor":
-        return activeRowId ? "Edit Vendor" : "Create Vendor";
-      case "createTechnician":
-        return activeRowId ? "Edit Technician" : "Create Technician";
+      case "createWorkRequest":
+        return activeRowId ? "Edit Work Request" : "Create Work Request";
+      case "createWorkRequest":
+        return activeRowId ? "Edit Work Request" : "Create Work Request";
     }
     switch (centralStateDelete) {
-      case "deactivateVendor":
-        return "De-activate Vendor";
-      case "activateVendor":
-        return "Re-activate Vendor";
-      case "deactivateTechnician":
-        return "De-activate Technician";
-      case "activateTechnician":
-        return "Re-activate Technician";
+      case "deactivateWorkRequest":
+        return "De-activate Work Request ";
+      case "activateWorkRequest":
+        return "Re-activate Work Request";
+      case "deactivateWorkRequest":
+        return "De-activate Work Request ";
+      case "activateWorkRequest":
+        return "Re-activate Work Request";
     }
     return "Zijela";
   };
 
   const getDetail = () => {
     switch (centralState) {
-      case "createVendor":
+      case "createWorkRequest":
         return activeRowId
-          ? "You can edit vendor details here."
-          : "You can create and manage vendor here.";
-      case "createTechnician":
+          ? "You can edit work request details here."
+          : "You can create and manage work request here.";
+      case "createWorkRequest":
         return activeRowId
-          ? "You can edit technician details here."
-          : "You can manage technicians here.";
+          ? "You can edit work request details here."
+          : "You can create and manage work request here.";
       case "viewPermissions":
         return "All permissions available for this role";
     }
     switch (centralStateDelete) {
-      case "activateVendor":
-        return "Are you sure you want to Re-activate this vendor";
-      case "deactivateVendor":
-        return "Are you sure you want to de-activate this vendor";
-      case "activateTechnician":
-        return "Are you sure you want to Re-activate this technician";
-      case "deactivateTechnician":
-        return "Are you sure you want to de-activate this technician";
+      case "activateWorkRequest":
+        return "Are you sure you want to Re-activate this work request";
+      case "deactivateWorkRequest":
+        return "Are you sure you want to de-activate this work request";
+      case "activateWorkRequest":
+        return "Are you sure you want to Re-activate this work request";
+      case "deactivateWorkRequest":
+        return "Are you sure you want to de-activate this work request";
     }
     return "Zijela";
   };
 
   // Mapping centralState values to components
   const componentMap: Record<string, JSX.Element> = {
-    createVendor: (
+    createWorkRequest: (
       <DynamicCreateForm
         inputs={[
-          { name: "vendorName", label: "Vendor Name", type: "text" },
-          { name: "vendorCode", label: "Vendor Code", type: "text" },
-          { name: "address", label: "Address", type: "text" },
-          { name: "phoneNumber", label: "Phone Number", type: "text" },
-          { name: "email", label: "Email address", type: "text" },
+          { name: "title", label: "Title", type: "text" },
+          { name: "description", label: "Description", type: "textarea" },
+          { name: "file", label: "FIle", type: "file" },
         ]}
         selects={[
           {
-            name: "vendorType",
-            label: "Vendor Type",
-            placeholder: "Select Vendor Type",
+            name: "facility",
+            label: "Facility ",
+            placeholder: "Select Facility",
+            options: facilities?.map((facility: Facility) => ({
+              value: facility.id,
+              label: facility.name,
+            })),
+          },
+          {
+            name: "unit",
+            label: "Unit",
+            placeholder: "Select Unit",
+            options: units?.map((unit: Unit) => ({
+              value: unit.id,
+              label: unit.unitNumber,
+            })),
+          },
+          {
+            name: "blocks",
+            label: "Blocks",
+            placeholder: "Select Blocks",
+            options: blocks?.map((asset: Block) => ({
+              value: asset.id,
+              label: asset.blockNumber,
+            })),
+          },
+          {
+            name: "assets",
+            label: "Assets",
+            placeholder: "Select Assets",
+            options: assets?.map((asset: Asset) => ({
+              value: asset.id.toString(),
+              label: asset.assetNumber.toString(),
+            })),
+          },
+          {
+            name: "subCategory",
+            label: "Sub-Category",
+            placeholder: "Select Sub-Category",
             options: [
               { value: "single", label: "Single" },
               { value: "residential", label: "Residential" },
@@ -145,51 +200,30 @@ function VendorManagement() {
           },
           {
             name: "category",
-            label: "Vendor Category",
+            label: "Category",
             placeholder: "Select Category",
             options: [
               { value: "single", label: "Single" },
               { value: "residential", label: "Residential" },
             ],
           },
-        ]}
-        title="Vendor"
-        apiEndpoint="/vendors"
-        activeRowId={activeRowId}
-        setModalState={setCentralState}
-        setSuccessState={setSuccessState}
-        fetchResource={(id) =>
-          axiosInstance.get(`/vendors/${id}`).then((res) => res.data.data)
-        }
-      />
-    ),
-    createTechnician: (
-      <DynamicCreateForm
-        inputs={[
-          { name: "firstName", label: "First Name", type: "text" },
-          { name: "surname", label: "Surname", type: "text" },
-          { name: "address", label: "Address", type: "text" },
-          { name: "phoneNumber", label: "Phone Number", type: "text" },
-          { name: "email", label: "Email address", type: "text" },
-        ]}
-        selects={[
           {
-            name: "serviceCategory",
-            label: "Service Category",
-            placeholder: "Select Category",
+            name: "department",
+            label: "Departnemt",
+            placeholder: "Select Department",
             options: [
               { value: "single", label: "Single" },
-              { value: "residential", label: "Private" },
+              { value: "residential", label: "Residential" },
             ],
           },
         ]}
-        title="Technician"
-        apiEndpoint="/technicians"
+        title="Work Request"
+        apiEndpoint="/work-requests"
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={(id) =>
-          axiosInstance.get(`/technicians/${id}`).then((res) => res.data.data)
+          axiosInstance.get(`/work-requests/${id}`).then((res) => res.data.data)
         }
       />
     ),
@@ -202,8 +236,8 @@ function VendorManagement() {
   }, [centralState]);
 
   const tabPermissions: { [key: string]: string[] } = {
-    Vendors: ["read_vendors"],
-    Technicians: ["read_vendors"],
+    "Assigned Work Request": ["create_work-requests"],
+    "Other Work Request": ["create_work-requests"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -223,11 +257,17 @@ function VendorManagement() {
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
 
   useEffect(() => {
-    if (selectedTab === "Technicians") {
-      getTechnicians();
+    if (selectedTab === "Other Work Request") {
+      getOtherWorkRequests();
     } else {
       const fetchData = async () => {
-        await Promise.all([getVendors()]);
+        await Promise.all([
+          getAssignedWorkRequests(),
+          getFacilities(),
+          getBlocks(),
+          getUnits(),
+          getAssets(),
+        ]);
       };
       fetchData();
     }
@@ -235,8 +275,8 @@ function VendorManagement() {
 
   return (
     <DashboardLayout
-      title="Vendor Management"
-      detail="Manage all vendors and technicians here"
+      title="Work Request"
+      detail="Submit work request here and view created work requests"
     >
       <SuccessModalCompoenent
         title={successState.title}
@@ -253,10 +293,10 @@ function VendorManagement() {
         modalState={centralStateDelete}
         setModalState={setCentralStateDelete}
         takeAction={
-          centralStateDelete === "deactivateTechnician" ||
-          centralStateDelete === "activateTechnician"
-            ? deleteTechnician
-            : deleteVendor
+          centralStateDelete === "deactivateWorkRequest" ||
+          centralStateDelete === "activateWorkRequest"
+            ? deleteWorkRequests
+            : deleteWorkRequests
         }
       ></ActionModalCompoenent>
 
@@ -272,7 +312,7 @@ function VendorManagement() {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      <PermissionGuard requiredPermissions={["read_vendors"]}>
+      <PermissionGuard requiredPermissions={["create_work-requests"]}>
         <div className="relative bg-white rounded-2xl p-4">
           <div className="flex space-x-4 pb-2">
             {tabs.map((tab) => (
@@ -300,12 +340,12 @@ function VendorManagement() {
         </div>
       </PermissionGuard>
 
-      <PermissionGuard requiredPermissions={["read_vendors"]}>
+      <PermissionGuard requiredPermissions={["create_work-requests"]}>
         <div className="relative bg-white rounded-2xl p-4 mt-4">
-          {selectedTab === "Vendors" && (
+          {selectedTab === "Assigned Work Request" && (
             <TableComponent
-              data={vendors}
-              type="vendors"
+              data={assignedworkRequests}
+              type="workrequests"
               setModalState={setCentralState}
               setModalStateDelete={setCentralStateDelete}
               toggleActions={toggleActions}
@@ -314,10 +354,10 @@ function VendorManagement() {
               deleteAction={setCentralStateDelete}
             />
           )}
-          {selectedTab === "Technicians" && (
+          {selectedTab === "Other Work Request" && (
             <TableComponent
-              data={technicians}
-              type="technicians"
+              data={otherWorkRequests}
+              type="workrequests"
               setModalState={setCentralState}
               setModalStateDelete={setCentralStateDelete}
               toggleActions={toggleActions}
@@ -332,4 +372,4 @@ function VendorManagement() {
   );
 }
 
-export default withPermissions(VendorManagement, ["vendors"]);
+export default withPermissions(WorkRequests, ["work-requests"]);

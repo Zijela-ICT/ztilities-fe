@@ -6,7 +6,7 @@ import { LabelInputComponent } from "../input-container";
 import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 
-export default function CreateTechnician({
+export default function CreateWorkRequest({
   setModalState,
   activeRowId,
   setSuccessState,

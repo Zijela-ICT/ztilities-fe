@@ -115,7 +115,7 @@ export default function TableComponent({
       {/* button here based on types */}
 
       {/* Table */}
-      <div className="overflow-x-auto bg-white rounded-lg border border-gray-100 min-h-auto">
+      <div className="overflow-x-auto bg-white rounded-lg border border-gray-100 min-h-[40vh]">
         <table className="min-w-full table-auto text-sm">
           <thead className="bg-gray-100 text-left">
             <tr className="relative">
@@ -155,7 +155,7 @@ export default function TableComponent({
                         // Handle array case, extract specific properties
                         row[column]
                           .map((item: any) =>
-                            ["name", "blockNumber", "unitNumber, assetNumber"]
+                            ["name", "blockNumber", "unitNumber", "assetNumber"]
                               .map((prop) => item[prop])
                               .filter(Boolean)
                               .join(", ")
@@ -164,7 +164,7 @@ export default function TableComponent({
                       ) : typeof row[column] === "object" &&
                         row[column] !== null ? (
                         // Handle single object case, extract specific properties
-                        ["name", "blockNumber", "unitNumber, assetNumber"]
+                        ["name", "blockNumber", "unitNumber", "assetNumber"]
                           .map((prop) => row[column][prop])
                           .filter(Boolean)
                           .join(", ")
@@ -298,7 +298,7 @@ export default function TableComponent({
                           requiredPermissions={["delete_roles:id"]}
                         >
                           {row.users > 0 ? (
-                            <div className="h-[2.5rem] md:h-[2rem]">
+                            <div>
                               <TrashIconGray />
                             </div>
                           ) : (
@@ -552,6 +552,134 @@ export default function TableComponent({
                                       setModalStateDelete("activateVendors")
                                     }
                                     permissions={["delete_vendors:id"]}
+                                  />
+                                )}
+                              </li>
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : type === "technicians" ? (
+                    <>
+                      <div className="relative">
+                        {/* Button */}
+                        <PermissionGuard
+                          requiredPermissions={[
+                            "delete_vendors:id",
+                            "update_vendors:id",
+                          ]}
+                        >
+                          <button
+                            onClick={() => toggleActions(row.id)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <TripleDotsIcon />
+                          </button>
+                        </PermissionGuard>
+
+                        {/* Dropdown Menu */}
+                        {activeRowId === row.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                            <ul className="py-2">
+                              {/* <li>
+                                <DropdownButtonComponent
+                                  text="View"
+                                  onClick={() => setModalState("viewBlock")}
+                                  permissions={["update_users:id"]}
+                                />
+                              </li> */}
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Edit"
+                                  onClick={() => setModalState("createTechnician")}
+                                  permissions={["update_vendors:id"]}
+                                />
+                              </li>
+                              <li>
+                                {row.isDeactivated === false ? (
+                                  <DropdownButtonComponent
+                                    text="De-activate"
+                                    onClick={() =>
+                                      setModalStateDelete("deactivateTechnician")
+                                    }
+                                    permissions={["delete_vendors:id"]}
+                                  />
+                                ) : (
+                                  <DropdownButtonComponent
+                                    text="Re-activate"
+                                    onClick={() =>
+                                      setModalStateDelete("activateTechnician")
+                                    }
+                                    permissions={["delete_vendors:id"]}
+                                  />
+                                )}
+                              </li>
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : type === "workrequests" ? (
+                    <>
+                      <div className="relative">
+                        {/* Button */}
+                        <PermissionGuard
+                          requiredPermissions={[
+                            "create_work-requests",
+                            "update_work-requests:id/status",
+                          ]}
+                        >
+                          <button
+                            onClick={() => toggleActions(row.id)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <TripleDotsIcon />
+                          </button>
+                        </PermissionGuard>
+
+                        {/* Dropdown Menu */}
+                        {activeRowId === row.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                            <ul className="py-2">
+                              <li>
+                                <DropdownButtonComponent
+                                  text="View"
+                                  onClick={() =>
+                                    setModalState("viewWorkRequest")
+                                  }
+                                  permissions={["create_work-requests"]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Edit"
+                                  onClick={() =>
+                                    setModalState("createWorkRequest")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/status",
+                                  ]}
+                                />
+                              </li>
+                              <li>
+                                {row.isDeactivated === false ? (
+                                  <DropdownButtonComponent
+                                    text="De-activate"
+                                    onClick={() =>
+                                      setModalStateDelete(
+                                        "deactivateWorkRequest"
+                                      )
+                                    }
+                                    permissions={["create_work-requests"]}
+                                  />
+                                ) : (
+                                  <DropdownButtonComponent
+                                    text="Re-activate"
+                                    onClick={() =>
+                                      setModalStateDelete("activateWorkRequest")
+                                    }
+                                    permissions={["create_work-requests"]}
                                   />
                                 )}
                               </li>

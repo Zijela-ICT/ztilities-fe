@@ -16,7 +16,7 @@ export default function CreateBulkUser() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
- 
+
     // Handle form submission logic here
     const response = await axiosInstance.post("/users/pre-register", {
       formData,

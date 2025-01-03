@@ -7,25 +7,25 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import CreateUser from "@/components/user-management/create-user";
 import CreateBulkUser from "@/components/user-management/create-bulk-user";
 import axiosInstance from "@/utils/api";
 import ResetPassword from "@/components/user-management/reset-password";
 import { useParams, useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
+import DynamicCreateForm from "@/components/dynamic-create-form";
 
 function UserManagement() {
   const params = useParams();
   const router = useRouter();
   const { id } = params;
-  
+
   // Success state
   const [successState, setSuccessState] = useState({
     title: "",
     detail: "",
     status: false,
   });
-  
+
   // Delete user function
   const deleteUser = async () => {
     await axiosInstance.delete(`/users/${activeRowId}`);
@@ -36,31 +36,31 @@ function UserManagement() {
       status: true,
     });
   };
-  
+
   // Roles state and fetch function
   const [roles, setRoles] = useState<Role[]>();
   const getRoles = async () => {
     const response = await axiosInstance.get("/roles");
     setRoles(response.data.data);
   };
-  
+
   // Single role state and fetch function
   const [role, setRole] = useState<RoleData>();
   const getARole = async () => {
     const response = await axiosInstance.get(`/roles/${id}`);
     setRole(response.data.data);
   };
-  
+
   // Active row tracking
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const toggleActions = (rowId: string) => {
     setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
   };
-  
+
   // Central states for managing actions
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
-  
+
   // Fetch roles and role data on centralState/centralStateDelete change
   useEffect(() => {
     const fetchData = async () => {
@@ -68,7 +68,7 @@ function UserManagement() {
     };
     fetchData();
   }, [centralState, centralStateDelete]);
-  
+
   // Dynamic title logic
   const getTitle = () => {
     switch (centralState) {
@@ -79,17 +79,17 @@ function UserManagement() {
       case "resetPassword":
         return "Reset Password";
     }
-  
+
     switch (centralStateDelete) {
       case "deleteUser":
         return "De-activate User";
       case "activateUser":
         return "Re-activate User";
     }
-  
+
     return "Zijela";
   };
-  
+
   // Dynamic detail logic
   const getDetail = () => {
     switch (centralState) {
@@ -102,25 +102,46 @@ function UserManagement() {
       case "resetPassword":
         return "Change the password for this user";
     }
-  
+
     switch (centralStateDelete) {
       case "deleteUser":
         return "Are you sure you want to de-activate this user";
       case "activateUser":
         return "Are you sure you want to Re-activate this user";
     }
-  
+
     return "Zijela";
   };
-  
+
   // Component mapping for central state
   const componentMap: Record<string, JSX.Element> = {
     createUser: (
-      <CreateUser
-        roles={roles}
-        setModalState={setCentralState}
+      <DynamicCreateForm
+        inputs={[
+          { name: "firstName", label: "First Name", type: "text" },
+          { name: "lastName", label: "Last Name", type: "text" },
+          { name: "email", label: "Email address", type: "email" },
+        ]}
+        selects={[
+          {
+            name: "roles",
+            label: "Roles",
+            placeholder: "Assign Roles",
+            options: roles?.map((asset: Role) => ({
+              value: asset.id,
+              label: asset.name,
+            })),
+            isMulti: true,
+          },
+        ]}
+        title="User"
+        apiEndpoint={`${activeRowId ? "/users" : "/users/pre-register"}`}
         activeRowId={activeRowId}
+        setModalState={setCentralState}
         setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/users/${id}`).then((res) => res.data.data)
+        }
       />
     ),
     createBulkUser: <CreateBulkUser />,
@@ -133,7 +154,7 @@ function UserManagement() {
       />
     ),
   };
-  
+
   // Utility function to format role names
   function formatRoleName(roleName: string): string {
     return `${roleName
@@ -142,7 +163,7 @@ function UserManagement() {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ")} Role`;
   }
-  
+
   return (
     <DashboardLayout
       title={role?.name ? formatRoleName(role?.name) : "...."}

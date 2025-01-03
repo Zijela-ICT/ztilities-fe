@@ -77,6 +77,7 @@ interface ActionModalProps {
   bulk?: any;
   takeAction?: any;
   customAction?: any;
+  text? : string
 }
 
 export function ActionModalCompoenent({
@@ -156,6 +157,7 @@ export function SuccessModalCompoenent({
   setModalState,
   bulk,
   customAction,
+  text
 }: ActionModalProps) {
   return (
     <>
@@ -189,7 +191,7 @@ export function SuccessModalCompoenent({
 
             <div className="flex items-center">
               <ButtonComponent
-                text="Done"
+                text={text?text : "Done"}
                 className="text-white"
                 onClick={() =>
                   customAction ? customAction() : setModalState(false)

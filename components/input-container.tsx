@@ -1,3 +1,5 @@
+import { UploadIcon } from "@/utils/svg";
+
 interface InputProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   value: string;
@@ -9,6 +11,7 @@ interface InputProps {
   show?: boolean;
   toggleView?: boolean;
   name?: string;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 export default function InputComponent({
@@ -21,6 +24,7 @@ export default function InputComponent({
   onClick,
   show,
   toggleView,
+  onKeyDown,
 }: InputProps) {
   return (
     <>
@@ -30,6 +34,7 @@ export default function InputComponent({
           name={name}
           value={value}
           onChange={onChange}
+          onKeyDown={onKeyDown}
           placeholder={placeholder}
           className={`${className} w-full h-14 px-4 pr-10 border rounded-lg bg-gray-100 font-bold text-base text-gray-400 text-sm placeholder-gray-400  focus:outline-none`}
         />
@@ -80,7 +85,7 @@ export default function InputComponent({
 
 interface LabelInputProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  value: string;
+  value?: string;
   name: string;
   className?: string;
   type: string;
@@ -116,5 +121,88 @@ export function LabelInputComponent({
         {label}
       </label>
     </>
+  );
+}
+
+export function LabelTextareaComponent({
+  onChange,
+  value,
+  name,
+  className,
+  label,
+  readOnly,
+  required,
+}: {
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  value: string;
+  name: string;
+  className?: string;
+  label: string;
+  readOnly?: boolean;
+  required?: boolean;
+}) {
+  return (
+    <div className="relative w-full">
+      <textarea
+        name={name}
+        placeholder=" "
+        value={value}
+        onChange={onChange}
+        readOnly={readOnly}
+        required={required}
+        className={`peer w-full rounded-lg px-4 pt-6 pb-2 text-base text-gray-900 outline-none bg-gray-100 resize-none ${className}`}
+      />
+      <label className="absolute left-4 top-2 text-gray-600 text-sm transition-all duration-200 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-focus:top-2">
+        {label}
+      </label>
+    </div>
+  );
+}
+
+export function FileInputComponent({
+  onChange,
+  name,
+  label = "Upload File",
+  svgIcon,
+  className,
+}: {
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  label?: string;
+  svgIcon?: React.ReactNode; // Pass SVG as a prop
+  className?: string;
+  name: string;
+}) {
+  return (
+    <div
+      className={`relative w-full bg-gray-100 rounded-lg p-6 text-center ${className}`}
+    >
+      <div className="flex flex-col items-center">
+        <div className="mb-4 text-gray-500">
+          <UploadIcon />
+        </div>
+        <label
+          htmlFor="file-input"
+          className="block text-gray-600 text-lg font-medium cursor-pointer"
+        >
+          {label}
+        </label>
+
+        <p className="text-gray-500 text-sm mt-2">
+          Click to upload or or drag and drop
+        </p>
+        <p className="text-gray-500 text-sm mt-2">
+          SVG, PNG, JPG or GIF (max. 800x400px)
+        </p>
+      </div>
+
+      {/* Hidden File Input */}
+      <input
+        name={name}
+        type="file"
+        id="file-input"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        onChange={onChange}
+      />
+    </div>
   );
 }

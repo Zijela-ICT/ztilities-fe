@@ -7,7 +7,6 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import CreateUser from "@/components/user-management/create-user";
 import CreateRole from "@/components/user-management/create-role";
 import CreateBulkUser from "@/components/user-management/create-bulk-user";
 import axiosInstance from "@/utils/api";
@@ -16,6 +15,7 @@ import PermissionList from "@/components/user-management/view-permissions";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
+import DynamicCreateForm from "@/components/dynamic-create-form";
 
 function UserManagement() {
   const tabs = ["All Users", "Role", "Permissions"];
@@ -25,7 +25,7 @@ function UserManagement() {
     detail: "",
     status: false,
   });
-  
+
   const [users, setUsers] = useState<User[]>();
   const [roles, setRoles] = useState<Role[]>();
   const [role, setRole] = useState<RoleData>();
@@ -33,28 +33,28 @@ function UserManagement() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
-  
+
   // Fetch data functions
   const getUsers = async () => {
     const response = await axiosInstance.get("/users");
     setUsers(response.data.data);
   };
-  
+
   const getRoles = async () => {
     const response = await axiosInstance.get("/roles");
     setRoles(response.data.data);
   };
-  
+
   const getARole = async () => {
     const response = await axiosInstance.get(`/roles/${activeRowId}`);
     setRole(response.data.data);
   };
-  
+
   const getPermissions = async () => {
     const response = await axiosInstance.get("/permissions");
     setPermissions(response.data.data);
   };
-  
+
   // Delete functions
   const deleteUser = async () => {
     await axiosInstance.delete(`/users/${activeRowId}`);
@@ -65,7 +65,7 @@ function UserManagement() {
       status: true,
     });
   };
-  
+
   const deleteRole = async (id: number) => {
     await axiosInstance.delete(`/roles/${activeRowId}`);
     setCentralStateDelete("");
@@ -75,11 +75,13 @@ function UserManagement() {
       status: true,
     });
   };
-  
+
   // Group permissions by category
   const groupPermissions = (permissions: Permission[]) => {
     return permissions?.reduce((groups, permission) => {
-      const category = permission?.permissionString?.split(":")[0]?.split("_")[1];
+      const category = permission?.permissionString
+        ?.split(":")[0]
+        ?.split("_")[1];
       if (!groups[category]) {
         groups[category] = [];
       }
@@ -87,10 +89,10 @@ function UserManagement() {
       return groups;
     }, {} as Record<string, Permission[]>);
   };
-  
+
   const groupedPermissions = groupPermissions(permissions);
   const groupedPermissionsByUser = groupPermissions(role?.permissions);
-  
+
   // Toggle actions
   const toggleActions = (rowId: string) => {
     if (selectedTab === "All Users") {
@@ -99,7 +101,7 @@ function UserManagement() {
       setActiveRowId(rowId);
     }
   };
-  
+
   // Dynamic title and detail logic
   const getTitle = () => {
     switch (centralState) {
@@ -124,7 +126,7 @@ function UserManagement() {
     }
     return "Zijela";
   };
-  
+
   const getDetail = () => {
     switch (centralState) {
       case "createUser":
@@ -152,15 +154,36 @@ function UserManagement() {
     }
     return "Zijela";
   };
-  
+
   // Mapping centralState values to components
   const componentMap: Record<string, JSX.Element> = {
     createUser: (
-      <CreateUser
-        roles={roles}
-        setModalState={setCentralState}
+      <DynamicCreateForm
+        inputs={[
+          { name: "firstName", label: "First Name", type: "text" },
+          { name: "lastName", label: "Last Name", type: "text" },
+          { name: "email", label: "Email address", type: "email" },
+        ]}
+        selects={[
+          {
+            name: "roles",
+            label: "Roles",
+            placeholder: "Assign Roles",
+            options: roles?.map((asset: Role) => ({
+              value: asset.id,
+              label: asset.name,
+            })),
+            isMulti: true,
+          },
+        ]}
+        title="User"
+        apiEndpoint={`${activeRowId ? "/users" : "/users/pre-register"}`}
         activeRowId={activeRowId}
+        setModalState={setCentralState}
         setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/users/${id}`).then((res) => res.data.data)
+        }
       />
     ),
     createBulkUser: <CreateBulkUser />,
@@ -185,35 +208,35 @@ function UserManagement() {
       </div>
     ),
   };
-  
+
   useEffect(() => {
     if (centralState === "viewPermissions") {
       getARole();
     }
   }, [centralState]);
-  
+
   const tabPermissions: { [key: string]: string[] } = {
     "All Users": ["read_users"], // Permission to view "All Users"
     Role: ["read_roles"], // Permission to view "Role"
     Permissions: ["read_permissions"], // Permission to view "Permissions"
   };
-  
+
   const { userPermissions } = useDataPermission();
-  
+
   const getDefaultTab = () => {
     const userPermissionStrings = userPermissions.map(
       (perm) => perm.permissionString
     );
-  
+
     return tabs.find((tab) =>
       (tabPermissions[tab] || []).every((permission) =>
         userPermissionStrings.includes(permission)
       )
     );
   };
-  
+
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
-  
+
   useEffect(() => {
     if (selectedTab === "Role") {
       getRoles();
@@ -226,7 +249,6 @@ function UserManagement() {
       fetchData();
     }
   }, [centralState, centralStateDelete, selectedTab]);
-  
 
   return (
     <DashboardLayout

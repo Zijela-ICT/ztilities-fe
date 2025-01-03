@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 
 import axiosInstance from "@/utils/api";
 import UnprotectedRoute from "@/components/auth/unprotected-routes";
+import { SuccessModalCompoenent } from "@/components/modal-component";
 
 const Logo = "/assets/logo.png";
 const images = [
@@ -24,6 +25,10 @@ export default function LogIn() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userId, setUserId] = useState("");
+  const [message, setMessage] = useState("");
+
+  const [modalState, setModalState] = useState(false);
 
   // Set email from the URL query parameter
   useEffect(() => {
@@ -50,8 +55,14 @@ export default function LogIn() {
       password,
     });
 
-    localStorage.setItem("authToken", response.data.data.access_token);
-    router.push("/dashboard");
+    if (response.data.message === "User login successful") {
+      localStorage.setItem("authToken", response.data.data.access_token);
+      router.push("/dashboard");
+    } else {
+      setUserId(response.data?.data?.userId);
+      setMessage(response.data?.message);
+      setModalState(true);
+    }
   };
 
   useEffect(() => {
@@ -62,6 +73,14 @@ export default function LogIn() {
   }, []);
   return (
     <UnprotectedRoute>
+      <SuccessModalCompoenent
+        title={message}
+        detail={"2FA token sent to your email address"}
+        modalState={modalState}
+        setModalState={setModalState}
+        customAction={() => router.push(`/two-factor-auth?userId=${userId}`)}
+        text="Proceed"
+      ></SuccessModalCompoenent>
       <div className="relative h-full md:p-24 p-0 bg-transparent">
         <div className="rounded-2xl w-full bg-white flex  flex-col md:flex-row min-h-[90vh]">
           <div className="md:w-1/2 w-full py-24 sm:px-24 px-8">

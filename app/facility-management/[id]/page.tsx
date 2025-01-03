@@ -7,25 +7,24 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import CreateUser from "@/components/user-management/create-user";
 import CreateBulkUser from "@/components/user-management/create-bulk-user";
 import axiosInstance from "@/utils/api";
 
 import { useParams, useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
 
- function FacilityManagement() {
+function FacilityManagement() {
   const params = useParams();
   const router = useRouter();
   const { id } = params;
-  
+
   // Success state
   const [successState, setSuccessState] = useState({
     title: "",
     detail: "",
     status: false,
   });
-  
+
   // Delete user function
   const deleteUser = async () => {
     await axiosInstance.delete(`/users/${activeRowId}`);
@@ -36,31 +35,31 @@ import withPermissions from "@/components/auth/permission-protected-routes";
       status: true,
     });
   };
-  
+
   // Roles state and fetch function
   const [roles, setRoles] = useState<Role[]>();
   const getRoles = async () => {
     const response = await axiosInstance.get("/roles");
     setRoles(response.data.data);
   };
-  
+
   // Single role state and fetch function
   const [role, setRole] = useState<RoleData>();
   const getARole = async () => {
     const response = await axiosInstance.get(`/roles/${id}`);
     setRole(response.data.data);
   };
-  
+
   // Active row tracking
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const toggleActions = (rowId: string) => {
     setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
   };
-  
+
   // Central states for managing actions
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
-  
+
   // Fetch roles and role data on centralState/centralStateDelete change
   useEffect(() => {
     const fetchData = async () => {
@@ -68,7 +67,7 @@ import withPermissions from "@/components/auth/permission-protected-routes";
     };
     fetchData();
   }, [centralState, centralStateDelete]);
-  
+
   // Dynamic title logic
   const getTitle = () => {
     if (centralState === "createUser") {
@@ -88,7 +87,7 @@ import withPermissions from "@/components/auth/permission-protected-routes";
     }
     return "Zijela";
   };
-  
+
   // Dynamic detail logic
   const getDetail = () => {
     if (centralState === "createUser") {
@@ -110,20 +109,13 @@ import withPermissions from "@/components/auth/permission-protected-routes";
     }
     return "Zijela";
   };
-  
+
   // Component mapping for central state
   const componentMap: Record<string, JSX.Element> = {
-    createUser: (
-      <CreateUser
-        roles={roles}
-        setModalState={setCentralState}
-        activeRowId={activeRowId}
-        setSuccessState={setSuccessState}
-      />
-    ),
+    createUser: <></>,
     createBulkUser: <CreateBulkUser />,
   };
-  
+
   // Utility function to format role names
   function formatRoleName(roleName: string): string {
     return `${roleName
@@ -132,7 +124,7 @@ import withPermissions from "@/components/auth/permission-protected-routes";
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ")} Role`;
   }
-  
+
   return (
     <DashboardLayout
       title={role?.name ? formatRoleName(role?.name) : "...."}

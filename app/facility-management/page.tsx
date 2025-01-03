@@ -9,14 +9,11 @@ import ModalCompoenent, {
 } from "@/components/modal-component";
 import CreateBulkUser from "@/components/user-management/create-bulk-user";
 import axiosInstance from "@/utils/api";
-import PermissionList from "@/components/user-management/view-permissions";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
-import CreateFacility from "@/components/facility-management/create-facility";
-import CreateBlock from "@/components/facility-management/create-block";
-import CreateUnit from "@/components/facility-management/create-units";
 import FacilityDetails from "@/components/facility-management/view-facility";
+import DynamicCreateForm from "@/components/dynamic-create-form";
 
 function FacilityManagement() {
   const tabs = ["Facilities", "Blocks", "Units", "Assets"];
@@ -27,49 +24,49 @@ function FacilityManagement() {
     detail: "",
     status: false,
   });
-  
+
   const [facilities, setFacilities] = useState<Facility[]>();
   const [blocks, setBlocks] = useState<Block[]>();
   const [units, setUnits] = useState<Unit[]>();
   const [assets, setAssets] = useState<Asset[]>();
   const [facility, setAFacility] = useState<Facility>();
   const [asset, setAAsset] = useState<Asset>();
-  
+
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
-  
+
   // Fetch data functions
   const getFacilities = async () => {
     const response = await axiosInstance.get("/facilities");
     setFacilities(response.data.data);
   };
-  
+
   const getAFacility = async () => {
     const response = await axiosInstance.get(`/facilities/${activeRowId}`);
     setAFacility(response.data.data);
   };
-  
+
   const getBlocks = async () => {
     const response = await axiosInstance.get("/blocks");
     setBlocks(response.data.data);
   };
-  
+
   const getUnits = async () => {
     const response = await axiosInstance.get("/units");
     setUnits(response.data.data);
   };
-  
+
   const getAssets = async () => {
     const response = await axiosInstance.get("/assets");
     setAssets(response.data.data);
   };
-  
+
   const getAAsset = async () => {
     const response = await axiosInstance.get(`/assets/${activeRowId}`);
     setAAsset(response.data.data);
   };
-  
+
   // Delete functions
   const deleteFacility = async () => {
     await axiosInstance.delete(`/facilities/${activeRowId}`);
@@ -80,7 +77,7 @@ function FacilityManagement() {
       status: true,
     });
   };
-  
+
   const deleteBlock = async () => {
     await axiosInstance.delete(`/blocks/${activeRowId}`);
     setCentralStateDelete("");
@@ -90,7 +87,7 @@ function FacilityManagement() {
       status: true,
     });
   };
-  
+
   const deleteUnit = async () => {
     await axiosInstance.delete(`/units/${activeRowId}`);
     setCentralStateDelete("");
@@ -100,7 +97,7 @@ function FacilityManagement() {
       status: true,
     });
   };
-  
+
   const deleteAsset = async () => {
     await axiosInstance.delete(`/assets/${activeRowId}`);
     setCentralStateDelete("");
@@ -110,7 +107,7 @@ function FacilityManagement() {
       status: true,
     });
   };
-  
+
   // Utility functions
   const normalizeItems = (items: any[], key: string) => {
     return items.map((item) => ({
@@ -118,7 +115,7 @@ function FacilityManagement() {
       normalizedString: item[key],
     }));
   };
-  
+
   const groupFacilityItems = (items: any[]) => {
     return items?.reduce((groups, item) => {
       const category = item?.normalizedString?.split(" ")[0];
@@ -129,22 +126,25 @@ function FacilityManagement() {
       return groups;
     }, {} as Record<string, any[]>);
   };
-  
+
   // Normalize and group facility items
-  const normalizedBlocks = normalizeItems(facility?.blocks || [], "blockNumber");
+  const normalizedBlocks = normalizeItems(
+    facility?.blocks || [],
+    "blockNumber"
+  );
   const normalizedUnits = normalizeItems(facility?.units || [], "unitNumber");
   const normalizedAssets = normalizeItems(
     facility?.assets || [],
     "assetNumber"
   );
-  
+
   const combinedFacilityItems = [
     ...normalizedBlocks,
     ...normalizedUnits,
     ...normalizedAssets,
   ];
   const groupedFacilityItem = groupFacilityItems(combinedFacilityItems);
-  
+
   // Actions
   const toggleActions = (rowId: string) => {
     if (
@@ -157,7 +157,7 @@ function FacilityManagement() {
       setActiveRowId(rowId);
     }
   };
-  
+
   // Dynamic title and detail logic
   const getTitle = () => {
     switch (centralState) {
@@ -186,7 +186,7 @@ function FacilityManagement() {
     }
     return "Zijela";
   };
-  
+
   const getDetail = () => {
     switch (centralState) {
       case "createFacility":
@@ -222,35 +222,167 @@ function FacilityManagement() {
     }
     return "Zijela";
   };
-  
+
   // Component mapping
   const componentMap: Record<string, JSX.Element> = {
     createFacility: (
-      <CreateFacility
-        blocks={blocks}
-        units={units}
-        assets={assets}
-        setModalState={setCentralState}
+      <DynamicCreateForm
+        inputs={[
+          { name: "name", label: "Facility Name", type: "text" },
+          { name: "code", label: "Code", type: "text" },
+          { name: "facilityOfficer", label: "Facility Officer", type: "text" },
+          { name: "address", label: "Address", type: "text" },
+          { name: "phone", label: "Phone Number", type: "text" },
+          { name: "email", label: "Email address", type: "text" },
+        ]}
+        selects={[
+          {
+            name: "type",
+            label: "Facility Type",
+            placeholder: "Select Block Type",
+            options: [
+              { value: "single", label: "Single" },
+              { value: "residential", label: "Residential" },
+            ],
+          },
+          {
+            name: "blocks",
+            label: "Blocks",
+            placeholder: "Assign Blocks",
+            options: blocks?.map((asset: Block) => ({
+              value: asset.id,
+              label: asset.blockNumber,
+            })),
+            isMulti: true,
+          },
+          {
+            name: "assets",
+            label: "Assets",
+            placeholder: "Assign Assets",
+            options: assets?.map((asset: Asset) => ({
+              value: asset.id,
+              label: asset.assetNumber,
+            })),
+            isMulti: true,
+          },
+        ]}
+        title="Facility"
+        apiEndpoint="/facilities"
         activeRowId={activeRowId}
+        setModalState={setCentralState}
         setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
+        }
       />
     ),
     createBulkUser: <CreateBulkUser />,
     createBlock: (
-      <CreateBlock
-        units={units}
-        assets={assets}
+      <DynamicCreateForm
+        inputs={[
+          { name: "blockNumber", label: "Block Number", type: "text" },
+          { name: "code", label: "Code", type: "text" },
+          { name: "facilityOfficer", label: "Facility Officer", type: "text" },
+          { name: "address", label: "Address", type: "text" },
+          { name: "phone", label: "Phone Number", type: "text" },
+          { name: "email", label: "Email address", type: "text" },
+        ]}
+        selects={[
+          {
+            name: "type",
+            label: "Block Type",
+            placeholder: "Select Block Type",
+            options: [
+              { value: "single", label: "Single" },
+              { value: "residential", label: "Residential" },
+            ],
+          },
+          {
+            name: "units",
+            label: "Units",
+            placeholder: "Assign Units",
+            options: units?.map((asset: Unit) => ({
+              value: asset.id,
+              label: asset.unitNumber,
+            })),
+            isMulti: true,
+          },
+          {
+            name: "assets",
+            label: "Assets",
+            placeholder: "Assign Assets",
+            options: assets?.map((asset: Asset) => ({
+              value: asset.id,
+              label: asset.assetNumber,
+            })),
+            isMulti: true,
+          },
+        ]}
+        title="Blocks"
+        apiEndpoint="/blocks"
+        activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-        activeRowId={activeRowId}
+        fetchResource={(id) =>
+          axiosInstance.get(`/blocks/${id}`).then((res) => res.data.data)
+        }
       />
     ),
     createUnit: (
-      <CreateUnit
-        assets={assets}
+      <DynamicCreateForm
+        inputs={[
+          { name: "unitNumber", label: "Unit Number", type: "text" },
+          { name: "ownership", label: "Ownership", type: "text" },
+          { name: "description", label: "Description", type: "text" },
+          { name: "address", label: "Address", type: "text" },
+        ]}
+        selects={[
+          {
+            name: "type",
+            label: "Unit Type",
+            placeholder: "Select Unit Type",
+            options: [
+              { value: "single", label: "Single" },
+              { value: "residential", label: "Residential" },
+            ],
+          },
+          {
+            name: "bookable",
+            label: "Bookable",
+            placeholder: "Is it Bookable?",
+            options: [
+              { value: "yes", label: "Yes" },
+              { value: "no", label: "No" },
+            ],
+          },
+          {
+            name: "commonArea",
+            label: "Common Area",
+            placeholder: "Common Area?",
+            options: [
+              { value: "yes", label: "Yes" },
+              { value: "no", label: "No" },
+            ],
+          },
+          {
+            name: "assets",
+            label: "Assets",
+            placeholder: "Assign Assets",
+            options: assets?.map((asset: Asset) => ({
+              value: asset.id,
+              label: asset.assetNumber,
+            })),
+            isMulti: true,
+          },
+        ]}
+        title="Units"
+        apiEndpoint="/units"
+        activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-        activeRowId={activeRowId}
+        fetchResource={(id) =>
+          axiosInstance.get(`/units/${id}`).then((res) => res.data.data)
+        }
       />
     ),
     viewFacility: (
@@ -262,7 +394,7 @@ function FacilityManagement() {
       </div>
     ),
   };
-  
+
   // Permissions and default tab logic
   const tabPermissions: { [key: string]: string[] } = {
     Facilities: ["read_facilities"],
@@ -270,23 +402,23 @@ function FacilityManagement() {
     Units: ["read_units"],
     Assets: ["read_facilities"],
   };
-  
+
   const { userPermissions } = useDataPermission();
-  
+
   const getDefaultTab = () => {
     const userPermissionStrings = userPermissions.map(
       (perm) => perm.permissionString
     );
-  
+
     return tabs.find((tab) =>
       (tabPermissions[tab] || []).every((permission) =>
         userPermissionStrings.includes(permission)
       )
     );
   };
-  
+
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
-  
+
   // Fetch data on tab change or state change
   useEffect(() => {
     if (selectedTab === "Blocks") {
@@ -303,13 +435,13 @@ function FacilityManagement() {
       fetchData();
     }
   }, [centralState, centralStateDelete, selectedTab]);
-  
+
   useEffect(() => {
     if (centralState === "viewFacility") {
       getAFacility();
     }
   }, [centralState]);
-  
+
   return (
     <DashboardLayout
       title="Facility Management"

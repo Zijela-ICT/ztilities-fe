@@ -6,7 +6,7 @@ import { LabelInputComponent } from "../input-container";
 import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 
-export default function CreateVendor({
+export default function CreateWorkOrder({
   setModalState,
   activeRowId,
   setSuccessState,
@@ -182,7 +182,7 @@ export default function CreateVendor({
             type="submit"
             className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-base font-semibold text-white"
           >
-            {activeRowId ? "Edit Vendor" : "Create Vendor"}
+            {activeRowId ? "Edit Technician" : "Create Technician"}
           </button>
         </div>
       </form>

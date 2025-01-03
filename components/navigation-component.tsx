@@ -67,12 +67,18 @@ export default function Navigation() {
             permissions: ["users", "admin"],
             iconPath: paths.path1,
           },
-          {
-            href: "/work-requests",
-            label: "Work Request",
-            permissions: ["work-requests", "work-orders"],
-            iconPath: paths.path1,
-          },
+          // {
+          //   href: "/work-requests",
+          //   label: "Work Request",
+          //   permissions: ["work-requests"],
+          //   iconPath: paths.path1,
+          // },
+          // {
+          //   href: "/work-orders",
+          //   label: "Work Order",
+          //   permissions: ["work-orders"],
+          //   iconPath: paths.path1,
+          // },
           {
             href: "/facility-management",
             label: "Facility Management",

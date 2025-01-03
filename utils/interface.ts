@@ -28,6 +28,7 @@ interface AuthUser {
   needPasswordReset: boolean;
   isVendor: boolean;
   isDeactivated: boolean;
+  twoFAMethod: string;
 }
 
 interface Permission {
@@ -83,6 +84,7 @@ interface Unit {
 
 interface Asset {
   id: number;
+  assetNumber: string;
 }
 
 //Vendor
