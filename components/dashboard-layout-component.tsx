@@ -11,6 +11,7 @@ import ModalCompoenent from "./modal-component";
 import { useState } from "react";
 import ChangeMyPassword from "./change-my-password";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function DashboardLayout({
   children,
@@ -57,12 +58,24 @@ export default function DashboardLayout({
                       <ArrowLeft />
                     </div>
                   )}
-                  <h1 className="text-base text-gray-500 font-light">{detail}</h1>
+                  <h1 className="text-base text-gray-500 font-light">
+                    {detail}
+                  </h1>
                 </div>
               </div>
               <div className="flex space-x-6 mr-14">
                 <Link href={`/user-profile`}>
-                  <UserProfile />
+                  {user.avatar ? (
+                    <Image
+                      src={user?.avatar && user?.avatar}
+                      alt="User Avatar"
+                      className="rounded-full"
+                      width={32}
+                      height={32}
+                    />
+                  ) : (
+                    <UserProfile />
+                  )}
                 </Link>
                 <Link href={`/settings`}>
                   <SettingUserIcon />

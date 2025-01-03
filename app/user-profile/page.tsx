@@ -201,7 +201,7 @@ export default function UserProfile() {
       ></SuccessModalCompoenent>
 
       <ModalCompoenent
-        title={"QR Code"}
+        title={"Scan QR Code"}
         detail={
           "Make sure you scan the code if you choose App for verification"
         }
