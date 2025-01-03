@@ -106,16 +106,56 @@ export default function DynamicCreateForm({
   // };
 
   // Submit handler
+  // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   console.log(formData);
+  //   try {
+  //     if (activeRowId) {
+  //       await axiosInstance.patch(`${apiEndpoint}/${activeRowId}`, formData);
+  //     } else {
+  //       await axiosInstance.post(apiEndpoint, formData);
+  //     }
+
+  //     setFormData({});
+  //     setModalState("");
+  //     setSuccessState({
+  //       title: "Successful",
+  //       detail: `You have successfully ${
+  //         activeRowId ? "edited" : "created"
+  //       } this resource.`,
+  //       status: true,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error submitting form:", error);
+  //   }
+  // };
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+  
+    // Prepend "Block" for blockNumber and "Asset" for assetNumber if not already present
+    const updatedFormData = { ...formData };
+  
+    if (updatedFormData.blockNumber && !updatedFormData.blockNumber.startsWith("Block")) {
+      updatedFormData.blockNumber = `Block ${updatedFormData.blockNumber}`;
+    }
+  
+    if (updatedFormData.assetNumber && !updatedFormData.assetNumber.startsWith("Asset")) {
+      updatedFormData.assetNumber = `Asset ${updatedFormData.assetNumber}`;
+    }
+
+    if (updatedFormData.unitNumber && !updatedFormData.unitNumber.startsWith("Unit")) {
+      updatedFormData.unitNumber = `Unit ${updatedFormData.unitNumber}`;
+    }
+  
+    // console.log(updatedFormData);
+  
     try {
       if (activeRowId) {
-        await axiosInstance.patch(`${apiEndpoint}/${activeRowId}`, formData);
+        await axiosInstance.patch(`${apiEndpoint}/${activeRowId}`, updatedFormData);
       } else {
-        await axiosInstance.post(apiEndpoint, formData);
+        await axiosInstance.post(apiEndpoint, updatedFormData);
       }
-
+  
       setFormData({});
       setModalState("");
       setSuccessState({
@@ -129,6 +169,7 @@ export default function DynamicCreateForm({
       console.error("Error submitting form:", error);
     }
   };
+  
 
   useEffect(() => {
     if (activeRowId && fetchResource) {
