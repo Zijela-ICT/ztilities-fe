@@ -11,7 +11,7 @@ interface ModalProps {
   children?: any;
   bulk?: any;
   activeRowId?: number;
-  width?: string
+  width?: string;
 }
 
 export default function ModalCompoenent({
@@ -21,7 +21,7 @@ export default function ModalCompoenent({
   modalState,
   setModalState,
   bulk,
-  width
+  width,
 }: ModalProps) {
   return (
     <>
@@ -33,7 +33,11 @@ export default function ModalCompoenent({
           modalState ? "block" : "hidden"
         } fixed inset-0 z-50 flex justify-center items-center overflow-y-auto `}
       >
-        <div className={`relative p-4 w-full ${width ? width :"max-w-2xl" } max-h-full mx-auto`}>
+        <div
+          className={`relative p-4 w-full ${
+            width ? width : "max-w-2xl"
+          } max-h-full mx-auto`}
+        >
           {/* Modal content */}
           <div
             className={`relative ${
@@ -77,7 +81,7 @@ interface ActionModalProps {
   bulk?: any;
   takeAction?: any;
   customAction?: any;
-  text? : string
+  text?: string;
 }
 
 export function ActionModalCompoenent({
@@ -106,7 +110,7 @@ export function ActionModalCompoenent({
           >
             <div className="mb-6">
               <Image
-                className=" mx-auto text-gray-400 my-16"
+                className="animate-heartbeat mx-auto text-gray-400 my-16"
                 src={`/assets/warning.png`}
                 width={155}
                 height={155}
@@ -157,7 +161,7 @@ export function SuccessModalCompoenent({
   setModalState,
   bulk,
   customAction,
-  text
+  text,
 }: ActionModalProps) {
   return (
     <>
@@ -176,13 +180,13 @@ export function SuccessModalCompoenent({
             } rounded-xl shadow text-center p-8`}
           >
             <div className="mb-6">
-              {/* <Image
-                className=" mx-auto text-gray-400 my-16"
-                src={`/assets/warning.png`}
+              <Image
+                className="animate-heartbeat mx-auto text-gray-400 my-16"
+                src={`/assets/success-check.png`}
                 width={155}
                 height={155}
                 alt="img"
-              /> */}
+              />
             </div>
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">
               {title}
@@ -191,7 +195,7 @@ export function SuccessModalCompoenent({
 
             <div className="flex items-center">
               <ButtonComponent
-                text={text?text : "Done"}
+                text={text ? text : "Done"}
                 className="text-white"
                 onClick={() =>
                   customAction ? customAction() : setModalState(false)
