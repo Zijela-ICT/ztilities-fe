@@ -65,7 +65,7 @@ export default function DashboardLayout({
               </div>
               <div className="flex space-x-6 mr-14">
                 <Link href={`/user-profile`}>
-                  {user.avatar ? (
+                  {user?.avatar ? (
                     <Image
                       src={user?.avatar && user?.avatar}
                       alt="User Avatar"
