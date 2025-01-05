@@ -141,7 +141,7 @@ export default function TableComponent({
           <tbody>
             {currentItems?.map((row: any, index) => (
               <tr key={index} className="border-b border-gray-100 h-20">
-                {columns
+                {/* {columns
                   .filter(
                     (column) =>
                       column !== "id" &&
@@ -155,7 +155,7 @@ export default function TableComponent({
                         // Handle array case, extract specific properties
                         row[column]
                           .map((item: any) =>
-                            ["name", "blockNumber", "unitNumber", "assetNumber"]
+                            ["name", "blockNumber", "unitNumber", "assetName"]
                               .map((prop) => item[prop])
                               .filter(Boolean)
                               .join(", ")
@@ -164,7 +164,67 @@ export default function TableComponent({
                       ) : typeof row[column] === "object" &&
                         row[column] !== null ? (
                         // Handle single object case, extract specific properties
-                        ["name", "blockNumber", "unitNumber", "assetNumber"]
+                        ["name", "blockNumber", "unitNumber", "assetName"]
+                          .map((prop) => row[column][prop])
+                          .filter(Boolean)
+                          .join(", ")
+                      ) : column === "isDeactivated" ? (
+                        // Handle isDeactivated column
+                        <span
+                          className={`px-2.5 py-1 ${
+                            row[column] === false
+                              ? "text-[#036B26] bg-[#E7F6EC]"
+                              : "text-[#B76E00] bg-[#FFAB0014]"
+                          } rounded-full `}
+                        >
+                          {row[column] === true ? "Inactive" : "Active"}
+                        </span>
+                      ) : column === "status" ? (
+                        // Handle status column
+                        <span
+                          className={`px-2.5 py-1 ${
+                            row[column] === "Approved"
+                              ? "text-[#036B26] bg-[#E7F6EC]"
+                              : "text-[#B76E00] bg-[#FFAB0014]"
+                          } rounded-full `}
+                        >
+                          {row[column]?.toString()}
+                        </span>
+                      ) : (
+                        // Default case for other columns
+                        row[column]?.toString()
+                      )}
+                    </td>
+                  ))} */}
+                {columns
+                  .filter(
+                    (column) =>
+                      column !== "id" &&
+                      column !== "createdAt" &&
+                      column !== "updatedAt" &&
+                      column !== "avatar"
+                  )
+                  .map((column) => (
+                    <td key={column} className="py-3 px-4">
+                      {Array.isArray(row[column]) ? (
+                        type === "assets" ? (
+                          // Show the length of the array for specific types
+                          row[column].length
+                        ) : (
+                          // Handle array case, extract specific properties
+                          row[column]
+                            .map((item: any) =>
+                              ["name", "blockNumber", "unitNumber", "assetName"]
+                                .map((prop) => item[prop])
+                                .filter(Boolean)
+                                .join(", ")
+                            )
+                            .join(", ")
+                        )
+                      ) : typeof row[column] === "object" &&
+                        row[column] !== null ? (
+                        // Handle single object case, extract specific properties
+                        ["name", "blockNumber", "unitNumber", "assetName"]
                           .map((prop) => row[column][prop])
                           .filter(Boolean)
                           .join(", ")
@@ -342,7 +402,7 @@ export default function TableComponent({
                                 <DropdownButtonComponent
                                   text="View"
                                   onClick={() => setModalState("viewFacility")}
-                                  permissions={["read_facilities"]}
+                                  permissions={["read_facilities:id"]}
                                 />
                               </li>
                               <li>
@@ -401,13 +461,13 @@ export default function TableComponent({
                         {activeRowId === row.id && (
                           <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
                             <ul className="py-2">
-                              {/* <li>
+                              <li>
                                 <DropdownButtonComponent
                                   text="View"
                                   onClick={() => setModalState("viewBlock")}
-                                  permissions={["update_users:id"]}
+                                  permissions={["read_blocks:id"]}
                                 />
-                              </li> */}
+                              </li>
                               <li>
                                 <DropdownButtonComponent
                                   text="Edit"
@@ -462,13 +522,13 @@ export default function TableComponent({
                         {activeRowId === row.id && (
                           <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
                             <ul className="py-2">
-                              {/* <li>
+                              <li>
                                 <DropdownButtonComponent
                                   text="View"
-                                  onClick={() => setModalState("viewBlock")}
-                                  permissions={["update_users:id"]}
+                                  onClick={() => setModalState("viewUnit")}
+                                  permissions={["read_units:id"]}
                                 />
-                              </li> */}
+                              </li>
                               <li>
                                 <DropdownButtonComponent
                                   text="Edit"
@@ -498,6 +558,48 @@ export default function TableComponent({
                             </ul>
                           </div>
                         )}
+                      </div>
+                    </>
+                  ) : type === "assets" ? (
+                    <>
+                      <div className="flex items-center space-x-2 w-full md:w-4/5 ">
+                        <ButtonComponent
+                          text="View Facilities"
+                          onClick={() =>
+                            router.push(`/facility-management/${row?.id}`)
+                          }
+                          permissions={["read_assets:id"]}
+                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-white border border-gray-200"
+                        />
+
+                        <ButtonComponent
+                          text="Edit Asset"
+                          onClick={() => {
+                            toggleActions(row.id);
+                            setModalState("createAsset");
+                          }}
+                          permissions={["update_assets:id"]}
+                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
+                        />
+
+                        <PermissionGuard
+                          requiredPermissions={["delete_assets:id"]}
+                        >
+                          {row.facilities.length > 0 ? (
+                            <div>
+                              <TrashIconGray />
+                            </div>
+                          ) : (
+                            <div
+                              onClick={() => {
+                                toggleActions(row.id);
+                                setModalStateDelete("deleteAsset");
+                              }}
+                            >
+                              <TrashIcon />
+                            </div>
+                          )}
+                        </PermissionGuard>
                       </div>
                     </>
                   ) : type === "vendors" ? (
@@ -592,7 +694,9 @@ export default function TableComponent({
                               <li>
                                 <DropdownButtonComponent
                                   text="Edit"
-                                  onClick={() => setModalState("createTechnician")}
+                                  onClick={() =>
+                                    setModalState("createTechnician")
+                                  }
                                   permissions={["update_vendors:id"]}
                                 />
                               </li>
@@ -601,7 +705,9 @@ export default function TableComponent({
                                   <DropdownButtonComponent
                                     text="De-activate"
                                     onClick={() =>
-                                      setModalStateDelete("deactivateTechnician")
+                                      setModalStateDelete(
+                                        "deactivateTechnician"
+                                      )
                                     }
                                     permissions={["delete_vendors:id"]}
                                   />

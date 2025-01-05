@@ -131,31 +131,43 @@ export default function DynamicCreateForm({
   // };
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     // Prepend "Block" for blockNumber and "Asset" for assetNumber if not already present
     const updatedFormData = { ...formData };
-  
-    if (updatedFormData.blockNumber && !updatedFormData.blockNumber.startsWith("Block")) {
+
+    if (
+      updatedFormData.blockNumber &&
+      !updatedFormData.blockNumber.startsWith("Block")
+    ) {
       updatedFormData.blockNumber = `Block ${updatedFormData.blockNumber}`;
     }
-  
-    if (updatedFormData.assetNumber && !updatedFormData.assetNumber.startsWith("Asset")) {
+
+    if (
+      updatedFormData.assetNumber &&
+      !updatedFormData.assetNumber.startsWith("Asset")
+    ) {
       updatedFormData.assetNumber = `Asset ${updatedFormData.assetNumber}`;
     }
 
-    if (updatedFormData.unitNumber && !updatedFormData.unitNumber.startsWith("Unit")) {
+    if (
+      updatedFormData.unitNumber &&
+      !updatedFormData.unitNumber.startsWith("Unit")
+    ) {
       updatedFormData.unitNumber = `Unit ${updatedFormData.unitNumber}`;
     }
-  
+
     // console.log(updatedFormData);
-  
+
     try {
       if (activeRowId) {
-        await axiosInstance.patch(`${apiEndpoint}/${activeRowId}`, updatedFormData);
+        await axiosInstance.patch(
+          `${apiEndpoint}/${activeRowId}`,
+          updatedFormData
+        );
       } else {
         await axiosInstance.post(apiEndpoint, updatedFormData);
       }
-  
+
       setFormData({});
       setModalState("");
       setSuccessState({
@@ -169,7 +181,6 @@ export default function DynamicCreateForm({
       console.error("Error submitting form:", error);
     }
   };
-  
 
   useEffect(() => {
     if (activeRowId && fetchResource) {
@@ -239,7 +250,40 @@ export default function DynamicCreateForm({
         })}
 
         {/* Render selects dynamically */}
-        {selects?.map((select) => (
+        {selects?.map((select) => {
+          // Skip rendering 'facilitId' when the title is 'Blocks' and there is an activeRowId
+          if (
+            (title === "Blocks" &&
+              activeRowId &&
+              select.name === "facilityId") ||
+            (title === "Units" && activeRowId && select.name === "blockId")
+          ) {
+            return null;
+          }
+          return (
+            <div key={select.name} className="relative w-full mt-6">
+              <Select
+                isMulti={select.isMulti}
+                name={select.name}
+                options={select.options}
+                value={
+                  select.isMulti
+                    ? select.options?.filter((option) =>
+                        formData[select.name]?.includes(option.value)
+                      )
+                    : select.options?.find(
+                        (option) => option.value === formData[select.name]
+                      )
+                }
+                onChange={handleSelectChange(select.name, select.isMulti)}
+                styles={multiSelectStyle}
+                placeholder={select.placeholder}
+              />
+            </div>
+          );
+        })}
+
+        {/* {selects?.map((select) => (
           <div key={select.name} className="relative w-full mt-6">
             <Select
               isMulti={select.isMulti}
@@ -259,7 +303,7 @@ export default function DynamicCreateForm({
               placeholder={select.placeholder}
             />
           </div>
-        ))}
+        ))} */}
 
         <div className="mt-10 flex w-full justify-end">
           <button

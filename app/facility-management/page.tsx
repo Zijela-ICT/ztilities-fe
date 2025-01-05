@@ -31,6 +31,8 @@ function FacilityManagement() {
   const [assets, setAssets] = useState<Asset[]>();
   const [facility, setAFacility] = useState<Facility>();
   const [asset, setAAsset] = useState<Asset>();
+  const [block, setABlock] = useState<Block>();
+  const [unit, setAUnit] = useState<Unit>();
 
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [centralState, setCentralState] = useState<string>();
@@ -60,6 +62,16 @@ function FacilityManagement() {
   const getAssets = async () => {
     const response = await axiosInstance.get("/assets");
     setAssets(response.data.data);
+  };
+
+  const getABlock = async () => {
+    const response = await axiosInstance.get(`/blocks/${activeRowId}`);
+    setABlock(response.data.data);
+  };
+
+  const getAUnit = async () => {
+    const response = await axiosInstance.get(`/units/${activeRowId}`);
+    setAUnit(response.data.data);
   };
 
   const getAAsset = async () => {
@@ -128,28 +140,45 @@ function FacilityManagement() {
   };
 
   // Normalize and group facility items
-  const normalizedBlocks = normalizeItems(
+  const normalizedFacilityBlocks = normalizeItems(
     facility?.blocks || [],
     "blockNumber"
   );
-  const normalizedUnits = normalizeItems(facility?.units || [], "unitNumber");
-  const normalizedAssets = normalizeItems(
+  const normalizedFacilityAssets = normalizeItems(
     facility?.assets || [],
-    "assetNumber"
+    "assetName"
   );
 
+  const normalizedBlockUnits = normalizeItems(block?.units || [], "unitNumber");
+  const normalizedBlockAssets = normalizeItems(
+    block?.assets || [],
+    "assetName"
+  );
+
+  const normalizedUnitAssets = normalizeItems(unit?.assets || [], "assetName");
+
   const combinedFacilityItems = [
-    ...normalizedBlocks,
-    ...normalizedUnits,
-    ...normalizedAssets,
+    ...normalizedFacilityBlocks,
+    ...normalizedFacilityAssets,
   ];
+
+  const combinedBlockItems = [
+    ...normalizedBlockUnits,
+    ...normalizedBlockAssets,
+  ];
+
+  const combinedUnitItems = [...normalizedUnitAssets];
+
   const groupedFacilityItem = groupFacilityItems(combinedFacilityItems);
+  const groupedBlockItem = groupFacilityItems(combinedBlockItems);
+  const groupedUnitItem = groupFacilityItems(combinedUnitItems);
 
   // Actions
   const toggleActions = (rowId: string) => {
     if (
       selectedTab === "Facilities" ||
       selectedTab === "Blocks" ||
+      selectedTab === "Assets" ||
       selectedTab === "Units"
     ) {
       setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
@@ -246,22 +275,12 @@ function FacilityManagement() {
             ],
           },
           {
-            name: "blocks",
-            label: "Blocks",
-            placeholder: "Assign Blocks",
-            options: blocks?.map((asset: Block) => ({
-              value: asset.id,
-              label: asset.blockNumber,
-            })),
-            isMulti: true,
-          },
-          {
             name: "assets",
             label: "Assets",
             placeholder: "Assign Assets",
             options: assets?.map((asset: Asset) => ({
               value: asset.id,
-              label: asset.assetNumber,
+              label: asset.assetName,
             })),
             isMulti: true,
           },
@@ -298,14 +317,13 @@ function FacilityManagement() {
             ],
           },
           {
-            name: "units",
-            label: "Units",
-            placeholder: "Assign Units",
-            options: units?.map((asset: Unit) => ({
+            name: "facilityId",
+            label: "Facility",
+            placeholder: "Assign a facility to block",
+            options: facilities?.map((asset: Facility) => ({
               value: asset.id,
-              label: asset.unitNumber,
+              label: asset.name,
             })),
-            isMulti: true,
           },
           {
             name: "assets",
@@ -313,7 +331,7 @@ function FacilityManagement() {
             placeholder: "Assign Assets",
             options: assets?.map((asset: Asset) => ({
               value: asset.id,
-              label: asset.assetNumber,
+              label: asset.assetName,
             })),
             isMulti: true,
           },
@@ -333,8 +351,7 @@ function FacilityManagement() {
         inputs={[
           { name: "unitNumber", label: "Unit Number", type: "text" },
           { name: "ownership", label: "Ownership", type: "text" },
-          { name: "description", label: "Description", type: "text" },
-          { name: "address", label: "Address", type: "text" },
+          { name: "description", label: "Description", type: "textarea" },
         ]}
         selects={[
           {
@@ -365,12 +382,21 @@ function FacilityManagement() {
             ],
           },
           {
+            name: "blockId",
+            label: "Block",
+            placeholder: "Assign a block to units",
+            options: blocks?.map((asset: Block) => ({
+              value: asset.id,
+              label: asset.blockNumber,
+            })),
+          },
+          {
             name: "assets",
             label: "Assets",
             placeholder: "Assign Assets",
             options: assets?.map((asset: Asset) => ({
               value: asset.id,
-              label: asset.assetNumber,
+              label: asset.assetName,
             })),
             isMulti: true,
           },
@@ -385,11 +411,44 @@ function FacilityManagement() {
         }
       />
     ),
+    createAsset: (
+      <DynamicCreateForm
+        inputs={[
+          { name: "assetName", label: "Asset Name", type: "text" },
+          { name: "description", label: "Description (Optional)", type: "textarea" },
+        ]}
+        selects={[]}
+        title="Assets"
+        apiEndpoint="/assets"
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/assets/${id}`).then((res) => res.data.data)
+        }
+      />
+    ),
     viewFacility: (
       <div className="p-4">
         <FacilityDetails
           facility={facility}
           groupedPermissions={groupedFacilityItem || []}
+        />
+      </div>
+    ),
+    viewBlock: (
+      <div className="p-4">
+        <FacilityDetails
+          facility={block}
+          groupedPermissions={groupedBlockItem || []}
+        />
+      </div>
+    ),
+    viewUnit: (
+      <div className="p-4">
+        <FacilityDetails
+          facility={unit}
+          groupedPermissions={groupedUnitItem || []}
         />
       </div>
     ),
@@ -424,13 +483,20 @@ function FacilityManagement() {
     if (selectedTab === "Blocks") {
       getBlocks();
       getUnits();
+      getAssets();
     } else if (selectedTab === "Units") {
       getUnits();
+      getAssets();
     } else if (selectedTab === "Assets") {
       getAssets();
     } else {
       const fetchData = async () => {
-        await Promise.all([getFacilities(), getBlocks(), getUnits()]);
+        await Promise.all([
+          getFacilities(),
+          getBlocks(),
+          getUnits(),
+          getAssets(),
+        ]);
       };
       fetchData();
     }
@@ -439,6 +505,10 @@ function FacilityManagement() {
   useEffect(() => {
     if (centralState === "viewFacility") {
       getAFacility();
+    } else if (centralState === "viewBlock") {
+      getABlock();
+    } else if (centralState === "viewUnit") {
+      getAUnit();
     }
   }, [centralState]);
 

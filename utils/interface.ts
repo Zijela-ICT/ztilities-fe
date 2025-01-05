@@ -84,7 +84,10 @@ interface Unit {
 
 interface Asset {
   id: number;
-  assetNumber: string;
+  assetName: string;
+  blocks: Block[];
+  units: Unit[];
+  facilities: Facility[];
 }
 
 //Vendor

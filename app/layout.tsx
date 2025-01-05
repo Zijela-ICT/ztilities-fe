@@ -47,7 +47,7 @@ export default function RootLayout({
             <ToastContainer
               position="top-center"
               autoClose={3000}
-              newestOnTop={true}
+              newestOnTop={false}
               rtl={false}
               theme="colored"
               className="font-satoshi"

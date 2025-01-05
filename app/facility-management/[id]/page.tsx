@@ -12,6 +12,8 @@ import axiosInstance from "@/utils/api";
 
 import { useParams, useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
+import FacilityDetails from "@/components/facility-management/view-facility";
+import DynamicCreateForm from "@/components/dynamic-create-form";
 
 function FacilityManagement() {
   const params = useParams();
@@ -26,29 +28,66 @@ function FacilityManagement() {
   });
 
   // Delete user function
-  const deleteUser = async () => {
-    await axiosInstance.delete(`/users/${activeRowId}`);
+  const deleteFacility = async () => {
+    await axiosInstance.delete(`/facilities/${activeRowId}`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully de-activated this user",
+      detail: "You have successfully de-activated this facility",
       status: true,
     });
   };
 
   // Roles state and fetch function
-  const [roles, setRoles] = useState<Role[]>();
-  const getRoles = async () => {
-    const response = await axiosInstance.get("/roles");
-    setRoles(response.data.data);
+  const [assets, setAssets] = useState<Asset[]>();
+  const getAssets = async () => {
+    const response = await axiosInstance.get("/assets");
+    setAssets(response.data.data);
+  };
+
+  const [facility, setAFacility] = useState<Facility>();
+  const getAFacility = async () => {
+    const response = await axiosInstance.get(`/facilities/${activeRowId}`);
+    setAFacility(response.data.data);
   };
 
   // Single role state and fetch function
-  const [role, setRole] = useState<RoleData>();
-  const getARole = async () => {
-    const response = await axiosInstance.get(`/roles/${id}`);
-    setRole(response.data.data);
+  const [asset, setAsset] = useState<Asset>();
+  const getAAsset = async () => {
+    const response = await axiosInstance.get(`/assets/${id}`);
+    setAsset(response.data.data);
   };
+
+  // Utility functions
+  const normalizeItems = (items: any[], key: string) => {
+    return items.map((item) => ({
+      ...item,
+      normalizedString: item[key],
+    }));
+  };
+  const groupFacilityItems = (items: any[]) => {
+    return items?.reduce((groups, item) => {
+      const category = item?.normalizedString?.split(" ")[0];
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(item);
+      return groups;
+    }, {} as Record<string, any[]>);
+  };
+  const normalizedFacilityBlocks = normalizeItems(
+    facility?.blocks || [],
+    "blockNumber"
+  );
+  const normalizedFacilityAssets = normalizeItems(
+    facility?.assets || [],
+    "assetName"
+  );
+  const combinedFacilityItems = [
+    ...normalizedFacilityBlocks,
+    ...normalizedFacilityAssets,
+  ];
+  const groupedFacilityItem = groupFacilityItems(combinedFacilityItems);
 
   // Active row tracking
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -63,72 +102,151 @@ function FacilityManagement() {
   // Fetch roles and role data on centralState/centralStateDelete change
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([getRoles(), getARole()]);
+      await Promise.all([getAssets(), getAAsset()]);
     };
     fetchData();
   }, [centralState, centralStateDelete]);
 
   // Dynamic title logic
   const getTitle = () => {
-    if (centralState === "createUser") {
-      return activeRowId ? "Edit User" : "Create User";
+    switch (centralState) {
+      case "createFacility":
+        return activeRowId ? "Edit Facility" : "Create Facility";
+      case "createBlock":
+        return activeRowId ? "Edit Block" : "Create Block";
+      case "createUnit":
+        return activeRowId ? "Edit Unit" : "Create Unit";
+      case "createAsset":
+        return activeRowId ? "Edit Asset" : "Create Asset";
+      case "createBulkFacility":
+        return "Upload Bulk Facility";
+      case "viewFacility":
+        return "Facility Details";
     }
-    if (centralState === "createBulkUser") {
-      return "Upload Bulk User";
-    }
-    if (centralState === "resetPassword") {
-      return "Reset Password";
-    }
-    if (centralStateDelete === "deleteUser") {
-      return "De-activate User";
-    }
-    if (centralStateDelete === "activateUser") {
-      return "Re-activate User";
+    switch (centralStateDelete) {
+      case "deleteFacility":
+        return "Delete Facility";
+      case "deleteBlock":
+        return "Delete Block";
+      case "deleteUnit":
+        return "Delete Unit";
+      case "deleteAsset":
+        return "Delete Asset";
     }
     return "Zijela";
   };
 
-  // Dynamic detail logic
   const getDetail = () => {
-    if (centralState === "createUser") {
-      return activeRowId
-        ? "You can edit user details here."
-        : "You can create and manage users' access here.";
+    switch (centralState) {
+      case "createFacility":
+        return activeRowId
+          ? "You can edit facility details here."
+          : "You can create and manage facilities here.";
+      case "createBlock":
+        return activeRowId
+          ? "You can edit block details here."
+          : "You can manage blocks here.";
+      case "createUnit":
+        return activeRowId
+          ? "You can edit units details here."
+          : "You can manage units here.";
+      case "createBulkFacility":
+        return "Import CSV/Excel file";
+      case "createAsset":
+        return activeRowId
+          ? "You can edit assets details here."
+          : "You can manage assets here.";
+      case "viewFacility":
+        return "";
     }
-    if (centralState === "createBulkUser") {
-      return "Import CSV/Excel file";
-    }
-    if (centralState === "resetPassword") {
-      return "Change the password for this user";
-    }
-    if (centralStateDelete === "deleteUser") {
-      return "Are you sure you want to de-activate this user";
-    }
-    if (centralStateDelete === "activateUser") {
-      return "Are you sure you want to Re-activate this user";
+    switch (centralStateDelete) {
+      case "deleteFacility":
+        return "Are you sure you want to delete this facility";
+      case "deleteBlock":
+        return "Are you sure you want to delete this block";
+      case "deleteUnit":
+        return "Are you sure you want to delete this unit";
+      case "deleteAsset":
+        return "Are you sure you want to delete this asset";
     }
     return "Zijela";
   };
 
   // Component mapping for central state
+  // Component mapping
   const componentMap: Record<string, JSX.Element> = {
-    createUser: <></>,
+    createFacility: (
+      <DynamicCreateForm
+        inputs={[
+          { name: "name", label: "Facility Name", type: "text" },
+          { name: "code", label: "Code", type: "text" },
+          { name: "facilityOfficer", label: "Facility Officer", type: "text" },
+          { name: "address", label: "Address", type: "text" },
+          { name: "phone", label: "Phone Number", type: "text" },
+          { name: "email", label: "Email address", type: "text" },
+        ]}
+        selects={[
+          {
+            name: "type",
+            label: "Facility Type",
+            placeholder: "Select Block Type",
+            options: [
+              { value: "single", label: "Single" },
+              { value: "residential", label: "Residential" },
+            ],
+          },
+          {
+            name: "assets",
+            label: "Assets",
+            placeholder: "Assign Assets",
+            options: assets?.map((asset: Asset) => ({
+              value: asset.id,
+              label: asset.assetName,
+            })),
+            isMulti: true,
+          },
+        ]}
+        title="Facility"
+        apiEndpoint="/facilities"
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
+        }
+      />
+    ),
     createBulkUser: <CreateBulkUser />,
-  };
 
+    viewFacility: (
+      <div className="p-4">
+        <FacilityDetails
+          facility={facility}
+          groupedPermissions={groupedFacilityItem || []}
+        />
+      </div>
+    ),
+  };
+  console.log(activeRowId);
   // Utility function to format role names
   function formatRoleName(roleName: string): string {
     return `${roleName
       ?.replace(/_/g, " ")
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ")} Role`;
+      .join(" ")} `;
   }
+
+  useEffect(() => {
+    if (centralState === "viewFacility") {
+      getAFacility();
+    }
+  }, [centralState]);
 
   return (
     <DashboardLayout
-      title={role?.name ? formatRoleName(role?.name) : "...."}
-      detail="User Management"
+      title={asset?.assetName ? formatRoleName(asset?.assetName) : "...."}
+      detail="Facility Management"
       dynamic
       onclick={() => router.back()}
     >
@@ -146,7 +264,7 @@ function FacilityManagement() {
         detail={getDetail()}
         modalState={centralStateDelete}
         setModalState={setCentralStateDelete}
-        takeAction={deleteUser}
+        takeAction={deleteFacility}
       ></ActionModalCompoenent>
 
       <ModalCompoenent
@@ -159,8 +277,8 @@ function FacilityManagement() {
       </ModalCompoenent>
       <div className="relative bg-white rounded-2xl p-4 mt-4">
         <TableComponent
-          data={role?.users}
-          type="users"
+          data={asset?.facilities}
+          type="facilities"
           setModalState={setCentralState}
           setModalStateDelete={setCentralStateDelete}
           toggleActions={toggleActions}
@@ -172,4 +290,4 @@ function FacilityManagement() {
     </DashboardLayout>
   );
 }
-export default withPermissions(FacilityManagement, ["users", "roles"]);
+export default withPermissions(FacilityManagement, ["users", "assets"]);

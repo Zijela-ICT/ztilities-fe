@@ -158,7 +158,7 @@ function WorkRequests() {
             label: "Facility ",
             placeholder: "Select Facility",
             options: facilities?.map((facility: Facility) => ({
-              value: facility.id,
+              value: facility.name.toString(),
               label: facility.name,
             })),
           },
@@ -167,26 +167,26 @@ function WorkRequests() {
             label: "Unit",
             placeholder: "Select Unit",
             options: units?.map((unit: Unit) => ({
-              value: unit.id,
+              value: unit.unitNumber.toString(),
               label: unit.unitNumber,
             })),
           },
           {
-            name: "blocks",
-            label: "Blocks",
-            placeholder: "Select Blocks",
+            name: "block",
+            label: "Block",
+            placeholder: "Select Block",
             options: blocks?.map((asset: Block) => ({
-              value: asset.id,
+              value: asset.blockNumber.toString(),
               label: asset.blockNumber,
             })),
           },
           {
-            name: "assets",
-            label: "Assets",
-            placeholder: "Select Assets",
+            name: "asset",
+            label: "Asset",
+            placeholder: "Select Asset",
             options: assets?.map((asset: Asset) => ({
-              value: asset.id.toString(),
-              label: asset.assetNumber.toString(),
+              value: asset.assetName.toString(),
+              label: asset.assetName.toString(),
             })),
           },
           {
