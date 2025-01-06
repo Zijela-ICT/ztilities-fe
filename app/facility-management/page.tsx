@@ -265,15 +265,15 @@ function FacilityManagement() {
           { name: "email", label: "Email address", type: "text" },
         ]}
         selects={[
-          {
-            name: "type",
-            label: "Facility Type",
-            placeholder: "Select Block Type",
-            options: [
-              { value: "single", label: "Single" },
-              { value: "residential", label: "Residential" },
-            ],
-          },
+          // {
+          //   name: "type",
+          //   label: "Facility Type",
+          //   placeholder: "Select Block Type",
+          //   options: [
+          //     { value: "single", label: "Single" },
+          //     { value: "residential", label: "Residential" },
+          //   ],
+          // },
           {
             name: "assets",
             label: "Assets",

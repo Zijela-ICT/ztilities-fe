@@ -97,12 +97,12 @@ export default function Navigation() {
             permissions: ["roles", "users", "permissions", "auth"],
             iconPath: paths.path7,
           },
-          {
-            href: "/settings",
-            label: "Settings",
-            permissions: ["app-settings", "users"],
-            iconPath: paths.path8,
-          },
+          // {
+          //   href: "/transaction",
+          //   label: "Transactions",
+          //   permissions: ["wallets", "users"],
+          //   iconPath: paths.path8,
+          // },
         ].map(
           ({ href, label, permissions, iconPath }) =>
             hasPermissionForRoute(permissions) && (
