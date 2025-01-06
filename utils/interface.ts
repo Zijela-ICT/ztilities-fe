@@ -97,7 +97,22 @@ interface Vendor {
   vendorName: string;
   vendorType: string;
   category: string;
+  WHTCode : string;
   phoneNumber: string;
   email: string;
   address: string;
+  rating: number | null;
+  isDeactivated :boolean
+}
+
+interface Technician {
+  id: number;
+  surname: string;
+  firstName: string;
+  serviceCategory: string;
+  email: string;
+  phoneNumber: string;
+  address: string;
+  rating: number | null;
+  isDeactivated: boolean;
 }

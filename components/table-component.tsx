@@ -624,18 +624,18 @@ export default function TableComponent({
                         {activeRowId === row.id && (
                           <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
                             <ul className="py-2">
-                              {/* <li>
-                                <DropdownButtonComponent
-                                  text="View"
-                                  onClick={() => setModalState("viewBlock")}
-                                  permissions={["update_users:id"]}
-                                />
-                              </li> */}
                               <li>
                                 <DropdownButtonComponent
                                   text="Edit"
                                   onClick={() => setModalState("createVendor")}
                                   permissions={["update_vendors:id"]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Delete"
+                                  onClick={() => setModalStateDelete("deleteVendor")}
+                                  permissions={["delete_vendors:id"]}
                                 />
                               </li>
                               <li>
@@ -651,7 +651,7 @@ export default function TableComponent({
                                   <DropdownButtonComponent
                                     text="Re-activate"
                                     onClick={() =>
-                                      setModalStateDelete("activateVendors")
+                                      setModalStateDelete("activateVendor")
                                     }
                                     permissions={["delete_vendors:id"]}
                                   />
@@ -684,13 +684,6 @@ export default function TableComponent({
                         {activeRowId === row.id && (
                           <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
                             <ul className="py-2">
-                              {/* <li>
-                                <DropdownButtonComponent
-                                  text="View"
-                                  onClick={() => setModalState("viewBlock")}
-                                  permissions={["update_users:id"]}
-                                />
-                              </li> */}
                               <li>
                                 <DropdownButtonComponent
                                   text="Edit"
@@ -698,6 +691,13 @@ export default function TableComponent({
                                     setModalState("createTechnician")
                                   }
                                   permissions={["update_vendors:id"]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Delete"
+                                  onClick={() => setModalStateDelete("deleteTechnician")}
+                                  permissions={["delete_vendors:id"]}
                                 />
                               </li>
                               <li>

@@ -23,8 +23,9 @@ function VendorManagement() {
   });
 
   const [vendors, setVendors] = useState<Vendor[]>();
-  const [technicians, setTechnicians] = useState<Role[]>();
-  const [role, setRole] = useState<RoleData>();
+  const [technicians, setTechnicians] = useState<Technician[]>();
+  const [vendor, setVendor] = useState<Vendor>();
+  const [technician, setTechnician] = useState<Technician>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
@@ -40,9 +41,13 @@ function VendorManagement() {
     setTechnicians(response.data.data);
   };
 
-  const getARole = async () => {
-    const response = await axiosInstance.get(`/roles/${activeRowId}`);
-    setRole(response.data.data);
+  const getAVendor = async () => {
+    const response = await axiosInstance.get(`/vendors/${activeRowId}`);
+    setVendor(response.data.data);
+  };
+  const getATechnician = async () => {
+    const response = await axiosInstance.get(`/technicians/${activeRowId}`);
+    setTechnician(response.data.data);
   };
 
   // Delete functions
@@ -51,17 +56,41 @@ function VendorManagement() {
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully de-activated this vendor",
+      detail: "You have successfully deleted this vendor",
       status: true,
     });
   };
 
-  const deleteTechnician = async (id: number) => {
+  const deleteTechnician = async () => {
     await axiosInstance.delete(`/technicians/${activeRowId}`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
       detail: "You have successfully deleted this technician",
+      status: true,
+    });
+  };
+
+  const deactivateVendor = async () => {
+    await axiosInstance.patch(`/vendors/${activeRowId}`, {
+      isDeactivated: !vendor.isDeactivated,
+    });
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully de-activated this vendor",
+      status: true,
+    });
+  };
+
+  const deactivateTechnician = async () => {
+    await axiosInstance.patch(`/technicians/${activeRowId}`, {
+      isDeactivated: !technician.isDeactivated,
+    });
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully de-activated this technician",
       status: true,
     });
   };
@@ -88,10 +117,14 @@ function VendorManagement() {
         return "De-activate Vendor";
       case "activateVendor":
         return "Re-activate Vendor";
+      case "deleteVendor":
+        return "Delete Vendor";
       case "deactivateTechnician":
         return "De-activate Technician";
       case "activateTechnician":
         return "Re-activate Technician";
+      case "deleteTechnician":
+        return "Delete Technician";
     }
     return "Zijela";
   };
@@ -114,10 +147,14 @@ function VendorManagement() {
         return "Are you sure you want to Re-activate this vendor";
       case "deactivateVendor":
         return "Are you sure you want to de-activate this vendor";
+      case "deleteVendor":
+        return "Are you sure you want to delete this vendor";
       case "activateTechnician":
         return "Are you sure you want to Re-activate this technician";
       case "deactivateTechnician":
         return "Are you sure you want to de-activate this technician";
+      case "deleteTechnician":
+        return "Are you sure you want to delete this technician";
     }
     return "Zijela";
   };
@@ -196,10 +233,18 @@ function VendorManagement() {
   };
 
   useEffect(() => {
-    if (centralState === "viewPermissions") {
-      getARole();
+    if (
+      centralStateDelete === "deactivateVendor" ||
+      centralStateDelete === "activateVendor"
+    ) {
+      getAVendor();
+    } else if (
+      centralStateDelete === "deactivateTechnician" ||
+      centralStateDelete === "activateTechnician"
+    ) {
+      getATechnician();
     }
-  }, [centralState]);
+  }, [centralStateDelete]);
 
   const tabPermissions: { [key: string]: string[] } = {
     Vendors: ["read_vendors"],
@@ -255,8 +300,15 @@ function VendorManagement() {
         takeAction={
           centralStateDelete === "deactivateTechnician" ||
           centralStateDelete === "activateTechnician"
+            ? deactivateTechnician
+            : centralStateDelete === "deleteTechnician"
             ? deleteTechnician
-            : deleteVendor
+            : centralStateDelete === "deactivateVendor" ||
+              centralStateDelete === "activateVendor"
+            ? deactivateVendor
+            : centralStateDelete === "deleteVendor"
+            ? deleteVendor
+            : undefined
         }
       ></ActionModalCompoenent>
 

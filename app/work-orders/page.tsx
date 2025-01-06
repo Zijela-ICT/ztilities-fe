@@ -174,8 +174,8 @@ function WorkOrders() {
             label: "Assets",
             placeholder: "Select Assets",
             options: assets?.map((asset: Asset) => ({
-              value: asset.id.toString(),
-              label: asset.assetNumber.toString(),
+              value: asset.id?.toString(),
+              label: asset.assetName?.toString(),
             })),
           },
           {
