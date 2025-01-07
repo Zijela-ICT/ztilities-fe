@@ -125,7 +125,8 @@ export default function TableComponent({
                     column !== "id" &&
                     column !== "createdAt" &&
                     column !== "updatedAt" &&
-                    column !== "avatar"
+                    column !== "avatar" &&
+                    column !== "assets"
                 ) // Exclude the specified columns
                 .map((column) => (
                   <th key={column} className="py-3 px-4">
@@ -202,7 +203,8 @@ export default function TableComponent({
                       column !== "id" &&
                       column !== "createdAt" &&
                       column !== "updatedAt" &&
-                      column !== "avatar"
+                      column !== "avatar" &&
+                      column !== "assets"
                   )
                   .map((column) => (
                     <td key={column} className="py-3 px-4">
@@ -239,7 +241,7 @@ export default function TableComponent({
                         >
                           {row[column] === true ? "Inactive" : "Active"}
                         </span>
-                      ) : column === "status" ? (
+                      ) : column === "status" || column === "subStatus" ? (
                         // Handle status column
                         <span
                           className={`px-2.5 py-1 ${
@@ -634,7 +636,9 @@ export default function TableComponent({
                               <li>
                                 <DropdownButtonComponent
                                   text="Delete"
-                                  onClick={() => setModalStateDelete("deleteVendor")}
+                                  onClick={() =>
+                                    setModalStateDelete("deleteVendor")
+                                  }
                                   permissions={["delete_vendors:id"]}
                                 />
                               </li>
@@ -696,7 +700,9 @@ export default function TableComponent({
                               <li>
                                 <DropdownButtonComponent
                                   text="Delete"
-                                  onClick={() => setModalStateDelete("deleteTechnician")}
+                                  onClick={() =>
+                                    setModalStateDelete("deleteTechnician")
+                                  }
                                   permissions={["delete_vendors:id"]}
                                 />
                               </li>

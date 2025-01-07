@@ -260,20 +260,71 @@ function FacilityManagement() {
           { name: "name", label: "Facility Name", type: "text" },
           { name: "code", label: "Code", type: "text" },
           { name: "facilityOfficer", label: "Facility Officer", type: "text" },
+          { name: "contactName", label: "Contact Name", type: "text" },
           { name: "address", label: "Address", type: "text" },
           { name: "phone", label: "Phone Number", type: "text" },
           { name: "email", label: "Email address", type: "text" },
+          {
+            name: "nonProcurementLimit",
+            label: "Non Procurement Limit",
+            type: "text",
+          },
         ]}
         selects={[
-          // {
-          //   name: "type",
-          //   label: "Facility Type",
-          //   placeholder: "Select Block Type",
-          //   options: [
-          //     { value: "single", label: "Single" },
-          //     { value: "residential", label: "Residential" },
-          //   ],
-          // },
+          {
+            name: "type",
+            label: "Facility Type",
+            placeholder: "Select Facility Type",
+            options: [
+              { value: "single", label: "Single" },
+              { value: "residential", label: "Residential" },
+            ],
+          },
+          {
+            name: "commonArea",
+            label: "Common Area",
+            placeholder: "Common Area",
+            options: [
+              { value: "no", label: "No" },
+              { value: "yes", label: "Yes" },
+            ],
+          },
+          {
+            name: "approvalRequiredForImpress",
+            label: "Approval Required For Impress",
+            placeholder: "Approval Required For Impress",
+            options: [
+              { value: "no", label: "No" },
+              { value: "yes", label: "Yes" },
+            ],
+          },
+          {
+            name: "availableForLease",
+            label: "Available For Lease",
+            placeholder: "Available For Lease",
+            options: [
+              { value: "no", label: "No" },
+              { value: "yes", label: "Yes" },
+            ],
+          },
+          {
+            name: "remitLeasePayment",
+            label: "Remit Lease Payment",
+            placeholder: "Remit Lease Payment",
+            options: [
+              { value: "no", label: "No" },
+              { value: "yes", label: "Yes" },
+            ],
+          },
+          {
+            name: "status",
+            label: "Status",
+            placeholder: "Status",
+            options: [
+              { value: "Approved", label: "Approved" },
+              { value: "Pending", label: "Pending" },
+            ],
+          },
           {
             name: "assets",
             label: "Assets",
@@ -299,9 +350,11 @@ function FacilityManagement() {
     createBlock: (
       <DynamicCreateForm
         inputs={[
+          { name: "blockName", label: "Block Name", type: "text" },
           { name: "blockNumber", label: "Block Number", type: "text" },
           { name: "code", label: "Code", type: "text" },
           { name: "facilityOfficer", label: "Facility Officer", type: "text" },
+          { name: "contactName", label: "Contact Name", type: "text" },
           { name: "address", label: "Address", type: "text" },
           { name: "phone", label: "Phone Number", type: "text" },
           { name: "email", label: "Email address", type: "text" },
@@ -319,11 +372,20 @@ function FacilityManagement() {
           {
             name: "facilityId",
             label: "Facility",
-            placeholder: "Assign a facility to block",
+            placeholder: "Assign a Block to facility",
             options: facilities?.map((asset: Facility) => ({
               value: asset.id,
               label: asset.name,
             })),
+          },
+          {
+            name: "status",
+            label: "Status",
+            placeholder: "Status",
+            options: [
+              { value: "Approved", label: "Approved" },
+              { value: "Pending", label: "Pending" },
+            ],
           },
           {
             name: "assets",
@@ -336,7 +398,7 @@ function FacilityManagement() {
             isMulti: true,
           },
         ]}
-        title="Blocks"
+        title="Block"
         apiEndpoint="/blocks"
         activeRowId={activeRowId}
         setModalState={setCentralState}
@@ -351,6 +413,12 @@ function FacilityManagement() {
         inputs={[
           { name: "unitNumber", label: "Unit Number", type: "text" },
           { name: "ownership", label: "Ownership", type: "text" },
+          { name: "noOfSQM", label: "No of SQM", type: "text" },
+          {
+            name: "serviceOrPowerChargeStartDate",
+            label: "Service Or Power Charge Start Date",
+            type: "date",
+          },
           { name: "description", label: "Description", type: "textarea" },
         ]}
         selects={[
@@ -381,10 +449,47 @@ function FacilityManagement() {
               { value: "no", label: "No" },
             ],
           },
+
+          {
+            name: "availableForLease",
+            label: "Available For Lease",
+            placeholder: "Available For Lease",
+            options: [
+              { value: "no", label: "No" },
+              { value: "yes", label: "Yes" },
+            ],
+          },
+          {
+            name: "remitLeasePayment",
+            label: "Remit Lease Payment",
+            placeholder: "Remit Lease Payment",
+            options: [
+              { value: "no", label: "No" },
+              { value: "yes", label: "Yes" },
+            ],
+          },
+          {
+            name: "status",
+            label: "Status",
+            placeholder: "Status",
+            options: [
+              { value: "Approved", label: "Approved" },
+              { value: "Pending", label: "Pending" },
+            ],
+          },
+          {
+            name: "subStatus",
+            label: "Sub Status",
+            placeholder: "Sub Status",
+            options: [
+              { value: "Approved", label: "Approved" },
+              { value: "Pending", label: "Pending" },
+            ],
+          },
           {
             name: "blockId",
             label: "Block",
-            placeholder: "Assign a block to units",
+            placeholder: "Assign a Unit to block",
             options: blocks?.map((asset: Block) => ({
               value: asset.id,
               label: asset.blockNumber,
@@ -415,7 +520,11 @@ function FacilityManagement() {
       <DynamicCreateForm
         inputs={[
           { name: "assetName", label: "Asset Name", type: "text" },
-          { name: "description", label: "Description (Optional)", type: "textarea" },
+          {
+            name: "description",
+            label: "Description (Optional)",
+            type: "textarea",
+          },
         ]}
         selects={[]}
         title="Assets"

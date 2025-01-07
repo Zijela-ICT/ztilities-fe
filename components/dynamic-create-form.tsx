@@ -13,7 +13,7 @@ import { multiSelectStyle } from "@/utils/ojects";
 interface InputField {
   name: string;
   label: string;
-  type: "text" | "number" | "email" | "file" | "textarea";
+  type: "text" | "number" | "email" | "file" | "textarea" | "date";
 }
 
 interface SelectField {
@@ -253,7 +253,7 @@ export default function DynamicCreateForm({
         {selects?.map((select) => {
           // Skip rendering 'facilitId' when the title is 'Blocks' and there is an activeRowId
           if (
-            (title === "Blocks" &&
+            (title === "Block" &&
               activeRowId &&
               select.name === "facilityId") ||
             (title === "Units" && activeRowId && select.name === "blockId")

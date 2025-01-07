@@ -181,20 +181,71 @@ function FacilityManagement() {
           { name: "name", label: "Facility Name", type: "text" },
           { name: "code", label: "Code", type: "text" },
           { name: "facilityOfficer", label: "Facility Officer", type: "text" },
+          { name: "contactName", label: "Contact Name", type: "text" },
           { name: "address", label: "Address", type: "text" },
           { name: "phone", label: "Phone Number", type: "text" },
           { name: "email", label: "Email address", type: "text" },
+          {
+            name: "nonProcurementLimit",
+            label: "Non Procurement Limit",
+            type: "text",
+          },
         ]}
         selects={[
-          // {
-          //   name: "type",
-          //   label: "Facility Type",
-          //   placeholder: "Select Block Type",
-          //   options: [
-          //     { value: "single", label: "Single" },
-          //     { value: "residential", label: "Residential" },
-          //   ],
-          // },
+          {
+            name: "type",
+            label: "Facility Type",
+            placeholder: "Select Facility Type",
+            options: [
+              { value: "single", label: "Single" },
+              { value: "residential", label: "Residential" },
+            ],
+          },
+          {
+            name: "commonArea",
+            label: "Common Area",
+            placeholder: "Common Area",
+            options: [
+              { value: "no", label: "No" },
+              { value: "yes", label: "Yes" },
+            ],
+          },
+          {
+            name: "approvalRequiredForImpress",
+            label: "Approval Required For Impress",
+            placeholder: "Approval Required For Impress",
+            options: [
+              { value: "no", label: "No" },
+              { value: "yes", label: "Yes" },
+            ],
+          },
+          {
+            name: "availableForLease",
+            label: "Available For Lease",
+            placeholder: "Available For Lease",
+            options: [
+              { value: "no", label: "No" },
+              { value: "yes", label: "Yes" },
+            ],
+          },
+          {
+            name: "remitLeasePayment",
+            label: "Remit Lease Payment",
+            placeholder: "Remit Lease Payment",
+            options: [
+              { value: "no", label: "No" },
+              { value: "yes", label: "Yes" },
+            ],
+          },
+          {
+            name: "status",
+            label: "Status",
+            placeholder: "Status",
+            options: [
+              { value: "Approved", label: "Approved" },
+              { value: "Pending", label: "Pending" },
+            ],
+          },
           {
             name: "assets",
             label: "Assets",
