@@ -65,7 +65,7 @@ interface FacilityDetailsProps {
   facility: Record<string, any>;
   groupedPermissions: Record<
     string,
-    { id: string; normalizedString: string }[]
+    { id: string; normalizedString: string; units: any[] }[]
   >;
   excludedKeys?: string[]; // Array of keys to omit
 }
@@ -123,12 +123,38 @@ export default function FacilityDetails({
                     key={permission.id}
                     className="flex items-start space-x-3"
                   >
-                    <span
-                      className="text-sm text-gray-700 flex-1 overflow-hidden overflow-ellipsis whitespace-normal"
-                      title={permission.normalizedString} // Tooltip for full text
-                    >
-                      {permission.normalizedString}
-                    </span>
+                    {Array.isArray(permission?.units) ? (
+                      // Render a dropdown for sub-permissions if it's an array
+                      <details className="w-full">
+                        <summary className="flex items-center text-sm font-medium cursor-pointer">
+                          {permission.normalizedString}
+                          <span className="transform transition-transform duration-100 ml-3">
+                            <DropDownArrow />
+                          </span>
+                        </summary>
+                        <ul className="mt-3 ml-4 pl-3 border-l border-gray-300 space-y-2">
+                          {permission.units.map((unit, index) => {
+                            return (
+                              <li
+                                key={index}
+                                className="text-sm text-gray-700"
+                                title={unit}
+                              >
+                                {unit?.unitNumber}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </details>
+                    ) : (
+                      // Render a single permission
+                      <span
+                        className="text-sm text-gray-700 flex-1 overflow-hidden overflow-ellipsis whitespace-normal"
+                        title={permission.normalizedString}
+                      >
+                        {permission.normalizedString}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -139,3 +165,37 @@ export default function FacilityDetails({
     </>
   );
 }
+
+// {Object.entries(groupedPermissions || {}).map(
+//   ([category, permissions]) => (
+//     <details
+//       key={category}
+//       className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4"
+//     >
+//       <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
+//         {/* Capitalize category name */}
+//         {category.replace(/([a-z])([A-Z])/g, "$1 $2")}
+//         <span className="transform transition-transform duration-100 group-open:rotate-180">
+//           <DropDownArrow />
+//         </span>
+//       </summary>
+//       <nav className="mt-4 pt-9 pb-6 border-t border-gray-300">
+//         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+//           {permissions.map((permission) => (
+//             <li
+//               key={permission.id}
+//               className="flex items-start space-x-3"
+//             >
+//               <span
+//                 className="text-sm text-gray-700 flex-1 overflow-hidden overflow-ellipsis whitespace-normal"
+//                 title={permission.normalizedString} // Tooltip for full text
+//               >
+//                 {permission.normalizedString}
+//               </span>
+//             </li>
+//           ))}
+//         </ul>
+//       </nav>
+//     </details>
+//   )
+// )}

@@ -85,6 +85,12 @@ export default function Navigation() {
             permissions: ["units", "blocks", "facilities"],
             iconPath: paths.path2,
           },
+          // {
+          //   href: "/ppm",
+          //   label: "PPM",
+          //   permissions: ["users"],
+          //   iconPath: paths.path9,
+          // },
           {
             href: "/vendor-management",
             label: "Vendor & Tech Management",

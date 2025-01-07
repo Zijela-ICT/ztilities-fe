@@ -1,6 +1,6 @@
 "use client";
 
-import { JSX, useEffect, useState } from "react";
+import { JSX, use, useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
 import ModalCompoenent, {
@@ -25,6 +25,7 @@ function FacilityManagement() {
     status: false,
   });
 
+  const [users, setUsers] = useState<User[]>();
   const [facilities, setFacilities] = useState<Facility[]>();
   const [blocks, setBlocks] = useState<Block[]>();
   const [units, setUnits] = useState<Unit[]>();
@@ -39,6 +40,11 @@ function FacilityManagement() {
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   // Fetch data functions
+  const getUsers = async () => {
+    const response = await axiosInstance.get("/users");
+    setUsers(response.data.data);
+  };
+
   const getFacilities = async () => {
     const response = await axiosInstance.get("/facilities");
     setFacilities(response.data.data);
@@ -505,6 +511,15 @@ function FacilityManagement() {
             })),
             isMulti: true,
           },
+          {
+            name: "userId",
+            label: "Client",
+            placeholder: "Assign Unit to a client",
+            options: users?.map((user: User) => ({
+              value: user.id,
+              label: `${user.firstName} ${user.lastName}`,
+            })),
+          },
         ]}
         title="Units"
         apiEndpoint="/units"
@@ -596,6 +611,7 @@ function FacilityManagement() {
     } else if (selectedTab === "Units") {
       getUnits();
       getAssets();
+      getUsers();
     } else if (selectedTab === "Assets") {
       getAssets();
     } else {

@@ -15,6 +15,7 @@
     "react": "^19.0.0",
     "react-avatar-editor": "^13.0.2",
     "react-chartjs-2": "^5.3.0",
+    "react-datepicker": "^7.6.0",
     "react-dom": "^19.0.0",
     "react-select": "^5.9.0",
     "react-toastify": "^10.0.6"
