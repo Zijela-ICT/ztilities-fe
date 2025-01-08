@@ -85,12 +85,16 @@ export default function FacilityDetails({
             <div key={index} className="flex items-center justify-between">
               {/* Dynamically format the key */}
               <p className="text-gray-500 capitalize">
-                {key.replace(/([a-z])([A-Z])/g, "$1 $2")}
+                {key === "user"
+                  ? "client"
+                  : key.replace(/([a-z])([A-Z])/g, "$1 $2")}
               </p>
 
               {/* Handle various value types */}
               <p className="text-gray-900">
-                {Array.isArray(value)
+                {key === "user" && value !== null && typeof value === "object"
+                  ? `${value?.firstName || "-"} ${value?.lastName || "-"}`
+                  : Array.isArray(value)
                   ? value.length // Show array length
                   : typeof value === "object" && value !== null
                   ? JSON.stringify(value) // Show object as a JSON string

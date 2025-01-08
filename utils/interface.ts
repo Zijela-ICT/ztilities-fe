@@ -80,6 +80,7 @@ interface Unit {
   commonArea: string | null;
   address: string | null;
   assets: Asset[];
+  user : User
 }
 
 interface Asset {

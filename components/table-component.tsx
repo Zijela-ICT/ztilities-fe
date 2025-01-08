@@ -126,13 +126,16 @@ export default function TableComponent({
                     column !== "createdAt" &&
                     column !== "updatedAt" &&
                     column !== "avatar" &&
-                    column !== "assets"
+                    column !== "assets" &&
+                    column !== "user"
                 ) // Exclude the specified columns
                 .map((column) => (
                   <th key={column} className="py-3 px-4">
                     {column === "isDeactivated"
                       ? "Status"
-                      : column.charAt(0).toUpperCase() + column.slice(1)}
+                      : // : column === "user"
+                        // ? "Client"
+                        column.charAt(0).toUpperCase() + column.slice(1)}
                   </th>
                 ))}
 
@@ -204,7 +207,8 @@ export default function TableComponent({
                       column !== "createdAt" &&
                       column !== "updatedAt" &&
                       column !== "avatar" &&
-                      column !== "assets"
+                      column !== "assets" &&
+                      column !== "user"
                   )
                   .map((column) => (
                     <td key={column} className="py-3 px-4">
@@ -226,7 +230,14 @@ export default function TableComponent({
                       ) : typeof row[column] === "object" &&
                         row[column] !== null ? (
                         // Handle single object case, extract specific properties
-                        ["name", "blockNumber", "unitNumber", "assetName"]
+                        [
+                          "name",
+                          "blockNumber",
+                          "unitNumber",
+                          "assetName",
+                          `firstName`,
+                          "lastName",
+                        ]
                           .map((prop) => row[column][prop])
                           .filter(Boolean)
                           .join(", ")

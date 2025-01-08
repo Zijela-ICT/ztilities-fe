@@ -196,6 +196,11 @@ export default function DynamicCreateForm({
           }
         });
 
+        // Handle single object fields like 'user'
+        if (data.user && typeof data.user === "object") {
+          dynamicProcessedData.userId = data.user.id; // Example: Keep only the user ID
+        }
+
         setResource(data);
         setFormData(dynamicProcessedData);
       });

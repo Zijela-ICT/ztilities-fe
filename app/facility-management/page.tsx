@@ -208,6 +208,10 @@ function FacilityManagement() {
         return "Upload Bulk Facility";
       case "viewFacility":
         return "Facility Details";
+      case "viewBlock":
+        return "Block Details";
+      case "viewUnit":
+        return "Unit Details";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -243,6 +247,10 @@ function FacilityManagement() {
           ? "You can edit assets details here."
           : "You can manage assets here.";
       case "viewFacility":
+        return "";
+      case "viewBlock":
+        return "";
+      case "viewUnit":
         return "";
     }
     switch (centralStateDelete) {
