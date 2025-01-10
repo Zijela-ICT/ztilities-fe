@@ -200,7 +200,7 @@ export default function TableComponent({
                       )}
                     </td>
                   ))} */}
-                {columns
+                {/* {columns
                   .filter(
                     (column) =>
                       column !== "id" &&
@@ -219,9 +219,16 @@ export default function TableComponent({
                         ) : (
                           // Handle array case, extract specific properties
                           row[column]
-                            .map((item: any) =>
-                              ["name", "blockNumber", "unitNumber", "assetName"]
-                                .map((prop) => item[prop])
+                            ?.map((item: any) =>
+                              [
+                                "name",
+                                "blockNumber",
+                                "unitNumber",
+                                "assetName",
+                                `firstName`,
+                                "lastName",
+                              ]
+                                ?.map((prop) => item[prop])
                                 .filter(Boolean)
                                 .join(", ")
                             )
@@ -260,6 +267,103 @@ export default function TableComponent({
                               ? "text-[#036B26] bg-[#E7F6EC]"
                               : "text-[#B76E00] bg-[#FFAB0014]"
                           } rounded-full `}
+                        >
+                          {row[column]?.toString()}
+                        </span>
+                      ) : (
+                        // Default case for other columns
+                        row[column]?.toString()
+                      )}
+                    </td>
+                  ))} */}
+
+                {columns
+                  .filter(
+                    (column) =>
+                      column !== "id" &&
+                      column !== "createdAt" &&
+                      column !== "updatedAt" &&
+                      column !== "avatar" &&
+                      column !== "assets" &&
+                      column !== "user"
+                  )
+                  .map((column) => (
+                    <td key={column} className="py-3 px-4">
+                      {Array.isArray(row[column]) ? (
+                        type === "assets" || type === "workrequests" ? (
+                          // Show the length of the array for specific types
+                          row[column]?.length
+                        ) : (
+                          // Handle array case, extract specific properties
+                          row[column]
+                            ?.map((item: any) =>
+                              [
+                                "name",
+                                "blockNumber",
+                                "unitNumber",
+                                "assetName",
+                                `firstName`,
+                                "lastName",
+                              ]
+                                ?.map((prop) => item?.[prop]) // Optional chaining here
+                                .filter(Boolean)
+                                .join(", ")
+                            )
+                            .join(", ")
+                        )
+                      ) : typeof row[column] === "object" &&
+                        row[column] !== null ? (
+                        // Handle single object case, extract specific properties
+                        [
+                          "name",
+                          "blockNumber",
+                          "unitNumber",
+                          "assetName",
+                          `firstName`,
+                          "lastName",
+                        ]
+                          .map((prop) => row[column]?.[prop]) // Optional chaining here
+                          .filter(Boolean)
+                          .join(", ")
+                      ) : column === "isDeactivated" ? (
+                        // Handle isDeactivated column
+                        <span
+                          className={`px-2.5 py-1 ${
+                            row[column] === false
+                              ? "text-[#036B26] bg-[#E7F6EC]"
+                              : "text-[#B76E00] bg-[#FFAB0014]"
+                          } rounded-full `}
+                        >
+                          {row[column] === true ? "Inactive" : "Active"}
+                        </span>
+                      ) : column === "status" || column === "subStatus" ? (
+                        // Handle status column
+                        // <span
+                        //   className={`px-2.5 py-1 ${
+                        //     row[column] === "Approved"
+                        //       ? "text-[#036B26] bg-[#E7F6EC]"
+                        //       : "text-[#B76E00] bg-[#FFAB0014]"
+                        //   } rounded-full `}
+                        // >
+                        //   {row[column]?.toString()}
+                        // </span>
+                        <span
+                          className={`px-2.5 py-1 ${
+                            row[column] === "Approved"
+                              ? "text-[#036B26] bg-[#E7F6EC]"
+                              : row[column] === "pending"
+                              ? "text-[#FF9F00] bg-[#FFEB84]"
+                              : row[column] === "rejected"
+                              ? "text-[#B76E00] bg-[#FFAB0014]"
+                              : row[column] === "closed"
+                              ? "text-[#757575] bg-[#E0E0E0]"
+                              : row[column] === "reopened"
+                              ? "text-[#0E7B7B] bg-[#D1F0F0]"
+                              : row[column] === "approved" ||
+                                row[column] === "accepted" // Explicit check for Approved again for clarity
+                              ? "text-[#036B26] bg-[#E7F6EC]"
+                              : ""
+                          } rounded-full`}
                         >
                           {row[column]?.toString()}
                         </span>
@@ -774,7 +878,7 @@ export default function TableComponent({
                                   permissions={["create_work-requests"]}
                                 />
                               </li>
-                              <li>
+                              {/* <li>
                                 <DropdownButtonComponent
                                   text="Edit"
                                   onClick={() =>
@@ -784,8 +888,63 @@ export default function TableComponent({
                                     "update_work-requests:id/status",
                                   ]}
                                 />
+                              </li> */}
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Comment"
+                                  onClick={() =>
+                                    setModalState("commentWorkRequest")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/status",
+                                  ]}
+                                />
                               </li>
                               <li>
+                                <DropdownButtonComponent
+                                  text="Add Attatchment"
+                                  onClick={() =>
+                                    setModalState("attatchmentWorkRequest")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/status",
+                                  ]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Add Quotations"
+                                  onClick={() =>
+                                    setModalState("quotationsWorkRequest")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/status",
+                                  ]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Update Status"
+                                  onClick={() =>
+                                    setModalState("updateStatusWorkRequest")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/status",
+                                  ]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Assign Technician"
+                                  onClick={() =>
+                                    setModalState("assignTechnicianWorkRequest")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/status",
+                                  ]}
+                                />
+                              </li>
+                              {/* <li>
                                 {row.isDeactivated === false ? (
                                   <DropdownButtonComponent
                                     text="De-activate"
@@ -805,7 +964,7 @@ export default function TableComponent({
                                     permissions={["create_work-requests"]}
                                   />
                                 )}
-                              </li>
+                              </li> */}
                             </ul>
                           </div>
                         )}

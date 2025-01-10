@@ -163,20 +163,90 @@ export function FileInputComponent({
   onChange,
   name,
   label = "Upload File",
-  svgIcon,
+  uploadedFile,
   className,
 }: {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   label?: string;
-  svgIcon?: React.ReactNode; // Pass SVG as a prop
+  uploadedFile?: File | null;
   className?: string;
   name: string;
 }) {
+  const renderFilePreview = () => {
+    if (!uploadedFile) return null;
+    if (uploadedFile.type.startsWith("image/")) {
+      return (
+        <img
+          src={URL.createObjectURL(uploadedFile)}
+          alt="Uploaded"
+          className="w-32 h-32 object-cover rounded-lg"
+        />
+      );
+    } else if (uploadedFile.type === "application/pdf") {
+      return (
+        <div className="border rounded-lg overflow-hidden">
+          <object
+            data={URL.createObjectURL(uploadedFile)}
+            title="PDF Preview"
+            className="w-full h-full"
+          ></object>
+        </div>
+      );
+    } else {
+      // Fallback for unsupported types
+      return (
+        <div className="flex flex-col items-center justify-center w-32 h-32 bg-gray-200 rounded-lg">
+          <p className="text-gray-500 text-sm">Unsupported File</p>
+          <p className="text-gray-600 text-xs">{uploadedFile.name}</p>
+        </div>
+      );
+    }
+  };
   return (
     <div
       className={`relative w-full bg-gray-100 rounded-lg p-6 text-center ${className}`}
     >
-      <div className="flex flex-col items-center">
+      {uploadedFile ? (
+        <div className="flex flex-col items-center">
+          {renderFilePreview()}
+
+          {/* Display File Name */}
+          <p className="mt-2 text-gray-600 text-sm">{uploadedFile.name}</p>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center">
+          <div className="mb-4 text-gray-500">
+            <UploadIcon />
+          </div>
+          <label
+            htmlFor="file-input"
+            className="block text-gray-600 text-lg font-medium cursor-pointer"
+          >
+            {label}
+          </label>
+          <p className="text-gray-500 text-sm mt-2">
+            Click to upload or drag and drop
+          </p>
+          <p className="text-gray-500 text-sm mt-2">
+            SVG, PNG, JPG, or GIF (max. 800x400px)
+          </p>
+        </div>
+      )}
+
+      {/* Hidden File Input */}
+      <input
+        name={name}
+        type="file"
+        id="file-input"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        onChange={onChange}
+      />
+    </div>
+  );
+}
+
+{
+  /* <div className="flex flex-col items-center">
         <div className="mb-4 text-gray-500">
           <UploadIcon />
         </div>
@@ -193,16 +263,5 @@ export function FileInputComponent({
         <p className="text-gray-500 text-sm mt-2">
           SVG, PNG, JPG or GIF (max. 800x400px)
         </p>
-      </div>
-
-      {/* Hidden File Input */}
-      <input
-        name={name}
-        type="file"
-        id="file-input"
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        onChange={onChange}
-      />
-    </div>
-  );
+      </div> */
 }

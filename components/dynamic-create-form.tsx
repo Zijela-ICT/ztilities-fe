@@ -74,11 +74,13 @@ export default function DynamicCreateForm({
       });
     };
 
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
 
     if (files && files[0]) {
       const file = files[0];
+      setUploadedFile(file);
       const reader = new FileReader();
 
       reader.onload = () => {
@@ -94,46 +96,13 @@ export default function DynamicCreateForm({
     }
   };
 
-  // Handle file change
-  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, files } = e.target;
-  //   if (files) {
-  //     setFormData({
-  //       ...formData,
-  //       [name]: files[0], // Storing the first file selected
-  //     });
-  //   }
-  // };
-
-  // Submit handler
-  // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   console.log(formData);
-  //   try {
-  //     if (activeRowId) {
-  //       await axiosInstance.patch(`${apiEndpoint}/${activeRowId}`, formData);
-  //     } else {
-  //       await axiosInstance.post(apiEndpoint, formData);
-  //     }
-
-  //     setFormData({});
-  //     setModalState("");
-  //     setSuccessState({
-  //       title: "Successful",
-  //       detail: `You have successfully ${
-  //         activeRowId ? "edited" : "created"
-  //       } this resource.`,
-  //       status: true,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error submitting form:", error);
-  //   }
-  // };
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // console.log(formData);
+    const { venortechSelected, typeSelected, ...filteredFormData } = formData;
     // Prepend "Block" for blockNumber and "Asset" for assetNumber if not already present
-    const updatedFormData = { ...formData };
+    const updatedFormData = { ...filteredFormData };
 
     if (
       updatedFormData.blockNumber &&
@@ -156,25 +125,80 @@ export default function DynamicCreateForm({
       updatedFormData.unitNumber = `Unit ${updatedFormData.unitNumber}`;
     }
 
+    if (
+      updatedFormData.amount &&
+      updatedFormData.startDate &&
+      updatedFormData.endDate
+    ) {
+      updatedFormData.amount = updatedFormData.amount;
+      updatedFormData.startDate = updatedFormData.startDate;
+
+      updatedFormData.endDate = updatedFormData.endDate;
+    }
+
     // console.log(updatedFormData);
 
     try {
-      if (activeRowId) {
-        await axiosInstance.patch(
-          `${apiEndpoint}/${activeRowId}`,
-          updatedFormData
-        );
+      // if (activeRowId) {
+      //   await axiosInstance.patch(
+      //     `${apiEndpoint}/${activeRowId}`,
+      //     updatedFormData
+      //   );
+      // } else {
+      //   await axiosInstance.post(apiEndpoint, updatedFormData);
+      // }
+
+      if (
+        [
+          "User",
+          "Facility",
+          "Units",
+          "Vendor",
+          "Technician",
+          "Assets",
+          "Block",
+          "Work Request",
+        ].includes(title)
+      ) {
+        if (activeRowId) {
+          await axiosInstance.patch(
+            `${apiEndpoint}/${activeRowId}`,
+            updatedFormData
+          );
+        } else {
+          await axiosInstance.post(apiEndpoint, updatedFormData);
+        }
       } else {
-        await axiosInstance.post(apiEndpoint, updatedFormData);
+        await axiosInstance.patch(apiEndpoint, updatedFormData);
       }
 
       setFormData({});
       setModalState("");
+      // setSuccessState({
+      //   title: "Successful",
+      //   detail: `You have successfully ${
+      //     activeRowId ? "edited" : "created"
+      //   } this resource.`,
+      //   status: true,
+      // });
       setSuccessState({
         title: "Successful",
-        detail: `You have successfully ${
-          activeRowId ? "edited" : "created"
-        } this resource.`,
+        detail: `${
+          [
+            "User",
+            "Facility",
+            "Units",
+            "Vendor",
+            "Technician",
+            "Assets",
+            "Block",
+            "Work Request",
+          ].includes(title)
+            ? activeRowId
+              ? `You have successfully edited ${title}`
+              : `You have successfully created ${title}`
+            : `Action Sucessfully`
+        }.`,
         status: true,
       });
     } catch (error) {
@@ -215,6 +239,7 @@ export default function DynamicCreateForm({
       >
         {/* Render inputs dynamically */}
         {inputs.map((input) => {
+          console.log(formData);
           if (input.type === "file") {
             return (
               <div key={input.name} className="relative w-full mt-6">
@@ -222,6 +247,7 @@ export default function DynamicCreateForm({
                   name={input.name}
                   onChange={handleFileChange}
                   label={input.label}
+                  uploadedFile = {uploadedFile}
                   // No value prop needed for file inputs
                 />
               </div>
@@ -229,6 +255,12 @@ export default function DynamicCreateForm({
           }
 
           if (input.type === "textarea") {
+            if (
+              formData.status !== "rejected" &&
+              input.name === "reasonForRejection"
+            ) {
+              return null; // Skip rendering this select if typeSelected does not match
+            }
             return (
               <div key={input.name} className="relative w-full mt-6">
                 <LabelTextareaComponent
@@ -265,6 +297,22 @@ export default function DynamicCreateForm({
           ) {
             return null;
           }
+          // Conditionally render based on `typeSelected`
+          if (
+            (select.name === "unit" && formData.typeSelected !== "unit") ||
+            (select.name === "facility" &&
+              formData.typeSelected !== "facility") ||
+            (select.name === "block" && formData.typeSelected !== "block") ||
+            (title === "Add Quotation" &&
+              select.name === "vendor" &&
+              formData.venortechSelected !== "ven") ||
+            (title === "Add Quotation" &&
+              select.name === "technician" &&
+              formData.venortechSelected !== "tech")
+          ) {
+            return null; // Skip rendering this select if typeSelected does not match
+          }
+
           return (
             <div key={select.name} className="relative w-full mt-6">
               <Select
@@ -288,34 +336,27 @@ export default function DynamicCreateForm({
           );
         })}
 
-        {/* {selects?.map((select) => (
-          <div key={select.name} className="relative w-full mt-6">
-            <Select
-              isMulti={select.isMulti}
-              name={select.name}
-              options={select.options}
-              value={
-                select.isMulti
-                  ? select.options?.filter((option) =>
-                      formData[select.name]?.includes(option.value)
-                    )
-                  : select.options?.find(
-                      (option) => option.value === formData[select.name]
-                    )
-              }
-              onChange={handleSelectChange(select.name, select.isMulti)}
-              styles={multiSelectStyle}
-              placeholder={select.placeholder}
-            />
-          </div>
-        ))} */}
-
         <div className="mt-10 flex w-full justify-end">
           <button
             type="submit"
             className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-base font-semibold text-white"
           >
-            {activeRowId ? `Edit ${title}` : `Create ${title}`}
+            <p>
+              {[
+                "User",
+                "Facility",
+                "Units",
+                "Vendor",
+                "Technician",
+                "Assets",
+                "Block",
+                "Work Request",
+              ].includes(title)
+                ? activeRowId
+                  ? `Edit ${title}`
+                  : `Create ${title}`
+                : title}
+            </p>
           </button>
         </div>
       </form>

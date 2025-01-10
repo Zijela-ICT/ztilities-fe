@@ -62,8 +62,9 @@ import { DropDownArrow } from "@/utils/svg";
 import React from "react";
 
 interface FacilityDetailsProps {
+  title?: string;
   facility: Record<string, any>;
-  groupedPermissions: Record<
+  groupedPermissions?: Record<
     string,
     { id: string; normalizedString: string; units: any[] }[]
   >;
@@ -71,10 +72,12 @@ interface FacilityDetailsProps {
 }
 
 export default function FacilityDetails({
+  title,
   facility,
   groupedPermissions,
   excludedKeys = ["facility", "block", "id", "createdAt", "updatedAt"],
 }: FacilityDetailsProps) {
+  console.log(facility);
   return (
     <>
       {/* Dynamically render facility details, omitting excluded keys */}
@@ -92,8 +95,23 @@ export default function FacilityDetails({
 
               {/* Handle various value types */}
               <p className="text-gray-900">
-                {key === "user" && value !== null && typeof value === "object"
+                {key === "user" ||
+                (key === "requestedBy" &&
+                  value !== null &&
+                  typeof value === "object")
                   ? `${value?.firstName || "-"} ${value?.lastName || "-"}`
+                  : key === "unit" &&
+                    value !== null &&
+                    typeof value === "object"
+                  ? `${value?.unitNumber || "-"}`
+                  : key === "asset" &&
+                    value !== null &&
+                    typeof value === "object"
+                  ? `${value?.unitNumber || "-"}`
+                  : key === "assignedTechnician" &&
+                    value !== null &&
+                    typeof value === "object"
+                  ? `${value?.firstName || "-"} ${value?.lastName || "-"} `
                   : Array.isArray(value)
                   ? value.length // Show array length
                   : typeof value === "object" && value !== null
@@ -105,6 +123,129 @@ export default function FacilityDetails({
             </div>
           ))}
       </div>
+
+      {/* for request */}
+      {title === "Work Request" && (
+        <>
+          {" "}
+          <div className="space-y-5 px-2 text-gray-500">
+            {Object.entries(facility || {})
+              .filter(([key, value]) => Array.isArray(value)) // Only keys with array values
+              .map(([key, array], index) => (
+                <details
+                  key={index}
+                  className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4"
+                >
+                  {/* Title as a Toggle */}
+                  <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
+                    {key
+                      .replace(/([a-z])([A-Z])/g, "$1 $2")
+                      .charAt(0)
+                      .toUpperCase() +
+                      key.replace(/([a-z])([A-Z])/g, "$1 $2").slice(1)}
+                    <span className="transform transition-transform duration-100 group-open:rotate-180">
+                      <DropDownArrow />
+                    </span>
+                  </summary>
+
+                  <div className="mt-3 space-y-3">
+                    {/* Check if Array has Items */}
+                    {array.length > 0 ? (
+                      array.map((item, idx) => (
+                        <details
+                          key={idx}
+                          className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4"
+                        >
+                          <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
+                            {key
+                              .replace(/([a-z])([A-Z])/g, "$1 $2")
+                              .charAt(0)
+                              .toUpperCase() +
+                              key
+                                .replace(/([a-z])([A-Z])/g, "$1 $2")
+                                .slice(1)}{" "}
+                            {idx + 1}
+                            <span className="transform transition-transform duration-100 group-open:rotate-180">
+                              <DropDownArrow />
+                            </span>
+                          </summary>
+
+                          <div className="mt-2 space-y-2">
+                            {/* Recursively Map Over Object */}
+                            {typeof item === "object" && item !== null ? (
+                              Object.entries(item).map(([subKey, subValue]) => (
+                                <div key={subKey} className="flex flex-col">
+                                  <span className="text-sm text-gray-500 capitalize">
+                                    {subKey.replace(/([a-z])([A-Z])/g, "$1 $2")}
+                                  </span>
+
+                                  {/* Check for Nested Object */}
+                                  {typeof subValue === "object" &&
+                                  subValue !== null ? (
+                                    Array.isArray(subValue) ? (
+                                      <p className="text-gray-900">
+                                        Array: {subValue.length} items
+                                      </p>
+                                    ) : (
+                                      <div className="pl-4 mt-2 border-l-2 border-gray-300">
+                                        {Object.entries(subValue)
+                                          .filter(([nestedKey]) =>
+                                            ["firstName", "lastName"].includes(
+                                              nestedKey
+                                            )
+                                          ) // Filter for only firstName and lastName
+                                          .map(([nestedKey, nestedValue]) => (
+                                            <div
+                                              key={nestedKey}
+                                              className="flex items-center space-x-2"
+                                            >
+                                              <span className="text-sm  text-gray-600 capitalize">
+                                                {nestedKey.replace(
+                                                  /([a-z])([A-Z])/g,
+                                                  "$1 $2"
+                                                )}
+                                                :
+                                              </span>
+                                              <span className="text-gray-800">
+                                                {nestedValue !== null &&
+                                                nestedValue !== undefined
+                                                  ? String(nestedValue)
+                                                  : "-"}
+                                              </span>
+                                            </div>
+                                          ))}
+                                      </div>
+                                    )
+                                  ) : (
+                                    <span className="text-gray-900">
+                                      {subValue !== null &&
+                                      subValue !== undefined
+                                        ? String(subValue)
+                                        : "-"}
+                                    </span>
+                                  )}
+                                </div>
+                              ))
+                            ) : (
+                              /* Handle non-object array items */
+                              <p className="text-gray-900">
+                                {item !== null && item !== undefined
+                                  ? String(item)
+                                  : "-"}
+                              </p>
+                            )}
+                          </div>
+                        </details>
+                      ))
+                    ) : (
+                      <p className="text-gray-500">No items available</p>
+                    )}
+                  </div>
+                </details>
+              ))}
+          </div>
+        </>
+      )}
 
       {/* Dynamically render grouped permissions */}
       {Object.entries(groupedPermissions || {}).map(

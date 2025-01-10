@@ -14,11 +14,11 @@ import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
 
-import CreateWorkRequest from "@/components/work-request/create-work-request";
 import DynamicCreateForm from "@/components/dynamic-create-form";
+import FacilityDetails from "@/components/facility-management/view-facility";
 
 function WorkRequests() {
-  const tabs = ["Assigned Work Request", "Other Work Request"];
+  const tabs = ["All Work Request", "Facility Maager Work Request"];
 
   const [successState, setSuccessState] = useState({
     title: "",
@@ -26,9 +26,9 @@ function WorkRequests() {
     status: false,
   });
 
-  const [assignedworkRequests, setAssignedWorkRequests] = useState<Vendor[]>();
-  const [otherWorkRequests, setOtherWorkRequests] = useState<Role[]>();
-  const [role, setRole] = useState<RoleData>();
+  const [assignedworkRequests, setAssignedWorkRequests] = useState<any[]>();
+  const [otherWorkRequests, setOtherWorkRequests] = useState<any[]>();
+  const [workRequest, setWorkRequest] = useState<any>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
@@ -36,10 +36,15 @@ function WorkRequests() {
   const [blocks, setBlocks] = useState<Block[]>();
   const [units, setUnits] = useState<Unit[]>();
   const [assets, setAssets] = useState<Asset[]>();
+  const [vendors, setVendors] = useState<Vendor[]>();
+  const [technician, setTechnicians] = useState<Technician[]>();
 
+  console.log(assignedworkRequests);
   // Fetch data functions
   const getAssignedWorkRequests = async () => {
-    const response = await axiosInstance.get("/work-requests");
+    const response = await axiosInstance.get(
+      "/work-requests/my-facilities-work-request/all"
+    );
     setAssignedWorkRequests(response.data.data);
   };
 
@@ -48,9 +53,19 @@ function WorkRequests() {
     setOtherWorkRequests(response.data.data);
   };
 
-  const getARole = async () => {
-    const response = await axiosInstance.get(`/roles/${activeRowId}`);
-    setRole(response.data.data);
+  const getVendors = async () => {
+    const response = await axiosInstance.get("/vendors");
+    setVendors(response.data.data);
+  };
+
+  const getTechnicians = async () => {
+    const response = await axiosInstance.get("/technicians");
+    setTechnicians(response.data.data);
+  };
+
+  const getAWorkRequest = async () => {
+    const response = await axiosInstance.get(`/work-requests/${activeRowId}`);
+    setWorkRequest(response.data.data);
   };
 
   // Delete functions
@@ -87,8 +102,8 @@ function WorkRequests() {
   // Toggle actions
   const toggleActions = (rowId: string) => {
     if (
-      selectedTab === "Assigned Work Request" ||
-      selectedTab === "Other Work Request"
+      selectedTab === "Facility Maager Work Request" ||
+      selectedTab === "All Work Request"
     ) {
       setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
     } else {
@@ -101,8 +116,18 @@ function WorkRequests() {
     switch (centralState) {
       case "createWorkRequest":
         return activeRowId ? "Edit Work Request" : "Create Work Request";
-      case "createWorkRequest":
-        return activeRowId ? "Edit Work Request" : "Create Work Request";
+      case "viewWorkRequest":
+        return "Work Request Details";
+      case "commentWorkRequest":
+        return "Add comment";
+      case "attatchmentWorkRequest":
+        return "Add attatchment";
+      case "quotationsWorkRequest":
+        return "Add quotation";
+      case "updateStatusWorkRequest":
+        return "Update Status";
+      case "assignTechnicianWorkRequest":
+        return "Assign Technician";
     }
     switch (centralStateDelete) {
       case "deactivateWorkRequest":
@@ -123,12 +148,18 @@ function WorkRequests() {
         return activeRowId
           ? "You can edit work request details here."
           : "You can create and manage work request here.";
-      case "createWorkRequest":
-        return activeRowId
-          ? "You can edit work request details here."
-          : "You can create and manage work request here.";
-      case "viewPermissions":
-        return "All permissions available for this role";
+      case "viewWorkRequest":
+        return "";
+      case "commentWorkRequest":
+        return "";
+      case "attatchmentWorkRequest":
+        return "";
+      case "quotationsWorkRequest":
+        return "";
+      case "updateStatusWorkRequest":
+        return "";
+      case "assignTechnicianWorkRequest":
+        return "";
     }
     switch (centralStateDelete) {
       case "activateWorkRequest":
@@ -150,25 +181,25 @@ function WorkRequests() {
         inputs={[
           { name: "title", label: "Title", type: "text" },
           { name: "description", label: "Description", type: "textarea" },
-          { name: "file", label: "FIle", type: "file" },
         ]}
         selects={[
+          {
+            name: "typeSelected",
+            label: "Type Selected",
+            placeholder: "What you wanna raise for",
+            options: [
+              { value: "unit", label: "Unit" },
+              { value: "block", label: "Block" },
+              { value: "facility", label: "Facility" },
+            ],
+          },
           {
             name: "facility",
             label: "Facility ",
             placeholder: "Select Facility",
             options: facilities?.map((facility: Facility) => ({
-              value: facility.name.toString(),
+              value: facility.id.toString(),
               label: facility.name,
-            })),
-          },
-          {
-            name: "unit",
-            label: "Unit",
-            placeholder: "Select Unit",
-            options: units?.map((unit: Unit) => ({
-              value: unit.unitNumber.toString(),
-              label: unit.unitNumber,
             })),
           },
           {
@@ -176,28 +207,29 @@ function WorkRequests() {
             label: "Block",
             placeholder: "Select Block",
             options: blocks?.map((asset: Block) => ({
-              value: asset.blockNumber.toString(),
+              value: asset.id.toString(),
               label: asset.blockNumber,
             })),
           },
           {
-            name: "asset",
-            label: "Asset",
-            placeholder: "Select Asset",
-            options: assets?.map((asset: Asset) => ({
-              value: asset.assetName.toString(),
-              label: asset.assetName.toString(),
+            name: "unit",
+            label: "Unit",
+            placeholder: "Select Unit",
+            options: units?.map((unit: Unit) => ({
+              value: unit.id.toString(),
+              label: unit.unitNumber,
             })),
           },
-          {
-            name: "subCategory",
-            label: "Sub-Category",
-            placeholder: "Select Sub-Category",
-            options: [
-              { value: "single", label: "Single" },
-              { value: "residential", label: "Residential" },
-            ],
-          },
+
+          // {
+          //   name: "asset",
+          //   label: "Asset",
+          //   placeholder: "Select Asset",
+          //   options: assets?.map((asset: Asset) => ({
+          //     value: asset.id.toString(),
+          //     label: asset.assetName.toString(),
+          //   })),
+          // },
           {
             name: "category",
             label: "Category",
@@ -208,9 +240,9 @@ function WorkRequests() {
             ],
           },
           {
-            name: "department",
-            label: "Departnemt",
-            placeholder: "Select Department",
+            name: "subCategory",
+            label: "Sub-Category",
+            placeholder: "Select Sub-Category",
             options: [
               { value: "single", label: "Single" },
               { value: "residential", label: "Residential" },
@@ -227,17 +259,147 @@ function WorkRequests() {
         }
       />
     ),
+    commentWorkRequest: (
+      <DynamicCreateForm
+        inputs={[{ name: "comment", label: "Comment", type: "textarea" }]}
+        selects={[]}
+        title="Add Comment"
+        apiEndpoint={`/work-requests/${activeRowId}/comments`}
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    attatchmentWorkRequest: (
+      <DynamicCreateForm
+        inputs={[
+          { name: "title", label: "Tile", type: "text" },
+          { name: "file", label: "FIle", type: "file" },
+        ]}
+        selects={[]}
+        title="Add Attachment"
+        apiEndpoint={`/work-requests/${activeRowId}/upload-attachment`}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    quotationsWorkRequest: (
+      <DynamicCreateForm
+        selects={[
+          {
+            name: "venortechSelected",
+            label: "Select",
+            placeholder: "Assign ",
+            options: [
+              { value: "tech", label: "Technician" },
+              { value: "ven", label: "Vendor" },
+            ],
+          },
+          {
+            name: "vendor",
+            label: "Vendor",
+            placeholder: "Select Vendor",
+            options: vendors?.map((unit: Vendor) => ({
+              value: unit.email.toString(),
+              label: unit.vendorName,
+            })),
+          },
+          {
+            name: "technician",
+            label: "Technician",
+            placeholder: "Select Technician",
+            options: technician?.map((tech: Technician) => ({
+              value: tech.email.toString(),
+              label: `${tech.firstName} ${tech.surname}`,
+            })),
+          },
+        ]}
+        inputs={[
+          { name: "title", label: "Tile", type: "text" },
+          { name: "amount", label: "Amount", type: "number" },
+          { name: "startDate", label: "Start Date", type: "date" },
+          { name: "endDate", label: "End Date", type: "date" },
+        ]}
+        title="Add Quotation"
+        apiEndpoint={`/work-requests/${activeRowId}/upload-quotation`}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    updateStatusWorkRequest: (
+      <DynamicCreateForm
+        selects={[
+          {
+            name: "status",
+            label: "status",
+            placeholder: "Select status",
+            options: [
+              { value: "accepted", label: "Accepted" },
+              { value: "pending", label: "Pending" },
+              { value: "rejected", label: "Rejected" },
+              { value: "closed", label: "Closed" },
+              { value: "reopened", label: "Reopened" },
+              { value: "approved", label: "Approved" },
+            ],
+          },
+        ]}
+        inputs={[
+          {
+            name: "reasonForRejection",
+            label: "Reaseon for Rejection",
+            type: "textarea",
+          },
+        ]}
+        title="Update Status"
+        apiEndpoint={`/work-requests/${activeRowId}/status`}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    assignTechnicianWorkRequest: (
+      <DynamicCreateForm
+        selects={[
+          {
+            name: "technicianEmail",
+            label: "Technician",
+            placeholder: "Select Technician",
+            options: technician?.map((tech: Technician) => ({
+              value: tech.email.toString(),
+              label: `${tech.firstName} ${tech.surname}`,
+            })),
+          },
+        ]}
+        inputs={[]}
+        title="Assign Technician"
+        apiEndpoint={`/work-requests/${activeRowId}/assign`}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+
+    viewWorkRequest: (
+      <div className="p-4">
+        <FacilityDetails facility={workRequest} title="Work Request" />
+      </div>
+    ),
   };
 
   useEffect(() => {
-    if (centralState === "viewPermissions") {
-      getARole();
+    if (centralState === "viewWorkRequest") {
+      getAWorkRequest();
+    }
+    if (centralState === "quotationsWorkRequest") {
+      getVendors();
+      getTechnicians();
+    }
+    if (centralState === "assignTechnicianWorkRequest") {
+      getTechnicians();
     }
   }, [centralState]);
 
   const tabPermissions: { [key: string]: string[] } = {
-    "Assigned Work Request": ["create_work-requests"],
-    "Other Work Request": ["create_work-requests"],
+    "Facility Maager Work Request": ["create_work-requests"],
+    "All Work Request": ["create_work-requests"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -257,7 +419,7 @@ function WorkRequests() {
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
 
   useEffect(() => {
-    if (selectedTab === "Other Work Request") {
+    if (selectedTab === "All Work Request") {
       getOtherWorkRequests();
     } else {
       const fetchData = async () => {
@@ -342,7 +504,7 @@ function WorkRequests() {
 
       <PermissionGuard requiredPermissions={["create_work-requests"]}>
         <div className="relative bg-white rounded-2xl p-4 mt-4">
-          {selectedTab === "Assigned Work Request" && (
+          {selectedTab === "Facility Maager Work Request" && (
             <TableComponent
               data={assignedworkRequests}
               type="workrequests"
@@ -354,7 +516,7 @@ function WorkRequests() {
               deleteAction={setCentralStateDelete}
             />
           )}
-          {selectedTab === "Other Work Request" && (
+          {selectedTab === "All Work Request" && (
             <TableComponent
               data={otherWorkRequests}
               type="workrequests"
