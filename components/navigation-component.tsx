@@ -68,10 +68,16 @@ export default function Navigation() {
             iconPath: paths.path1,
           },
           {
+            href: "/facility-management",
+            label: "Facility Management",
+            permissions: ["units", "blocks", "facilities"],
+            iconPath: paths.path5,
+          },
+          {
             href: "/work-requests",
             label: "Work Request",
             permissions: ["work-requests"],
-            iconPath: paths.path1,
+            iconPath: paths.path3,
           },
           // {
           //   href: "/work-orders",
@@ -79,12 +85,7 @@ export default function Navigation() {
           //   permissions: ["work-orders"],
           //   iconPath: paths.path1,
           // },
-          {
-            href: "/facility-management",
-            label: "Facility Management",
-            permissions: ["units", "blocks", "facilities"],
-            iconPath: paths.path2,
-          },
+
           // {
           //   href: "/ppm",
           //   label: "PPM",
@@ -95,7 +96,7 @@ export default function Navigation() {
             href: "/vendor-management",
             label: "Vendor & Tech Management",
             permissions: ["vendors"],
-            iconPath: paths.path5,
+            iconPath: paths.path9,
           },
           {
             href: "/user-management",
