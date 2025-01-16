@@ -960,7 +960,7 @@ export default function TableComponent({
                                   ]}
                                 />
                               </li>
-                              <li>
+                              {/* <li>
                                 <DropdownButtonComponent
                                   text="Add Attachment"
                                   onClick={() =>
@@ -970,7 +970,7 @@ export default function TableComponent({
                                     "update_work-requests:id/upload-attachment",
                                   ]}
                                 />
-                              </li>
+                              </li> */}
                               <li>
                                 <DropdownButtonComponent
                                   text="Add Quotations"
