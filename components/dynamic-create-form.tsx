@@ -134,6 +134,12 @@ export default function DynamicCreateForm({
       updatedFormData.unitNumber = `Unit ${updatedFormData.unitNumber}`;
     }
 
+    if (updatedFormData.apportionmentMetric) {
+      updatedFormData.apportionmentMetric = Number(
+        updatedFormData.apportionmentMetric
+      );
+    }
+
     console.log(updatedFormData);
 
     try {
