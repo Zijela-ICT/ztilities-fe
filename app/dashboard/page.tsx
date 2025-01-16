@@ -17,6 +17,7 @@ export default function Dashboard() {
   const { user, userPermissions, setUser, setUserPermissions } =
     useDataPermission();
 
+  const [assignedworkRequests, setAssignedWorkRequests] = useState<any[]>();
   const [centralState, setCentralState] = useState<string>();
   const [successState, setSuccessState] = useState({
     title: "",
@@ -27,28 +28,32 @@ export default function Dashboard() {
   const getMe = async () => {
     const response = await axiosInstance.get("/auth/me");
     setUser(response.data.data.user);
-
     const roles = response.data.data?.roles || [];
     const allPermissions = roles
       .map((role: any) => role.permissions || []) // Extract permissions from each role
       .flat(); // Flatten the array of arrays
-
     // Remove duplicate permissions using a Set
     const uniquePermissions: Permission[] = Array.from(new Set(allPermissions));
-
     setUserPermissions(uniquePermissions);
   };
 
   const getWallet = async () => {
     const response = await axiosInstance.get("/wallets/user-wallets");
-
     console.log(response.data.data);
+  };
+
+  const getAssignedWorkRequests = async () => {
+    const response = await axiosInstance.get(
+      "/work-requests/my-facilities-work-request/all"
+    );
+    setAssignedWorkRequests(response.data.data);
   };
 
   // useEffect to fetch getMe initially and every 5 minutes
   useEffect(() => {
     getMe();
     getWallet();
+    getAssignedWorkRequests();
     const interval = setInterval(() => {
       getMe();
     }, 5 * 60 * 1000); // 5 minutes in milliseconds
@@ -56,12 +61,32 @@ export default function Dashboard() {
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
 
+  const pendingRequests = assignedworkRequests?.filter(
+    (request) => request.status === "pending"
+  );
+
   const data = [
-    { title: "Create Work Request", number: 1200, rate: "5 days" },
-    { title: "Pending Work Request", number: 3200, rate: "7 days" },
-    { title: "Created Work Order", number: 1500, rate: "3 days" },
-    { title: "Pending Work Order", number: 800, rate: "10 days" },
-    { title: "Wallet Balance", number: 4500, rate: "" },
+    {
+      title: "Create Work Request",
+      number: assignedworkRequests?.length,
+      rate: "5 days",
+    },
+    {
+      title: "Pending Work Request",
+      number: pendingRequests?.length,
+      rate: "7 days",
+    },
+    {
+      title: "Created Work Order",
+      number: assignedworkRequests?.length,
+      rate: "3 days",
+    },
+    {
+      title: "Pending Work Order",
+      number: pendingRequests?.length,
+      rate: "10 days",
+    },
+    { title: "Wallet Balance", number: 0, rate: "" },
   ];
 
   // Mapping centralState values to components

@@ -443,6 +443,15 @@ function FacilityManagement() {
             })),
             isMulti: true,
           },
+          {
+            name: "userId",
+            label: "Client",
+            placeholder: "Assign Block to a client",
+            options: users?.map((user: User) => ({
+              value: user.id,
+              label: `${user.firstName} ${user.lastName}`,
+            })),
+          },
         ]}
         title="Block"
         apiEndpoint="/blocks"
@@ -691,7 +700,7 @@ function FacilityManagement() {
           getBlocks(),
           getUnits(),
           getAssets(),
-          getUsers()
+          getUsers(),
         ]);
       };
       fetchData();
