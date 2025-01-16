@@ -220,7 +220,6 @@ export default function DynamicCreateForm({
     }
   }, [activeRowId, fetchResource, selects]);
 
-  console.log(formData);
   return (
     <>
       <form

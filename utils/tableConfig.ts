@@ -98,12 +98,12 @@ export const tableMainButtonConfigs = {
       permissions: ["create_work-requests:for-a-user"],
       action: "createWorkRequestforUser",
     },
-    // {
-    //   text: "Power",
-    //   className: "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-    //   permissions: ["update_work-requests:id/apportion/power"],
-    //   action: "apportionPower",
-    // },
+    {
+      text: "Power",
+      className: "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["update_work-requests:id/apportion/power"],
+      action: "apportionPower",
+    },
   ],
   workorders: [
     {

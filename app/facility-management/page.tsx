@@ -234,6 +234,8 @@ function FacilityManagement() {
         return "Unit Details";
       case "viewAssetCategory":
         return "Category Details";
+      case "assignUserToFacility":
+        return "Assign User";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -280,6 +282,8 @@ function FacilityManagement() {
         return "";
       case "viewAssetCategory":
         return "";
+      case "assignUserToFacility":
+        return "Assign User to a facility";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -579,6 +583,30 @@ function FacilityManagement() {
         setSuccessState={setSuccessState}
       />
     ),
+    assignUserToFacility: (
+      <DynamicCreateForm
+        inputs={[]}
+        selects={[
+          {
+            name: "userId",
+            label: "Facility Manager",
+            placeholder: "Assign Facility to a User",
+            options: users?.map((user: User) => ({
+              value: user.id,
+              label: `${user.firstName} ${user.lastName}`,
+            })),
+          },
+        ]}
+        title="Assign Facility"
+        apiEndpoint={`/facilities/${activeRowId}/assign`}
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        // fetchResource={(id) =>
+        //   axiosInstance.get(`/units/${id}`).then((res) => res.data.data)
+        // }
+      />
+    ),
     createAssetCategory: (
       <CreateCategory
         activeRowId={activeRowId}
@@ -663,6 +691,7 @@ function FacilityManagement() {
           getBlocks(),
           getUnits(),
           getAssets(),
+          getUsers()
         ]);
       };
       fetchData();

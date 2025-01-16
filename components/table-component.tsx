@@ -80,8 +80,10 @@ export default function TableComponent({
       <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0  font-semibold text-md mb-4">
         <div
           className={`flex items-center border rounded-md focus-within:ring-2 focus-within:ring-blue-500 w-full ${
-            type === "users" || type === "workrequests"
+            type === "users"
               ? "sm:w-[60%]"
+              : type === "workrequests"
+              ? "sm:w-[40%]" // Updated style for workrequests
               : "sm:w-[70%]"
           }`}
         >
@@ -530,6 +532,15 @@ export default function TableComponent({
                                     setModalState("createFacility")
                                   }
                                   permissions={["update_facilities:id"]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Assign a User"
+                                  onClick={() =>
+                                    setModalState("assignUserToFacility")
+                                  }
+                                  permissions={["update_facilities:id/assign"]}
                                 />
                               </li>
                               <li>
