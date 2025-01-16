@@ -462,6 +462,11 @@ function FacilityManagement() {
             type: "date",
           },
           { name: "description", label: "Description", type: "textarea" },
+          {
+            name: "apportionmentMetric",
+            label: "Apportionment Metric",
+            type: "number",
+          },
         ]}
         selects={[
           {
