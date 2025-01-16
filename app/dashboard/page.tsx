@@ -6,6 +6,8 @@ import DynamicCreateForm from "@/components/dynamic-create-form";
 import ModalCompoenent, {
   SuccessModalCompoenent,
 } from "@/components/modal-component";
+import CreateWorkOrder from "@/components/work-order/create-work-order";
+import CreateWorkRequest from "@/components/work-request/create-work-request";
 import { useDataPermission } from "@/context";
 import axiosInstance from "@/utils/api";
 import { BarChartIcon, WorkIcon } from "@/utils/svg";
@@ -65,33 +67,13 @@ export default function Dashboard() {
   // Mapping centralState values to components
   const componentMap: Record<string, JSX.Element> = {
     createWorkOrder: (
-      <DynamicCreateForm
-        inputs={[
-          { name: "name", label: "Facility Name", type: "text" },
-          { name: "code", label: "Code", type: "text" },
-          { name: "facilityOfficer", label: "Facility Officer", type: "text" },
-          { name: "address", label: "Address", type: "text" },
-          { name: "phone", label: "Phone Number", type: "text" },
-          { name: "email", label: "Email address", type: "text" },
-        ]}
-        title="Work Order"
-        apiEndpoint="/work-orders"
+      <CreateWorkOrder
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
     ),
     createWorkRequest: (
-      <DynamicCreateForm
-        inputs={[
-          { name: "name", label: "Facility Name", type: "text" },
-          { name: "code", label: "Code", type: "text" },
-          { name: "facilityOfficer", label: "Facility Officer", type: "text" },
-          { name: "address", label: "Address", type: "text" },
-          { name: "phone", label: "Phone Number", type: "textarea" },
-          { name: "file", label: "Upload File", type: "file" },
-        ]}
-        title="Work Request"
-        apiEndpoint="/work-requests"
+      <CreateWorkRequest
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
@@ -142,7 +124,7 @@ export default function Dashboard() {
       >
         {componentMap[centralState]}
       </ModalCompoenent>
-      <div className="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {data.map((item, index) => (
           <div
             key={index}
@@ -170,7 +152,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="hidden w-full rounded-lg bg-white my-8 flex flex-col items-center justify-center px-6 py-10">
+      <div className=" w-full rounded-lg bg-white my-8 flex flex-col items-center justify-center px-6 py-10">
         <WorkIcon />
         <h1 className="text-2xl font-semibold text-black">
           No Request/order created yet

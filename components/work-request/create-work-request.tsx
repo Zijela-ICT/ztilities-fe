@@ -9,6 +9,14 @@ export default function CreateWorkRequest({
   setModalState,
   activeRowId,
   setSuccessState,
+}: {
+  setModalState: (state: string) => void;
+  activeRowId?: string | null;
+  setSuccessState: (state: {
+    title: string;
+    detail: string;
+    status: boolean;
+  }) => void;
 }) {
   const { user } = useDataPermission();
 
