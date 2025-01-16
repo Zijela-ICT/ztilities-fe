@@ -79,12 +79,12 @@ export default function Navigation() {
             permissions: ["work-requests"],
             iconPath: paths.path3,
           },
-          // {
-          //   href: "/work-orders",
-          //   label: "Work Order",
-          //   permissions: ["work-orders"],
-          //   iconPath: paths.path1,
-          // },
+          {
+            href: "/work-orders",
+            label: "Work Order",
+            permissions: ["work-orders"],
+            iconPath: paths.path6,
+          },
 
           // {
           //   href: "/ppm",

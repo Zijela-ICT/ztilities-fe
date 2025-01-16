@@ -35,7 +35,7 @@ interface CreateUnitProps {
     detail: string;
     status: boolean;
   }) => void;
-  fetchResource?: (id: string) => Promise<any>; // Function to fetch data for editing
+  fetchResource?: (id: string) => Promise<any>;
   title: string;
 }
 
@@ -100,7 +100,16 @@ export default function DynamicCreateForm({
     e.preventDefault();
 
     // console.log(formData);
-    const { venortechSelected, typeSelected, ...filteredFormData } = formData;
+    const {
+      typeSelected,
+      attachments,
+      fileAttachments,
+      comments,
+      quotations,
+      activities,
+      ...filteredFormData
+    } = formData;
+
     // Prepend "Block" for blockNumber and "Asset" for assetNumber if not already present
     const updatedFormData = { ...filteredFormData };
 
@@ -125,29 +134,9 @@ export default function DynamicCreateForm({
       updatedFormData.unitNumber = `Unit ${updatedFormData.unitNumber}`;
     }
 
-    if (
-      updatedFormData.amount &&
-      updatedFormData.startDate &&
-      updatedFormData.endDate
-    ) {
-      updatedFormData.amount = updatedFormData.amount;
-      updatedFormData.startDate = updatedFormData.startDate;
-
-      updatedFormData.endDate = updatedFormData.endDate;
-    }
-
-    // console.log(updatedFormData);
+    console.log(updatedFormData);
 
     try {
-      // if (activeRowId) {
-      //   await axiosInstance.patch(
-      //     `${apiEndpoint}/${activeRowId}`,
-      //     updatedFormData
-      //   );
-      // } else {
-      //   await axiosInstance.post(apiEndpoint, updatedFormData);
-      // }
-
       if (
         [
           "User",
@@ -174,13 +163,7 @@ export default function DynamicCreateForm({
 
       setFormData({});
       setModalState("");
-      // setSuccessState({
-      //   title: "Successful",
-      //   detail: `You have successfully ${
-      //     activeRowId ? "edited" : "created"
-      //   } this resource.`,
-      //   status: true,
-      // });
+
       setSuccessState({
         title: "Successful",
         detail: `${
@@ -231,8 +214,9 @@ export default function DynamicCreateForm({
     }
   }, [activeRowId, fetchResource, selects]);
 
+  console.log(formData);
   return (
-    <div>
+    <>
       <form
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
@@ -247,7 +231,7 @@ export default function DynamicCreateForm({
                   name={input.name}
                   onChange={handleFileChange}
                   label={input.label}
-                  uploadedFile = {uploadedFile}
+                  uploadedFile={uploadedFile}
                   // No value prop needed for file inputs
                 />
               </div>
@@ -303,36 +287,38 @@ export default function DynamicCreateForm({
             (select.name === "facility" &&
               formData.typeSelected !== "facility") ||
             (select.name === "block" && formData.typeSelected !== "block") ||
-            (title === "Add Quotation" &&
-              select.name === "vendor" &&
-              formData.venortechSelected !== "ven") ||
-            (title === "Add Quotation" &&
-              select.name === "technician" &&
-              formData.venortechSelected !== "tech")
+            ((title === "Add Quotation" || title === "Assign Technician") &&
+              select.label === "Vendor" &&
+              formData.entity !== "Vendor") ||
+            ((title === "Add Quotation" || title === "Assign Technician") &&
+              select.label === "Technician" &&
+              formData.entity !== "Technician")
           ) {
             return null; // Skip rendering this select if typeSelected does not match
           }
 
           return (
-            <div key={select.name} className="relative w-full mt-6">
-              <Select
-                isMulti={select.isMulti}
-                name={select.name}
-                options={select.options}
-                value={
-                  select.isMulti
-                    ? select.options?.filter((option) =>
-                        formData[select.name]?.includes(option.value)
-                      )
-                    : select.options?.find(
-                        (option) => option.value === formData[select.name]
-                      )
-                }
-                onChange={handleSelectChange(select.name, select.isMulti)}
-                styles={multiSelectStyle}
-                placeholder={select.placeholder}
-              />
-            </div>
+            <>
+              <div key={select.name} className="relative w-full mt-6">
+                <Select
+                  isMulti={select.isMulti}
+                  name={select.name}
+                  options={select.options}
+                  value={
+                    select.isMulti
+                      ? select.options?.filter((option) =>
+                          formData[select.name]?.includes(option.value)
+                        )
+                      : select.options?.find(
+                          (option) => option.value === formData[select.name]
+                        )
+                  }
+                  onChange={handleSelectChange(select.name, select.isMulti)}
+                  styles={multiSelectStyle}
+                  placeholder={select.placeholder}
+                />
+              </div>
+            </>
           );
         })}
 
@@ -360,6 +346,6 @@ export default function DynamicCreateForm({
           </button>
         </div>
       </form>
-    </div>
+    </>
   );
 }

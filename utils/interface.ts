@@ -29,6 +29,9 @@ interface AuthUser {
   isVendor: boolean;
   isDeactivated: boolean;
   twoFAMethod: string;
+  units : Unit[]
+  facilities : Facility[]
+  blocks : Block[]
 }
 
 interface Permission {

@@ -135,85 +135,10 @@ function WorkOrders() {
   // Mapping centralState values to components
   const componentMap: Record<string, JSX.Element> = {
     createWorkOrder: (
-      <DynamicCreateForm
-        inputs={[
-          { name: "title", label: "Title", type: "text" },
-          { name: "description", label: "Description", type: "textarea" },
-          { name: "file", label: "FIle", type: "file" },
-        ]}
-        selects={[
-          {
-            name: "facility",
-            label: "Facility ",
-            placeholder: "Select Facility",
-            options: facilities?.map((facility: Facility) => ({
-              value: facility.id,
-              label: facility.name,
-            })),
-          },
-          {
-            name: "unit",
-            label: "Unit",
-            placeholder: "Select Unit",
-            options: units?.map((unit: Unit) => ({
-              value: unit.id,
-              label: unit.unitNumber,
-            })),
-          },
-          {
-            name: "blocks",
-            label: "Blocks",
-            placeholder: "Select Blocks",
-            options: blocks?.map((asset: Block) => ({
-              value: asset.id,
-              label: asset.blockNumber,
-            })),
-          },
-          {
-            name: "assets",
-            label: "Assets",
-            placeholder: "Select Assets",
-            options: assets?.map((asset: Asset) => ({
-              value: asset.id?.toString(),
-              label: asset.assetName?.toString(),
-            })),
-          },
-          {
-            name: "subCategory",
-            label: "Sub-Category",
-            placeholder: "Select Sub-Category",
-            options: [
-              { value: "single", label: "Single" },
-              { value: "residential", label: "Residential" },
-            ],
-          },
-          {
-            name: "category",
-            label: "Category",
-            placeholder: "Select Category",
-            options: [
-              { value: "single", label: "Single" },
-              { value: "residential", label: "Residential" },
-            ],
-          },
-          {
-            name: "department",
-            label: "Departnemt",
-            placeholder: "Select Department",
-            options: [
-              { value: "single", label: "Single" },
-              { value: "residential", label: "Residential" },
-            ],
-          },
-        ]}
-        title="Work Order"
-        apiEndpoint="/work-orders"
+      <CreateWorkOrder
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-        fetchResource={(id) =>
-          axiosInstance.get(`/work-orders/${id}`).then((res) => res.data.data)
-        }
       />
     ),
   };

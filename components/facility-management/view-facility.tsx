@@ -125,7 +125,7 @@ export default function FacilityDetails({
       </div>
 
       {/* for request */}
-      {title === "Work Request" && (
+      {(title === "Work Request" || title === "Category") && (
         <>
           {" "}
           <div className="space-y-5 px-2 text-gray-500">

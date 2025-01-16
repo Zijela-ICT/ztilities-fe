@@ -1,25 +1,62 @@
-"use client";
-
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
 import { LabelInputComponent } from "../input-container";
 import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
+import { useDataPermission } from "@/context";
 
 export default function CreateWorkOrder({
   setModalState,
   activeRowId,
   setSuccessState,
 }) {
+  const { user } = useDataPermission();
+
+  const [facility, setAFacility] = useState<Facility>();
+  const [block, setABlock] = useState<Block>();
+  const [unit, setAUnit] = useState<Unit>();
+
   const [formData, setFormData] = useState({
-    vendorCode: "",
-    vendorName: "",
-    vendorType: "",
-    category: "",
-    phoneNumber: "",
-    email: "",
-    address: "",
+    title: "",
+    description: "",
+    entity: "",
+    unit: "",
+    block: "",
+    facility: "",
+    asset: "",
   });
+
+  // Fetch work request if activeRowId exists
+  const getWorkRequest = async () => {
+    if (activeRowId) {
+      const response = await axiosInstance.get(
+        `/work-requests/work-order/${activeRowId}`
+      );
+      const data = response.data.data;
+      setFormData({
+        ...formData,
+        title: data.title,
+        description: data.description,
+      });
+    }
+  };
+
+  const getAFacility = async () => {
+    const response = await axiosInstance.get(
+      `/facilities/${formData.facility}`
+    );
+    setAFacility(response.data.data);
+  };
+
+  const getABlock = async () => {
+    const response = await axiosInstance.get(`/blocks/${formData.block}`);
+    setABlock(response.data.data);
+  };
+
+  const getAUnit = async () => {
+    const response = await axiosInstance.get(`/units/${formData.unit}`);
+    setAUnit(response.data.data);
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -39,63 +76,86 @@ export default function CreateWorkOrder({
     e.preventDefault();
 
     if (activeRowId) {
-      await axiosInstance.patch(`/vendors/${vendor.id}`, {
-        ...formData,
-      });
+      await axiosInstance.patch(
+        `/work-requests/work-order/${activeRowId}`,
+        formData
+      );
     } else {
-      await axiosInstance.post("/vendors", {
-        ...formData,
-      });
+      await axiosInstance.post("/work-requests/work-order/", formData);
     }
     setFormData({
-      vendorCode: "",
-      vendorName: "",
-      vendorType: "",
-      category: "",
-      phoneNumber: "",
-      email: "",
-      address: "",
+      title: "",
+      description: "",
+      entity: "",
+      unit: "",
+      block: "",
+      facility: "",
+      asset: "",
     });
     setModalState("");
     setSuccessState({
       title: "Successful",
       detail: `You have successfully ${
         activeRowId ? "edited" : "created"
-      } this Vendor`,
+      } this Work Request`,
       status: true,
     });
   };
 
-  const [vendor, setVendor] = useState<Vendor>(null);
-  const getAVendor = async () => {
-    const response = await axiosInstance.get(`/vendors/${activeRowId}`);
-    if (response.data.data) {
-      setVendor(response.data.data);
-    }
-  };
+  const entityOptions = [
+    { value: "unit", label: "Unit" },
+    { value: "block", label: "Block" },
+    { value: "facility", label: "Facility" },
+  ];
+
+  const unitOptions = user?.units?.map((unit: Unit) => ({
+    value: unit.id.toString(),
+    label: unit.unitNumber,
+  }));
+
+  const blockOptions = user?.blocks?.map((unit: Block) => ({
+    value: unit.id.toString(),
+    label: unit.blockNumber,
+  }));
+
+  const facilityOptions = user?.facilities?.map((unit: Facility) => ({
+    value: unit.id.toString(),
+    label: unit.name,
+  }));
+
+  const assetOptions =
+    formData.entity === "unit"
+      ? unit?.assets?.map((unit: Asset) => ({
+          value: unit.id.toString(),
+          label: unit.assetName,
+        }))
+      : formData?.entity === "facility"
+      ? facility?.assets?.map((block: Asset) => ({
+          value: block.id.toString(),
+          label: block.assetName,
+        }))
+      : formData?.entity === "block"
+      ? block?.assets?.map((otherBlock: Asset) => ({
+          value: otherBlock.id.toString(),
+          label: otherBlock.assetName,
+        }))
+      : [];
 
   useEffect(() => {
-    if (activeRowId !== null) getAVendor();
+    if (activeRowId) {
+      getWorkRequest();
+    }
   }, [activeRowId]);
 
   useEffect(() => {
-    if (vendor) {
-      setFormData({
-        vendorCode: vendor?.vendorCode || "",
-        vendorName: vendor?.vendorName || "",
-        vendorType: vendor?.vendorType || "",
-        category: vendor?.category || "",
-        phoneNumber: vendor?.phoneNumber || "",
-        email: vendor?.email || "",
-        address: vendor?.address,
-      });
+    if (formData.unit) {
+      getAUnit();
+    } else if (formData.block) {
+      getABlock();
+    } else if (formData.facility) {
+      getAFacility();
     }
-  }, [vendor]);
-
-  const typeOptions = [
-    { value: "single", label: "Single" },
-    { value: "residential", label: "Residential" },
-  ];
+  }, [formData.unit, formData.block, formData.facility]);
 
   return (
     <div>
@@ -106,83 +166,100 @@ export default function CreateWorkOrder({
         <div className="relative w-full mt-6">
           <LabelInputComponent
             type="text"
-            name="vendorCode"
-            value={formData.vendorCode}
+            name="title"
+            value={formData.title}
             onChange={handleChange}
-            label="Vendor Code"
+            label="Title"
           />
         </div>
 
         <div className="relative w-full mt-6">
           <LabelInputComponent
             type="text"
-            name="vendorName"
-            value={formData.vendorName}
+            name="description"
+            value={formData.description}
             onChange={handleChange}
-            label="Vendor Name"
+            label="Description"
           />
         </div>
 
-        <div className="relative w-full mt-6">
-          <Select
-            options={typeOptions}
-            value={typeOptions.find(
-              (option) => option.value === formData.vendorType
+        {/* Only show the rest of the form if there is no activeRowId */}
+        {!activeRowId && (
+          <>
+            <div className="relative w-full mt-6">
+              <Select
+                options={entityOptions}
+                value={entityOptions?.find(
+                  (option) => option.value === formData.entity
+                )}
+                onChange={handleSelectChange("entity")}
+                styles={multiSelectStyle}
+                placeholder="Select Entity"
+              />
+            </div>
+
+            {formData.entity === "unit" && (
+              <div className="relative w-full mt-6">
+                <Select
+                  options={unitOptions}
+                  value={unitOptions?.find(
+                    (option) => option.value === formData.unit
+                  )}
+                  onChange={handleSelectChange("unit")}
+                  styles={multiSelectStyle}
+                  placeholder="Select Unit"
+                />
+              </div>
             )}
-            onChange={handleSelectChange("vendorType")}
-            styles={multiSelectStyle}
-            placeholder="Vendor Type"
-          />
-        </div>
 
-        <div className="relative w-full mt-6">
-          <Select
-            options={typeOptions}
-            value={typeOptions.find(
-              (option) => option.value === formData.category
+            {formData.entity === "block" && (
+              <div className="relative w-full mt-6">
+                <Select
+                  options={blockOptions}
+                  value={blockOptions?.find(
+                    (option) => option.value === formData.block
+                  )}
+                  onChange={handleSelectChange("block")}
+                  styles={multiSelectStyle}
+                  placeholder="Select Block"
+                />
+              </div>
             )}
-            onChange={handleSelectChange("category")}
-            styles={multiSelectStyle}
-            placeholder="Category"
-          />
-        </div>
 
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="tel"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            label="Phone number"
-          />
-        </div>
+            {formData.entity === "facility" && (
+              <div className="relative w-full mt-6">
+                <Select
+                  options={facilityOptions}
+                  value={facilityOptions?.find(
+                    (option) => option.value === formData.facility
+                  )}
+                  onChange={handleSelectChange("facility")}
+                  styles={multiSelectStyle}
+                  placeholder="Select Facility"
+                />
+              </div>
+            )}
 
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            label="Email address"
-          />
-        </div>
-
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            label="Address"
-          />
-        </div>
+            <div className="relative w-full mt-6">
+              <Select
+                options={assetOptions}
+                value={assetOptions?.find(
+                  (option) => option.value === formData.asset
+                )}
+                onChange={handleSelectChange("asset")}
+                styles={multiSelectStyle}
+                placeholder="Select Assets"
+              />
+            </div>
+          </>
+        )}
 
         <div className="mt-10 flex w-full justify-end">
           <button
             type="submit"
             className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-base font-semibold text-white"
           >
-            {activeRowId ? "Edit Technician" : "Create Technician"}
+            {activeRowId ? "Edit Work Order" : "Create Work Order"}
           </button>
         </div>
       </form>

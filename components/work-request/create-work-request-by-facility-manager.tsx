@@ -5,18 +5,20 @@ import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 
-export default function CreateWorkRequest({
+export default function CreateWorkRequestForUser({
   setModalState,
   activeRowId,
   setSuccessState,
 }) {
   const { user } = useDataPermission();
 
+  const [users, setUsers] = useState<User[]>();
   const [facility, setAFacility] = useState<Facility>();
   const [block, setABlock] = useState<Block>();
   const [unit, setAUnit] = useState<Unit>();
 
   const [formData, setFormData] = useState({
+    userId: "",
     title: "",
     description: "",
     entity: "",
@@ -37,6 +39,11 @@ export default function CreateWorkRequest({
         description: data.description,
       });
     }
+  };
+
+  const getUsers = async () => {
+    const response = await axiosInstance.get("/users");
+    setUsers(response.data.data);
   };
 
   const getAFacility = async () => {
@@ -76,9 +83,10 @@ export default function CreateWorkRequest({
     if (activeRowId) {
       await axiosInstance.patch(`/work-requests/${activeRowId}`, formData);
     } else {
-      await axiosInstance.post("/work-requests", formData);
+      await axiosInstance.post("/work-requests/for-a-user", formData);
     }
     setFormData({
+      userId: "",
       title: "",
       description: "",
       entity: "",
@@ -102,6 +110,11 @@ export default function CreateWorkRequest({
     { value: "block", label: "Block" },
     { value: "facility", label: "Facility" },
   ];
+
+  const userOptions = users?.map((unit: User) => ({
+    value: unit.id.toString(),
+    label: unit.firstName + unit.lastName,
+  }));
 
   const unitOptions = user?.units?.map((unit: Unit) => ({
     value: unit.id.toString(),
@@ -143,6 +156,10 @@ export default function CreateWorkRequest({
   }, [activeRowId]);
 
   useEffect(() => {
+    getUsers();
+  }, []);
+
+  useEffect(() => {
     if (formData.unit) {
       getAUnit();
     } else if (formData.block) {
@@ -158,6 +175,17 @@ export default function CreateWorkRequest({
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
+        <div className="relative w-full mt-6">
+          <Select
+            options={userOptions}
+            value={userOptions?.find(
+              (option) => option.value === formData.asset
+            )}
+            onChange={handleSelectChange("userId")}
+            styles={multiSelectStyle}
+            placeholder="Select a user"
+          />
+        </div>
         <div className="relative w-full mt-6">
           <LabelInputComponent
             type="text"
@@ -254,7 +282,9 @@ export default function CreateWorkRequest({
             type="submit"
             className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-base font-semibold text-white"
           >
-            {activeRowId ? "Edit Work Request" : "Create Work Request"}
+            {activeRowId
+              ? "Edit Work Request for a user"
+              : "Create Work Request for a user"}
           </button>
         </div>
       </form>

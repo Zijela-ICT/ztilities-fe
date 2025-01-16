@@ -80,7 +80,9 @@ export default function TableComponent({
       <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0  font-semibold text-md mb-4">
         <div
           className={`flex items-center border rounded-md focus-within:ring-2 focus-within:ring-blue-500 w-full ${
-            type === "users" ? "sm:w-[65%]" : "sm:w-[70%]"
+            type === "users" || type === "workrequests"
+              ? "sm:w-[60%]"
+              : "sm:w-[70%]"
           }`}
         >
           {/* Search Icon */}
@@ -304,6 +306,7 @@ export default function TableComponent({
                                 "assetName",
                                 `firstName`,
                                 "lastName",
+                                "subCategoryName",
                               ]
                                 ?.map((prop) => item?.[prop]) // Optional chaining here
                                 .filter(Boolean)
@@ -321,6 +324,7 @@ export default function TableComponent({
                           "assetName",
                           `firstName`,
                           "lastName",
+                          "subCategoryName",
                         ]
                           .map((prop) => row[column]?.[prop]) // Optional chaining here
                           .filter(Boolean)
@@ -337,31 +341,28 @@ export default function TableComponent({
                           {row[column] === true ? "Inactive" : "Active"}
                         </span>
                       ) : column === "status" || column === "subStatus" ? (
-                        // Handle status column
-                        // <span
-                        //   className={`px-2.5 py-1 ${
-                        //     row[column] === "Approved"
-                        //       ? "text-[#036B26] bg-[#E7F6EC]"
-                        //       : "text-[#B76E00] bg-[#FFAB0014]"
-                        //   } rounded-full `}
-                        // >
-                        //   {row[column]?.toString()}
-                        // </span>
                         <span
                           className={`px-2.5 py-1 ${
-                            row[column] === "Approved"
+                            row[column]?.toString().toLowerCase() === "approved"
                               ? "text-[#036B26] bg-[#E7F6EC]"
-                              : row[column] === "pending"
+                              : row[column]?.toString().toLowerCase() ===
+                                "pending"
                               ? "text-[#FF9F00] bg-[#FFEB84]"
-                              : row[column] === "rejected"
+                              : row[column]?.toString().toLowerCase() ===
+                                "rejected"
                               ? "text-[#B76E00] bg-[#FFAB0014]"
-                              : row[column] === "closed"
+                              : row[column]?.toString().toLowerCase() ===
+                                "closed"
                               ? "text-[#757575] bg-[#E0E0E0]"
-                              : row[column] === "reopened"
+                              : row[column]?.toString().toLowerCase() ===
+                                "reopened"
                               ? "text-[#0E7B7B] bg-[#D1F0F0]"
-                              : row[column] === "approved" ||
-                                row[column] === "accepted" // Explicit check for Approved again for clarity
+                              : row[column]?.toString().toLowerCase() ===
+                                "accepted"
                               ? "text-[#036B26] bg-[#E7F6EC]"
+                              : row[column]?.toString().toLowerCase() ===
+                                "initiated"
+                              ? "text-[#1E5AB9] bg-[#E0EDFF]"
                               : ""
                           } rounded-full`}
                         >
@@ -719,6 +720,56 @@ export default function TableComponent({
                         </PermissionGuard>
                       </div>
                     </>
+                  ) : type === "categories" ? (
+                    <>
+                      <div className="relative">
+                        {/* Button */}
+                        <PermissionGuard
+                          requiredPermissions={[
+                            "read_assets:/sub-category/all",
+                            "read_assets:/category/sub-category/id",
+                            "read_assets:/category/all",
+                            "delete_assets:/sub-category/id",
+                            ,
+                            "delete_assets:/category/id",
+                            "create_assets:/sub-category",
+                          ]}
+                        >
+                          <button
+                            onClick={() => toggleActions(row.id)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <TripleDotsIcon />
+                          </button>
+                        </PermissionGuard>
+
+                        {/* Dropdown Menu */}
+                        {activeRowId === row.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                            <ul className="py-2">
+                              <li>
+                                <DropdownButtonComponent
+                                  text="View Category"
+                                  onClick={() =>
+                                    setModalState("viewAssetCategory")
+                                  }
+                                  permissions={["read_assets:/category/all"]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Create Sub Category"
+                                  onClick={() =>
+                                    setModalState("createAssetCategory")
+                                  }
+                                  permissions={["create_assets:/sub-category"]}
+                                />
+                              </li>
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </>
                   ) : type === "vendors" ? (
                     <>
                       <div className="relative">
@@ -854,7 +905,7 @@ export default function TableComponent({
                         <PermissionGuard
                           requiredPermissions={[
                             "create_work-requests",
-                            "update_work-requests:id/status",
+                            "read_work-requests:id",
                           ]}
                         >
                           <button
@@ -875,20 +926,18 @@ export default function TableComponent({
                                   onClick={() =>
                                     setModalState("viewWorkRequest")
                                   }
-                                  permissions={["create_work-requests"]}
+                                  permissions={["read_work-requests:id"]}
                                 />
                               </li>
-                              {/* <li>
+                              <li>
                                 <DropdownButtonComponent
                                   text="Edit"
                                   onClick={() =>
                                     setModalState("createWorkRequest")
                                   }
-                                  permissions={[
-                                    "update_work-requests:id/status",
-                                  ]}
+                                  permissions={["read_work-requests:id"]}
                                 />
-                              </li> */}
+                              </li>
                               <li>
                                 <DropdownButtonComponent
                                   text="Comment"
@@ -896,18 +945,18 @@ export default function TableComponent({
                                     setModalState("commentWorkRequest")
                                   }
                                   permissions={[
-                                    "update_work-requests:id/status",
+                                    "update_work-requests:id/comments",
                                   ]}
                                 />
                               </li>
                               <li>
                                 <DropdownButtonComponent
-                                  text="Add Attatchment"
+                                  text="Add Attachment"
                                   onClick={() =>
                                     setModalState("attatchmentWorkRequest")
                                   }
                                   permissions={[
-                                    "update_work-requests:id/status",
+                                    "update_work-requests:id/upload-attachment",
                                   ]}
                                 />
                               </li>
@@ -918,7 +967,7 @@ export default function TableComponent({
                                     setModalState("quotationsWorkRequest")
                                   }
                                   permissions={[
-                                    "update_work-requests:id/status",
+                                    "update_work-requests:id/upload-quotation",
                                   ]}
                                 />
                               </li>
@@ -929,7 +978,8 @@ export default function TableComponent({
                                     setModalState("updateStatusWorkRequest")
                                   }
                                   permissions={[
-                                    "update_work-requests:id/status",
+                                    "update_work-requests:id/status/reject",
+                                    "update_work-requests:id/status/close",
                                   ]}
                                 />
                               </li>
@@ -940,10 +990,37 @@ export default function TableComponent({
                                     setModalState("assignTechnicianWorkRequest")
                                   }
                                   permissions={[
-                                    "update_work-requests:id/status",
+                                    "update_work-requests:id/assign",
                                   ]}
                                 />
                               </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Accept Quotation"
+                                  onClick={() =>
+                                    setModalState("acceptQuotation")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/accept-quotation/quotationId",
+                                  ]}
+                                />
+                              </li>
+                              {row.amount > 0 && (
+                                <li>
+                                  <DropdownButtonComponent
+                                    text="Apportion Service Charge"
+                                    onClick={() =>
+                                      setModalStateDelete(
+                                        "apportionServiceCharge"
+                                      )
+                                    }
+                                    permissions={[
+                                      "update_work-requests:id/apportion/service-charge",
+                                    ]}
+                                  />
+                                </li>
+                              )}
+
                               {/* <li>
                                 {row.isDeactivated === false ? (
                                   <DropdownButtonComponent

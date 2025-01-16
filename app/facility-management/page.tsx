@@ -14,9 +14,11 @@ import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
 import FacilityDetails from "@/components/facility-management/view-facility";
 import DynamicCreateForm from "@/components/dynamic-create-form";
+import CreateCategory from "@/components/facility-management/create-category";
+import CreateAsset from "@/components/facility-management/create-asset";
 
 function FacilityManagement() {
-  const tabs = ["Facilities", "Blocks", "Units", "Assets"];
+  const tabs = ["Facilities", "Blocks", "Units", "Assets", "Categories"];
 
   // States
   const [successState, setSuccessState] = useState({
@@ -30,10 +32,12 @@ function FacilityManagement() {
   const [blocks, setBlocks] = useState<Block[]>();
   const [units, setUnits] = useState<Unit[]>();
   const [assets, setAssets] = useState<Asset[]>();
+  const [categories, setCategories] = useState<any[]>();
   const [facility, setAFacility] = useState<Facility>();
   const [asset, setAAsset] = useState<Asset>();
   const [block, setABlock] = useState<Block>();
   const [unit, setAUnit] = useState<Unit>();
+  const [category, setACategory] = useState<any>();
 
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [centralState, setCentralState] = useState<string>();
@@ -70,6 +74,11 @@ function FacilityManagement() {
     setAssets(response.data.data);
   };
 
+  const getCategories = async () => {
+    const response = await axiosInstance.get("/assets/category/all");
+    setCategories(response.data.data);
+  };
+
   const getABlock = async () => {
     const response = await axiosInstance.get(`/blocks/${activeRowId}`);
     setABlock(response.data.data);
@@ -83,6 +92,13 @@ function FacilityManagement() {
   const getAAsset = async () => {
     const response = await axiosInstance.get(`/assets/${activeRowId}`);
     setAAsset(response.data.data);
+  };
+
+  const getACategory = async () => {
+    const response = await axiosInstance.get(
+      `/assets/category/sub-category/${activeRowId}`
+    );
+    setACategory(response.data.data);
   };
 
   // Delete functions
@@ -185,7 +201,8 @@ function FacilityManagement() {
       selectedTab === "Facilities" ||
       selectedTab === "Blocks" ||
       selectedTab === "Assets" ||
-      selectedTab === "Units"
+      selectedTab === "Units" ||
+      selectedTab === "Categories"
     ) {
       setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
     } else {
@@ -204,6 +221,9 @@ function FacilityManagement() {
         return activeRowId ? "Edit Unit" : "Create Unit";
       case "createAsset":
         return activeRowId ? "Edit Asset" : "Create Asset";
+      case "createAssetCategory":
+        return activeRowId ? "Edit Category" : "Create Category";
+
       case "createBulkFacility":
         return "Upload Bulk Facility";
       case "viewFacility":
@@ -212,6 +232,8 @@ function FacilityManagement() {
         return "Block Details";
       case "viewUnit":
         return "Unit Details";
+      case "viewAssetCategory":
+        return "Category Details";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -246,11 +268,17 @@ function FacilityManagement() {
         return activeRowId
           ? "You can edit assets details here."
           : "You can manage assets here.";
+      case "createAssetCategory":
+        return activeRowId
+          ? "You can edit assets categories details here."
+          : "You can manage assets categories here.";
       case "viewFacility":
         return "";
       case "viewBlock":
         return "";
       case "viewUnit":
+        return "";
+      case "viewAssetCategory":
         return "";
     }
     switch (centralStateDelete) {
@@ -540,24 +568,17 @@ function FacilityManagement() {
       />
     ),
     createAsset: (
-      <DynamicCreateForm
-        inputs={[
-          { name: "assetName", label: "Asset Name", type: "text" },
-          {
-            name: "description",
-            label: "Description (Optional)",
-            type: "textarea",
-          },
-        ]}
-        selects={[]}
-        title="Assets"
-        apiEndpoint="/assets"
+      <CreateAsset
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-        fetchResource={(id) =>
-          axiosInstance.get(`/assets/${id}`).then((res) => res.data.data)
-        }
+      />
+    ),
+    createAssetCategory: (
+      <CreateCategory
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
       />
     ),
     viewFacility: (
@@ -584,6 +605,11 @@ function FacilityManagement() {
         />
       </div>
     ),
+    viewAssetCategory: (
+      <div className="p-4">
+        <FacilityDetails facility={category} title="Category" />
+      </div>
+    ),
   };
 
   // Permissions and default tab logic
@@ -591,7 +617,8 @@ function FacilityManagement() {
     Facilities: ["read_facilities"],
     Blocks: ["read_blocks"],
     Units: ["read_units"],
-    Assets: ["read_facilities"],
+    Assets: ["read_assets"],
+    categories: ["read_assets:/category/all"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -622,6 +649,8 @@ function FacilityManagement() {
       getUsers();
     } else if (selectedTab === "Assets") {
       getAssets();
+    } else if (selectedTab === "Categories") {
+      getCategories();
     } else {
       const fetchData = async () => {
         await Promise.all([
@@ -642,6 +671,8 @@ function FacilityManagement() {
       getABlock();
     } else if (centralState === "viewUnit") {
       getAUnit();
+    } else if (centralState === "viewAssetCategory") {
+      getACategory();
     }
   }, [centralState]);
 
@@ -763,6 +794,18 @@ function FacilityManagement() {
             <TableComponent
               data={assets}
               type="assets"
+              setModalState={setCentralState}
+              setModalStateDelete={setCentralStateDelete}
+              toggleActions={toggleActions}
+              activeRowId={activeRowId}
+              setActiveRowId={setActiveRowId}
+              deleteAction={setCentralStateDelete}
+            />
+          )}
+          {selectedTab === "Categories" && (
+            <TableComponent
+              data={categories}
+              type="categories"
               setModalState={setCentralState}
               setModalStateDelete={setCentralStateDelete}
               toggleActions={toggleActions}

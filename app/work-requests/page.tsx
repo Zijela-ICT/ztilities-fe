@@ -16,9 +16,16 @@ import { useDataPermission } from "@/context";
 
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import FacilityDetails from "@/components/facility-management/view-facility";
+import CreateWorkRequest from "@/components/work-request/create-work-request";
+import CreateWorkRequestForUser from "@/components/work-request/create-work-request-by-facility-manager";
+import UpdateWorkRequest from "@/components/work-request/update-work-request";
+import AcceptQuotation from "@/components/work-request/acceptQuotation";
+import ApportionPower from "@/components/work-request/apportionPower";
 
 function WorkRequests() {
-  const tabs = ["All Work Request", "Facility Maager Work Request"];
+  const { user, setUser, setUserPermissions } = useDataPermission();
+
+  const tabs = ["All Work Request", "Facility Work Request"];
 
   const [successState, setSuccessState] = useState({
     title: "",
@@ -79,6 +86,18 @@ function WorkRequests() {
     });
   };
 
+  const apportionServiceCharge = async () => {
+    await axiosInstance.patch(
+      `/work-requests/${activeRowId}/apportion/service-charge`
+    );
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully apportion service charge",
+      status: true,
+    });
+  };
+
   const getFacilities = async () => {
     const response = await axiosInstance.get("/facilities");
     setFacilities(response.data.data);
@@ -102,7 +121,7 @@ function WorkRequests() {
   // Toggle actions
   const toggleActions = (rowId: string) => {
     if (
-      selectedTab === "Facility Maager Work Request" ||
+      selectedTab === "Facility Work Request" ||
       selectedTab === "All Work Request"
     ) {
       setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
@@ -115,6 +134,7 @@ function WorkRequests() {
   const getTitle = () => {
     switch (centralState) {
       case "createWorkRequest":
+      case "createWorkRequestforUser":
         return activeRowId ? "Edit Work Request" : "Create Work Request";
       case "viewWorkRequest":
         return "Work Request Details";
@@ -128,6 +148,10 @@ function WorkRequests() {
         return "Update Status";
       case "assignTechnicianWorkRequest":
         return "Assign Technician";
+      case "acceptQuotation":
+        return "Accept Quotation";
+        case  "apportionPower" :
+          return "Apportion Power"
     }
     switch (centralStateDelete) {
       case "deactivateWorkRequest":
@@ -138,6 +162,8 @@ function WorkRequests() {
         return "De-activate Work Request ";
       case "activateWorkRequest":
         return "Re-activate Work Request";
+      case "apportionServiceCharge":
+        return "Apportion Service charge";
     }
     return "Zijela";
   };
@@ -145,6 +171,7 @@ function WorkRequests() {
   const getDetail = () => {
     switch (centralState) {
       case "createWorkRequest":
+      case "createWorkRequestforUser":
         return activeRowId
           ? "You can edit work request details here."
           : "You can create and manage work request here.";
@@ -160,6 +187,10 @@ function WorkRequests() {
         return "";
       case "assignTechnicianWorkRequest":
         return "";
+      case "acceptQuotation":
+        return "";
+        case "apportionPower" :
+          return ""
     }
     switch (centralStateDelete) {
       case "activateWorkRequest":
@@ -170,6 +201,8 @@ function WorkRequests() {
         return "Are you sure you want to Re-activate this work request";
       case "deactivateWorkRequest":
         return "Are you sure you want to de-activate this work request";
+      case "apportionServiceCharge":
+        return "You want to apportion service charge for this work request";
     }
     return "Zijela";
   };
@@ -177,86 +210,17 @@ function WorkRequests() {
   // Mapping centralState values to components
   const componentMap: Record<string, JSX.Element> = {
     createWorkRequest: (
-      <DynamicCreateForm
-        inputs={[
-          { name: "title", label: "Title", type: "text" },
-          { name: "description", label: "Description", type: "textarea" },
-        ]}
-        selects={[
-          {
-            name: "typeSelected",
-            label: "Type Selected",
-            placeholder: "What you wanna raise for",
-            options: [
-              { value: "unit", label: "Unit" },
-              { value: "block", label: "Block" },
-              { value: "facility", label: "Facility" },
-            ],
-          },
-          {
-            name: "facility",
-            label: "Facility ",
-            placeholder: "Select Facility",
-            options: facilities?.map((facility: Facility) => ({
-              value: facility.id.toString(),
-              label: facility.name,
-            })),
-          },
-          {
-            name: "block",
-            label: "Block",
-            placeholder: "Select Block",
-            options: blocks?.map((asset: Block) => ({
-              value: asset.id.toString(),
-              label: asset.blockNumber,
-            })),
-          },
-          {
-            name: "unit",
-            label: "Unit",
-            placeholder: "Select Unit",
-            options: units?.map((unit: Unit) => ({
-              value: unit.id.toString(),
-              label: unit.unitNumber,
-            })),
-          },
-
-          // {
-          //   name: "asset",
-          //   label: "Asset",
-          //   placeholder: "Select Asset",
-          //   options: assets?.map((asset: Asset) => ({
-          //     value: asset.id.toString(),
-          //     label: asset.assetName.toString(),
-          //   })),
-          // },
-          {
-            name: "category",
-            label: "Category",
-            placeholder: "Select Category",
-            options: [
-              { value: "single", label: "Single" },
-              { value: "residential", label: "Residential" },
-            ],
-          },
-          {
-            name: "subCategory",
-            label: "Sub-Category",
-            placeholder: "Select Sub-Category",
-            options: [
-              { value: "single", label: "Single" },
-              { value: "residential", label: "Residential" },
-            ],
-          },
-        ]}
-        title="Work Request"
-        apiEndpoint="/work-requests"
+      <CreateWorkRequest
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-        fetchResource={(id) =>
-          axiosInstance.get(`/work-requests/${id}`).then((res) => res.data.data)
-        }
+      />
+    ),
+    createWorkRequestforUser: (
+      <CreateWorkRequestForUser
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
       />
     ),
     commentWorkRequest: (
@@ -273,8 +237,8 @@ function WorkRequests() {
     attatchmentWorkRequest: (
       <DynamicCreateForm
         inputs={[
-          { name: "title", label: "Tile", type: "text" },
-          { name: "file", label: "FIle", type: "file" },
+          { name: "title", label: "Title", type: "text" },
+          { name: "file", label: "File", type: "file" },
         ]}
         selects={[]}
         title="Add Attachment"
@@ -287,35 +251,36 @@ function WorkRequests() {
       <DynamicCreateForm
         selects={[
           {
-            name: "venortechSelected",
+            name: "entity",
             label: "Select",
             placeholder: "Assign ",
             options: [
-              { value: "tech", label: "Technician" },
-              { value: "ven", label: "Vendor" },
+              { value: "Technician", label: "Technician" },
+              { value: "Vendor", label: "Vendor" },
             ],
           },
           {
-            name: "vendor",
+            name: "id",
             label: "Vendor",
             placeholder: "Select Vendor",
             options: vendors?.map((unit: Vendor) => ({
-              value: unit.email.toString(),
+              value: Number(unit?.id),
               label: unit.vendorName,
             })),
           },
           {
-            name: "technician",
+            name: "id",
             label: "Technician",
             placeholder: "Select Technician",
             options: technician?.map((tech: Technician) => ({
-              value: tech.email.toString(),
+              value: Number(tech?.id),
               label: `${tech.firstName} ${tech.surname}`,
             })),
           },
         ]}
         inputs={[
-          { name: "title", label: "Tile", type: "text" },
+          { name: "title", label: "Title", type: "text" },
+          { name: "file", label: "FIle", type: "file" },
           { name: "amount", label: "Amount", type: "number" },
           { name: "startDate", label: "Start Date", type: "date" },
           { name: "endDate", label: "End Date", type: "date" },
@@ -327,31 +292,8 @@ function WorkRequests() {
       />
     ),
     updateStatusWorkRequest: (
-      <DynamicCreateForm
-        selects={[
-          {
-            name: "status",
-            label: "status",
-            placeholder: "Select status",
-            options: [
-              { value: "accepted", label: "Accepted" },
-              { value: "pending", label: "Pending" },
-              { value: "rejected", label: "Rejected" },
-              { value: "closed", label: "Closed" },
-              { value: "reopened", label: "Reopened" },
-              { value: "approved", label: "Approved" },
-            ],
-          },
-        ]}
-        inputs={[
-          {
-            name: "reasonForRejection",
-            label: "Reaseon for Rejection",
-            type: "textarea",
-          },
-        ]}
-        title="Update Status"
-        apiEndpoint={`/work-requests/${activeRowId}/status`}
+      <UpdateWorkRequest
+        activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
@@ -360,11 +302,29 @@ function WorkRequests() {
       <DynamicCreateForm
         selects={[
           {
-            name: "technicianEmail",
+            name: "entity",
+            label: "Select",
+            placeholder: "Assign ",
+            options: [
+              { value: "Technician", label: "Technician" },
+              { value: "Vendor", label: "Vendor" },
+            ],
+          },
+          {
+            name: "id",
+            label: "Vendor",
+            placeholder: "Select Vendor",
+            options: vendors?.map((unit: Vendor) => ({
+              value: Number(unit?.id),
+              label: unit.vendorName,
+            })),
+          },
+          {
+            name: "id",
             label: "Technician",
             placeholder: "Select Technician",
             options: technician?.map((tech: Technician) => ({
-              value: tech.email.toString(),
+              value: Number(tech?.id),
               label: `${tech.firstName} ${tech.surname}`,
             })),
           },
@@ -376,7 +336,20 @@ function WorkRequests() {
         setSuccessState={setSuccessState}
       />
     ),
-
+    acceptQuotation: (
+      <AcceptQuotation
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    apportionPower: (
+      <ApportionPower
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
     viewWorkRequest: (
       <div className="p-4">
         <FacilityDetails facility={workRequest} title="Work Request" />
@@ -398,8 +371,10 @@ function WorkRequests() {
   }, [centralState]);
 
   const tabPermissions: { [key: string]: string[] } = {
-    "Facility Maager Work Request": ["create_work-requests"],
-    "All Work Request": ["create_work-requests"],
+    "Facility Work Request": [
+      "read_work-requests:my-facilities-work-request/all",
+    ],
+    "All Work Request": ["read_work-requests"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -420,11 +395,9 @@ function WorkRequests() {
 
   useEffect(() => {
     if (selectedTab === "All Work Request") {
-      getOtherWorkRequests();
-    } else {
       const fetchData = async () => {
         await Promise.all([
-          getAssignedWorkRequests(),
+          getOtherWorkRequests(),
           getFacilities(),
           getBlocks(),
           getUnits(),
@@ -432,6 +405,12 @@ function WorkRequests() {
         ]);
       };
       fetchData();
+    } else {
+      getAssignedWorkRequests();
+      getFacilities();
+      getBlocks();
+      getUnits();
+      getAssets();
     }
   }, [centralState, centralStateDelete, selectedTab]);
 
@@ -458,6 +437,8 @@ function WorkRequests() {
           centralStateDelete === "deactivateWorkRequest" ||
           centralStateDelete === "activateWorkRequest"
             ? deleteWorkRequests
+            : centralStateDelete === "apportionServiceCharge"
+            ? apportionServiceCharge
             : deleteWorkRequests
         }
       ></ActionModalCompoenent>
@@ -474,7 +455,12 @@ function WorkRequests() {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      <PermissionGuard requiredPermissions={["create_work-requests"]}>
+      <PermissionGuard
+        requiredPermissions={[
+          "read_work-requests",
+          "read_work-requests:my-facilities-work-request/all",
+        ]}
+      >
         <div className="relative bg-white rounded-2xl p-4">
           <div className="flex space-x-4 pb-2">
             {tabs.map((tab) => (
@@ -502,9 +488,14 @@ function WorkRequests() {
         </div>
       </PermissionGuard>
 
-      <PermissionGuard requiredPermissions={["create_work-requests"]}>
+      <PermissionGuard
+        requiredPermissions={[
+          "read_work-requests",
+          "read_work-requests:my-facilities-work-request/all",
+        ]}
+      >
         <div className="relative bg-white rounded-2xl p-4 mt-4">
-          {selectedTab === "Facility Maager Work Request" && (
+          {selectedTab === "Facility Work Request" && (
             <TableComponent
               data={assignedworkRequests}
               type="workrequests"

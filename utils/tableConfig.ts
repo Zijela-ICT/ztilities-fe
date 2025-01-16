@@ -61,6 +61,14 @@ export const tableMainButtonConfigs = {
       action: "createAsset",
     },
   ],
+  categories: [
+    {
+      text: "Add Category",
+      className: "flex-1 px-4 py-3 text-white bg-[#A8353A]",
+      permissions: ["create_assets:/category"],
+      action: "createAssetCategory",
+    },
+  ],
   vendors: [
     {
       text: "Add New Vendor",
@@ -84,6 +92,18 @@ export const tableMainButtonConfigs = {
       permissions: ["create_work-requests"],
       action: "createWorkRequest",
     },
+    {
+      text: "Create Work Request for User",
+      className: "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["create_work-requests:for-a-user"],
+      action: "createWorkRequestforUser",
+    },
+    // {
+    //   text: "Power",
+    //   className: "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+    //   permissions: ["update_work-requests:id/apportion/power"],
+    //   action: "apportionPower",
+    // },
   ],
   workorders: [
     {
