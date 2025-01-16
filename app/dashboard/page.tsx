@@ -62,7 +62,7 @@ export default function Dashboard() {
   }, []);
 
   const pendingRequests = assignedworkRequests?.filter(
-    (request) => request.status === "pending"
+    (request) => request.status === "Initiated"
   );
 
   const data = [
@@ -72,7 +72,7 @@ export default function Dashboard() {
       rate: "5 days",
     },
     {
-      title: "Pending Work Request",
+      title: "Initiated Work Request",
       number: pendingRequests?.length,
       rate: "7 days",
     },
@@ -82,7 +82,7 @@ export default function Dashboard() {
       rate: "3 days",
     },
     {
-      title: "Pending Work Order",
+      title: "initiated Work Order",
       number: pendingRequests?.length,
       rate: "10 days",
     },

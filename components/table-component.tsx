@@ -605,6 +605,15 @@ export default function TableComponent({
                                 />
                               </li>
                               <li>
+                                <DropdownButtonComponent
+                                  text="Assign a User"
+                                  onClick={() =>
+                                    setModalState("assignUserToBlock")
+                                  }
+                                  permissions={["update_blocks:id"]}
+                                />
+                              </li>
+                              <li>
                                 {row.isDeactivated === false ? (
                                   <DropdownButtonComponent
                                     text="Delete"

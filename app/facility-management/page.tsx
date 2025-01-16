@@ -236,6 +236,8 @@ function FacilityManagement() {
         return "Category Details";
       case "assignUserToFacility":
         return "Assign User";
+      case "assignUserToBlock":
+        return "Assign User";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -284,6 +286,8 @@ function FacilityManagement() {
         return "";
       case "assignUserToFacility":
         return "Assign User to a facility";
+      case "assignUserToBlock":
+        return "Assign User to a block";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -443,15 +447,15 @@ function FacilityManagement() {
             })),
             isMulti: true,
           },
-          {
-            name: "userId",
-            label: "Client",
-            placeholder: "Assign Block to a client",
-            options: users?.map((user: User) => ({
-              value: user.id,
-              label: `${user.firstName} ${user.lastName}`,
-            })),
-          },
+          // {
+          //   name: "userId",
+          //   label: "Client",
+          //   placeholder: "Assign Block to a client",
+          //   options: users?.map((user: User) => ({
+          //     value: user.id,
+          //     label: `${user.firstName} ${user.lastName}`,
+          //   })),
+          // },
         ]}
         title="Block"
         apiEndpoint="/blocks"
@@ -611,9 +615,27 @@ function FacilityManagement() {
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-        // fetchResource={(id) =>
-        //   axiosInstance.get(`/units/${id}`).then((res) => res.data.data)
-        // }
+      />
+    ),
+    assignUserToBlock: (
+      <DynamicCreateForm
+        inputs={[]}
+        selects={[
+          {
+            name: "userId",
+            label: "Facility Manager",
+            placeholder: "Assign Block to a User",
+            options: users?.map((user: User) => ({
+              value: user.id,
+              label: `${user.firstName} ${user.lastName}`,
+            })),
+          },
+        ]}
+        title="Assign Block"
+        apiEndpoint={`/blocks/${activeRowId}/assign`}
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
       />
     ),
     createAssetCategory: (
