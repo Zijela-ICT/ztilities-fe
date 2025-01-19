@@ -278,7 +278,7 @@ function FacilityManagement() {
       </div>
     ),
   };
-  console.log(activeRowId);
+
   // Utility function to format role names
   function formatRoleName(roleName: string): string {
     return `${roleName

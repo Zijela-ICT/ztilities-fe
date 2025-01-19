@@ -46,7 +46,6 @@ function WorkRequests() {
   const [vendors, setVendors] = useState<Vendor[]>();
   const [technician, setTechnicians] = useState<Technician[]>();
 
-  console.log(assignedworkRequests);
   // Fetch data functions
   const getAssignedWorkRequests = async () => {
     const response = await axiosInstance.get(
@@ -94,6 +93,18 @@ function WorkRequests() {
     setSuccessState({
       title: "Successful",
       detail: "You have successfully apportion service charge",
+      status: true,
+    });
+  };
+
+  const assignProcurement = async () => {
+    await axiosInstance.patch(
+      `/work-requests/${activeRowId}/assign/to-procurement`
+    );
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully assigned procurement",
       status: true,
     });
   };
@@ -150,8 +161,6 @@ function WorkRequests() {
         return "Assign Technician";
       case "acceptQuotation":
         return "Accept Quotation";
-        case  "apportionPower" :
-          return "Apportion Power"
     }
     switch (centralStateDelete) {
       case "deactivateWorkRequest":
@@ -164,6 +173,8 @@ function WorkRequests() {
         return "Re-activate Work Request";
       case "apportionServiceCharge":
         return "Apportion Service charge";
+      case "assignProcurement":
+        return "Assign Procurement";
     }
     return "Zijela";
   };
@@ -189,8 +200,6 @@ function WorkRequests() {
         return "";
       case "acceptQuotation":
         return "";
-        case "apportionPower" :
-          return ""
     }
     switch (centralStateDelete) {
       case "activateWorkRequest":
@@ -203,6 +212,8 @@ function WorkRequests() {
         return "Are you sure you want to de-activate this work request";
       case "apportionServiceCharge":
         return "You want to apportion service charge for this work request";
+      case "assignProcurement":
+        return "You want to assign Procurement";
     }
     return "Zijela";
   };
@@ -343,13 +354,7 @@ function WorkRequests() {
         setSuccessState={setSuccessState}
       />
     ),
-    apportionPower: (
-      <ApportionPower
-        activeRowId={activeRowId}
-        setModalState={setCentralState}
-        setSuccessState={setSuccessState}
-      />
-    ),
+
     viewWorkRequest: (
       <div className="p-4">
         <FacilityDetails facility={workRequest} title="Work Request" />
@@ -439,6 +444,8 @@ function WorkRequests() {
             ? deleteWorkRequests
             : centralStateDelete === "apportionServiceCharge"
             ? apportionServiceCharge
+            : centralStateDelete === "assignProcurement"
+            ? assignProcurement
             : deleteWorkRequests
         }
       ></ActionModalCompoenent>

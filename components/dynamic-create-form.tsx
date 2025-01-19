@@ -99,7 +99,6 @@ export default function DynamicCreateForm({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // console.log(formData);
     const {
       typeSelected,
       attachments,
@@ -139,8 +138,6 @@ export default function DynamicCreateForm({
         updatedFormData.apportionmentMetric
       );
     }
-
-    console.log(updatedFormData);
 
     try {
       if (
@@ -228,7 +225,6 @@ export default function DynamicCreateForm({
       >
         {/* Render inputs dynamically */}
         {inputs.map((input) => {
-          console.log(formData);
           if (input.type === "file") {
             return (
               <div key={input.name} className="relative w-full mt-6">

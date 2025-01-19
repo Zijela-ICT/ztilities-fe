@@ -77,7 +77,6 @@ export default function FacilityDetails({
   groupedPermissions,
   excludedKeys = ["facility", "block", "id", "createdAt", "updatedAt"],
 }: FacilityDetailsProps) {
-  console.log(facility);
   return (
     <>
       {/* Dynamically render facility details, omitting excluded keys */}
@@ -96,6 +95,8 @@ export default function FacilityDetails({
               {/* Handle various value types */}
               <p className="text-gray-900">
                 {key === "user" ||
+                key === "assignedVendor" ||
+                key === "assignedTechnician" ||
                 (key === "requestedBy" &&
                   value !== null &&
                   typeof value === "object")
@@ -108,7 +109,7 @@ export default function FacilityDetails({
                     value !== null &&
                     typeof value === "object"
                   ? `${value?.unitNumber || "-"}`
-                  : key === "assignedTechnician" &&
+                  : key === "addedBy" &&
                     value !== null &&
                     typeof value === "object"
                   ? `${value?.firstName || "-"} ${value?.lastName || "-"} `
@@ -125,7 +126,9 @@ export default function FacilityDetails({
       </div>
 
       {/* for request */}
-      {(title === "Work Request" || title === "Category") && (
+      {(title === "Work Request" ||
+        title === "Category" ||
+        title === "Power Charge") && (
         <>
           {" "}
           <div className="space-y-5 px-2 text-gray-500">
@@ -190,9 +193,11 @@ export default function FacilityDetails({
                                       <div className="pl-4 mt-2 border-l-2 border-gray-300">
                                         {Object.entries(subValue)
                                           .filter(([nestedKey]) =>
-                                            ["firstName", "lastName"].includes(
-                                              nestedKey
-                                            )
+                                            [
+                                              "firstName",
+                                              "lastName",
+                                              "id",
+                                            ].includes(nestedKey)
                                           ) // Filter for only firstName and lastName
                                           .map(([nestedKey, nestedValue]) => (
                                             <div

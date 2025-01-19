@@ -19,6 +19,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import Link from "next/link";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -245,7 +246,7 @@ export default function Transactions() {
             <div className="flex items-baseline text-lg justify-between mb-6">
               <h2 className="font-semibold text-black">Recent Transactions</h2>
               <h2 className="font-medium text-[#A8353A] flex items-center space-x-1 cursor-pointer">
-                <div>See all</div>
+                <Link href={"/transaction/all"} >See all</Link>
                 <div className="rotate-180">
                   <ArrowLeft />
                 </div>

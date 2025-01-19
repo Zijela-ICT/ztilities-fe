@@ -83,7 +83,9 @@ export default function TableComponent({
             type === "users"
               ? "sm:w-[60%]"
               : type === "workrequests"
-              ? "sm:w-[40%]" // Updated style for workrequests
+              ? "sm:w-[60%]"
+              : type === "transactions"
+              ? "sm:w-full" // Updated style for workrequests
               : "sm:w-[70%]"
           }`}
         >
@@ -294,7 +296,9 @@ export default function TableComponent({
                   .map((column) => (
                     <td key={column} className="py-3 px-4">
                       {Array.isArray(row[column]) ? (
-                        type === "assets" || type === "workrequests" ? (
+                        type === "assets" ||
+                        type === "workrequests" ||
+                        type === "powers" ? (
                           // Show the length of the array for specific types
                           row[column]?.length
                         ) : (
@@ -346,25 +350,40 @@ export default function TableComponent({
                         <span
                           className={`px-2.5 py-1 ${
                             row[column]?.toString().toLowerCase() === "approved"
-                              ? "text-[#036B26] bg-[#E7F6EC]"
+                              ? "text-[#1E8449] bg-[#D4EFDF]"
                               : row[column]?.toString().toLowerCase() ===
                                 "pending"
-                              ? "text-[#FF9F00] bg-[#FFEB84]"
+                              ? "text-[#FF8C00] bg-[#FFEFD5]"
                               : row[column]?.toString().toLowerCase() ===
                                 "rejected"
-                              ? "text-[#B76E00] bg-[#FFAB0014]"
+                              ? "text-[#C0392B] bg-[#FADBD8]"
                               : row[column]?.toString().toLowerCase() ===
                                 "closed"
-                              ? "text-[#757575] bg-[#E0E0E0]"
+                              ? "text-[#5D6D7E] bg-[#D6DBDF]"
                               : row[column]?.toString().toLowerCase() ===
                                 "reopened"
-                              ? "text-[#0E7B7B] bg-[#D1F0F0]"
+                              ? "text-[#0E6655] bg-[#D1F2EB]"
                               : row[column]?.toString().toLowerCase() ===
                                 "accepted"
-                              ? "text-[#036B26] bg-[#E7F6EC]"
+                              ? "text-[#1E8449] bg-[#D4EFDF]"
                               : row[column]?.toString().toLowerCase() ===
                                 "initiated"
-                              ? "text-[#1E5AB9] bg-[#E0EDFF]"
+                              ? "text-[#2874A6] bg-[#D6EAF8]"
+                              : row[column]?.toString().toLowerCase() ===
+                                "quotation selected"
+                              ? "text-[#1E90FF] bg-[#D6E9FF]"
+                              : row[column]?.toString().toLowerCase() ===
+                                "quotation approved"
+                              ? "text-[#28A745] bg-[#DFF6DF]"
+                              : row[column]?.toString().toLowerCase() ===
+                                "awaiting selection"
+                              ? "text-[#FFC107] bg-[#FFF8E1]"
+                              : row[column]?.toString().toLowerCase() ===
+                                "waiting for quotations"
+                              ? "text-[#FF8C00] bg-[#FFF4E1]"
+                              : row[column]?.toString().toLowerCase() ===
+                                "apportioned"
+                              ? "text-[#6A1B9A] bg-[#F3E5F5]"
                               : ""
                           } rounded-full`}
                         >
@@ -918,6 +937,103 @@ export default function TableComponent({
                         )}
                       </div>
                     </>
+                  ) : type === "powers" ? (
+                    <>
+                      <div className="relative">
+                        {/* Button */}
+                        <PermissionGuard
+                          requiredPermissions={[
+                            "delete_vendors:id",
+                            "update_vendors:id",
+                          ]}
+                        >
+                          <button
+                            onClick={() => toggleActions(row.id)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <TripleDotsIcon />
+                          </button>
+                        </PermissionGuard>
+
+                        {/* Dropdown Menu */}
+                        {activeRowId === row.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                            <ul className="py-2">
+                              <li>
+                                <DropdownButtonComponent
+                                  text="View"
+                                  onClick={() =>
+                                    setModalState("viewPowerCharge")
+                                  }
+                                  permissions={["read_power-charges:id"]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Edit"
+                                  onClick={() =>
+                                    setModalState("createPowerCharge")
+                                  }
+                                  permissions={["update_power-charges:id"]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Approve"
+                                  onClick={() =>
+                                    setModalStateDelete("approvePowerCharge")
+                                  }
+                                  permissions={[
+                                    "update_power-charges:id/status/approve",
+                                  ]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Apportion"
+                                  onClick={() =>
+                                    setModalStateDelete("apportionPowerCharge")
+                                  }
+                                  permissions={[
+                                    "update_power-charges:id/apportion",
+                                  ]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Delete"
+                                  onClick={() =>
+                                    setModalStateDelete("deletePowerCharge")
+                                  }
+                                  permissions={["delete_power-charges:id"]}
+                                />
+                              </li>
+                              {/* <li>
+                                {row.isDeactivated === false ? (
+                                  <DropdownButtonComponent
+                                    text="De-activate"
+                                    onClick={() =>
+                                      setModalStateDelete(
+                                        "deactivateTechnician"
+                                      )
+                                    }
+                                    permissions={["delete_vendors:id"]}
+                                  />
+                                ) : (
+                                  <DropdownButtonComponent
+                                    text="Re-activate"
+                                    onClick={() =>
+                                      setModalStateDelete("activateTechnician")
+                                    }
+                                    permissions={["delete_vendors:id"]}
+                                  />
+                                )}
+                              </li> */}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </>
                   ) : type === "workrequests" ? (
                     <>
                       <div className="relative">
@@ -949,7 +1065,7 @@ export default function TableComponent({
                                   permissions={["read_work-requests:id"]}
                                 />
                               </li>
-                              <li>
+                              {/* <li>
                                 <DropdownButtonComponent
                                   text="Edit"
                                   onClick={() =>
@@ -957,7 +1073,7 @@ export default function TableComponent({
                                   }
                                   permissions={["read_work-requests:id"]}
                                 />
-                              </li>
+                              </li> */}
                               <li>
                                 <DropdownButtonComponent
                                   text="Comment"
@@ -980,7 +1096,7 @@ export default function TableComponent({
                                   ]}
                                 />
                               </li> */}
-                              <li>
+                              {/* <li>
                                 <DropdownButtonComponent
                                   text="Add Quotations"
                                   onClick={() =>
@@ -990,7 +1106,7 @@ export default function TableComponent({
                                     "update_work-requests:id/upload-quotation",
                                   ]}
                                 />
-                              </li>
+                              </li> */}
                               <li>
                                 <DropdownButtonComponent
                                   text="Update Status"
@@ -1003,7 +1119,7 @@ export default function TableComponent({
                                   ]}
                                 />
                               </li>
-                              <li>
+                              {/* <li>
                                 <DropdownButtonComponent
                                   text="Assign Technician"
                                   onClick={() =>
@@ -1013,12 +1129,34 @@ export default function TableComponent({
                                     "update_work-requests:id/assign",
                                   ]}
                                 />
-                              </li>
-                              <li>
+                              </li> */}
+                              {/* <li>
                                 <DropdownButtonComponent
                                   text="Accept Quotation"
                                   onClick={() =>
                                     setModalState("acceptQuotation")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/accept-quotation/quotationId",
+                                  ]}
+                                />
+                              </li> */}
+                              {/* <li>
+                                <DropdownButtonComponent
+                                  text="Accept Work Request"
+                                  onClick={() =>
+                                    setModalState("acceptWorkRequest")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/accept-quotation/quotationId",
+                                  ]}
+                                />
+                              </li> */}
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Assign to Procurement"
+                                  onClick={() =>
+                                    setModalStateDelete("assignProcurement")
                                   }
                                   permissions={[
                                     "update_work-requests:id/accept-quotation/quotationId",
@@ -1037,6 +1175,174 @@ export default function TableComponent({
                                     permissions={[
                                       "update_work-requests:id/apportion/service-charge",
                                     ]}
+                                  />
+                                </li>
+                              )}
+
+                              {/* <li>
+                                {row.isDeactivated === false ? (
+                                  <DropdownButtonComponent
+                                    text="De-activate"
+                                    onClick={() =>
+                                      setModalStateDelete(
+                                        "deactivateWorkRequest"
+                                      )
+                                    }
+                                    permissions={["create_work-requests"]}
+                                  />
+                                ) : (
+                                  <DropdownButtonComponent
+                                    text="Re-activate"
+                                    onClick={() =>
+                                      setModalStateDelete("activateWorkRequest")
+                                    }
+                                    permissions={["create_work-requests"]}
+                                  />
+                                )}
+                              </li> */}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : type === "workorders" ? (
+                    <>
+                      <div className="relative">
+                        {/* Button */}
+                        <PermissionGuard
+                          requiredPermissions={[
+                            "create_work-orders",
+                            "read_work-orders:id",
+                          ]}
+                        >
+                          <button
+                            onClick={() => toggleActions(row.id)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <TripleDotsIcon />
+                          </button>
+                        </PermissionGuard>
+
+                        {/* Dropdown Menu */}
+                        {activeRowId === row.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                            <ul className="py-2">
+                              <li>
+                                <DropdownButtonComponent
+                                  text="View"
+                                  onClick={() => setModalState("viewWorkOrder")}
+                                  permissions={[]}
+                                />
+                              </li>
+                              {/* <li>
+                                <DropdownButtonComponent
+                                  text="Edit"
+                                  onClick={() =>
+                                    setModalState("createWorkRequest")
+                                  }
+                                  permissions={["read_work-requests:id"]}
+                                />
+                              </li> */}
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Comment"
+                                  onClick={() =>
+                                    setModalState("commentWorkOrder")
+                                  }
+                                  permissions={[]}
+                                />
+                              </li>
+                              {/* <li>
+                                <DropdownButtonComponent
+                                  text="Add Attachment"
+                                  onClick={() =>
+                                    setModalState("attatchmentWorkRequest")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/upload-attachment",
+                                  ]}
+                                />
+                              </li> */}
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Add Quotations"
+                                  onClick={() =>
+                                    setModalState("quotationsWorkOrder")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/upload-quotation",
+                                  ]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Approve Quotation"
+                                  onClick={() =>
+                                    setModalState("acceptQuotation")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/accept-quotation/quotationId",
+                                  ]}
+                                />
+                              </li>
+                              {/* <li>
+                                <DropdownButtonComponent
+                                  text="Update Status"
+                                  onClick={() =>
+                                    setModalState("updateStatusWorkOrder")
+                                  }
+                                  permissions={[]}
+                                />
+                              </li> */}
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Close"
+                                  onClick={() =>
+                                    setModalStateDelete("closeWorkOrder")
+                                  }
+                                  permissions={[]}
+                                />
+                              </li>
+                              {/* <li>
+                                <DropdownButtonComponent
+                                  text="Assign Technician"
+                                  onClick={() =>
+                                    setModalState("assignTechnicianWorkRequest")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/assign",
+                                  ]}
+                                />
+                              </li> */}
+
+                              {/* <li>
+                                <DropdownButtonComponent
+                                  text="Accept Work Order"
+                                  onClick={() =>
+                                    setModalState("acceptWorkOrder")
+                                  }
+                                  permissions={[]}
+                                />
+                              </li> */}
+                              {/* <li>
+                                <DropdownButtonComponent
+                                  text="Assign to Procurement"
+                                  onClick={() =>
+                                    setModalState("assignProcurement")
+                                  }
+                                  permissions={[]}
+                                />
+                              </li> */}
+                              {row.amount > 0 && (
+                                <li>
+                                  <DropdownButtonComponent
+                                    text="Apportion Service Charge"
+                                    onClick={() =>
+                                      setModalStateDelete(
+                                        "apportionServiceCharge"
+                                      )
+                                    }
+                                    permissions={[]}
                                   />
                                 </li>
                               )}

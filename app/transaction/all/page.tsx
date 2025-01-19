@@ -357,8 +357,8 @@ function WorkOrders() {
 
   return (
     <DashboardLayout
-      title="Work Order"
-      detail="Submit work order here and view created work orders"
+      title="Transactions"
+      detail="See balance and all transactions here"
     >
       <SuccessModalCompoenent
         title={successState.title}
@@ -398,39 +398,11 @@ function WorkOrders() {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      {/* <PermissionGuard requiredPermissions={["create_work-orders"]}>
-        <div className="relative bg-white rounded-2xl p-4">
-          <div className="flex space-x-4 pb-2">
-            {tabs.map((tab) => (
-              <PermissionGuard
-                key={tab}
-                requiredPermissions={tabPermissions[tab] || []} // Match tab to permissions
-              >
-                <button
-                  key={tab}
-                  onClick={() => setSelectedTab(tab)}
-                  className={`relative text-gray-500 hover:text-gray-900 px-4 py-2 font-medium focus:outline-none group ${
-                    selectedTab === tab
-                      ? "text-[#A8353A] font-semibold" // Active tab styles
-                      : ""
-                  }`}
-                >
-                  {tab}
-                  {selectedTab === tab && (
-                    <span className="absolute left-0 bottom-[-5px] w-full h-[2px] bg-[#A8353A]"></span>
-                  )}
-                </button>
-              </PermissionGuard>
-            ))}
-          </div>
-        </div>
-      </PermissionGuard> */}
-
       <PermissionGuard requiredPermissions={["create_work-orders"]}>
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           <TableComponent
-            data={workOrders}
-            type="workorders"
+            data={[]}
+            type="transactions"
             setModalState={setCentralState}
             setModalStateDelete={setCentralStateDelete}
             toggleActions={toggleActions}
@@ -439,18 +411,7 @@ function WorkOrders() {
             deleteAction={setCentralStateDelete}
           />
 
-          {/* {selectedTab === "All Work Order" && (
-            <TableComponent
-              data={otherWorkOrders}
-              type="workorders"
-              setModalState={setCentralState}
-              setModalStateDelete={setCentralStateDelete}
-              toggleActions={toggleActions}
-              activeRowId={activeRowId}
-              setActiveRowId={setActiveRowId}
-              deleteAction={setCentralStateDelete}
-            />
-          )} */}
+
         </div>
       </PermissionGuard>
     </DashboardLayout>
