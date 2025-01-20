@@ -15,7 +15,7 @@ export default function AcceptQuotation({
     if (activeRowId) {
       const fetchQuotations = async () => {
         const response = await axiosInstance.get(
-          `/work-orders/${activeRowId}`
+          `/work-requests/${activeRowId}`
         );
         setQuotations(
           response.data.data?.quotations?.map((quotation: any) => ({
@@ -31,7 +31,7 @@ export default function AcceptQuotation({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await axiosInstance.patch(
-      `/work-orders/${activeRowId}/accept-quotation/${selectedQuotation.value}`
+      `/work-requests/${activeRowId}/accept-quotation/${selectedQuotation.value}`
     );
     setQuotations([]);
     setSelectedQuotation(null);

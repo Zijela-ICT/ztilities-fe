@@ -58,7 +58,7 @@ function WorkOrders() {
   };
 
   const getAWorkOrder = async () => {
-    const response = await axiosInstance.get(`/work-orders/${activeRowId}`);
+    const response = await axiosInstance.get(`/work-requests/${activeRowId}`);
     setWorkOrder(response.data.data);
   };
 
@@ -75,7 +75,7 @@ function WorkOrders() {
 
   // Delete functions
   const closeWorkOrder = async () => {
-    await axiosInstance.delete(`/work-orders/${activeRowId}/status/close`);
+    await axiosInstance.patch(`/work-requests/${activeRowId}/status/close`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
@@ -86,7 +86,7 @@ function WorkOrders() {
 
   const apportionServiceCharge = async () => {
     await axiosInstance.patch(
-      `/work-orders/${activeRowId}/apportion/service-charge`
+      `/work-requests/${activeRowId}/apportion/service-charge`
     );
     setCentralStateDelete("");
     setSuccessState({
@@ -192,7 +192,7 @@ function WorkOrders() {
         inputs={[{ name: "comment", label: "Comment", type: "textarea" }]}
         selects={[]}
         title="Add Comment"
-        apiEndpoint={`/work-orders/${activeRowId}/comments`}
+        apiEndpoint={`/work-requests/${activeRowId}/comments`}
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
@@ -206,7 +206,7 @@ function WorkOrders() {
         ]}
         selects={[]}
         title="Add Attachment"
-        apiEndpoint={`/work-orders/${activeRowId}/upload-attachment`}
+        apiEndpoint={`/work-requests/${activeRowId}/upload-attachment`}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
@@ -250,7 +250,7 @@ function WorkOrders() {
           { name: "endDate", label: "End Date", type: "date" },
         ]}
         title="Add Quotation"
-        apiEndpoint={`/work-orders/${activeRowId}/upload-quotation`}
+        apiEndpoint={`/work-requests/${activeRowId}/upload-quotation`}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
