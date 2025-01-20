@@ -121,6 +121,8 @@ function WorkOrders() {
         return "Assign Technician";
       case "acceptQuotation":
         return "Accept Quotation";
+      case "closeWorkOrder":
+        return "Close Work Order ";
     }
     switch (centralStateDelete) {
       case "deactivateWorkOrder":
@@ -133,8 +135,9 @@ function WorkOrders() {
         return "Re-activate Work Order";
       case "apportionServiceCharge":
         return "Apportion Service charge";
-      case "closeWorkOrder":
-        return "Close Work Order ";
+
+      case "requestquotationsapproval":
+        return "Request quotation approval ";
     }
     return "Zijela";
   };
@@ -160,6 +163,8 @@ function WorkOrders() {
         return "";
       case "acceptQuotation":
         return "";
+      case "closeWorkOrder":
+        return "";
     }
     switch (centralStateDelete) {
       case "activateWorkOrder":
@@ -172,8 +177,8 @@ function WorkOrders() {
         return "Are you sure you want to de-activate this work order";
       case "apportionServiceCharge":
         return "You want to apportion service charge for this work order";
-      case "closeWorkOrder":
-        return "You want to close this work order ";
+      case "requestquotationsapproval":
+        return "Request quotation approval";
     }
     return "Zijela";
   };
@@ -258,6 +263,16 @@ function WorkOrders() {
     updateStatusWorkOrder: (
       <UpdateWorkOrder
         activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    closeWorkOrder: (
+      <DynamicCreateForm
+        selects={[]}
+        inputs={[{ name: "comment", label: "Comment", type: "textarea" }]}
+        title="Close Work Order"
+        apiEndpoint={`/work-requests/${activeRowId}/status/close`}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />

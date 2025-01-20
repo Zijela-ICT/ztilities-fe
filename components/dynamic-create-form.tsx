@@ -183,7 +183,7 @@ export default function DynamicCreateForm({
             ? activeRowId
               ? `You have successfully edited ${title}`
               : `You have successfully created ${title}`
-            : `Action Sucessfully`
+            : `Your action has been successful`
         }.`,
         status: true,
       });

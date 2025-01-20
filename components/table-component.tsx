@@ -133,7 +133,10 @@ export default function TableComponent({
                     column !== "updatedAt" &&
                     column !== "avatar" &&
                     column !== "assets" &&
-                    column !== "user"
+                    column !== "user" &&
+                    column !== "isApproved" &&
+                    column !== "isApportioned" &&
+                    column !== "isWorkOrder"
                 ) // Exclude the specified columns
                 .map((column) => (
                   <th key={column} className="py-3 px-4">
@@ -291,13 +294,17 @@ export default function TableComponent({
                       column !== "updatedAt" &&
                       column !== "avatar" &&
                       column !== "assets" &&
-                      column !== "user"
+                      column !== "user" &&
+                      column !== "isApproved" &&
+                      column !== "isApportioned" &&
+                      column !== "isWorkOrder"
                   )
                   .map((column) => (
                     <td key={column} className="py-3 px-4">
                       {Array.isArray(row[column]) ? (
                         type === "assets" ||
                         type === "workrequests" ||
+                        type === "workorders" ||
                         type === "powers" ? (
                           // Show the length of the array for specific types
                           row[column]?.length
@@ -381,6 +388,9 @@ export default function TableComponent({
                               : row[column]?.toString().toLowerCase() ===
                                 "waiting for quotations"
                               ? "text-[#FF8C00] bg-[#FFF4E1]"
+                              : row[column]?.toString().toLowerCase() ===
+                                "quotations uploaded"
+                              ? "text-[#1E90FF] bg-[#D6E9FF]"
                               : row[column]?.toString().toLowerCase() ===
                                 "apportioned"
                               ? "text-[#6A1B9A] bg-[#F3E5F5]"
@@ -1276,6 +1286,19 @@ export default function TableComponent({
                               </li>
                               <li>
                                 <DropdownButtonComponent
+                                  text="Request Quotation Approval"
+                                  onClick={() =>
+                                    setModalStateDelete(
+                                      "requestquotationsapproval"
+                                    )
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/upload-quotation",
+                                  ]}
+                                />
+                              </li>
+                              <li>
+                                <DropdownButtonComponent
                                   text="Approve Quotation"
                                   onClick={() =>
                                     setModalState("acceptQuotation")
@@ -1298,7 +1321,7 @@ export default function TableComponent({
                                 <DropdownButtonComponent
                                   text="Close"
                                   onClick={() =>
-                                    setModalStateDelete("closeWorkOrder")
+                                    setModalState("closeWorkOrder")
                                   }
                                   permissions={[]}
                                 />

@@ -18,7 +18,7 @@ export default function UpdateWorkRequest({
   const statusOptions = [
     { value: "closed", label: "Closed" },
     { value: "rejected", label: "Rejected" },
-    { value: "approved", label: "Approved" },
+    { value: "accepted", label: "Accepted" },
   ];
 
   const handleSelectChange = (fieldName: string) => (selected: any) => {
@@ -51,7 +51,7 @@ export default function UpdateWorkRequest({
         ? `/work-requests/${activeRowId}/status/close`
         : formData.status === "rejected"
         ? `/work-requests/${activeRowId}/status/reject`
-        : `/work-requests/${activeRowId}/status/approve`;
+        : `/work-requests/${activeRowId}/status/accept`;
 
     try {
       if (formData.status === "closed") {
@@ -84,7 +84,11 @@ export default function UpdateWorkRequest({
       setSuccessState({
         title: "Successful",
         detail: `You have successfully ${
-          formData.status === "closed" ? "closed" : "rejected"
+          formData.status === "closed"
+            ? "closed"
+            : formData.status === "rejected"
+            ? "rejected"
+            : "accepted"
         } this Work Request`,
         status: true,
       });
@@ -156,8 +160,8 @@ export default function UpdateWorkRequest({
           >
             {formData.status === "closed"
               ? "Close Work Request"
-              : formData.status === "approved"
-              ? "Approve Work Request"
+              : formData.status === "accepted"
+              ? "Accept Work Request"
               : "Reject Work Request"}
           </button>
         </div>

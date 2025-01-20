@@ -20,7 +20,7 @@ export default function AcceptQuotation({
         setQuotations(
           response.data.data?.quotations?.map((quotation: any) => ({
             value: quotation.quotationId,
-            label: quotation.quotationId,
+            label: quotation.title,
           }))
         );
       };
