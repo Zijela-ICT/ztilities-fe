@@ -127,6 +127,7 @@ export default function FacilityDetails({
 
       {/* for request */}
       {(title === "Work Request" ||
+      title === "Work Order" ||
         title === "Category" ||
         title === "Power Charge") && (
         <>
