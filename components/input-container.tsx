@@ -220,7 +220,7 @@ export function FileInputComponent({
           </div>
           <label
             htmlFor="file-input"
-            className="block text-gray-600 text-lg font-medium cursor-pointer"
+            className="block text-gray-600 text-base font-medium cursor-pointer"
           >
             {label}
           </label>
@@ -252,7 +252,7 @@ export function FileInputComponent({
         </div>
         <label
           htmlFor="file-input"
-          className="block text-gray-600 text-lg font-medium cursor-pointer"
+          className="block text-gray-600 text-base font-medium cursor-pointer"
         >
           {label}
         </label>

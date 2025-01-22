@@ -12,13 +12,18 @@ import { useDataPermission } from "@/context";
 import axiosInstance from "@/utils/api";
 import { BarChartIcon, WorkIcon } from "@/utils/svg";
 import { JSX, useEffect, useState } from "react";
+import WorkOrders from "../work-orders/page";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+  const router = useRouter();
   const { user, userPermissions, setUser, setUserPermissions } =
     useDataPermission();
 
   const [assignedworkRequests, setAssignedWorkRequests] = useState<any[]>();
+  const [workOrders, setWorkOrders] = useState<any[]>();
   const [centralState, setCentralState] = useState<string>();
+  const [tempcentralState, setTmpCentralState] = useState<string>();
   const [successState, setSuccessState] = useState({
     title: "",
     detail: "",
@@ -49,16 +54,25 @@ export default function Dashboard() {
     setAssignedWorkRequests(response.data.data);
   };
 
+  const getWorkOrders = async () => {
+    const response = await axiosInstance.get("/work-requests/work-order/all");
+    setWorkOrders(response.data.data);
+  };
+
   // useEffect to fetch getMe initially and every 5 minutes
   useEffect(() => {
     getMe();
     getWallet();
-    getAssignedWorkRequests();
     const interval = setInterval(() => {
       getMe();
     }, 5 * 60 * 1000); // 5 minutes in milliseconds
 
     return () => clearInterval(interval); // Cleanup interval on unmount
+  }, []);
+
+  useEffect(() => {
+    getAssignedWorkRequests();
+    getWorkOrders();
   }, []);
 
   const pendingRequests = assignedworkRequests?.filter(
@@ -126,6 +140,7 @@ export default function Dashboard() {
     return "Zijela";
   };
 
+  console.log(centralState);
   return (
     <DashboardLayout
       title="Dashboard"
@@ -135,9 +150,13 @@ export default function Dashboard() {
         title={successState.title}
         detail={successState.detail}
         modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
+        setModalState={(state: boolean) => {
+          if (tempcentralState === "createWorkRequest") {
+            router.push("/work-requests");
+          } else {
+            setSuccessState((prevState) => ({ ...prevState, status: state }));
+          }
+        }}
       ></SuccessModalCompoenent>
       <ModalCompoenent
         title={getTitle()}
@@ -153,21 +172,21 @@ export default function Dashboard() {
         {data.map((item, index) => (
           <div
             key={index}
-            className="bg-white p-4 rounded-lg  flex items-center justify-between"
+            className="bg-white py-3 px-4 rounded-lg flex items-center justify-between"
           >
             {/* Left Content */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-500 mb-3">
+              <h3 className="text-sm font-semibold text-gray-500 mb-1">
                 {item.title}
               </h3>
-              <p className="text-4xl font-bold text-gray-800 mb-5">
+              <p className="text-3xl font-bold text-gray-800 mb-3">
                 {item.number}
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
                   0%
                 </span>
-                <span className="text-sm text-gray-500">{item.rate}</span>
+                <span className="text-xs text-gray-500">{item.rate}</span>
                 {/* Badge */}
               </div>
             </div>
@@ -177,35 +196,43 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className=" w-full rounded-lg bg-white my-8 flex flex-col items-center justify-center px-6 py-10">
-        <WorkIcon />
-        <h1 className="text-2xl font-semibold text-black">
-          No Request/order created yet
-        </h1>
-        <h1 className="text-lg">
-          Your active reuests and order will appear here
-        </h1>
-        <div className="flex space-x-4 my-4 w-2/4">
-          <ButtonComponent
-            text={"Create Work Order"}
-            onClick={() => {
-              setCentralState("createWorkOrder");
-            }}
-            className={
-              "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]"
-            }
-            permissions={["create_work-orders"]}
-          />
-          <ButtonComponent
-            text={"Create Work Request"}
-            onClick={() => {
-              setCentralState("createWorkRequest");
-            }}
-            className={"flex-1 px-4 py-3 text-white bg-[#A8353A]"}
-            permissions={["create_work-requests"]}
-          />
+      {workOrders?.length < 1 ? (
+        <div className=" w-full rounded-lg bg-white my-8 flex flex-col items-center justify-center px-6 py-10">
+          <WorkIcon />
+          <h1 className="text-2xl font-semibold text-black">
+            No Request/order created yet
+          </h1>
+          <h1 className="text-base">
+            Your active reuests and order will appear here
+          </h1>
+          <div className="flex space-x-4 my-4 w-2/4">
+            <ButtonComponent
+              text={"Create Work Order"}
+              onClick={() => {
+                setCentralState("createWorkOrder");
+              }}
+              className={
+                "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]"
+              }
+              permissions={["create_work-orders"]}
+            />
+            <ButtonComponent
+              text={"Create Work Request"}
+              onClick={() => {
+                setCentralState("createWorkRequest");
+                setTmpCentralState("createWorkRequest");
+              }}
+              className={"flex-1 px-4 py-3 text-white bg-[#A8353A]"}
+              permissions={["create_work-requests"]}
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <>
+          {" "}
+          <WorkOrders nowrap={true} />{" "}
+        </>
+      )}
     </DashboardLayout>
   );
 }

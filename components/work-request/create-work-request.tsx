@@ -260,7 +260,7 @@ export default function CreateWorkRequest({
         <div className="mt-10 flex w-full justify-end">
           <button
             type="submit"
-            className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-base font-semibold text-white"
+            className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-xs font-semibold text-white"
           >
             {activeRowId ? "Edit Work Request" : "Create Work Request"}
           </button>

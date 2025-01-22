@@ -224,10 +224,10 @@ export default function DynamicCreateForm({
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
         {/* Render inputs dynamically */}
-        {inputs.map((input) => {
+        {inputs.map((input, index) => {
           if (input.type === "file") {
             return (
-              <div key={input.name} className="relative w-full mt-6">
+              <div key={index} className="relative w-full mt-6">
                 <FileInputComponent
                   name={input.name}
                   onChange={handleFileChange}
@@ -272,7 +272,7 @@ export default function DynamicCreateForm({
         })}
 
         {/* Render selects dynamically */}
-        {selects?.map((select) => {
+        {selects?.map((select, index) => {
           // Skip rendering 'facilitId' when the title is 'Blocks' and there is an activeRowId
           if (
             (title === "Block" &&
@@ -300,7 +300,7 @@ export default function DynamicCreateForm({
 
           return (
             <>
-              <div key={select.name} className="relative w-full mt-6">
+              <div key={index} className="relative w-full mt-6">
                 <Select
                   isMulti={select.isMulti}
                   name={select.name}
@@ -326,7 +326,7 @@ export default function DynamicCreateForm({
         <div className="mt-10 flex w-full justify-end">
           <button
             type="submit"
-            className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-base font-semibold text-white"
+            className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-xs font-semibold text-white"
           >
             <p>
               {[

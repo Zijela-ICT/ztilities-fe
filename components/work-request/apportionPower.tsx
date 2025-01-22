@@ -196,7 +196,7 @@ export default function ApportionPower({
         }}
       >
         <div className="p-6">
-          <h3 className="font-semibold text-lg mb-4">Units</h3>
+          <h3 className="font-semibold text-base mb-4">Units</h3>
           <div className="overflow-x-auto border rounded-md">
             <table className="table-auto w-full text-left border-collapse">
               <thead className="bg-gray-100">
@@ -242,7 +242,7 @@ export default function ApportionPower({
           <div className="mt-10 flex w-full justify-end space-x-4">
             <button
               onClick={() => setCentralState("")}
-              className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-base font-semibold text-white"
+              className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-xs font-semibold text-white"
             >
               Done
             </button>
@@ -295,14 +295,14 @@ export default function ApportionPower({
             <button
               type="button"
               onClick={() => setCentralState("UnitsFetched")}
-              className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-base font-semibold text-white"
+              className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-xs font-semibold text-white"
             >
               Proceed to add consumption
             </button>
           )}
           <button
             type="submit"
-            className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-base font-semibold text-white"
+            className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-xs font-semibold text-white"
           >
             Submit
           </button>

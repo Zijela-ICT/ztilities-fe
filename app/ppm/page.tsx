@@ -71,7 +71,7 @@ export default function Ppm() {
           </div>
 
           <div className="w-4/5 p-4 bg-white rounded-xl ">
-            <h2 className="text-lg font-bold mb-4">
+            <h2 className="text-base font-bold mb-4">
               {selectedDate.toLocaleDateString("en-US", {
                 month: "long",
                 year: "numeric",
@@ -92,7 +92,7 @@ export default function Ppm() {
                   key={day}
                   className="border border-gray-100  p-4 text-center hover:bg-gray-100 cursor-pointer flex flex-col justify-between h-48"
                 >
-                  <div className="font-bold text-lg">{day}</div>
+                  <div className="font-bold text-base">{day}</div>
                   <ul className="text-sm text-gray-600">
                     {getWorkForDay(day).map((work, index) => (
                       <li key={index} className="truncate">

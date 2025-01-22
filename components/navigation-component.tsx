@@ -35,7 +35,7 @@ export default function Navigation() {
   };
 
   return (
-    <ul className="px-4 py-4 space-y-4 text-sm font-medium text-gray-500  w-full lg:w-1/5 bg-white">
+    <ul className="px-4 py-4 space-y-4 text-xs font-medium text-gray-500  w-full lg:w-1/5 bg-white">
       <div className="flex items-center justify-between">
         <Link href={`/dashboard`} className="w-full px-4 ml-4">
           <Image src={Logo} alt="logo" width={100} height={70} />
@@ -122,7 +122,7 @@ export default function Navigation() {
               <li key={href} className="w-full px-4">
                 <Link
                   href={href}
-                  className={`inline-flex items-center w-full px-4 py-2 rounded-md font-thin text-md ${
+                  className={`inline-flex items-center w-full px-4 py-2 rounded-md font-thin  ${
                     isActive(href) ? "bg-[#FBC2B61A] text-[#A8353A] " : ""
                   }`}
                   aria-current={isActive(href) ? "page" : undefined}
@@ -154,7 +154,7 @@ export default function Navigation() {
         <li className="w-full px-4 pt-4">
           <button
             onClick={logout}
-            className="inline-flex items-center justify-between w-full pl-4 py-3 pr-20 text-sm rounded-lg text-white bg-[#A8353A] "
+            className="inline-flex items-center justify-between w-full pl-4 py-3 pr-20 rounded-lg text-white bg-[#A8353A] "
           >
             <LogoutIcon />
             Logout

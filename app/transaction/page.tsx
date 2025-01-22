@@ -231,7 +231,7 @@ export default function Transactions() {
         <div className="flex flex-col md:flex-row w-full h-auto space-y-4 md:space-y-0 md:space-x-4">
           {/* Left Section (Graph) */}
           <div className="w-full md:w-3/5 bg-white rounded-lg  p-6">
-            <h2 className="text-lg font-semibold mb-4 text-black">
+            <h2 className="text-base font-semibold mb-4 text-black">
               Transaction Trend
             </h2>
             <div className="h-full ">
@@ -243,7 +243,7 @@ export default function Transactions() {
 
           {/* Right Section (Simple List) */}
           <div className="w-full md:w-2/5 bg-white p-4 rounded-lg">
-            <div className="flex items-baseline text-lg justify-between mb-6">
+            <div className="flex items-baseline text-base justify-between mb-6">
               <h2 className="font-semibold text-black">Recent Transactions</h2>
               <h2 className="font-medium text-[#A8353A] flex items-center space-x-1 cursor-pointer">
                 <Link href={"/transaction/all"} >See all</Link>

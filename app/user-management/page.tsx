@@ -299,7 +299,7 @@ function UserManagement() {
                 <button
                   key={tab}
                   onClick={() => setSelectedTab(tab)}
-                  className={`relative text-gray-500 hover:text-gray-900 px-4 py-2 font-medium focus:outline-none group ${
+                  className={`relative text-gray-500 hover:text-gray-900 px-4 py-2 text-xs font-medium focus:outline-none group ${
                     selectedTab === tab
                       ? "text-[#A8353A] font-semibold" // Active tab styles
                       : ""

@@ -22,7 +22,7 @@ export default function ButtonComponent({
       <button
         disabled={disabled}
         onClick={onClick}
-        className={`${className} w-full flex items-center justify-center h-[3.3rem] px-3 rounded-lg font-semibold  text-md  disabled:cursor-not-allowed disabled:text-gray-500 disabled:opacity-85 ${
+        className={`${className} w-full flex items-center justify-center h-[2.9rem] px-3 rounded-lg font-semibold  text-xs  disabled:cursor-not-allowed disabled:text-gray-500 disabled:opacity-85 ${
           disabled ? "bg-gray-300" : "bg-[#A8353A]"
         }`}
       >
@@ -103,7 +103,7 @@ export function DropdownButtonComponent({
   return (
     <PermissionGuard requiredPermissions={permissions}>
       <button
-        className={` ${className} w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100`}
+        className={` ${className} w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-100`}
         onClick={onClick}
       >
         {text}

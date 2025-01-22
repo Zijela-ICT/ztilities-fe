@@ -120,7 +120,7 @@ export function ActionModalCompoenent({
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">
               {title}
             </h3>
-            <p className="text-gray-700 text-lg font-thin mb-8">{detail}</p>
+            <p className="text-gray-700 text-base font-thin mb-8">{detail}</p>
 
             <div className="flex items-center space-x-4">
               <ButtonComponent
@@ -191,7 +191,7 @@ export function SuccessModalCompoenent({
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">
               {title}
             </h3>
-            <p className="text-gray-700 text-lg font-thin mb-8">{detail}</p>
+            <p className="text-gray-700 text-base font-thin mb-8">{detail}</p>
 
             <div className="flex items-center">
               <ButtonComponent

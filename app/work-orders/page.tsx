@@ -7,22 +7,21 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-
 import axiosInstance from "@/utils/api";
-
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
-
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import FacilityDetails from "@/components/facility-management/view-facility";
 import CreateWorkOrder from "@/components/work-order/create-work-order";
-
 import UpdateWorkOrder from "@/components/work-order/update-work-order";
 import AcceptQuotation from "@/components/work-order/acceptQuotation";
-import ApportionPower from "@/components/work-order/apportionPower";
 
-function WorkOrders() {
+interface Props {
+  nowrap: boolean;
+}
+
+function WorkOrders({ nowrap }: Props) {
   const { user, setUser, setUserPermissions } = useDataPermission();
 
   const tabs = ["All Work Order"];
@@ -374,6 +373,7 @@ function WorkOrders() {
     <DashboardLayout
       title="Work Order"
       detail="Submit work order here and view created work orders"
+      nowrap={nowrap}
     >
       <SuccessModalCompoenent
         title={successState.title}
@@ -424,7 +424,7 @@ function WorkOrders() {
                 <button
                   key={tab}
                   onClick={() => setSelectedTab(tab)}
-                  className={`relative text-gray-500 hover:text-gray-900 px-4 py-2 font-medium focus:outline-none group ${
+                  className={`relative text-gray-500 hover:text-gray-900 px-4 py-2 text-xs font-medium focus:outline-none group ${
                     selectedTab === tab
                       ? "text-[#A8353A] font-semibold" // Active tab styles
                       : ""
