@@ -14,8 +14,9 @@ import { BarChartIcon, WorkIcon } from "@/utils/svg";
 import { JSX, useEffect, useState } from "react";
 import WorkOrders from "../work-orders/page";
 import { useRouter } from "next/navigation";
+import withPermissions from "@/components/auth/permission-protected-routes";
 
-export default function Dashboard() {
+function Dashboard() {
   const router = useRouter();
   const { user, userPermissions, setUser, setUserPermissions } =
     useDataPermission();
@@ -236,3 +237,6 @@ export default function Dashboard() {
     </DashboardLayout>
   );
 }
+
+// export default withPermissions(Dashboard, ["users", "wallets"]);
+export default Dashboard

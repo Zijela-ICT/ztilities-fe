@@ -20,6 +20,7 @@ import {
   Legend,
 } from "chart.js";
 import Link from "next/link";
+import withPermissions from "@/components/auth/permission-protected-routes";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -32,7 +33,7 @@ ChartJS.register(
   Legend
 );
 
-export default function Transactions() {
+function Transactions() {
   const [filters, setFilters] = useState({
     Block: "",
     Facility: "",
@@ -246,7 +247,7 @@ export default function Transactions() {
             <div className="flex items-baseline text-base justify-between mb-6">
               <h2 className="font-semibold text-black">Recent Transactions</h2>
               <h2 className="font-medium text-[#A8353A] flex items-center space-x-1 cursor-pointer">
-                <Link href={"/transaction/all"} >See all</Link>
+                <Link href={"/transaction/all"}>See all</Link>
                 <div className="rotate-180">
                   <ArrowLeft />
                 </div>
@@ -286,3 +287,5 @@ export default function Transactions() {
     </DashboardLayout>
   );
 }
+
+export default withPermissions(Transactions, ["wallets"]);

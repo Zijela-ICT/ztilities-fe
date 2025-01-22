@@ -247,7 +247,7 @@ export default function DynamicCreateForm({
               return null; // Skip rendering this select if typeSelected does not match
             }
             return (
-              <div key={input.name} className="relative w-full mt-6">
+              <div key={index} className="relative w-full mt-6">
                 <LabelTextareaComponent
                   name={input.name}
                   value={formData[input.name] || ""}
@@ -259,7 +259,7 @@ export default function DynamicCreateForm({
           }
 
           return (
-            <div key={input.name} className="relative w-full mt-6">
+            <div key={index} className="relative w-full mt-6">
               <LabelInputComponent
                 type={input.type}
                 name={input.name}

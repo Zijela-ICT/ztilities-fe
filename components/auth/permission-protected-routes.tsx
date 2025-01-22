@@ -16,15 +16,16 @@ const withPermissions = (
     // Helper function to check for permission matches
     const hasPermissionForRoute = (permissions: string[]) => {
       return permissions?.some((permission) =>
-        userPermissions?.some(
-          (userPermission) => userPermission?.permissionString.includes(permission)
+        userPermissions?.some((userPermission) =>
+          userPermission?.permissionString.includes(permission)
         )
       );
     };
 
     useEffect(() => {
       if (!hasPermissionForRoute(requiredPermissions)) {
-        router.back();
+        // router.back();
+        router.push("/dashboard");
       }
     }, [router, userPermissions, requiredPermissions]);
 

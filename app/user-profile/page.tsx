@@ -14,8 +14,9 @@ import ModalCompoenent, {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import AvatarEditor from "react-avatar-editor";
+import withPermissions from "@/components/auth/permission-protected-routes";
 
-export default function UserProfile() {
+ function UserProfile() {
   const router = useRouter();
   const { user, setUser } = useDataPermission();
   const [centralState, setCentralState] = useState<string>();
@@ -483,3 +484,6 @@ export default function UserProfile() {
     </DashboardLayout>
   );
 }
+
+
+export default withPermissions(UserProfile, ["users"]);

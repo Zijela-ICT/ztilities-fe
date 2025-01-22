@@ -10,7 +10,7 @@ export default function PermissionList({ groupedPermissions }) {
           key={category}
           className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4"
         >
-          <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
+          <summary className="flex justify-between items-center text-xs font-semibold cursor-pointer">
             {category.charAt(0).toUpperCase() + category.slice(1)}{" "}
             {/* Capitalize category name */}
             <span className="transform transition-transform duration-100 group-open:rotate-180">
@@ -22,7 +22,7 @@ export default function PermissionList({ groupedPermissions }) {
               {groupedPermissions[category].map((permission) => (
                 <li key={permission.id} className="flex items-start space-x-3">
                   <span
-                    className="text-sm text-gray-700 flex-1 overflow-hidden overflow-ellipsis whitespace-normal"
+                    className="text-xs text-gray-700 flex-1 overflow-hidden overflow-ellipsis whitespace-normal"
                     title={permission.permissionString} // Tooltip for full text
                   >
                     {permission.permissionString}
