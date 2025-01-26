@@ -181,60 +181,69 @@ function Dashboard() {
         {componentMap[centralState]}
       </ModalCompoenent>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {data.map((item, index) => (
-          <div
-            key={index}
-            className="bg-white py-3 px-4 rounded-lg flex items-center justify-between"
-          >
-            {/* Left Content */}
-            <div className="relative">
-              {item.title !== "Wallet Balance" && (
-                <h3 className="text-sm font-semibold text-gray-500 mb-1">
-                  {item.title}
-                </h3>
-              )}
+        {data.map((item, index) =>
+          (item.title === "Wallet Balance" && user?.wallets?.length > 0) ||
+          item.title !== "Wallet Balance" ? (
+            <div
+              key={index}
+              className="bg-white py-3 px-4 rounded-lg flex items-center justify-between"
+            >
+              {/* Left Content */}
+              <div className="relative">
+                {item.title !== "Wallet Balance" && (
+                  <h3 className="text-sm font-semibold text-gray-500 mb-1">
+                    {item.title}
+                  </h3>
+                )}
 
-              {item.title === "Wallet Balance" ? (
-                <>
-                  {/* Dropdown for Wallet Balance */}
-                  <select
-                    value={selectedWallet}
-                    onChange={handleWalletChange}
-                    className="text-sm font-semibold text-gray-500 mb-1"
-                  >
-                    {user?.wallets.map((wallet) => (
-                      <option key={wallet.id} value={wallet.id}>
-                        {wallet.walletType}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-2xl font-bold text-gray-800 mb-3">
-                    ₦
-                   {parseFloat(user?.wallets.find((wallet) => wallet.id === selectedWallet)?.balance || 0)
-    .toFixed(2)
-    .toLocaleString()}
-                  </p>
-                  <div className="flex items-center gap-2 h-6"></div>
-                </>
-              ) : (
-                <>
-                  <p className="text-3xl font-bold text-gray-800 mb-3">
-                    {item.number}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
-                      0%
-                    </span>
-                    <span className="text-xs text-gray-500">{item.rate}</span>
+                {item.title === "Wallet Balance" &&
+                user?.wallets?.length > 0 ? (
+                  <div>
+                    {/* Dropdown for Wallet Balance */}
+                    <select
+                      value={selectedWallet}
+                      onChange={handleWalletChange}
+                      className="text-sm font-semibold text-gray-500 mb-1"
+                    >
+                      {user.wallets.map((wallet) => (
+                        <option key={wallet.id} value={wallet.id}>
+                          {wallet.walletType}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-2xl font-bold text-gray-800 mb-3">
+                      ₦
+                      {parseFloat(
+                        user.wallets.find(
+                          (wallet) => wallet.id === selectedWallet
+                        )?.balance || 0
+                      )
+                        .toFixed(2)
+                        .toLocaleString()}
+                    </p>
+                    <div className="flex items-center gap-2 h-6"></div>
                   </div>
-                </>
-              )}
+                ) : item.title !== "Wallet Balance" ? (
+                  <div>
+                    <p className="text-3xl font-bold text-gray-800 mb-3">
+                      {item.number}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
+                        0%
+                      </span>
+                      <span className="text-xs text-gray-500">{item.rate}</span>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              {/* Right Icon */}
+              <BarChartIcon />
             </div>
-            {/* Right Icon */}
-            <BarChartIcon />
-          </div>
-        ))}
+          ) : null
+        )}
       </div>
+
       {workOrders?.length < 1 ? (
         <div className=" w-full rounded-lg bg-white my-8 flex flex-col items-center justify-center px-6 py-10">
           <WorkIcon />

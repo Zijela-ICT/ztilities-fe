@@ -11,11 +11,12 @@ import axiosInstance from "@/utils/api";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
-import ApportionPower from "@/components/work-request/apportionPower";
-import FacilityDetails from "@/components/facility-management/view-facility";
+import DynamicCreateForm from "@/components/dynamic-create-form";
 
-function Power() {
-  const tabs = ["Power Apportion"];
+function VendorManagement() {
+  const { user, setUser, setUserPermissions } = useDataPermission();
+
+  const tabs = ["My Bills", "All Bills"];
 
   const [successState, setSuccessState] = useState({
     title: "",
@@ -23,30 +24,36 @@ function Power() {
     status: false,
   });
 
-  const [powerCharges, setPowerCharges] = useState<any[]>();
-  const [powerCharge, setAPowerCharge] = useState<any[]>();
-  const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
+  const [vendor, setVendor] = useState<Vendor>();
+  const [technician, setTechnician] = useState<Technician>();
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const [extraRowId, setExtraROwId] = useState<string | null>(null);
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
-  const [facilities, setFacilities] = useState<Facility[]>();
-  const [blocks, setBlocks] = useState<Block[]>();
-  const [units, setUnits] = useState<Unit[]>();
-  const [assets, setAssets] = useState<Asset[]>();
 
-  // Fetch data functions
-  const getPowerCharges = async () => {
-    const response = await axiosInstance.get("/power-charges");
-    setPowerCharges(response.data.data);
+  const myunits = user.units;
+
+  const billData = myunits
+    .map((unit) =>
+      unit.bills
+        ? unit.bills.map((bill) => (bill ? { ...bill, unitId: unit.id } : null)) // Add unit id to each bill
+        : []
+    ) // If unit.bills is undefined, return an empty array
+    .flat() // Flatten the array
+    .filter((bill) => bill !== null && bill !== undefined); // Remove null and undefined values
+
+  const getAVendor = async () => {
+    const response = await axiosInstance.get(`/vendors/${activeRowId}`);
+    setVendor(response.data.data);
   };
-
-  const getAPowerCharge = async () => {
-    const response = await axiosInstance.get(`/power-charges/${activeRowId}`);
-    setAPowerCharge(response.data.data);
+  const getATechnician = async () => {
+    const response = await axiosInstance.get(`/technicians/${activeRowId}`);
+    setTechnician(response.data.data);
   };
 
   // Delete functions
-  const deletePowerCharge = async () => {
-    await axiosInstance.delete(`/power-charges/${activeRowId}`);
+  const deleteVendor = async () => {
+    await axiosInstance.delete(`/vendors/${activeRowId}`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
@@ -55,134 +62,156 @@ function Power() {
     });
   };
 
-  const approvePowerCharge = async () => {
-    await axiosInstance.patch(`/power-charges/${activeRowId}/status/approve`);
+  const deleteTechnician = async () => {
+    await axiosInstance.delete(`/technicians/${activeRowId}`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully approved this power charge",
+      detail: "You have successfully deleted this technician",
       status: true,
     });
   };
 
-  const apportionPowerCharge = async () => {
-    await axiosInstance.patch(`/power-charges/${activeRowId}/apportion`);
+  const deactivateVendor = async () => {
+    await axiosInstance.patch(`/vendors/${activeRowId}`, {
+      isDeactivated: !vendor.isDeactivated,
+    });
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully apportioned power charge",
+      detail: "You have successfully de-activated this vendor",
       status: true,
     });
   };
 
-  const getFacilities = async () => {
-    const response = await axiosInstance.get("/facilities");
-    setFacilities(response.data.data);
+  const deactivateTechnician = async () => {
+    await axiosInstance.patch(`/technicians/${activeRowId}`, {
+      isDeactivated: !technician.isDeactivated,
+    });
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully de-activated this technician",
+      status: true,
+    });
   };
 
-  const getBlocks = async () => {
-    const response = await axiosInstance.get("/blocks");
-    setBlocks(response.data.data);
-  };
-
-  const getUnits = async () => {
-    const response = await axiosInstance.get("/units");
-    setUnits(response.data.data);
-  };
-
-  const getAssets = async () => {
-    const response = await axiosInstance.get("/assets");
-    setAssets(response.data.data);
+  const payBills = async () => {
+    await axiosInstance.patch(`/units/${extraRowId}/pay/${activeRowId}`);
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have paid for this bill",
+      status: true,
+    });
   };
 
   // Toggle actions
   const toggleActions = (rowId: string) => {
     setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
   };
+  const extraActions = (id: string) => {
+    setExtraROwId((prevId) => (prevId === id ? null : id));
+  };
 
   // Dynamic title and detail logic
   const getTitle = () => {
     switch (centralState) {
-      case "createWorkOrder":
-        return activeRowId ? "Edit Power Apportion" : "Create Power Apportion";
-      case "createWorkOrder":
-        return activeRowId ? "Edit Power Apportion" : "Create Power Apportion";
-      case "createPowerCharge":
-        return "Create Power Charge";
-      case "viewPowerCharge":
-        return "View Power Charge";
+      case "createVendor":
+        return activeRowId ? "Edit Vendor" : "Create Vendor";
+      case "createTechnician":
+        return activeRowId ? "Edit Technician" : "Create Technician";
     }
     switch (centralStateDelete) {
-      case "deactivateWorkOrder":
-        return "De-activate Power Apportion ";
-      case "activateWorkOrder":
-        return "Re-activate Power Apportion";
-      case "approvePowerCharge":
-        return "Approve Power Charge";
-      case "apportionPowerCharge":
-        return "Apportion Power Charge";
-      case "deletePowerCharge":
-        return "Delete Power Charge";
+      case "deactivateVendor":
+        return "De-activate Vendor";
+      case "activateVendor":
+        return "Re-activate Vendor";
+      case "deleteVendor":
+        return "Delete Vendor";
+      case "deactivateTechnician":
+        return "De-activate Technician";
+      case "activateTechnician":
+        return "Re-activate Technician";
+      case "deleteTechnician":
+        return "Delete Technician";
+      case "payBills":
+        return "Pay bills";
     }
     return "Zijela";
   };
 
   const getDetail = () => {
     switch (centralState) {
-      case "createWorkOrder":
+      case "createVendor":
         return activeRowId
-          ? "You can edit Power Apportion details here."
-          : "You can create and manage Power Apportion here.";
-      case "createWorkOrder":
+          ? "You can edit vendor details here."
+          : "You can create and manage vendor here.";
+      case "createTechnician":
         return activeRowId
-          ? "You can edit Power Apportion details here."
-          : "You can create and manage Power Apportion here.";
+          ? "You can edit technician details here."
+          : "You can manage technicians here.";
       case "viewPermissions":
         return "All permissions available for this role";
-      case "createPowerCharge":
-        return "";
-      case "viewPowerCharge":
-        return "";
     }
     switch (centralStateDelete) {
-      case "activateWorkOrder":
-        return "Are you sure you want to Re-activate this Power Apportion";
-      case "deactivateWorkOrder":
-        return "Are you sure you want to de-activate this Power Apportion";
-      case "approvePowerCharge":
-        return "Are you sure you want to approve the power charge";
-      case "apportionPowerCharge":
-        return "Are you sure you want to apportion the power charge";
-      case "deletePowerCharge":
-        return "Are you sure you want to delete the power charge";
+      case "payBills":
+        return "Are you sure you want to pay for this bill";
     }
     return "Zijela";
   };
 
   // Mapping centralState values to components
   const componentMap: Record<string, JSX.Element> = {
-    createPowerCharge: (
-      <ApportionPower
+    createTechnician: (
+      <DynamicCreateForm
+        inputs={[
+          { name: "firstName", label: "First Name", type: "text" },
+          { name: "surname", label: "Surname", type: "text" },
+          { name: "address", label: "Address", type: "text" },
+          { name: "phoneNumber", label: "Phone Number", type: "text" },
+          { name: "email", label: "Email address", type: "text" },
+        ]}
+        selects={[
+          {
+            name: "serviceCategory",
+            label: "Service Category",
+            placeholder: "Select Category",
+            options: [
+              { value: "single", label: "Single" },
+              { value: "residential", label: "Private" },
+            ],
+          },
+        ]}
+        title="Technician"
+        apiEndpoint="/technicians"
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/technicians/${id}`).then((res) => res.data.data)
+        }
       />
-    ),
-    viewPowerCharge: (
-      <div className="p-4">
-        <FacilityDetails facility={powerCharge} title="Power Charge" />
-      </div>
     ),
   };
 
   useEffect(() => {
-    if (centralState === "viewPowerCharge") {
-      getAPowerCharge();
+    if (
+      centralStateDelete === "deactivateVendor" ||
+      centralStateDelete === "activateVendor"
+    ) {
+      getAVendor();
+    } else if (
+      centralStateDelete === "deactivateTechnician" ||
+      centralStateDelete === "activateTechnician"
+    ) {
+      getATechnician();
     }
-  }, [centralState]);
+  }, [centralStateDelete]);
 
   const tabPermissions: { [key: string]: string[] } = {
-    "Power Apportion": ["read_power-charges"],
+    "My Bills": ["read_vendors"],
+    "All Bills": ["read_vendors"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -202,23 +231,17 @@ function Power() {
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
 
   useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([
-        getPowerCharges(),
-        // getFacilities(),
-        // getBlocks(),
-        // getUnits(),
-        // getAssets(),
-      ]);
-    };
-    fetchData();
-  }, [centralState, centralStateDelete]);
+    if (selectedTab === "All Bills") {
+    } else {
+      const fetchData = async () => {
+        await Promise.all([]);
+      };
+      fetchData();
+    }
+  }, [centralState, centralStateDelete, selectedTab]);
 
   return (
-    <DashboardLayout
-      title="Bills"
-      detail="Manage and track all bills here"
-    >
+    <DashboardLayout title="Bills" detail="Manage all bills here">
       <SuccessModalCompoenent
         title={successState.title}
         detail={successState.detail}
@@ -234,13 +257,17 @@ function Power() {
         modalState={centralStateDelete}
         setModalState={setCentralStateDelete}
         takeAction={
-          centralStateDelete === "approvePowerCharge"
-            ? approvePowerCharge
-            : centralStateDelete === "apportionPowerCharge"
-            ? apportionPowerCharge
-            : centralStateDelete === "deletePowerCharge"
-            ? deletePowerCharge
-            : null
+          centralStateDelete === "deactivateTechnician" ||
+          centralStateDelete === "activateTechnician"
+            ? deactivateTechnician
+            : centralStateDelete === "deleteTechnician"
+            ? deleteTechnician
+            : centralStateDelete === "deactivateVendor" ||
+              centralStateDelete === "activateVendor"
+            ? deactivateVendor
+            : centralStateDelete === "payBills"
+            ? payBills
+            : undefined
         }
       ></ActionModalCompoenent>
 
@@ -256,7 +283,7 @@ function Power() {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      {/* <PermissionGuard requiredPermissions={["create_work-orders"]}>
+      <PermissionGuard requiredPermissions={["read_vendors"]}>
         <div className="relative bg-white rounded-2xl p-4">
           <div className="flex space-x-4 pb-2">
             {tabs.map((tab) => (
@@ -282,36 +309,40 @@ function Power() {
             ))}
           </div>
         </div>
-      </PermissionGuard> */}
+      </PermissionGuard>
 
-      <PermissionGuard requiredPermissions={["read_power-charges"]}>
+      <PermissionGuard requiredPermissions={["read_vendors"]}>
         <div className="relative bg-white rounded-2xl p-4 mt-4">
-          {/* {selectedTab === "Power Apportion" && (
+          {selectedTab === "My Bills" && (
             <TableComponent
-              data={workOrders}
-              type="workorders"
+              data={billData}
+              type="bills"
               setModalState={setCentralState}
               setModalStateDelete={setCentralStateDelete}
               toggleActions={toggleActions}
+              extraActions={extraActions}
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
             />
-          )} */}
-          <TableComponent
-            data={[]}
-            type="bills"
-            setModalState={setCentralState}
-            setModalStateDelete={setCentralStateDelete}
-            toggleActions={toggleActions}
-            activeRowId={activeRowId}
-            setActiveRowId={setActiveRowId}
-            deleteAction={setCentralStateDelete}
-          />
+          )}
+          {selectedTab === "All Bills" && (
+            <TableComponent
+              data={[]}
+              type="bills"
+              setModalState={setCentralState}
+              setModalStateDelete={setCentralStateDelete}
+              toggleActions={toggleActions}
+              extraActions={extraActions}
+              activeRowId={activeRowId}
+              setActiveRowId={setActiveRowId}
+              deleteAction={setCentralStateDelete}
+            />
+          )}
         </div>
       </PermissionGuard>
     </DashboardLayout>
   );
 }
 
-export default withPermissions(Power, ["power-charges"]);
+export default withPermissions(VendorManagement, ["work-orders"]);

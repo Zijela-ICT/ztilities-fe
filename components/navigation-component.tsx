@@ -64,7 +64,7 @@ export default function Navigation() {
           {
             href: "/dashboard",
             label: "Dashboard",
-            permissions: ["users", "admin"],
+            permissions: ["users", "admin", "wallets"],
             iconPath: paths.path1,
           },
           {
@@ -88,13 +88,13 @@ export default function Navigation() {
           {
             href: "/power",
             label: "Power",
-            permissions: ["work-requests"],
+            permissions: ["power-charges"],
             iconPath: paths.path6,
           },
           {
             href: "/bills",
             label: "Bills",
-            permissions: ["work-requests"],
+            permissions: ["units"],
             iconPath: paths.path6,
           },
 

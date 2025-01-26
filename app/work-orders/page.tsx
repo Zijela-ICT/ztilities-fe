@@ -446,9 +446,21 @@ function WorkOrders({ nowrap }: Props) {
     ),
     viewServiceCharge: (
       <div className="p-4">
-        <FacilityDetails
+        {/* <FacilityDetails
           facility={{ apportionmentDetails: workOrder?.apportionmentDetails }}
           title="Work Order"
+        /> */}
+        {/* <EntityDetails data={workOrder?.apportionmentDetails} /> */}
+        <TableComponent
+          data={workOrder?.apportionmentDetails}
+          type="apportionmentDetails"
+          setModalState={setCentralState}
+          setModalStateDelete={setCentralStateDelete}
+          toggleActions={toggleActions}
+          activeRowId={activeRowId}
+          setActiveRowId={setActiveRowId}
+          deleteAction={setCentralStateDelete}
+          noSearch
         />
         <ButtonComponent
           text={"Approve"}
@@ -530,7 +542,7 @@ function WorkOrders({ nowrap }: Props) {
             ? apportionServiceCharge
             : centralStateDelete === "closeWorkOrder"
             ? closeWorkOrder
-            : centralState === "requestquotationsapproval"
+            : centralStateDelete === "requestquotationsapproval"
             ? requestQuotationApproval
             : centralStateDelete === "approveQuotation"
             ? approveWorkOrder

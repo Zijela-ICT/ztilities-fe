@@ -18,9 +18,11 @@ interface TableProps {
   setModalState?: any;
   setModalStateDelete?: any;
   toggleActions?: any;
+  extraActions?: any;
   activeRowId?: any;
   setActiveRowId?: any;
   deleteAction?: any;
+  noSearch?: boolean;
 }
 
 export default function TableComponent({
@@ -29,8 +31,10 @@ export default function TableComponent({
   setModalState,
   setModalStateDelete,
   toggleActions,
+  extraActions,
   activeRowId,
   setActiveRowId,
+  noSearch,
 }: TableProps) {
   const router = useRouter(); // Get the dynamic route parameters
 
@@ -77,49 +81,57 @@ export default function TableComponent({
 
   return (
     <div className="p-4">
-      <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0  font-semibold text-md mb-4">
-        <div
-          className={`flex items-center border rounded-md focus-within:ring-2 focus-within:ring-blue-500 w-full ${
-            type === "users"
-              ? "sm:w-[60%]"
-              : type === "workrequests"
-              ? "sm:w-[60%]"
-              : type === "bills"
-              ? "w-full"
-              : type === "transactions"
-              ? "sm:w-full"
-              : "sm:w-[70%]"
-          }`}
-        >
-          {/* Search Icon */}
-          <span className="pl-3 text-gray-400 mt-2">
-            <SearchIcon />
-          </span>
+      {noSearch ? null : (
+        <>
+          {" "}
+          <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0  font-semibold text-md mb-4">
+            <div
+              className={`flex items-center border rounded-md focus-within:ring-2 focus-within:ring-blue-500 w-full ${
+                type === "users"
+                  ? "sm:w-[60%]"
+                  : type === "workrequests"
+                  ? "sm:w-[60%]"
+                  : type === "bills"
+                  ? "w-full"
+                  : type === "apportionmentDetails"
+                  ? "w-full"
+                  : type === "transactions"
+                  ? "sm:w-full"
+                  : "sm:w-[70%]"
+              }`}
+            >
+              {/* Search Icon */}
+              <span className="pl-3 text-gray-400 mt-2">
+                <SearchIcon />
+              </span>
 
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={handleSearch}
-            className="px-1 py-4 w-full focus:outline-none"
-          />
-        </div>
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={handleSearch}
+                className="px-1 py-4 w-full focus:outline-none"
+              />
+            </div>
 
-        {/* button here based on types */}
-        {tableMainButtonConfigs[type]?.map((button, index) => (
-          <ButtonComponent
-            key={index}
-            text={button.text}
-            onClick={() => {
-              setModalState(button.action);
-              setActiveRowId(null);
-            }}
-            className={button.className}
-            permissions={button.permissions}
-          />
-        ))}
-      </div>
+            {/* button here based on types */}
+            {tableMainButtonConfigs[type]?.map((button, index) => (
+              <ButtonComponent
+                key={index}
+                text={button.text}
+                onClick={() => {
+                  setModalState(button.action);
+                  setActiveRowId(null);
+                }}
+                className={button.className}
+                permissions={button.permissions}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
       {/* button here based on types */}
 
       {/* Table */}
@@ -148,7 +160,11 @@ export default function TableComponent({
                   </th>
                 ))}
 
-              <th className="py-3 px-4 ">Actions</th>
+              {noSearch ? null : (
+                <>
+                  <th className="py-3 px-4 ">Actions</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -300,879 +316,909 @@ export default function TableComponent({
                   ))}
 
                 {/* Actions based on type */}
-                <td className="py-3 px-4">
-                  {type === "users" ? (
-                    <>
-                      <div className="relative">
-                        {/* Button */}
-                        <PermissionGuard
-                          requiredPermissions={[
-                            "delete_users:id",
-                            "update_users:id",
-                            "update_users:reset-password/admin",
-                          ]}
-                        >
-                          <button
-                            onClick={() => toggleActions(row.id)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <TripleDotsIcon />
-                          </button>
-                        </PermissionGuard>
-
-                        {/* Dropdown Menu */}
-                        {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
-                            <ul className="py-2">
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Edit User"
-                                  onClick={() => setModalState("createUser")}
-                                  permissions={["update_users:id"]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Reset Password"
-                                  onClick={() => setModalState("resetPassword")}
-                                  permissions={[
-                                    "update_users:reset-password/admin",
-                                  ]}
-                                />
-                              </li>
-                              <li>
-                                {row.isDeactivated === false ? (
-                                  <DropdownButtonComponent
-                                    text="De-activate User"
-                                    onClick={() =>
-                                      setModalStateDelete("deleteUser")
-                                    }
-                                    permissions={["delete_users:id"]}
-                                  />
-                                ) : (
-                                  <DropdownButtonComponent
-                                    text="Re-activate User"
-                                    onClick={() =>
-                                      setModalStateDelete("activateUser")
-                                    }
-                                    permissions={["delete_users:id"]}
-                                  />
-                                )}
-                              </li>
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : type === "roles" ? (
-                    <>
-                      <div className="flex items-center space-x-2 w-full md:w-4/5 ">
-                        <ButtonComponent
-                          text="View Users"
-                          onClick={() =>
-                            router.push(`/user-management/${row?.id}`)
-                          }
-                          permissions={["read_roles:id"]}
-                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-white border border-gray-200"
-                        />
-
-                        <ButtonComponent
-                          text="View Permissions"
-                          onClick={() => {
-                            toggleActions(row.id);
-                            setModalState("viewPermissions");
-                          }}
-                          permissions={["read_permissions"]}
-                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-white border border-gray-200"
-                        />
-
-                        <ButtonComponent
-                          text="Edit Role"
-                          onClick={() => {
-                            toggleActions(row.id);
-                            setModalState("createRole");
-                          }}
-                          permissions={["update_roles:id"]}
-                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
-                        />
-
-                        <PermissionGuard
-                          requiredPermissions={["delete_roles:id"]}
-                        >
-                          {row.users > 0 ? (
-                            <div>
-                              <TrashIconGray />
-                            </div>
-                          ) : (
-                            <div
-                              onClick={() => {
-                                toggleActions(row.id);
-                                setModalStateDelete("deleteRole");
-                              }}
+                {noSearch ? null : (
+                  <>
+                    {" "}
+                    <td className="py-3 px-4">
+                      {type === "users" ? (
+                        <>
+                          <div className="relative">
+                            {/* Button */}
+                            <PermissionGuard
+                              requiredPermissions={[
+                                "delete_users:id",
+                                "update_users:id",
+                                "update_users:reset-password/admin",
+                              ]}
                             >
-                              <TrashIcon />
-                            </div>
-                          )}
-                        </PermissionGuard>
-                      </div>
-                    </>
-                  ) : type === "facilities" ? (
-                    <>
-                      <div className="relative">
-                        {/* Button */}
-                        <PermissionGuard
-                          requiredPermissions={[
-                            "delete_facilities:id",
-                            "update_facilities:id",
-                            "update_facilities:id/assign",
-                            "read_facilities:id",
-                          ]}
-                        >
-                          <button
-                            onClick={() => toggleActions(row.id)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <TripleDotsIcon />
-                          </button>
-                        </PermissionGuard>
+                              <button
+                                onClick={() => toggleActions(row.id)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <TripleDotsIcon />
+                              </button>
+                            </PermissionGuard>
 
-                        {/* Dropdown Menu */}
-                        {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
-                            <ul className="py-2">
-                              <li>
-                                <DropdownButtonComponent
-                                  text="View"
-                                  onClick={() => setModalState("viewFacility")}
-                                  permissions={["read_facilities:id"]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Edit"
-                                  onClick={() =>
-                                    setModalState("createFacility")
-                                  }
-                                  permissions={["update_facilities:id"]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Assign a User"
-                                  onClick={() =>
-                                    setModalState("assignUserToFacility")
-                                  }
-                                  permissions={["update_facilities:id/assign"]}
-                                />
-                              </li>
-                              <li>
-                                {row.isDeactivated === false ? (
-                                  <DropdownButtonComponent
-                                    text="Delete"
-                                    onClick={() =>
-                                      setModalStateDelete("deleteFacility")
-                                    }
-                                    permissions={["delete_facilities:id"]}
-                                  />
-                                ) : (
-                                  <DropdownButtonComponent
-                                    text="Delete"
-                                    onClick={() =>
-                                      setModalStateDelete("deleteFacility")
-                                    }
-                                    permissions={["delete_facilities:id"]}
-                                  />
-                                )}
-                              </li>
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : type === "blocks" ? (
-                    <>
-                      <div className="relative">
-                        {/* Button */}
-                        <PermissionGuard
-                          requiredPermissions={[
-                            "delete_blocks:id",
-                            "update_blocks:id",
-                            "read_blocks:id",
-                          ]}
-                        >
-                          <button
-                            onClick={() => toggleActions(row.id)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <TripleDotsIcon />
-                          </button>
-                        </PermissionGuard>
-
-                        {/* Dropdown Menu */}
-                        {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
-                            <ul className="py-2">
-                              <li>
-                                <DropdownButtonComponent
-                                  text="View"
-                                  onClick={() => setModalState("viewBlock")}
-                                  permissions={["read_blocks:id"]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Edit"
-                                  onClick={() => setModalState("createBlock")}
-                                  permissions={["update_blocks:id"]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Assign a User"
-                                  onClick={() =>
-                                    setModalState("assignUserToBlock")
-                                  }
-                                  permissions={["update_blocks:id"]}
-                                />
-                              </li>
-                              <li>
-                                {row.isDeactivated === false ? (
-                                  <DropdownButtonComponent
-                                    text="Delete"
-                                    onClick={() =>
-                                      setModalStateDelete("deleteBlock")
-                                    }
-                                    permissions={["delete_blocks:id"]}
-                                  />
-                                ) : (
-                                  <DropdownButtonComponent
-                                    text="Delete"
-                                    onClick={() =>
-                                      setModalStateDelete("deleteBlock")
-                                    }
-                                    permissions={["delete_blocks:id"]}
-                                  />
-                                )}
-                              </li>
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : type === "units" ? (
-                    <>
-                      <div className="relative">
-                        {/* Button */}
-                        <PermissionGuard
-                          requiredPermissions={[
-                            "delete_units:id",
-                            "update_units:id",
-                            "read_units:id",
-                          ]}
-                        >
-                          <button
-                            onClick={() => toggleActions(row.id)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <TripleDotsIcon />
-                          </button>
-                        </PermissionGuard>
-
-                        {/* Dropdown Menu */}
-                        {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
-                            <ul className="py-2">
-                              <li>
-                                <DropdownButtonComponent
-                                  text="View"
-                                  onClick={() => setModalState("viewUnit")}
-                                  permissions={["read_units:id"]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Edit"
-                                  onClick={() => setModalState("createUnit")}
-                                  permissions={["update_units:id"]}
-                                />
-                              </li>
-                              <li>
-                                {row.isDeactivated === false ? (
-                                  <DropdownButtonComponent
-                                    text="Delete"
-                                    onClick={() =>
-                                      setModalStateDelete("deleteUnit")
-                                    }
-                                    permissions={["delete_units:id"]}
-                                  />
-                                ) : (
-                                  <DropdownButtonComponent
-                                    text="Delete"
-                                    onClick={() =>
-                                      setModalStateDelete("deleteUnit")
-                                    }
-                                    permissions={["delete_units:id"]}
-                                  />
-                                )}
-                              </li>
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : type === "assets" ? (
-                    <>
-                      <div className="flex items-center space-x-2 w-full md:w-4/5 ">
-                        <ButtonComponent
-                          text="View Facilities"
-                          onClick={() =>
-                            router.push(`/facility-management/${row?.id}`)
-                          }
-                          permissions={["read_assets:id"]}
-                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-white border border-gray-200"
-                        />
-
-                        <ButtonComponent
-                          text="Edit Asset"
-                          onClick={() => {
-                            toggleActions(row.id);
-                            setModalState("createAsset");
-                          }}
-                          permissions={["update_assets:id"]}
-                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
-                        />
-
-                        <PermissionGuard
-                          requiredPermissions={["delete_assets:id"]}
-                        >
-                          {row.facilities.length > 0 ? (
-                            <div>
-                              <TrashIconGray />
-                            </div>
-                          ) : (
-                            <div
-                              onClick={() => {
-                                toggleActions(row.id);
-                                setModalStateDelete("deleteAsset");
-                              }}
-                            >
-                              <TrashIcon />
-                            </div>
-                          )}
-                        </PermissionGuard>
-                      </div>
-                    </>
-                  ) : type === "categories" ? (
-                    <>
-                      <div className="relative">
-                        {/* Button */}
-                        <PermissionGuard
-                          requiredPermissions={[
-                            "read_assets:/sub-category/all",
-                            "read_assets:/category/sub-category/id",
-                            "read_assets:/category/all",
-                            "delete_assets:/sub-category/id",
-                            ,
-                            "delete_assets:/category/id",
-                            "create_assets:/sub-category",
-                          ]}
-                        >
-                          <button
-                            onClick={() => toggleActions(row.id)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <TripleDotsIcon />
-                          </button>
-                        </PermissionGuard>
-
-                        {/* Dropdown Menu */}
-                        {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
-                            <ul className="py-2">
-                              <li>
-                                <DropdownButtonComponent
-                                  text="View Category"
-                                  onClick={() =>
-                                    setModalState("viewAssetCategory")
-                                  }
-                                  permissions={["read_assets:/category/all"]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Create Sub Category"
-                                  onClick={() =>
-                                    setModalState("createAssetCategory")
-                                  }
-                                  permissions={["create_assets:/sub-category"]}
-                                />
-                              </li>
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : type === "vendors" ? (
-                    <>
-                      <div className="relative">
-                        {/* Button */}
-                        <PermissionGuard
-                          requiredPermissions={[
-                            "delete_vendors:id",
-                            "update_vendors:id",
-                          ]}
-                        >
-                          <button
-                            onClick={() => toggleActions(row.id)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <TripleDotsIcon />
-                          </button>
-                        </PermissionGuard>
-
-                        {/* Dropdown Menu */}
-                        {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
-                            <ul className="py-2">
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Edit"
-                                  onClick={() => setModalState("createVendor")}
-                                  permissions={["update_vendors:id"]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Delete"
-                                  onClick={() =>
-                                    setModalStateDelete("deleteVendor")
-                                  }
-                                  permissions={["delete_vendors:id"]}
-                                />
-                              </li>
-                              <li>
-                                {row.isDeactivated === false ? (
-                                  <DropdownButtonComponent
-                                    text="De-activate"
-                                    onClick={() =>
-                                      setModalStateDelete("deactivateVendor")
-                                    }
-                                    permissions={["delete_vendors:id"]}
-                                  />
-                                ) : (
-                                  <DropdownButtonComponent
-                                    text="Re-activate"
-                                    onClick={() =>
-                                      setModalStateDelete("activateVendor")
-                                    }
-                                    permissions={["delete_vendors:id"]}
-                                  />
-                                )}
-                              </li>
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : type === "technicians" ? (
-                    <>
-                      <div className="relative">
-                        {/* Button */}
-                        <PermissionGuard
-                          requiredPermissions={[
-                            "delete_vendors:id",
-                            "update_vendors:id",
-                          ]}
-                        >
-                          <button
-                            onClick={() => toggleActions(row.id)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <TripleDotsIcon />
-                          </button>
-                        </PermissionGuard>
-
-                        {/* Dropdown Menu */}
-                        {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
-                            <ul className="py-2">
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Edit"
-                                  onClick={() =>
-                                    setModalState("createTechnician")
-                                  }
-                                  permissions={["update_vendors:id"]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Delete"
-                                  onClick={() =>
-                                    setModalStateDelete("deleteTechnician")
-                                  }
-                                  permissions={["delete_vendors:id"]}
-                                />
-                              </li>
-                              <li>
-                                {row.isDeactivated === false ? (
-                                  <DropdownButtonComponent
-                                    text="De-activate"
-                                    onClick={() =>
-                                      setModalStateDelete(
-                                        "deactivateTechnician"
-                                      )
-                                    }
-                                    permissions={["delete_vendors:id"]}
-                                  />
-                                ) : (
-                                  <DropdownButtonComponent
-                                    text="Re-activate"
-                                    onClick={() =>
-                                      setModalStateDelete("activateTechnician")
-                                    }
-                                    permissions={["delete_vendors:id"]}
-                                  />
-                                )}
-                              </li>
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : type === "powers" ? (
-                    <>
-                      <div className="relative">
-                        {/* Button */}
-                        <PermissionGuard
-                          requiredPermissions={[
-                            "delete_vendors:id",
-                            "update_vendors:id",
-                          ]}
-                        >
-                          <button
-                            onClick={() => toggleActions(row.id)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <TripleDotsIcon />
-                          </button>
-                        </PermissionGuard>
-
-                        {/* Dropdown Menu */}
-                        {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
-                            <ul className="py-2">
-                              <li>
-                                <DropdownButtonComponent
-                                  text="View"
-                                  onClick={() =>
-                                    setModalState("viewPowerCharge")
-                                  }
-                                  permissions={["read_power-charges:id"]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Edit"
-                                  onClick={() =>
-                                    setModalState("createPowerCharge")
-                                  }
-                                  permissions={["update_power-charges:id"]}
-                                />
-                              </li>
-
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Apportion"
-                                  onClick={() =>
-                                    setModalStateDelete("apportionPowerCharge")
-                                  }
-                                  permissions={[
-                                    "update_power-charges:id/apportion",
-                                  ]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Delete"
-                                  onClick={() =>
-                                    setModalStateDelete("deletePowerCharge")
-                                  }
-                                  permissions={["delete_power-charges:id"]}
-                                />
-                              </li>
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : type === "workrequests" ? (
-                    <>
-                      <div className="relative">
-                        {/* Button */}
-                        <PermissionGuard
-                          requiredPermissions={[
-                            "create_work-requests",
-                            "read_work-requests:id",
-                          ]}
-                        >
-                          <button
-                            onClick={() => toggleActions(row.id)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <TripleDotsIcon />
-                          </button>
-                        </PermissionGuard>
-
-                        {/* Dropdown Menu */}
-                        {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
-                            <ul className="py-2">
-                              <li>
-                                <DropdownButtonComponent
-                                  text="View"
-                                  onClick={() =>
-                                    setModalState("viewWorkRequest")
-                                  }
-                                  permissions={["read_work-requests:id"]}
-                                />
-                              </li>
-
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Comment"
-                                  onClick={() =>
-                                    setModalState("commentWorkRequest")
-                                  }
-                                  permissions={[
-                                    "update_work-requests:id/comments",
-                                  ]}
-                                />
-                              </li>
-
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Update Status"
-                                  onClick={() =>
-                                    setModalState("updateStatusWorkRequest")
-                                  }
-                                  permissions={[
-                                    "update_work-requests:id/status/reject",
-                                    "update_work-requests:id/status/close",
-                                  ]}
-                                />
-                              </li>
-
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Assign to Procurement"
-                                  onClick={() =>
-                                    setModalStateDelete("assignProcurement")
-                                  }
-                                  permissions={[
-                                    "update_work-requests:id/accept-quotation/quotationId",
-                                  ]}
-                                />
-                              </li>
-                              {row.amount > 0 && (
-                                <li>
-                                  <DropdownButtonComponent
-                                    text="Apportion Service Charge"
-                                    onClick={() =>
-                                      setModalStateDelete(
-                                        "apportionServiceCharge"
-                                      )
-                                    }
-                                    permissions={[
-                                      "update_work-requests:id/apportion/service-charge",
-                                    ]}
-                                  />
-                                </li>
-                              )}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : type === "workorders" ? (
-                    <>
-                      <div className="relative">
-                        {/* Button */}
-                        <PermissionGuard
-                          requiredPermissions={[
-                            "create_work-orders",
-                            "read_work-orders:id",
-                          ]}
-                        >
-                          <button
-                            onClick={() => toggleActions(row.id)}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            <TripleDotsIcon />
-                          </button>
-                        </PermissionGuard>
-
-                        {/* Dropdown Menu */}
-                        {activeRowId === row.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
-                            <ul className="py-2">
-                              <li>
-                                <DropdownButtonComponent
-                                  text="View"
-                                  onClick={() => setModalState("viewWorkOrder")}
-                                  permissions={[]}
-                                />
-                              </li>
-                              {/* <li>
-                                <DropdownButtonComponent
-                                  text="Edit"
-                                  onClick={() =>
-                                    setModalState("createWorkRequest")
-                                  }
-                                  permissions={["read_work-requests:id"]}
-                                />
-                              </li> */}
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Comment"
-                                  onClick={() =>
-                                    setModalState("commentWorkOrder")
-                                  }
-                                  permissions={[]}
-                                />
-                              </li>
-
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Add Quotations"
-                                  onClick={() =>
-                                    setModalState("quotationsWorkOrder")
-                                  }
-                                  permissions={[
-                                    "update_work-requests:id/upload-quotation",
-                                  ]}
-                                />
-                              </li>
-
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Select Quotation"
-                                  onClick={() =>
-                                    setModalState("acceptQuotation")
-                                  }
-                                  permissions={[
-                                    "update_work-requests:id/accept-quotation/quotationId",
-                                  ]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Request Quotation Approval"
-                                  onClick={() =>
-                                    setModalState("requestquotationsapproval")
-                                  }
-                                  permissions={[
-                                    "update_work-requests:id/upload-quotation",
-                                  ]}
-                                />
-                              </li>
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Approve Quotation"
-                                  onClick={() =>
-                                    setModalStateDelete("approveQuotation")
-                                  }
-                                  permissions={[
-                                    "update_work-requests:id/accept-quotation/quotationId",
-                                  ]}
-                                />
-                              </li>
-
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Raise Payment Order"
-                                  onClick={() =>
-                                    setModalState("raisePaymentOrder")
-                                  }
-                                  permissions={[]}
-                                />
-                              </li>
-
-                              <li>
-                                <DropdownButtonComponent
-                                  text="Close"
-                                  onClick={() =>
-                                    setModalState("closeWorkOrder")
-                                  }
-                                  permissions={[]}
-                                />
-                              </li>
-
-                              {row.amount > 0 && (
-                                <>
+                            {/* Dropdown Menu */}
+                            {activeRowId === row.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ul className="py-2">
                                   <li>
                                     <DropdownButtonComponent
-                                      text="Approve Service Charge"
+                                      text="Edit User"
                                       onClick={() =>
-                                        setModalState("viewServiceCharge")
+                                        setModalState("createUser")
+                                      }
+                                      permissions={["update_users:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Reset Password"
+                                      onClick={() =>
+                                        setModalState("resetPassword")
+                                      }
+                                      permissions={[
+                                        "update_users:reset-password/admin",
+                                      ]}
+                                    />
+                                  </li>
+                                  <li>
+                                    {row.isDeactivated === false ? (
+                                      <DropdownButtonComponent
+                                        text="De-activate User"
+                                        onClick={() =>
+                                          setModalStateDelete("deleteUser")
+                                        }
+                                        permissions={["delete_users:id"]}
+                                      />
+                                    ) : (
+                                      <DropdownButtonComponent
+                                        text="Re-activate User"
+                                        onClick={() =>
+                                          setModalStateDelete("activateUser")
+                                        }
+                                        permissions={["delete_users:id"]}
+                                      />
+                                    )}
+                                  </li>
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : type === "roles" ? (
+                        <>
+                          <div className="flex items-center space-x-2 w-full md:w-4/5 ">
+                            <ButtonComponent
+                              text="View Users"
+                              onClick={() =>
+                                router.push(`/user-management/${row?.id}`)
+                              }
+                              permissions={["read_roles:id"]}
+                              className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-white border border-gray-200"
+                            />
+
+                            <ButtonComponent
+                              text="View Permissions"
+                              onClick={() => {
+                                toggleActions(row.id);
+                                setModalState("viewPermissions");
+                              }}
+                              permissions={["read_permissions"]}
+                              className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-white border border-gray-200"
+                            />
+
+                            <ButtonComponent
+                              text="Edit Role"
+                              onClick={() => {
+                                toggleActions(row.id);
+                                setModalState("createRole");
+                              }}
+                              permissions={["update_roles:id"]}
+                              className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
+                            />
+
+                            <PermissionGuard
+                              requiredPermissions={["delete_roles:id"]}
+                            >
+                              {row.users > 0 ? (
+                                <div>
+                                  <TrashIconGray />
+                                </div>
+                              ) : (
+                                <div
+                                  onClick={() => {
+                                    toggleActions(row.id);
+                                    setModalStateDelete("deleteRole");
+                                  }}
+                                >
+                                  <TrashIcon />
+                                </div>
+                              )}
+                            </PermissionGuard>
+                          </div>
+                        </>
+                      ) : type === "facilities" ? (
+                        <>
+                          <div className="relative">
+                            {/* Button */}
+                            <PermissionGuard
+                              requiredPermissions={[
+                                "delete_facilities:id",
+                                "update_facilities:id",
+                                "update_facilities:id/assign",
+                                "read_facilities:id",
+                              ]}
+                            >
+                              <button
+                                onClick={() => toggleActions(row.id)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <TripleDotsIcon />
+                              </button>
+                            </PermissionGuard>
+
+                            {/* Dropdown Menu */}
+                            {activeRowId === row.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ul className="py-2">
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="View"
+                                      onClick={() =>
+                                        setModalState("viewFacility")
+                                      }
+                                      permissions={["read_facilities:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Edit"
+                                      onClick={() =>
+                                        setModalState("createFacility")
+                                      }
+                                      permissions={["update_facilities:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Assign a User"
+                                      onClick={() =>
+                                        setModalState("assignUserToFacility")
+                                      }
+                                      permissions={[
+                                        "update_facilities:id/assign",
+                                      ]}
+                                    />
+                                  </li>
+                                  <li>
+                                    {row.isDeactivated === false ? (
+                                      <DropdownButtonComponent
+                                        text="Delete"
+                                        onClick={() =>
+                                          setModalStateDelete("deleteFacility")
+                                        }
+                                        permissions={["delete_facilities:id"]}
+                                      />
+                                    ) : (
+                                      <DropdownButtonComponent
+                                        text="Delete"
+                                        onClick={() =>
+                                          setModalStateDelete("deleteFacility")
+                                        }
+                                        permissions={["delete_facilities:id"]}
+                                      />
+                                    )}
+                                  </li>
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : type === "blocks" ? (
+                        <>
+                          <div className="relative">
+                            {/* Button */}
+                            <PermissionGuard
+                              requiredPermissions={[
+                                "delete_blocks:id",
+                                "update_blocks:id",
+                                "read_blocks:id",
+                              ]}
+                            >
+                              <button
+                                onClick={() => toggleActions(row.id)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <TripleDotsIcon />
+                              </button>
+                            </PermissionGuard>
+
+                            {/* Dropdown Menu */}
+                            {activeRowId === row.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ul className="py-2">
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="View"
+                                      onClick={() => setModalState("viewBlock")}
+                                      permissions={["read_blocks:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Edit"
+                                      onClick={() =>
+                                        setModalState("createBlock")
+                                      }
+                                      permissions={["update_blocks:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Assign a User"
+                                      onClick={() =>
+                                        setModalState("assignUserToBlock")
+                                      }
+                                      permissions={["update_blocks:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    {row.isDeactivated === false ? (
+                                      <DropdownButtonComponent
+                                        text="Delete"
+                                        onClick={() =>
+                                          setModalStateDelete("deleteBlock")
+                                        }
+                                        permissions={["delete_blocks:id"]}
+                                      />
+                                    ) : (
+                                      <DropdownButtonComponent
+                                        text="Delete"
+                                        onClick={() =>
+                                          setModalStateDelete("deleteBlock")
+                                        }
+                                        permissions={["delete_blocks:id"]}
+                                      />
+                                    )}
+                                  </li>
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : type === "units" ? (
+                        <>
+                          <div className="relative">
+                            {/* Button */}
+                            <PermissionGuard
+                              requiredPermissions={[
+                                "delete_units:id",
+                                "update_units:id",
+                                "read_units:id",
+                              ]}
+                            >
+                              <button
+                                onClick={() => toggleActions(row.id)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <TripleDotsIcon />
+                              </button>
+                            </PermissionGuard>
+
+                            {/* Dropdown Menu */}
+                            {activeRowId === row.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ul className="py-2">
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="View"
+                                      onClick={() => setModalState("viewUnit")}
+                                      permissions={["read_units:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Edit"
+                                      onClick={() =>
+                                        setModalState("createUnit")
+                                      }
+                                      permissions={["update_units:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    {row.isDeactivated === false ? (
+                                      <DropdownButtonComponent
+                                        text="Delete"
+                                        onClick={() =>
+                                          setModalStateDelete("deleteUnit")
+                                        }
+                                        permissions={["delete_units:id"]}
+                                      />
+                                    ) : (
+                                      <DropdownButtonComponent
+                                        text="Delete"
+                                        onClick={() =>
+                                          setModalStateDelete("deleteUnit")
+                                        }
+                                        permissions={["delete_units:id"]}
+                                      />
+                                    )}
+                                  </li>
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : type === "assets" ? (
+                        <>
+                          <div className="flex items-center space-x-2 w-full md:w-4/5 ">
+                            <ButtonComponent
+                              text="View Facilities"
+                              onClick={() =>
+                                router.push(`/facility-management/${row?.id}`)
+                              }
+                              permissions={["read_assets:id"]}
+                              className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-white border border-gray-200"
+                            />
+
+                            <ButtonComponent
+                              text="Edit Asset"
+                              onClick={() => {
+                                toggleActions(row.id);
+                                setModalState("createAsset");
+                              }}
+                              permissions={["update_assets:id"]}
+                              className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
+                            />
+
+                            <PermissionGuard
+                              requiredPermissions={["delete_assets:id"]}
+                            >
+                              {row.facilities.length > 0 ? (
+                                <div>
+                                  <TrashIconGray />
+                                </div>
+                              ) : (
+                                <div
+                                  onClick={() => {
+                                    toggleActions(row.id);
+                                    setModalStateDelete("deleteAsset");
+                                  }}
+                                >
+                                  <TrashIcon />
+                                </div>
+                              )}
+                            </PermissionGuard>
+                          </div>
+                        </>
+                      ) : type === "categories" ? (
+                        <>
+                          <div className="relative">
+                            {/* Button */}
+                            <PermissionGuard
+                              requiredPermissions={[
+                                "read_assets:/sub-category/all",
+                                "read_assets:/category/sub-category/id",
+                                "read_assets:/category/all",
+                                "delete_assets:/sub-category/id",
+                                ,
+                                "delete_assets:/category/id",
+                                "create_assets:/sub-category",
+                              ]}
+                            >
+                              <button
+                                onClick={() => toggleActions(row.id)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <TripleDotsIcon />
+                              </button>
+                            </PermissionGuard>
+
+                            {/* Dropdown Menu */}
+                            {activeRowId === row.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ul className="py-2">
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="View Category"
+                                      onClick={() =>
+                                        setModalState("viewAssetCategory")
+                                      }
+                                      permissions={[
+                                        "read_assets:/category/all",
+                                      ]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Create Sub Category"
+                                      onClick={() =>
+                                        setModalState("createAssetCategory")
+                                      }
+                                      permissions={[
+                                        "create_assets:/sub-category",
+                                      ]}
+                                    />
+                                  </li>
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : type === "vendors" ? (
+                        <>
+                          <div className="relative">
+                            {/* Button */}
+                            <PermissionGuard
+                              requiredPermissions={[
+                                "delete_vendors:id",
+                                "update_vendors:id",
+                              ]}
+                            >
+                              <button
+                                onClick={() => toggleActions(row.id)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <TripleDotsIcon />
+                              </button>
+                            </PermissionGuard>
+
+                            {/* Dropdown Menu */}
+                            {activeRowId === row.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ul className="py-2">
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Edit"
+                                      onClick={() =>
+                                        setModalState("createVendor")
+                                      }
+                                      permissions={["update_vendors:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Delete"
+                                      onClick={() =>
+                                        setModalStateDelete("deleteVendor")
+                                      }
+                                      permissions={["delete_vendors:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    {row.isDeactivated === false ? (
+                                      <DropdownButtonComponent
+                                        text="De-activate"
+                                        onClick={() =>
+                                          setModalStateDelete(
+                                            "deactivateVendor"
+                                          )
+                                        }
+                                        permissions={["delete_vendors:id"]}
+                                      />
+                                    ) : (
+                                      <DropdownButtonComponent
+                                        text="Re-activate"
+                                        onClick={() =>
+                                          setModalStateDelete("activateVendor")
+                                        }
+                                        permissions={["delete_vendors:id"]}
+                                      />
+                                    )}
+                                  </li>
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : type === "technicians" ? (
+                        <>
+                          <div className="relative">
+                            {/* Button */}
+                            <PermissionGuard
+                              requiredPermissions={[
+                                "delete_vendors:id",
+                                "update_vendors:id",
+                              ]}
+                            >
+                              <button
+                                onClick={() => toggleActions(row.id)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <TripleDotsIcon />
+                              </button>
+                            </PermissionGuard>
+
+                            {/* Dropdown Menu */}
+                            {activeRowId === row.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ul className="py-2">
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Edit"
+                                      onClick={() =>
+                                        setModalState("createTechnician")
+                                      }
+                                      permissions={["update_vendors:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Delete"
+                                      onClick={() =>
+                                        setModalStateDelete("deleteTechnician")
+                                      }
+                                      permissions={["delete_vendors:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    {row.isDeactivated === false ? (
+                                      <DropdownButtonComponent
+                                        text="De-activate"
+                                        onClick={() =>
+                                          setModalStateDelete(
+                                            "deactivateTechnician"
+                                          )
+                                        }
+                                        permissions={["delete_vendors:id"]}
+                                      />
+                                    ) : (
+                                      <DropdownButtonComponent
+                                        text="Re-activate"
+                                        onClick={() =>
+                                          setModalStateDelete(
+                                            "activateTechnician"
+                                          )
+                                        }
+                                        permissions={["delete_vendors:id"]}
+                                      />
+                                    )}
+                                  </li>
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : type === "powers" ? (
+                        <>
+                          <div className="relative">
+                            {/* Button */}
+                            <PermissionGuard
+                              requiredPermissions={[
+                                "read_power-charges:id",
+                                "update_power-charges:id",
+                                "update_power-charges:id/apportion",
+                              ]}
+                            >
+                              <button
+                                onClick={() => toggleActions(row.id)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <TripleDotsIcon />
+                              </button>
+                            </PermissionGuard>
+
+                            {/* Dropdown Menu */}
+                            {activeRowId === row.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ul className="py-2">
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="View"
+                                      onClick={() =>
+                                        setModalState("viewPowerCharge")
+                                      }
+                                      permissions={["read_power-charges:id"]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Edit"
+                                      onClick={() =>
+                                        setModalState("createPowerCharge")
+                                      }
+                                      permissions={["update_power-charges:id"]}
+                                    />
+                                  </li>
+
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Apportion"
+                                      onClick={() =>
+                                        setModalStateDelete(
+                                          "apportionPowerCharge"
+                                        )
+                                      }
+                                      permissions={[
+                                        "update_power-charges:id/apportion",
+                                      ]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Delete"
+                                      onClick={() =>
+                                        setModalStateDelete("deletePowerCharge")
+                                      }
+                                      permissions={["delete_power-charges:id"]}
+                                    />
+                                  </li>
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : type === "workrequests" ? (
+                        <>
+                          <div className="relative">
+                            {/* Button */}
+                            <PermissionGuard
+                              requiredPermissions={[
+                                "create_work-requests",
+                                "read_work-requests:id",
+                              ]}
+                            >
+                              <button
+                                onClick={() => toggleActions(row.id)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <TripleDotsIcon />
+                              </button>
+                            </PermissionGuard>
+
+                            {/* Dropdown Menu */}
+                            {activeRowId === row.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ul className="py-2">
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="View"
+                                      onClick={() =>
+                                        setModalState("viewWorkRequest")
+                                      }
+                                      permissions={["read_work-requests:id"]}
+                                    />
+                                  </li>
+
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Comment"
+                                      onClick={() =>
+                                        setModalState("commentWorkRequest")
+                                      }
+                                      permissions={[
+                                        "update_work-requests:id/comments",
+                                      ]}
+                                    />
+                                  </li>
+
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Update Status"
+                                      onClick={() =>
+                                        setModalState("updateStatusWorkRequest")
+                                      }
+                                      permissions={[
+                                        "update_work-requests:id/status/reject",
+                                        "update_work-requests:id/status/close",
+                                      ]}
+                                    />
+                                  </li>
+
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Assign to Procurement"
+                                      onClick={() =>
+                                        setModalStateDelete("assignProcurement")
+                                      }
+                                      permissions={[
+                                        "update_work-requests:id/assign/to-procurement",
+                                      ]}
+                                    />
+                                  </li>
+                                  {row.amount > 0 && (
+                                    <li>
+                                      <DropdownButtonComponent
+                                        text="Apportion Service Charge"
+                                        onClick={() =>
+                                          setModalStateDelete(
+                                            "apportionServiceCharge"
+                                          )
+                                        }
+                                        permissions={[
+                                          "update_work-requests:id/apportion/service-charge",
+                                        ]}
+                                      />
+                                    </li>
+                                  )}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : type === "workorders" ? (
+                        <>
+                          <div className="relative">
+                            {/* Button */}
+                            <PermissionGuard
+                              requiredPermissions={[
+                                "create_work-orders",
+                                "create_work-requests:/work-order",
+                              ]}
+                            >
+                              <button
+                                onClick={() => toggleActions(row.id)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                <TripleDotsIcon />
+                              </button>
+                            </PermissionGuard>
+
+                            {/* Dropdown Menu */}
+                            {activeRowId === row.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ul className="py-2">
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="View"
+                                      onClick={() =>
+                                        setModalState("viewWorkOrder")
+                                      }
+                                      permissions={["read_work-requests:id"]}
+                                    />
+                                  </li>
+
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Comment"
+                                      onClick={() =>
+                                        setModalState("commentWorkOrder")
+                                      }
+                                      permissions={[
+                                        "update_work-requests:id/comments",
+                                      ]}
+                                    />
+                                  </li>
+
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Add Quotations"
+                                      onClick={() =>
+                                        setModalState("quotationsWorkOrder")
+                                      }
+                                      permissions={[
+                                        "update_work-requests:id/upload-quotation",
+                                      ]}
+                                    />
+                                  </li>
+
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Select Quotation"
+                                      onClick={() =>
+                                        setModalState("acceptQuotation")
+                                      }
+                                      permissions={[
+                                        "update_work-requests:id/accept-quotation/quotationId",
+                                      ]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Request Quotation Approval"
+                                      onClick={() =>
+                                        setModalStateDelete(
+                                          "requestquotationsapproval"
+                                        )
+                                      }
+                                      permissions={[
+                                        "update_work-requests:id/upload-quotation",
+                                      ]}
+                                    />
+                                  </li>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Approve Quotation"
+                                      onClick={() =>
+                                        setModalStateDelete("approveQuotation")
+                                      }
+                                      permissions={[
+                                        "update_work-requests:id/status/approve",
+                                      ]}
+                                    />
+                                  </li>
+
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Raise Payment Order"
+                                      onClick={() =>
+                                        setModalState("raisePaymentOrder")
                                       }
                                       permissions={[]}
                                     />
                                   </li>
-                                </>
-                              )}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : type === "bills" ? (
-                    <>
-                      <div className="flex items-center space-x-2 w-full md:w-4/5 ">
-                        <ButtonComponent
-                          text="Pay"
-                          onClick={() => {
-                            toggleActions(row.id);
-                            setModalState("Pay");
-                          }}
-                          permissions={[]}
-                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
-                        />
 
-                        {/* <PermissionGuard
-                          requiredPermissions={["delete_roles:id"]}
-                        >
-                          {row.users > 0 ? (
-                            <div>
-                              <TrashIconGray />
-                            </div>
-                          ) : (
-                            <div
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Close"
+                                      onClick={() =>
+                                        setModalState("closeWorkOrder")
+                                      }
+                                      permissions={[
+                                        "update_work-requests:id/status/close",
+                                      ]}
+                                    />
+                                  </li>
+
+                                  {row.amount > 0 && (
+                                    <>
+                                      <li>
+                                        <DropdownButtonComponent
+                                          text="Apportion Service Charge"
+                                          onClick={() =>
+                                            setModalStateDelete(
+                                              "apportionServiceCharge"
+                                            )
+                                          }
+                                          permissions={[
+                                            "update_work-requests:id/apportion/service-charge",
+                                          ]}
+                                        />
+                                      </li>
+
+                                      <li>
+                                        <DropdownButtonComponent
+                                          text="View Service Charge"
+                                          onClick={() =>
+                                            setModalState("viewServiceCharge")
+                                          }
+                                          permissions={[
+                                            "update_work-requests:id/apportion/service-charge/approve",
+                                          ]}
+                                        />
+                                      </li>
+                                    </>
+                                  )}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : type === "bills" ? (
+                        <>
+                          <div className="flex items-center space-x-2 w-full md:w-4/5 ">
+                            <ButtonComponent
+                              text="Pay"
                               onClick={() => {
-                                toggleActions(row.id);
-                                setModalStateDelete("deleteRole");
+                                toggleActions(row.billId);
+                                extraActions(row.unitId);
+                                setModalStateDelete("payBills");
                               }}
-                            >
-                              <TrashIcon />
-                            </div>
-                          )}
-                        </PermissionGuard> */}
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex items-center space-x-2">
-                        {/* Additional Condition */}
-                        <ButtonComponent
-                          text="Custom Action"
-                          onClick={() => console.log("Perform custom action")}
-                          permissions={["custom_action_permission"]}
-                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-green-500 text-white border border-gray-200 rounded-md"
-                        />
-                      </div>
-                    </>
-                  )}
-                </td>
+                              permissions={["update_units:id/pay/billId"]}
+                              className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-center space-x-2">
+                            {/* Additional Condition */}
+                            <ButtonComponent
+                              text="Custom Action"
+                              onClick={() =>
+                                console.log("Perform custom action")
+                              }
+                              permissions={["custom_action_permission"]}
+                              className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-green-500 text-white border border-gray-200 rounded-md"
+                            />
+                          </div>
+                        </>
+                      )}
+                    </td>
+                  </>
+                )}
               </tr>
             ))}
           </tbody>

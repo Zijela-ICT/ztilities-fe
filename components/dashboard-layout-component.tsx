@@ -104,22 +104,25 @@ export default function DashboardLayout({
               </div> */}
               <div className="flex space-x-6 mr-14">
                 {/* Wallet Dropdown */}
-                <div className="flex items-center space-x-2">
-                  <span className="text-lg text-black font-medium">
-                    ₦{parseFloat(selectedWallet?.balance || 0).toFixed(2)}
-                  </span>
-                  <select
-                    value={selectedWallet?.id}
-                    onChange={handleWalletChange}
-                    className="border p-2 rounded w-48"
-                  >
-                    {user?.wallets.map((wallet) => (
-                      <option key={wallet.id} value={wallet.id}>
-                        {wallet.walletType}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {selectedWallet && (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-lg text-black font-medium">
+                      ₦{parseFloat(selectedWallet?.balance || 0).toFixed(2)}
+                    </span>
+                    <select
+                      value={selectedWallet?.id}
+                      onChange={handleWalletChange}
+                      className="border p-2 rounded w-48"
+                    >
+                      {user?.wallets.map((wallet) => (
+                        <option key={wallet.id} value={wallet.id}>
+                          {wallet.walletType}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
                 <Link href={`/user-profile`}>
                   {user?.avatar ? (
                     <Image

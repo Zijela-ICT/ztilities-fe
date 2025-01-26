@@ -84,6 +84,7 @@ interface Unit {
   commonArea: string | null;
   address: string | null;
   assets: Asset[];
+  bills : any[]
   user : User
 }
 
