@@ -5,9 +5,11 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 // Define the context type
 interface ContextType {
   user: AuthUser | null;
-  userPermissions: Permission[]; // Permissions should be an array
+  userPermissions: Permission[];
+  userRoles: any[]; // Permissions should be an array
   setUser: (user: AuthUser | null) => void;
   setUserPermissions: (permissions: Permission[]) => void;
+  setUserRoles: (roles: any[]) => void;
 }
 
 // Create context with initial values
@@ -20,11 +22,19 @@ export const DataPermissionProvider = ({
   children: ReactNode;
 }) => {
   const [user, setUser] = useState<AuthUser | null>(null); // User starts as null
-  const [userPermissions, setUserPermissions] = useState<Permission[]>([]); // Permissions start as an empty array
+  const [userPermissions, setUserPermissions] = useState<Permission[]>([]);
+  const [userRoles, setUserRoles] = useState<any[]>([]); // Permissions start as an empty array
 
   return (
     <DataPermissionContext.Provider
-      value={{ user, userPermissions, setUser, setUserPermissions }}
+      value={{
+        user,
+        userPermissions,
+        userRoles,
+        setUser,
+        setUserPermissions,
+        setUserRoles,
+      }}
     >
       {children}
     </DataPermissionContext.Provider>

@@ -18,7 +18,7 @@ import withPermissions from "@/components/auth/permission-protected-routes";
 
 function Dashboard() {
   const router = useRouter();
-  const { user, userPermissions, setUser, setUserPermissions } =
+  const { user, setUser, setUserPermissions, setUserRoles } =
     useDataPermission();
 
   const [selectedWallet, setSelectedWallet] = useState<any>();
@@ -44,6 +44,7 @@ function Dashboard() {
     const response = await axiosInstance.get("/auth/me");
     setUser(response.data.data.user);
     const roles = response.data.data?.roles || [];
+    setUserRoles(roles)
     const allPermissions = roles
       .map((role: any) => role.permissions || []) // Extract permissions from each role
       .flat(); // Flatten the array of arrays

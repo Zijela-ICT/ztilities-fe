@@ -13,7 +13,7 @@ export default function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const { userPermissions } = useDataPermission();
+  const { user, userRoles, userPermissions } = useDataPermission();
 
   const isActive = useCallback((path: string) => pathname === path, [pathname]);
 
@@ -40,6 +40,7 @@ export default function Navigation() {
         <Link href={`/dashboard`} className="w-full px-4 ml-4">
           <Image src={Logo} alt="logo" width={100} height={70} />
         </Link>
+
         <button onClick={toggleMenu} className="md:hidden text-gray-500 ">
           <svg
             className="w-6 h-6"
@@ -57,6 +58,20 @@ export default function Navigation() {
           </svg>
         </button>
       </div>
+
+      <>
+        <div className="flex flex-col items-center justify-center p-4 bg-[#A8353A] rounded-lg shadow-lg text-white max-w-sm mx-auto">
+          <p className="text-lg font-semibold">
+            {user?.firstName} {user?.lastName}
+          </p>
+
+          <p className="text-sm mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm">
+            {userRoles.map((role) => {
+              return <> {role.name} </>;
+            })}
+          </p>
+        </div>
+      </>
 
       <div className={`md:block ${isMenuOpen ? "block" : "hidden"}`}>
         {[
@@ -150,12 +165,7 @@ export default function Navigation() {
             )
         )}
 
-        <div className="flex items-center px-4 pt-32 ">
-          <div>
-            <Image src={ZijelaLogo} alt="logo" width={25} height={25} />{" "}
-          </div>
-          <div className="ml-2">Zijela ICT</div>
-        </div>
+        <div className="flex items-center px-4 pt-32 "></div>
         {/* Logout Button */}
         <li className="w-full px-4 pt-4">
           <button

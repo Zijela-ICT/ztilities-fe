@@ -1118,7 +1118,7 @@ export default function TableComponent({
                                       ]}
                                     />
                                   </li>
-                                  <li>
+                                  {/* <li>
                                     <DropdownButtonComponent
                                       text="Approve Quotation"
                                       onClick={() =>
@@ -1128,9 +1128,9 @@ export default function TableComponent({
                                         "update_work-requests:id/status/approve",
                                       ]}
                                     />
-                                  </li>
+                                  </li> */}
 
-                                  <li>
+                                  {/* <li>
                                     <DropdownButtonComponent
                                       text="Raise Payment Order"
                                       onClick={() =>
@@ -1138,7 +1138,7 @@ export default function TableComponent({
                                       }
                                       permissions={[]}
                                     />
-                                  </li>
+                                  </li> */}
 
                                   <li>
                                     <DropdownButtonComponent
