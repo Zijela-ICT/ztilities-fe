@@ -21,6 +21,15 @@ function Dashboard() {
   const { user, userPermissions, setUser, setUserPermissions } =
     useDataPermission();
 
+  const [selectedWallet, setSelectedWallet] = useState<any>();
+  useEffect(() => {
+    setSelectedWallet(user?.wallets[0]?.id);
+  }, [user?.wallets]);
+
+  const handleWalletChange = (event) => {
+    setSelectedWallet(parseInt(event.target.value)); // Update selected wallet
+  };
+
   const [assignedworkRequests, setAssignedWorkRequests] = useState<any[]>();
   const [workOrders, setWorkOrders] = useState<any[]>();
   const [centralState, setCentralState] = useState<string>();
@@ -49,9 +58,7 @@ function Dashboard() {
   };
 
   const getAssignedWorkRequests = async () => {
-    const response = await axiosInstance.get(
-      "/work-requests/my-facilities-work-request/all"
-    );
+    const response = await axiosInstance.get("/work-requests");
     setAssignedWorkRequests(response.data.data);
   };
 
@@ -80,6 +87,10 @@ function Dashboard() {
     (request) => request.status === "Initiated"
   );
 
+  const pendingOrders = workOrders?.filter(
+    (request) => request.status === "Initiated"
+  );
+
   const data = [
     {
       title: "Create Work Request",
@@ -93,12 +104,12 @@ function Dashboard() {
     },
     {
       title: "Created Work Order",
-      number: assignedworkRequests?.length,
+      number: workOrders?.length,
       rate: "3 days",
     },
     {
       title: "initiated Work Order",
-      number: pendingRequests?.length,
+      number: pendingOrders?.length,
       rate: "10 days",
     },
     { title: "Wallet Balance", number: 0, rate: "" },
@@ -169,34 +180,61 @@ function Dashboard() {
       >
         {componentMap[centralState]}
       </ModalCompoenent>
-      <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {data.map((item, index) => (
           <div
             key={index}
             className="bg-white py-3 px-4 rounded-lg flex items-center justify-between"
           >
             {/* Left Content */}
-            <div>
-              <h3 className="text-sm font-semibold text-gray-500 mb-1">
-                {item.title}
-              </h3>
-              <p className="text-3xl font-bold text-gray-800 mb-3">
-                {item.number}
-              </p>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
-                  0%
-                </span>
-                <span className="text-xs text-gray-500">{item.rate}</span>
-                {/* Badge */}
-              </div>
+            <div className="relative">
+              {item.title !== "Wallet Balance" && (
+                <h3 className="text-sm font-semibold text-gray-500 mb-1">
+                  {item.title}
+                </h3>
+              )}
+
+              {item.title === "Wallet Balance" ? (
+                <>
+                  {/* Dropdown for Wallet Balance */}
+                  <select
+                    value={selectedWallet}
+                    onChange={handleWalletChange}
+                    className="text-sm font-semibold text-gray-500 mb-1"
+                  >
+                    {user?.wallets.map((wallet) => (
+                      <option key={wallet.id} value={wallet.id}>
+                        {wallet.walletType}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-2xl font-bold text-gray-800 mb-3">
+                    ₦
+                   {parseFloat(user?.wallets.find((wallet) => wallet.id === selectedWallet)?.balance || 0)
+    .toFixed(2)
+    .toLocaleString()}
+                  </p>
+                  <div className="flex items-center gap-2 h-6"></div>
+                </>
+              ) : (
+                <>
+                  <p className="text-3xl font-bold text-gray-800 mb-3">
+                    {item.number}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
+                      0%
+                    </span>
+                    <span className="text-xs text-gray-500">{item.rate}</span>
+                  </div>
+                </>
+              )}
             </div>
-            {/* Right SVG */}
+            {/* Right Icon */}
             <BarChartIcon />
           </div>
         ))}
       </div>
-
       {workOrders?.length < 1 ? (
         <div className=" w-full rounded-lg bg-white my-8 flex flex-col items-center justify-center px-6 py-10">
           <WorkIcon />
@@ -239,4 +277,4 @@ function Dashboard() {
 }
 
 // export default withPermissions(Dashboard, ["users", "wallets"]);
-export default Dashboard
+export default Dashboard;

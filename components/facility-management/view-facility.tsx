@@ -59,11 +59,12 @@
 "use client";
 
 import { DropDownArrow } from "@/utils/svg";
+import Link from "next/link";
 import React from "react";
 
 interface FacilityDetailsProps {
   title?: string;
-  facility: Record<string, any>;
+  facility?: Record<string, any>;
   groupedPermissions?: Record<
     string,
     { id: string; normalizedString: string; units: any[] }[]
@@ -99,27 +100,36 @@ export default function FacilityDetails({
                 key === "assignedTechnician" ||
                 (key === "requestedBy" &&
                   value !== null &&
-                  typeof value === "object")
-                  ? `${value?.firstName || "-"} ${value?.lastName || "-"}`
-                  : key === "unit" &&
-                    value !== null &&
-                    typeof value === "object"
-                  ? `${value?.unitNumber || "-"}`
-                  : key === "asset" &&
-                    value !== null &&
-                    typeof value === "object"
-                  ? `${value?.unitNumber || "-"}`
-                  : key === "addedBy" &&
-                    value !== null &&
-                    typeof value === "object"
-                  ? `${value?.firstName || "-"} ${value?.lastName || "-"} `
-                  : Array.isArray(value)
-                  ? value.length // Show array length
-                  : typeof value === "object" && value !== null
-                  ? JSON.stringify(value) // Show object as a JSON string
-                  : value !== null && value !== undefined
-                  ? String(value) // Convert other types to string
-                  : "-"}
+                  typeof value === "object") ? (
+                  `${value?.firstName || "-"} ${value?.lastName || "-"}`
+                ) : key === "unit" &&
+                  value !== null &&
+                  typeof value === "object" ? (
+                  `${value?.unitNumber || "-"}`
+                ) : key === "workRequestNumber" && value !== null ? (
+                  <Link
+                    className="underline text-[#A8353A]"
+                    href={`work-requests/${value}`}
+                  >
+                    {value || "-"}
+                  </Link>
+                ) : key === "asset" &&
+                  value !== null &&
+                  typeof value === "object" ? (
+                  `${value?.assetName || "-"}`
+                ) : key === "addedBy" &&
+                  value !== null &&
+                  typeof value === "object" ? (
+                  `${value?.firstName || "-"} ${value?.lastName || "-"} `
+                ) : Array.isArray(value) ? (
+                  value.length // Show array length
+                ) : typeof value === "object" && value !== null ? (
+                  JSON.stringify(value) // Show object as a JSON string
+                ) : value !== null && value !== undefined ? (
+                  String(value) // Convert other types to string
+                ) : (
+                  "-"
+                )}
               </p>
             </div>
           ))}
@@ -127,7 +137,7 @@ export default function FacilityDetails({
 
       {/* for request */}
       {(title === "Work Request" ||
-      title === "Work Order" ||
+        title === "Work Order" ||
         title === "Category" ||
         title === "Power Charge") && (
         <>
@@ -269,7 +279,7 @@ export default function FacilityDetails({
             </summary>
             <nav className="mt-4 pt-9 pb-6 border-t border-gray-300">
               <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {permissions.map((permission) => (
+                {permissions?.map((permission) => (
                   <li
                     key={permission.id}
                     className="flex items-start space-x-3"

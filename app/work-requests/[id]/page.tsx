@@ -7,26 +7,28 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
+
 import axiosInstance from "@/utils/api";
+
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
+
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import FacilityDetails from "@/components/facility-management/view-facility";
-import CreateWorkOrder from "@/components/work-order/create-work-order";
-import UpdateWorkOrder from "@/components/work-order/update-work-order";
-import AcceptQuotation from "@/components/work-order/acceptQuotation";
-import EntityDetails from "@/components/facility-management/view-entitty";
-import ButtonComponent from "@/components/button-component";
+import CreateWorkRequest from "@/components/work-request/create-work-request";
+import CreateWorkRequestForUser from "@/components/work-request/create-work-request-by-facility-manager";
+import UpdateWorkRequest from "@/components/work-request/update-work-request";
+import AcceptQuotation from "@/components/work-request/acceptQuotation";
+import ApportionPower from "@/components/work-request/apportionPower";
+import { useParams, useRouter } from "next/navigation";
 
-interface Props {
-  nowrap: boolean;
-}
-
-function WorkOrders({ nowrap }: Props) {
+function WorkRequests() {
   const { user, setUser, setUserPermissions } = useDataPermission();
+  const { id } = useParams();
 
-  const tabs = ["All Work Order"];
+  console.log(id);
+  const tabs = ["All Work Request", "Facility Work Request"];
 
   const [successState, setSuccessState] = useState({
     title: "",
@@ -34,24 +36,30 @@ function WorkOrders({ nowrap }: Props) {
     status: false,
   });
 
-  const [users, setUsers] = useState<User[]>();
-  const [workOrders, setWorkOrders] = useState<any[]>();
-  const [workOrder, setWorkOrder] = useState<any>();
+  const [assignedworkRequests, setAssignedWorkRequests] = useState<any[]>();
+  const [otherWorkRequests, setOtherWorkRequests] = useState<any[]>();
+  const [workRequest, setWorkRequest] = useState<any>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
+  const [facilities, setFacilities] = useState<Facility[]>();
+  const [blocks, setBlocks] = useState<Block[]>();
+  const [units, setUnits] = useState<Unit[]>();
+  const [assets, setAssets] = useState<Asset[]>();
   const [vendors, setVendors] = useState<Vendor[]>();
   const [technician, setTechnicians] = useState<Technician[]>();
 
   // Fetch data functions
-  const getUsers = async () => {
-    const response = await axiosInstance.get("/users");
-    setUsers(response.data.data);
+  const getAssignedWorkRequests = async () => {
+    const response = await axiosInstance.get(
+      "/work-requests/my-facilities-work-request/all"
+    );
+    setAssignedWorkRequests(response.data.data);
   };
 
-  const getWorkOrders = async () => {
-    const response = await axiosInstance.get("/work-requests/work-order/all");
-    setWorkOrders(response.data.data);
+  const getOtherWorkRequests = async () => {
+    const response = await axiosInstance.get("/work-requests");
+    setOtherWorkRequests(response.data.data);
   };
 
   const getVendors = async () => {
@@ -64,49 +72,18 @@ function WorkOrders({ nowrap }: Props) {
     setTechnicians(response.data.data);
   };
 
-  const getAWorkOrder = async () => {
+  const getAWorkRequest = async () => {
     const response = await axiosInstance.get(`/work-requests/${activeRowId}`);
-    setWorkOrder(response.data.data);
+    setWorkRequest(response.data.data);
   };
 
   // Delete functions
-  const deleteWorkOrders = async () => {
-    await axiosInstance.delete(`/work-orders/${activeRowId}`);
+  const deleteWorkRequests = async () => {
+    await axiosInstance.delete(`/work-requests/${activeRowId}`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully de-activated this work order",
-      status: true,
-    });
-  };
-
-  // Delete functions
-  const closeWorkOrder = async () => {
-    await axiosInstance.patch(`/work-requests/${activeRowId}/status/close`);
-    setCentralStateDelete("");
-    setSuccessState({
-      title: "Successful",
-      detail: "You have successfully closed work order",
-      status: true,
-    });
-  };
-
-  const approveWorkOrder = async () => {
-    await axiosInstance.patch(`/work-requests/${activeRowId}/status/approve`);
-    setCentralStateDelete("");
-    setSuccessState({
-      title: "Successful",
-      detail: "You have successfully approved work order",
-      status: true,
-    });
-  };
-
-  const requestQuotationApproval = async () => {
-    await axiosInstance.patch(`/work-requests/${activeRowId}/status/approve`);
-    setCentralStateDelete("");
-    setSuccessState({
-      title: "Successful",
-      detail: "You have successfully requested quotation to be approved",
+      detail: "You have successfully de-activated this vendor",
       status: true,
     });
   };
@@ -123,130 +100,144 @@ function WorkOrders({ nowrap }: Props) {
     });
   };
 
-  const approveApportionServiceCharge = async () => {
+  const assignProcurement = async () => {
     await axiosInstance.patch(
-      `/work-requests/${activeRowId}/apportion/service-charge/approve`
+      `/work-requests/${activeRowId}/assign/to-procurement`
     );
-    setCentralState("");
+    setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully approved apportion service charge",
+      detail: "You have successfully assigned procurement",
       status: true,
     });
   };
 
+  const getFacilities = async () => {
+    const response = await axiosInstance.get("/facilities");
+    setFacilities(response.data.data);
+  };
+
+  const getBlocks = async () => {
+    const response = await axiosInstance.get("/blocks");
+    setBlocks(response.data.data);
+  };
+
+  const getUnits = async () => {
+    const response = await axiosInstance.get("/units");
+    setUnits(response.data.data);
+  };
+
+  const getAssets = async () => {
+    const response = await axiosInstance.get("/assets");
+    setAssets(response.data.data);
+  };
+
   // Toggle actions
   const toggleActions = (rowId: string) => {
-    setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
+    if (
+      selectedTab === "Facility Work Request" ||
+      selectedTab === "All Work Request"
+    ) {
+      setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
+    } else {
+      setActiveRowId(rowId);
+    }
   };
 
   // Dynamic title and detail logic
   const getTitle = () => {
     switch (centralState) {
-      case "createWorkOrder":
-      case "createWorkOrderforUser":
-        return activeRowId ? "Edit Work Order" : "Create Work Order";
-      case "viewWorkOrder":
-        return "Work Order Details";
-      case "viewServiceCharge":
-        return "Apportionment Details";
-      case "commentWorkOrder":
+      case "createWorkRequest":
+      case "createWorkRequestforUser":
+        return activeRowId ? "Edit Work Request" : "Create Work Request";
+      case "viewWorkRequest":
+        return "Work Request Details";
+      case "commentWorkRequest":
         return "Add comment";
-      case "attatchmentWorkOrder":
+      case "attatchmentWorkRequest":
         return "Add attatchment";
-      case "quotationsWorkOrder":
+      case "quotationsWorkRequest":
         return "Add quotation";
-      case "updateStatusWorkOrder":
+      case "updateStatusWorkRequest":
         return "Update Status";
-      case "assignTechnicianWorkOrder":
+      case "assignTechnicianWorkRequest":
         return "Assign Technician";
       case "acceptQuotation":
         return "Accept Quotation";
-      case "closeWorkOrder":
-        return "Close Work Order ";
-      case "requestquotationsapproval":
-        return "Request quotation approval";
-      case "raisePaymentOrder":
-        return "Raise Payment Order";
     }
     switch (centralStateDelete) {
-      case "deactivateWorkOrder":
-        return "De-activate Work Order ";
-      case "activateWorkOrder":
-        return "Re-activate Work Order";
-      case "deactivateWorkOrder":
-        return "De-activate Work Order ";
-      case "activateWorkOrder":
-        return "Re-activate Work Order";
+      case "deactivateWorkRequest":
+        return "De-activate Work Request ";
+      case "activateWorkRequest":
+        return "Re-activate Work Request";
+      case "deactivateWorkRequest":
+        return "De-activate Work Request ";
+      case "activateWorkRequest":
+        return "Re-activate Work Request";
       case "apportionServiceCharge":
         return "Apportion Service charge";
-      case "requestquotationsapproval":
-        return "Request quotation approval ";
-      case "approveQuotation":
-        return "Approve Quotation";
+      case "assignProcurement":
+        return "Assign Procurement";
     }
     return "Zijela";
   };
 
   const getDetail = () => {
     switch (centralState) {
-      case "createWorkOrder":
-      case "createWorkOrderforUser":
+      case "createWorkRequest":
+      case "createWorkRequestforUser":
         return activeRowId
-          ? "You can edit work order details here."
-          : "You can create and manage work order here.";
-      case "viewWorkOrder":
+          ? "You can edit work request details here."
+          : "You can create and manage work request here.";
+      case "viewWorkRequest":
         return "";
-      case "viewServiceCharge":
+      case "commentWorkRequest":
         return "";
-      case "commentWorkOrder":
+      case "attatchmentWorkRequest":
         return "";
-      case "attatchmentWorkOrder":
+      case "quotationsWorkRequest":
         return "";
-      case "quotationsWorkOrder":
+      case "updateStatusWorkRequest":
         return "";
-      case "updateStatusWorkOrder":
-        return "";
-      case "assignTechnicianWorkOrder":
+      case "assignTechnicianWorkRequest":
         return "";
       case "acceptQuotation":
         return "";
-      case "requestquotationsapproval":
-        return "";
-      case "closeWorkOrder":
-        return "";
-      case "raisePaymentOrder":
-        return "";
     }
     switch (centralStateDelete) {
-      case "activateWorkOrder":
-        return "Are you sure you want to Re-activate this work order";
-      case "deactivateWorkOrder":
-        return "Are you sure you want to de-activate this work order";
-      case "activateWorkOrder":
-        return "Are you sure you want to Re-activate this work order";
-      case "deactivateWorkOrder":
-        return "Are you sure you want to de-activate this work order";
+      case "activateWorkRequest":
+        return "Are you sure you want to Re-activate this work request";
+      case "deactivateWorkRequest":
+        return "Are you sure you want to de-activate this work request";
+      case "activateWorkRequest":
+        return "Are you sure you want to Re-activate this work request";
+      case "deactivateWorkRequest":
+        return "Are you sure you want to de-activate this work request";
       case "apportionServiceCharge":
-        return "You want to apportion service charge for this work order";
-      case "requestquotationsapproval":
-        return "Request quotation approval";
-      case "approveQuotation":
-        return "You want to approve this quuotation";
+        return "You want to apportion service charge for this work request";
+      case "assignProcurement":
+        return "You want to assign Procurement";
     }
     return "Zijela";
   };
 
   // Mapping centralState values to components
   const componentMap: Record<string, JSX.Element> = {
-    createWorkOrder: (
-      <CreateWorkOrder
+    createWorkRequest: (
+      <CreateWorkRequest
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
     ),
-    commentWorkOrder: (
+    createWorkRequestforUser: (
+      <CreateWorkRequestForUser
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    commentWorkRequest: (
       <DynamicCreateForm
         inputs={[{ name: "comment", label: "Comment", type: "textarea" }]}
         selects={[]}
@@ -257,7 +248,7 @@ function WorkOrders({ nowrap }: Props) {
         setSuccessState={setSuccessState}
       />
     ),
-    attatchmentWorkOrder: (
+    attatchmentWorkRequest: (
       <DynamicCreateForm
         inputs={[
           { name: "title", label: "Title", type: "text" },
@@ -270,7 +261,7 @@ function WorkOrders({ nowrap }: Props) {
         setSuccessState={setSuccessState}
       />
     ),
-    quotationsWorkOrder: (
+    quotationsWorkRequest: (
       <DynamicCreateForm
         selects={[
           {
@@ -314,27 +305,14 @@ function WorkOrders({ nowrap }: Props) {
         setSuccessState={setSuccessState}
       />
     ),
-    updateStatusWorkOrder: (
-      <UpdateWorkOrder
+    updateStatusWorkRequest: (
+      <UpdateWorkRequest
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
     ),
-    closeWorkOrder: (
-      <DynamicCreateForm
-        selects={[]}
-        inputs={[
-          { name: "comment", label: "Comment", type: "textarea" },
-          { name: "file", label: "Attachment", type: "file" },
-        ]}
-        title="Close Work Order"
-        apiEndpoint={`/work-requests/${activeRowId}/status/close`}
-        setModalState={setCentralState}
-        setSuccessState={setSuccessState}
-      />
-    ),
-    assignTechnicianWorkOrder: (
+    assignTechnicianWorkRequest: (
       <DynamicCreateForm
         selects={[
           {
@@ -367,69 +345,10 @@ function WorkOrders({ nowrap }: Props) {
         ]}
         inputs={[]}
         title="Assign Technician"
-        apiEndpoint={`/work-orders/${activeRowId}/assign`}
+        apiEndpoint={`/work-requests/${activeRowId}/assign`}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
-    ),
-    requestquotationsapproval: (
-      <>
-        {/* <DynamicCreateForm
-          selects={[
-            {
-              name: "entity",
-              label: "Select",
-              placeholder: "Assign ",
-              options: [
-                { value: "Technician", label: "Technician" },
-                { value: "Vendor", label: "Vendor" },
-              ],
-            },
-            {
-              name: "id",
-              label: "Vendor",
-              placeholder: "Select Vendor",
-              options: vendors?.map((unit: Vendor) => ({
-                value: Number(unit?.id),
-                label: unit.vendorName,
-              })),
-            },
-            {
-              name: "id",
-              label: "Technician",
-              placeholder: "Select Technician",
-              options: technician?.map((tech: Technician) => ({
-                value: Number(tech?.id),
-                label: `${tech.firstName} ${tech.surname}`,
-              })),
-            },
-          ]}
-          inputs={[]}
-          title="Assign Technician"
-          apiEndpoint={`/work-orders/${activeRowId}/assign`}
-          setModalState={setCentralState}
-          setSuccessState={setSuccessState}
-        /> */}
-        <DynamicCreateForm
-          inputs={[]}
-          selects={[
-            {
-              name: "userId",
-              label: "Facility Manager",
-              placeholder: "Assign Facility to a User",
-              options: users?.map((user: User) => ({
-                value: user.id,
-                label: `${user.firstName} ${user.lastName}`,
-              })),
-            },
-          ]}
-          title="Request Approval"
-          apiEndpoint={`/work-requests/${activeRowId}/accept-quotation/:quotationId`}
-          activeRowId={activeRowId}
-          setModalState={setCentralState}
-          setSuccessState={setSuccessState}
-        />
-      </>
     ),
     acceptQuotation: (
       <AcceptQuotation
@@ -439,44 +358,38 @@ function WorkOrders({ nowrap }: Props) {
       />
     ),
 
-    viewWorkOrder: (
+    viewWorkRequest: (
       <div className="p-4">
-        <FacilityDetails facility={workOrder} title="Work Order" />
-      </div>
-    ),
-    viewServiceCharge: (
-      <div className="p-4">
-        <FacilityDetails
-          facility={{ apportionmentDetails: workOrder?.apportionmentDetails }}
-          title="Work Order"
-        />
-        <ButtonComponent
-          text={"Approve"}
-          onClick={() => approveApportionServiceCharge()}
-          className="text-white my-8"
-        />
+        <FacilityDetails facility={workRequest} title="Work Request" />
       </div>
     ),
   };
 
   useEffect(() => {
-    if (
-      centralState === "viewWorkOrder" ||
-      centralState === "viewServiceCharge"
-    ) {
-      getAWorkOrder();
+    if (id) {
+      setActiveRowId(id.toString());
+      setCentralState("viewWorkRequest");
     }
-    if (centralState === "quotationsWorkOrder") {
+  }, []);
+
+  useEffect(() => {
+    if (centralState === "viewWorkRequest") {
+      getAWorkRequest();
+    }
+    if (centralState === "quotationsWorkRequest") {
       getVendors();
       getTechnicians();
     }
-    if (centralState === "assignTechnicianWorkOrder") {
+    if (centralState === "assignTechnicianWorkRequest") {
       getTechnicians();
     }
   }, [centralState]);
 
   const tabPermissions: { [key: string]: string[] } = {
-    "All Work Order": ["create_work-orders"],
+    "Facility Work Request": [
+      "read_work-requests:my-facilities-work-request/all",
+    ],
+    "All Work Request": ["read_work-requests"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -496,17 +409,30 @@ function WorkOrders({ nowrap }: Props) {
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
 
   useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([getWorkOrders(), getUsers()]);
-    };
-    fetchData();
+    if (selectedTab === "All Work Request") {
+      const fetchData = async () => {
+        await Promise.all([
+          getOtherWorkRequests(),
+          getFacilities(),
+          getBlocks(),
+          getUnits(),
+          getAssets(),
+        ]);
+      };
+      fetchData();
+    } else {
+      getAssignedWorkRequests();
+      getFacilities();
+      getBlocks();
+      getUnits();
+      getAssets();
+    }
   }, [centralState, centralStateDelete, selectedTab]);
 
   return (
     <DashboardLayout
-      title="Work Order"
-      detail="Submit work order here and view created work orders"
-      nowrap={nowrap}
+      title="Work Request"
+      detail="Submit work request here and view created work requests"
     >
       <SuccessModalCompoenent
         title={successState.title}
@@ -523,18 +449,14 @@ function WorkOrders({ nowrap }: Props) {
         modalState={centralStateDelete}
         setModalState={setCentralStateDelete}
         takeAction={
-          centralStateDelete === "deactivateWorkOrder" ||
-          centralStateDelete === "activateWorkOrder"
-            ? deleteWorkOrders
+          centralStateDelete === "deactivateWorkRequest" ||
+          centralStateDelete === "activateWorkRequest"
+            ? deleteWorkRequests
             : centralStateDelete === "apportionServiceCharge"
             ? apportionServiceCharge
-            : centralStateDelete === "closeWorkOrder"
-            ? closeWorkOrder
-            : centralState === "requestquotationsapproval"
-            ? requestQuotationApproval
-            : centralStateDelete === "approveQuotation"
-            ? approveWorkOrder
-            : deleteWorkOrders
+            : centralStateDelete === "assignProcurement"
+            ? assignProcurement
+            : deleteWorkRequests
         }
       ></ActionModalCompoenent>
 
@@ -550,7 +472,12 @@ function WorkOrders({ nowrap }: Props) {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      {/* <PermissionGuard requiredPermissions={["create_work-orders"]}>
+      <PermissionGuard
+        requiredPermissions={[
+          "read_work-requests",
+          "read_work-requests:my-facilities-work-request/all",
+        ]}
+      >
         <div className="relative bg-white rounded-2xl p-4">
           <div className="flex space-x-4 pb-2">
             {tabs.map((tab) => (
@@ -576,25 +503,19 @@ function WorkOrders({ nowrap }: Props) {
             ))}
           </div>
         </div>
-      </PermissionGuard> */}
+      </PermissionGuard>
 
-      <PermissionGuard requiredPermissions={["create_work-orders"]}>
+      <PermissionGuard
+        requiredPermissions={[
+          "read_work-requests",
+          "read_work-requests:my-facilities-work-request/all",
+        ]}
+      >
         <div className="relative bg-white rounded-2xl p-4 mt-4">
-          <TableComponent
-            data={workOrders}
-            type="workorders"
-            setModalState={setCentralState}
-            setModalStateDelete={setCentralStateDelete}
-            toggleActions={toggleActions}
-            activeRowId={activeRowId}
-            setActiveRowId={setActiveRowId}
-            deleteAction={setCentralStateDelete}
-          />
-
-          {/* {selectedTab === "All Work Order" && (
+          {selectedTab === "Facility Work Request" && (
             <TableComponent
-              data={otherWorkOrders}
-              type="workorders"
+              data={assignedworkRequests}
+              type="workrequests"
               setModalState={setCentralState}
               setModalStateDelete={setCentralStateDelete}
               toggleActions={toggleActions}
@@ -602,11 +523,23 @@ function WorkOrders({ nowrap }: Props) {
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
             />
-          )} */}
+          )}
+          {selectedTab === "All Work Request" && (
+            <TableComponent
+              data={otherWorkRequests}
+              type="workrequests"
+              setModalState={setCentralState}
+              setModalStateDelete={setCentralStateDelete}
+              toggleActions={toggleActions}
+              activeRowId={activeRowId}
+              setActiveRowId={setActiveRowId}
+              deleteAction={setCentralStateDelete}
+            />
+          )}
         </div>
       </PermissionGuard>
     </DashboardLayout>
   );
 }
 
-export default withPermissions(WorkOrders, ["work-orders"]);
+export default withPermissions(WorkRequests, ["work-requests"]);

@@ -84,6 +84,8 @@ export default function TableComponent({
               ? "sm:w-[60%]"
               : type === "workrequests"
               ? "sm:w-[60%]"
+              : type === "bills"
+              ? "w-full"
               : type === "transactions"
               ? "sm:w-full"
               : "sm:w-[70%]"
@@ -246,7 +248,9 @@ export default function TableComponent({
                                 "quotation selected"
                               ? "text-[#1E90FF] bg-[#D6E9FF]"
                               : row[column]?.toString().toLowerCase() ===
-                                "quotation approved"
+                                  "quotation approved" ||
+                                row[column]?.toString().toLowerCase() ===
+                                  "apportionment_approved"
                               ? "text-[#28A745] bg-[#DFF6DF]"
                               : row[column]?.toString().toLowerCase() ===
                                 "awaiting selection"
@@ -1049,13 +1053,23 @@ export default function TableComponent({
                                   ]}
                                 />
                               </li>
+
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Select Quotation"
+                                  onClick={() =>
+                                    setModalState("acceptQuotation")
+                                  }
+                                  permissions={[
+                                    "update_work-requests:id/accept-quotation/quotationId",
+                                  ]}
+                                />
+                              </li>
                               <li>
                                 <DropdownButtonComponent
                                   text="Request Quotation Approval"
                                   onClick={() =>
-                                    setModalStateDelete(
-                                      "requestquotationsapproval"
-                                    )
+                                    setModalState("requestquotationsapproval")
                                   }
                                   permissions={[
                                     "update_work-requests:id/upload-quotation",
@@ -1066,11 +1080,21 @@ export default function TableComponent({
                                 <DropdownButtonComponent
                                   text="Approve Quotation"
                                   onClick={() =>
-                                    setModalState("acceptQuotation")
+                                    setModalStateDelete("approveQuotation")
                                   }
                                   permissions={[
                                     "update_work-requests:id/accept-quotation/quotationId",
                                   ]}
+                                />
+                              </li>
+
+                              <li>
+                                <DropdownButtonComponent
+                                  text="Raise Payment Order"
+                                  onClick={() =>
+                                    setModalState("raisePaymentOrder")
+                                  }
+                                  permissions={[]}
                                 />
                               </li>
 
@@ -1085,21 +1109,54 @@ export default function TableComponent({
                               </li>
 
                               {row.amount > 0 && (
-                                <li>
-                                  <DropdownButtonComponent
-                                    text="Apportion Service Charge"
-                                    onClick={() =>
-                                      setModalStateDelete(
-                                        "apportionServiceCharge"
-                                      )
-                                    }
-                                    permissions={[]}
-                                  />
-                                </li>
+                                <>
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Approve Service Charge"
+                                      onClick={() =>
+                                        setModalState("viewServiceCharge")
+                                      }
+                                      permissions={[]}
+                                    />
+                                  </li>
+                                </>
                               )}
                             </ul>
                           </div>
                         )}
+                      </div>
+                    </>
+                  ) : type === "bills" ? (
+                    <>
+                      <div className="flex items-center space-x-2 w-full md:w-4/5 ">
+                        <ButtonComponent
+                          text="Pay"
+                          onClick={() => {
+                            toggleActions(row.id);
+                            setModalState("Pay");
+                          }}
+                          permissions={[]}
+                          className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
+                        />
+
+                        {/* <PermissionGuard
+                          requiredPermissions={["delete_roles:id"]}
+                        >
+                          {row.users > 0 ? (
+                            <div>
+                              <TrashIconGray />
+                            </div>
+                          ) : (
+                            <div
+                              onClick={() => {
+                                toggleActions(row.id);
+                                setModalStateDelete("deleteRole");
+                              }}
+                            >
+                              <TrashIcon />
+                            </div>
+                          )}
+                        </PermissionGuard> */}
                       </div>
                     </>
                   ) : (

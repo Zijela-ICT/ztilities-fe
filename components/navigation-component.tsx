@@ -91,6 +91,12 @@ export default function Navigation() {
             permissions: ["work-requests"],
             iconPath: paths.path6,
           },
+          {
+            href: "/bills",
+            label: "Bills",
+            permissions: ["work-requests"],
+            iconPath: paths.path6,
+          },
 
           // {
           //   href: "/ppm",

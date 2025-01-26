@@ -110,7 +110,7 @@ export default function LogIn() {
               <div className="text-right w-full">
                 <span
                   onClick={() => router.push(`/forgot-password`)}
-                  className="text-[#A8353A] font-semibold cursor-pointer"
+                  className="text-[#A8353A] font-semibold text-xs cursor-pointer"
                 >
                   Forgot Password?
                 </span>

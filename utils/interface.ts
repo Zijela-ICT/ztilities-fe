@@ -32,6 +32,7 @@ interface AuthUser {
   units : Unit[]
   facilities : Facility[]
   blocks : Block[]
+  wallets : any []
 }
 
 interface Permission {
