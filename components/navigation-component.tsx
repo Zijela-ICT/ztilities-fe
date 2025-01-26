@@ -61,11 +61,11 @@ export default function Navigation() {
 
       <>
         <div className="flex flex-col items-center justify-center p-4 bg-[#A8353A] rounded-lg shadow-lg text-white max-w-sm mx-auto">
-          <p className="text-lg font-semibold">
+          <p className="text-base font-semibold">
             {user?.firstName} {user?.lastName}
           </p>
 
-          <p className="text-sm mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm">
+          <p className="text-xs mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm">
             {userRoles.map((role) => {
               return <> {role.name} </>;
             })}
