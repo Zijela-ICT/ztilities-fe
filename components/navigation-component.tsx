@@ -64,7 +64,7 @@ export default function Navigation() {
           {
             href: "/dashboard",
             label: "Dashboard",
-            permissions: ["users", "admin", "wallets"],
+            permissions: ["users", "admin"],
             iconPath: paths.path1,
           },
           {
