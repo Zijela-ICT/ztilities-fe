@@ -210,8 +210,8 @@ function VendorManagement() {
   }, [centralStateDelete]);
 
   const tabPermissions: { [key: string]: string[] } = {
-    "My Bills": ["read_vendors"],
-    "All Bills": ["read_vendors"],
+    "My Bills": ["update_units:id/pay/billId"],
+    "All Bills": ["update_units:id/pay/billId"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -283,7 +283,7 @@ function VendorManagement() {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      <PermissionGuard requiredPermissions={["read_vendors"]}>
+      <PermissionGuard requiredPermissions={["update_units:id/pay/billId"]}>
         <div className="relative bg-white rounded-2xl p-4">
           <div className="flex space-x-4 pb-2">
             {tabs.map((tab) => (
@@ -311,7 +311,7 @@ function VendorManagement() {
         </div>
       </PermissionGuard>
 
-      <PermissionGuard requiredPermissions={["read_vendors"]}>
+      <PermissionGuard requiredPermissions={["update_units:id/pay/billId"]}>
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           {selectedTab === "My Bills" && (
             <TableComponent

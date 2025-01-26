@@ -262,7 +262,7 @@ function Dashboard() {
               className={
                 "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]"
               }
-              permissions={["create_work-orders"]}
+              permissions={["create_work-requests:/work-order"]}
             />
             <ButtonComponent
               text={"Create Work Request"}
