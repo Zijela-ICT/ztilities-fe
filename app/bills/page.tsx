@@ -345,4 +345,4 @@ function VendorManagement() {
   );
 }
 
-export default withPermissions(VendorManagement, ["work-orders"]);
+export default withPermissions(VendorManagement, ["units"]);

@@ -285,5 +285,5 @@ function Dashboard() {
   );
 }
 
-// export default withPermissions(Dashboard, ["users", "wallets"]);
-export default Dashboard;
+export default withPermissions(Dashboard, ["users", "admin", "wallets"]);
+// export default Dashboard;
