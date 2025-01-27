@@ -65,11 +65,11 @@ export default function Navigation() {
             {user?.firstName} {user?.lastName}
           </p>
 
-          <p className="text-xs mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm">
+          <div className="text-xs mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm">
             {userRoles.map((role) => {
-              return <> {role.name} </>;
+              return <p key={role.name}> {role.name} </p>;
             })}
-          </p>
+          </div>
         </div>
       </>
 
@@ -79,7 +79,7 @@ export default function Navigation() {
           {
             href: "/dashboard",
             label: "Dashboard",
-            permissions: ["users", "admin"],
+            permissions: [],
             iconPath: paths.path1,
           },
           {
