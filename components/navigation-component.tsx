@@ -79,7 +79,7 @@ export default function Navigation() {
           {
             href: "/dashboard",
             label: "Dashboard",
-            permissions: [],
+            permissions: [""],
             iconPath: paths.path1,
           },
           {
