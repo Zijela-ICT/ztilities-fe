@@ -193,9 +193,19 @@ export default function FacilityDetails({
                                     {subKey.replace(/([a-z])([A-Z])/g, "$1 $2")}
                                   </span>
 
-                                  {/* Check for Nested Object */}
-                                  {typeof subValue === "object" &&
-                                  subValue !== null ? (
+                                  {/* Check if Key is 'file' */}
+                                  {subKey === "file" &&
+                                  typeof subValue === "string" ? (
+                                    <a
+                                      href={subValue}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-500 underline"
+                                    >
+                                      View File
+                                    </a>
+                                  ) : typeof subValue === "object" &&
+                                    subValue !== null ? (
                                     Array.isArray(subValue) ? (
                                       <p className="text-gray-900">
                                         Array: {subValue.length} items

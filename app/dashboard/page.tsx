@@ -44,7 +44,7 @@ function Dashboard() {
     const response = await axiosInstance.get("/auth/me");
     setUser(response.data.data.user);
     const roles = response.data.data?.roles || [];
-    setUserRoles(roles)
+    setUserRoles(roles);
     const allPermissions = roles
       .map((role: any) => role.permissions || []) // Extract permissions from each role
       .flat(); // Flatten the array of arrays
@@ -212,14 +212,14 @@ function Dashboard() {
                         </option>
                       ))}
                     </select>
-                    <p className="text-2xl font-bold text-gray-800 mb-3">
+                    <p className="text-xl font-bold text-gray-800 mb-3">
                       ₦
                       {parseFloat(
                         user.wallets.find(
                           (wallet) => wallet.id === selectedWallet
                         )?.balance || 0
                       )
-                        .toFixed(2)
+                        .toFixed(1)
                         .toLocaleString()}
                     </p>
                     <div className="flex items-center gap-2 h-6"></div>

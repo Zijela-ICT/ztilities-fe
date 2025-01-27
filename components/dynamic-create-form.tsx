@@ -211,6 +211,14 @@ export default function DynamicCreateForm({
           dynamicProcessedData.userId = data.user.id; // Example: Keep only the user ID
         }
 
+        if (data.facility && typeof data.facility === "object") {
+          dynamicProcessedData.facilityId = data.facility.id; // Example: Keep only the user ID
+        }
+
+        if (data.block && typeof data.block === "object") {
+          dynamicProcessedData.blockId = data.block.id; // Example: Keep only the user ID
+        }
+
         setResource(data);
         setFormData(dynamicProcessedData);
       });
@@ -274,14 +282,14 @@ export default function DynamicCreateForm({
         {/* Render selects dynamically */}
         {selects?.map((select, index) => {
           // Skip rendering 'facilitId' when the title is 'Blocks' and there is an activeRowId
-          if (
-            (title === "Block" &&
-              activeRowId &&
-              select.name === "facilityId") ||
-            (title === "Units" && activeRowId && select.name === "blockId")
-          ) {
-            return null;
-          }
+          // if (
+          //   (title === "Block" &&
+          //     activeRowId &&
+          //     select.name === "facilityId") ||
+          //   (title === "Units" && activeRowId && select.name === "blockId")
+          // ) {
+          //   return null;
+          // }
           // Conditionally render based on `typeSelected`
           if (
             (select.name === "unit" && formData.typeSelected !== "unit") ||
