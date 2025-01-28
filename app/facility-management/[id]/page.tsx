@@ -45,6 +45,12 @@ function FacilityManagement() {
     setAssets(response.data.data);
   };
 
+  const [users, setUsers] = useState<User[]>();
+  const getUsers = async () => {
+    const response = await axiosInstance.get("/users");
+    setUsers(response.data.data);
+  };
+
   const [facility, setAFacility] = useState<Facility>();
   const getAFacility = async () => {
     const response = await axiosInstance.get(`/facilities/${activeRowId}`);
@@ -58,37 +64,6 @@ function FacilityManagement() {
     setAsset(response.data.data);
   };
 
-  // Utility functions
-  const normalizeItems = (items: any[], key: string) => {
-    return items.map((item) => ({
-      ...item,
-      normalizedString: item[key],
-    }));
-  };
-  const groupFacilityItems = (items: any[]) => {
-    return items?.reduce((groups, item) => {
-      const category = item?.normalizedString?.split(" ")[0];
-      if (!groups[category]) {
-        groups[category] = [];
-      }
-      groups[category].push(item);
-      return groups;
-    }, {} as Record<string, any[]>);
-  };
-  const normalizedFacilityBlocks = normalizeItems(
-    facility?.blocks || [],
-    "blockNumber"
-  );
-  const normalizedFacilityAssets = normalizeItems(
-    facility?.assets || [],
-    "assetName"
-  );
-  const combinedFacilityItems = [
-    ...normalizedFacilityBlocks,
-    ...normalizedFacilityAssets,
-  ];
-  const groupedFacilityItem = groupFacilityItems(combinedFacilityItems);
-
   // Active row tracking
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const toggleActions = (rowId: string) => {
@@ -96,13 +71,14 @@ function FacilityManagement() {
   };
 
   // Central states for managing actions
+
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   // Fetch roles and role data on centralState/centralStateDelete change
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([getAssets(), getAAsset()]);
+      await Promise.all([getAssets(), getAAsset(), getUsers()]);
     };
     fetchData();
   }, [centralState, centralStateDelete]);
@@ -122,6 +98,8 @@ function FacilityManagement() {
         return "Upload Bulk Facility";
       case "viewFacility":
         return "Facility Details";
+      case "assignUserToFacility":
+        return "Assign User";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -158,6 +136,8 @@ function FacilityManagement() {
           : "You can manage assets here.";
       case "viewFacility":
         return "";
+      case "assignUserToFacility":
+        return "Assign facility to users";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -268,13 +248,34 @@ function FacilityManagement() {
       />
     ),
     createBulkUser: <CreateBulkUser />,
-
+    assignUserToFacility: (
+      <DynamicCreateForm
+        inputs={[]}
+        selects={[
+          {
+            name: "userIds",
+            label: "Facility Manager",
+            placeholder: "Assign Facility to Users",
+            options: users?.map((user: User) => ({
+              value: user.id,
+              label: `${user.firstName} ${user.lastName}`,
+            })),
+            isMulti: true,
+          },
+        ]}
+        title="Assign Facility"
+        apiEndpoint={`/facilities/${activeRowId}/assign`}
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
+        }
+      />
+    ),
     viewFacility: (
       <div className="p-4">
-        <FacilityDetails
-          facility={facility}
-          groupedPermissions={groupedFacilityItem || []}
-        />
+        <FacilityDetails facility={facility} />
       </div>
     ),
   };

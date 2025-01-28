@@ -142,59 +142,6 @@ function FacilityManagement() {
     });
   };
 
-  // Utility functions
-  const normalizeItems = (items: any[], key: string) => {
-    return items.map((item) => ({
-      ...item,
-      normalizedString: item[key],
-    }));
-  };
-
-  const groupFacilityItems = (items: any[]) => {
-    return items?.reduce((groups, item) => {
-      const category = item?.normalizedString?.split(" ")[0];
-      if (!groups[category]) {
-        groups[category] = [];
-      }
-      groups[category].push(item);
-      return groups;
-    }, {} as Record<string, any[]>);
-  };
-
-  // Normalize and group facility items
-  const normalizedFacilityBlocks = normalizeItems(
-    facility?.blocks || [],
-    "blockNumber"
-  );
-  const normalizedFacilityAssets = normalizeItems(
-    facility?.assets || [],
-    "assetName"
-  );
-
-  const normalizedBlockUnits = normalizeItems(block?.units || [], "unitNumber");
-  const normalizedBlockAssets = normalizeItems(
-    block?.assets || [],
-    "assetName"
-  );
-
-  const normalizedUnitAssets = normalizeItems(unit?.assets || [], "assetName");
-
-  const combinedFacilityItems = [
-    ...normalizedFacilityBlocks,
-    ...normalizedFacilityAssets,
-  ];
-
-  const combinedBlockItems = [
-    ...normalizedBlockUnits,
-    ...normalizedBlockAssets,
-  ];
-
-  const combinedUnitItems = [...normalizedUnitAssets];
-
-  const groupedFacilityItem = groupFacilityItems(combinedFacilityItems);
-  const groupedBlockItem = groupFacilityItems(combinedBlockItems);
-  const groupedUnitItem = groupFacilityItems(combinedUnitItems);
-
   // Actions
   const toggleActions = (rowId: string) => {
     if (
@@ -285,7 +232,7 @@ function FacilityManagement() {
       case "viewAssetCategory":
         return "";
       case "assignUserToFacility":
-        return "Assign User to a facility";
+        return "Assign facility to users";
       case "assignUserToBlock":
         return "Assign User to a block";
     }
@@ -447,15 +394,6 @@ function FacilityManagement() {
             })),
             isMulti: true,
           },
-          // {
-          //   name: "userId",
-          //   label: "Client",
-          //   placeholder: "Assign Block to a client",
-          //   options: users?.map((user: User) => ({
-          //     value: user.id,
-          //     label: `${user.firstName} ${user.lastName}`,
-          //   })),
-          // },
         ]}
         title="Block"
         apiEndpoint="/blocks"
@@ -603,7 +541,7 @@ function FacilityManagement() {
           {
             name: "userIds",
             label: "Facility Manager",
-            placeholder: "Assign Facility to a User",
+            placeholder: "Assign Facility to Users",
             options: users?.map((user: User) => ({
               value: user.id,
               label: `${user.firstName} ${user.lastName}`,
@@ -616,6 +554,9 @@ function FacilityManagement() {
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
+        }
       />
     ),
     assignUserToBlock: (
@@ -638,6 +579,9 @@ function FacilityManagement() {
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/blocks/${id}`).then((res) => res.data.data)
+        }
       />
     ),
     createAssetCategory: (
@@ -649,26 +593,17 @@ function FacilityManagement() {
     ),
     viewFacility: (
       <div className="p-4">
-        <FacilityDetails
-          facility={facility}
-          groupedPermissions={groupedFacilityItem || []}
-        />
+        <FacilityDetails facility={facility} />
       </div>
     ),
     viewBlock: (
       <div className="p-4">
-        <FacilityDetails
-          facility={block}
-          groupedPermissions={groupedBlockItem || []}
-        />
+        <FacilityDetails facility={block} />
       </div>
     ),
     viewUnit: (
       <div className="p-4">
-        <FacilityDetails
-          facility={unit}
-          groupedPermissions={groupedUnitItem || []}
-        />
+        <FacilityDetails facility={unit} />
       </div>
     ),
     viewAssetCategory: (
