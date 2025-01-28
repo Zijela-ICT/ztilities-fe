@@ -153,7 +153,7 @@ export default function TableComponent({
                     column !== "isWorkOrder"
                 ) // Exclude the specified columns
                 .map((column) => (
-                  <th key={column} className="py-3 px-4">
+                  <th key={column} className="py-3 px-4 ">
                     {column === "isDeactivated"
                       ? "Status"
                       : column.charAt(0).toUpperCase() + column.slice(1)}
@@ -1084,12 +1084,38 @@ export default function TableComponent({
 
                                   <li>
                                     <DropdownButtonComponent
+                                      text="Accept work order"
+                                      onClick={() =>
+                                        setModalStateDelete("acceptWorkOrder")
+                                      }
+                                      permissions={[
+                                        "update_work-requests:id/accept/work-order-by-procurement",
+                                      ]}
+                                    />
+                                  </li>
+
+                                  <li>
+                                    <DropdownButtonComponent
                                       text="Add Quotations"
                                       onClick={() =>
                                         setModalState("quotationsWorkOrder")
                                       }
                                       permissions={[
                                         "update_work-requests:id/upload-quotation",
+                                      ]}
+                                    />
+                                  </li>
+
+                                  <li>
+                                    <DropdownButtonComponent
+                                      text="Request Quotation Selection"
+                                      onClick={() =>
+                                        setModalStateDelete(
+                                          "requestquotationsselection"
+                                        )
+                                      }
+                                      permissions={[
+                                        "update_work-requests:id/quotations/request-quotation-selection",
                                       ]}
                                     />
                                   </li>
@@ -1105,19 +1131,21 @@ export default function TableComponent({
                                       ]}
                                     />
                                   </li>
-                                  {/* <li>
+
+                                  <li>
                                     <DropdownButtonComponent
                                       text="Request Quotation Approval"
                                       onClick={() =>
-                                        setModalStateDelete(
+                                        setModalState(
                                           "requestquotationsapproval"
                                         )
                                       }
                                       permissions={[
-                                        "update_work-requests:id/upload-quotation",
+                                        "update_work-requests:id/quotations/request-quotation-approval",
                                       ]}
                                     />
-                                  </li> */}
+                                  </li>
+
                                   <li>
                                     <DropdownButtonComponent
                                       text="Approve Quotation"
@@ -1125,20 +1153,22 @@ export default function TableComponent({
                                         setModalStateDelete("approveQuotation")
                                       }
                                       permissions={[
-                                        "update_work-requests:id/status/approve",
+                                        "update_work-requests:id/quotations/approve-quotation",
                                       ]}
                                     />
                                   </li>
 
-                                  {/* <li>
+                                  <li>
                                     <DropdownButtonComponent
                                       text="Raise Payment Order"
                                       onClick={() =>
-                                        setModalState("raisePaymentOrder")
+                                        setModalStateDelete("raisePaymentOrder")
                                       }
-                                      permissions={[]}
+                                      permissions={[
+                                        "update_work-requests:id/quotations/raise-payment-order",
+                                      ]}
                                     />
-                                  </li> */}
+                                  </li>
 
                                   <li>
                                     <DropdownButtonComponent
@@ -1187,20 +1217,30 @@ export default function TableComponent({
                           </div>
                         </>
                       ) : type === "bills" ? (
-                        <>
+                        <div className="flex items-center space-x-5">
                           <div className="flex items-center space-x-2 w-full md:w-4/5 ">
                             <ButtonComponent
                               text="Pay"
                               onClick={() => {
-                                toggleActions(row.billId);
-                                extraActions(row.unitId);
+                                toggleActions(row.id);
                                 setModalStateDelete("payBills");
                               }}
-                              permissions={["update_units:id/pay/billId"]}
+                              permissions={["update_bills:id/pay"]}
                               className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
                             />
                           </div>
-                        </>
+                          <div className="flex items-center space-x-2 w-full md:w-4/5 ">
+                            <ButtonComponent
+                              text="View"
+                              onClick={() => {
+                                toggleActions(row.id);
+                                setModalState("viewBills");
+                              }}
+                              permissions={["read_bills:id"]}
+                              className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
+                            />
+                          </div>
+                        </div>
                       ) : (
                         <>
                           <div className="flex items-center space-x-2">
@@ -1261,3 +1301,6 @@ export default function TableComponent({
     </div>
   );
 }
+
+
+// bg-white sticky right-0 z-10

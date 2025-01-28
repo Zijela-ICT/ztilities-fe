@@ -278,8 +278,7 @@ function Dashboard() {
         </div>
       ) : (
         <>
-          {" "}
-          <WorkOrders nowrap={true} />{" "}
+          <WorkOrders nowrap={true} />
         </>
       )}
     </DashboardLayout>

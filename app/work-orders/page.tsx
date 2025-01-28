@@ -101,12 +101,38 @@ function WorkOrders({ nowrap }: Props) {
     });
   };
 
-  const requestQuotationApproval = async () => {
-    await axiosInstance.patch(`/work-requests/${activeRowId}/status/approve`);
+  const acceptWorkOrder = async () => {
+    await axiosInstance.patch(
+      `/work-requests/${activeRowId}/accept/work-order-by-procurement`
+    );
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully requested quotation to be approved",
+      detail: "You have successfully accepted work order",
+      status: true,
+    });
+  };
+
+  const raisePaymentOrder = async () => {
+    await axiosInstance.patch(
+      `/work-requests/${activeRowId}/quotations/raise-payment-order`
+    );
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully raised payment order",
+      status: true,
+    });
+  };
+
+  const requestQuotationSelection = async () => {
+    await axiosInstance.patch(
+      `/work-requests/${activeRowId}/quotations/request-quotation-selection`
+    );
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully requested quotation to be selected",
       status: true,
     });
   };
@@ -166,8 +192,6 @@ function WorkOrders({ nowrap }: Props) {
         return "Close Work Order ";
       case "requestquotationsapproval":
         return "Request quotation approval";
-      case "raisePaymentOrder":
-        return "Raise Payment Order";
     }
     switch (centralStateDelete) {
       case "deactivateWorkOrder":
@@ -180,10 +204,14 @@ function WorkOrders({ nowrap }: Props) {
         return "Re-activate Work Order";
       case "apportionServiceCharge":
         return "Apportion Service charge";
-      case "requestquotationsapproval":
-        return "Request quotation approval ";
       case "approveQuotation":
         return "Approve Quotation";
+      case "acceptWorkOrder":
+        return "Accept Work Order";
+      case "requestquotationsselection":
+        return "Request quotation selection";
+      case "raisePaymentOrder":
+        return "Raise Payment Order";
     }
     return "Zijela";
   };
@@ -215,8 +243,6 @@ function WorkOrders({ nowrap }: Props) {
         return "";
       case "closeWorkOrder":
         return "";
-      case "raisePaymentOrder":
-        return "";
     }
     switch (centralStateDelete) {
       case "activateWorkOrder":
@@ -229,10 +255,14 @@ function WorkOrders({ nowrap }: Props) {
         return "Are you sure you want to de-activate this work order";
       case "apportionServiceCharge":
         return "You want to apportion service charge for this work order";
-      case "requestquotationsapproval":
-        return "Request quotation approval";
+      case "requestquotationsselection":
+        return "You want to request this quotation for selection";
       case "approveQuotation":
         return "You want to approve this quuotation";
+      case "acceptWorkOrder":
+        return "Are you sure you want to approve this work order";
+      case "raisePaymentOrder":
+        return "Are you sure you want to raise payment order";
     }
     return "Zijela";
   };
@@ -374,49 +404,16 @@ function WorkOrders({ nowrap }: Props) {
     ),
     requestquotationsapproval: (
       <>
-        {/* <DynamicCreateForm
-          selects={[
-            {
-              name: "entity",
-              label: "Select",
-              placeholder: "Assign ",
-              options: [
-                { value: "Technician", label: "Technician" },
-                { value: "Vendor", label: "Vendor" },
-              ],
-            },
-            {
-              name: "id",
-              label: "Vendor",
-              placeholder: "Select Vendor",
-              options: vendors?.map((unit: Vendor) => ({
-                value: Number(unit?.id),
-                label: unit.vendorName,
-              })),
-            },
-            {
-              name: "id",
-              label: "Technician",
-              placeholder: "Select Technician",
-              options: technician?.map((tech: Technician) => ({
-                value: Number(tech?.id),
-                label: `${tech.firstName} ${tech.surname}`,
-              })),
-            },
-          ]}
-          inputs={[]}
-          title="Assign Technician"
-          apiEndpoint={`/work-orders/${activeRowId}/assign`}
-          setModalState={setCentralState}
-          setSuccessState={setSuccessState}
-        /> */}
         <DynamicCreateForm
-          inputs={[]}
+          inputs={[
+            { name: "title", label: "Title", type: "text" },
+            { name: "description", label: "Description", type: "textarea" },
+          ]}
           selects={[
             {
               name: "userId",
-              label: "Facility Manager",
-              placeholder: "Assign Facility to a User",
+              label: "Approval Officer",
+              placeholder: "Select Approval Officer",
               options: users?.map((user: User) => ({
                 value: user.id,
                 label: `${user.firstName} ${user.lastName}`,
@@ -424,10 +421,15 @@ function WorkOrders({ nowrap }: Props) {
             },
           ]}
           title="Request Approval"
-          apiEndpoint={`/work-requests/${activeRowId}/accept-quotation/:quotationId`}
+          apiEndpoint={`/work-requests/${activeRowId}/quotations/request-quotation-approval`}
           activeRowId={activeRowId}
           setModalState={setCentralState}
           setSuccessState={setSuccessState}
+          fetchResource={(id) =>
+            axiosInstance
+              .get(`/work-requests/${id}`)
+              .then((res) => res.data.data)
+          }
         />
       </>
     ),
@@ -446,11 +448,6 @@ function WorkOrders({ nowrap }: Props) {
     ),
     viewServiceCharge: (
       <div className="p-4">
-        {/* <FacilityDetails
-          facility={{ apportionmentDetails: workOrder?.apportionmentDetails }}
-          title="Work Order"
-        /> */}
-        {/* <EntityDetails data={workOrder?.apportionmentDetails} /> */}
         <TableComponent
           data={workOrder?.apportionmentDetails}
           type="apportionmentDetails"
@@ -542,10 +539,14 @@ function WorkOrders({ nowrap }: Props) {
             ? apportionServiceCharge
             : centralStateDelete === "closeWorkOrder"
             ? closeWorkOrder
-            : centralStateDelete === "requestquotationsapproval"
-            ? requestQuotationApproval
+            : centralStateDelete === "requestquotationsselection"
+            ? requestQuotationSelection
             : centralStateDelete === "approveQuotation"
             ? approveWorkOrder
+            : centralStateDelete === "acceptWorkOrder"
+            ? acceptWorkOrder
+            : centralStateDelete === "raisePaymentOrder"
+            ? raisePaymentOrder
             : deleteWorkOrders
         }
       ></ActionModalCompoenent>
