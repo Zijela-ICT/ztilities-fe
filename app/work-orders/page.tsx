@@ -18,12 +18,14 @@ import UpdateWorkOrder from "@/components/work-order/update-work-order";
 import AcceptQuotation from "@/components/work-order/acceptQuotation";
 import EntityDetails from "@/components/facility-management/view-entitty";
 import ButtonComponent from "@/components/button-component";
+import createAxiosInstance from "@/utils/api";
 
 interface Props {
   nowrap: boolean;
 }
 
 function WorkOrders({ nowrap }: Props) {
+  const axiosInstance = createAxiosInstance();
   const { user, setUser, setUserPermissions } = useDataPermission();
 
   const tabs = ["All Work Order"];

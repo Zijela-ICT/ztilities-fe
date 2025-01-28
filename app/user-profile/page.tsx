@@ -15,8 +15,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import AvatarEditor from "react-avatar-editor";
 import withPermissions from "@/components/auth/permission-protected-routes";
+import createAxiosInstance from "@/utils/api";
 
  function UserProfile() {
+  const axiosInstance = createAxiosInstance();
   const router = useRouter();
   const { user, setUser } = useDataPermission();
   const [centralState, setCentralState] = useState<string>();

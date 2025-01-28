@@ -78,11 +78,11 @@ export default function FacilityDetails({
                 ) */}
 
       {/* for request */}
-      {(title === "Work Request" ||
-        title === "Bills" ||
-        title === "Work Order" ||
-        title === "Category" ||
-        title === "Power Charge") && (
+      {title === "Work Request" ||
+      title === "Bills" ||
+      title === "Work Order" ||
+      title === "Category" ||
+      title === "Power Charge" ? (
         <>
           {" "}
           <div className="space-y-5 px-2 text-gray-500">
@@ -214,74 +214,75 @@ export default function FacilityDetails({
               ))}
           </div>
         </>
-      )}
-
-      {/* Dynamically render grouped permissions */}
-      {Object.entries(facility || {})
-        .filter(([key, value]) => Array.isArray(value) && key !== "bills") // Only keys with array values
-        .map(([key, array], index) => (
-          <details
-            key={index}
-            className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4"
-          >
-            <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
-              {/* Capitalize category name */}
-              {key
-                .replace(/([a-z])([A-Z])/g, "$1 $2")
-                .charAt(0)
-                .toUpperCase() +
-                key.replace(/([a-z])([A-Z])/g, "$1 $2").slice(1)}
-              <span className="transform transition-transform duration-100 group-open:rotate-180">
-                <DropDownArrow />
-              </span>
-            </summary>
-            <nav className="mt-4 pt-9 pb-6 border-t border-gray-300">
-              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {array?.map((item, idx) => (
-                  <li key={idx} className="flex items-start space-x-3">
-                    {typeof item === "object" && !Array.isArray(item) ? (
-                      // Render a dropdown for an object (e.g., block or asset)
-                      <details className="w-full">
-                        <summary className="flex items-center text-sm font-medium cursor-pointer">
-                          {/* Access the property you want to display, e.g., blockNumber or assetName */}
-                          {item.blockNumber ||
-                            item.assetName ||
-                            item.unitNumber}
-                          {item.units && item.units.length > 0 && (
-                            <span className="transform transition-transform duration-100 ml-3">
-                              <DropDownArrow />
-                            </span>
-                          )}
-                        </summary>
-                        {item.units && item.units.length > 0 && (
-                          // Render units dropdown only if units array exists and has items
-                          <ul className="mt-3 ml-4 pl-3 border-l border-gray-300 space-y-2">
-                            {item.units.map((unit, subIdx) => (
-                              <li key={subIdx}>
-                                {/* Render unit information */}
-                                <span className="text-sm text-gray-700">
-                                  {unit.unitNumber}
+      ) : (
+        <>
+          {Object.entries(facility || {})
+            .filter(([key, value]) => Array.isArray(value) && key !== "bills") // Only keys with array values
+            .map(([key, array], index) => (
+              <details
+                key={index}
+                className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4"
+              >
+                <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
+                  {/* Capitalize category name */}
+                  {key
+                    .replace(/([a-z])([A-Z])/g, "$1 $2")
+                    .charAt(0)
+                    .toUpperCase() +
+                    key.replace(/([a-z])([A-Z])/g, "$1 $2").slice(1)}
+                  <span className="transform transition-transform duration-100 group-open:rotate-180">
+                    <DropDownArrow />
+                  </span>
+                </summary>
+                <nav className="mt-4 pt-9 pb-6 border-t border-gray-300">
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {array?.map((item, idx) => (
+                      <li key={idx} className="flex items-start space-x-3">
+                        {typeof item === "object" && !Array.isArray(item) ? (
+                          // Render a dropdown for an object (e.g., block or asset)
+                          <details className="w-full">
+                            <summary className="flex items-center text-sm font-medium cursor-pointer">
+                              {/* Access the property you want to display, e.g., blockNumber or assetName */}
+                              {item.blockNumber ||
+                                item.assetName ||
+                                item.unitNumber}
+                              {item.units && item.units.length > 0 && (
+                                <span className="transform transition-transform duration-100 ml-3">
+                                  <DropDownArrow />
                                 </span>
-                              </li>
-                            ))}
-                          </ul>
+                              )}
+                            </summary>
+                            {item.units && item.units.length > 0 && (
+                              // Render units dropdown only if units array exists and has items
+                              <ul className="mt-3 ml-4 pl-3 border-l border-gray-300 space-y-2">
+                                {item.units.map((unit, subIdx) => (
+                                  <li key={subIdx}>
+                                    {/* Render unit information */}
+                                    <span className="text-sm text-gray-700">
+                                      {unit.unitNumber}
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </details>
+                        ) : (
+                          // Render a single value if it's not an object
+                          <span
+                            className="text-sm text-gray-700 flex-1 overflow-hidden overflow-ellipsis whitespace-normal"
+                            title={item}
+                          >
+                            {item}
+                          </span>
                         )}
-                      </details>
-                    ) : (
-                      // Render a single value if it's not an object
-                      <span
-                        className="text-sm text-gray-700 flex-1 overflow-hidden overflow-ellipsis whitespace-normal"
-                        title={item}
-                      >
-                        {item}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </details>
-        ))}
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              </details>
+            ))}
+        </>
+      )}
     </>
   );
 }

@@ -22,8 +22,10 @@ import UpdateWorkRequest from "@/components/work-request/update-work-request";
 import AcceptQuotation from "@/components/work-request/acceptQuotation";
 import ApportionPower from "@/components/work-request/apportionPower";
 import { useParams, useRouter } from "next/navigation";
+import createAxiosInstance from "@/utils/api";
 
 function WorkRequests() {
+  const axiosInstance = createAxiosInstance();
   const { user, setUser, setUserPermissions } = useDataPermission();
   const { id } = useParams();
 

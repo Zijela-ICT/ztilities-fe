@@ -21,8 +21,10 @@ import CreateWorkRequestForUser from "@/components/work-request/create-work-requ
 import UpdateWorkRequest from "@/components/work-request/update-work-request";
 import AcceptQuotation from "@/components/work-request/acceptQuotation";
 import ApportionPower from "@/components/work-request/apportionPower";
+import createAxiosInstance from "@/utils/api";
 
 function WorkRequests() {
+  const axiosInstance = createAxiosInstance();
   const { user, setUser, setUserPermissions } = useDataPermission();
 
   const tabs = ["All Work Request", "Facility Work Request"];

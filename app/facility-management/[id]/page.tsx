@@ -14,8 +14,10 @@ import { useParams, useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import FacilityDetails from "@/components/facility-management/view-facility";
 import DynamicCreateForm from "@/components/dynamic-create-form";
+import createAxiosInstance from "@/utils/api";
 
 function FacilityManagement() {
+  const axiosInstance = createAxiosInstance();
   const params = useParams();
   const router = useRouter();
   const { id } = params;

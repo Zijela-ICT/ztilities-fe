@@ -5,12 +5,14 @@ import axiosInstance from "@/utils/api";
 import ModalCompoenent from "../modal-component";
 import { toast } from "react-toastify";
 import { LabelInputComponent } from "../input-container";
+import createAxiosInstance from "@/utils/api";
 
 export default function ApportionPower({
   setModalState,
   activeRowId,
   setSuccessState,
 }) {
+  const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({
     entity: "",
     option: "",

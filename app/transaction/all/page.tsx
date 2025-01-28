@@ -21,8 +21,10 @@ import CreateWorkOrder from "@/components/work-order/create-work-order";
 import UpdateWorkOrder from "@/components/work-order/update-work-order";
 import AcceptQuotation from "@/components/work-order/acceptQuotation";
 import ApportionPower from "@/components/work-order/apportionPower";
+import createAxiosInstance from "@/utils/api";
 
 function WorkOrders() {
+  const axiosInstance = createAxiosInstance();
   const { user, setUser, setUserPermissions } = useDataPermission();
 
   const tabs = ["All Work Order"];

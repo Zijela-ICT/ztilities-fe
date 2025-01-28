@@ -4,12 +4,14 @@ import { LabelInputComponent } from "../input-container";
 import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
+import createAxiosInstance from "@/utils/api";
 
 export default function CreateWorkRequestForUser({
   setModalState,
   activeRowId,
   setSuccessState,
 }) {
+  const axiosInstance = createAxiosInstance();
   const { user } = useDataPermission();
 
   const [users, setUsers] = useState<User[]>();

@@ -3,8 +3,10 @@
 import { FormEvent, useEffect, useState } from "react";
 import { LabelInputComponent } from "../input-container";
 import axiosInstance from "@/utils/api";
+import createAxiosInstance from "@/utils/api";
 
 export default function ResetPassword({ roles, setModalState, activeRowId,setSuccessState }) {
+  const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({
     user: "",
     password: "",

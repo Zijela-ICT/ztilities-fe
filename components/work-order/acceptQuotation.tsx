@@ -2,12 +2,14 @@ import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
 import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
+import createAxiosInstance from "@/utils/api";
 
 export default function AcceptQuotation({
   setModalState,
   activeRowId,
   setSuccessState,
 }) {
+  const axiosInstance = createAxiosInstance();
   const [quotations, setQuotations] = useState([]);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
 

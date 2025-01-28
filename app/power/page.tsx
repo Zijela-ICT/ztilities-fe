@@ -13,8 +13,10 @@ import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
 import ApportionPower from "@/components/work-request/apportionPower";
 import FacilityDetails from "@/components/facility-management/view-facility";
+import createAxiosInstance from "@/utils/api";
 
 function Power() {
+  const axiosInstance = createAxiosInstance();
   const tabs = ["Power Apportion"];
 
   const [successState, setSuccessState] = useState({

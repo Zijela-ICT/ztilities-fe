@@ -13,8 +13,10 @@ import ResetPassword from "@/components/user-management/reset-password";
 import { useParams, useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import DynamicCreateForm from "@/components/dynamic-create-form";
+import createAxiosInstance from "@/utils/api";
 
 function UserManagement() {
+  const axiosInstance = createAxiosInstance();
   const params = useParams();
   const router = useRouter();
   const { id } = params;

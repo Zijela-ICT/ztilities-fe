@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import axiosInstance from "@/utils/api";
 import UnprotectedRoute from "@/components/auth/unprotected-routes";
 import { SuccessModalCompoenent } from "@/components/modal-component";
+import createAxiosInstance from "@/utils/api";
 
 const Logo = "/assets/logo.png";
 const images = [
@@ -19,6 +20,7 @@ const images = [
 ];
 
 export default function LogIn() {
+  const axiosInstance = createAxiosInstance();
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [toggleView, setToggleView] = useState(false);

@@ -16,8 +16,10 @@ import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
 import DynamicCreateForm from "@/components/dynamic-create-form";
+import createAxiosInstance from "@/utils/api";
 
 function UserManagement() {
+  const axiosInstance = createAxiosInstance();
   const tabs = ["All Users", "Role", "Permissions"];
 
   const [successState, setSuccessState] = useState({

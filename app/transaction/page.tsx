@@ -21,6 +21,7 @@ import {
 } from "chart.js";
 import Link from "next/link";
 import withPermissions from "@/components/auth/permission-protected-routes";
+import createAxiosInstance from "@/utils/api";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -34,6 +35,7 @@ ChartJS.register(
 );
 
 function Transactions() {
+  const axiosInstance = createAxiosInstance();
   const [filters, setFilters] = useState({
     Block: "",
     Facility: "",

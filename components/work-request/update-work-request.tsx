@@ -3,12 +3,14 @@ import Select from "react-select";
 import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import { FileInputComponent, LabelInputComponent } from "../input-container";
+import createAxiosInstance from "@/utils/api";
 
 export default function UpdateWorkRequest({
   setModalState,
   activeRowId,
   setSuccessState,
 }) {
+  const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({
     status: "", // Status field
     reasonForRejection: "", // reasonForRejection field for "Rejected"

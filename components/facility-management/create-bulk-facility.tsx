@@ -4,8 +4,10 @@ import { FormEvent, useState, useEffect } from "react";
 import axiosInstance from "@/utils/api";
 import { DownloadArrow, DownloadIcon } from "@/utils/svg";
 import ButtonComponent from "../button-component";
+import createAxiosInstance from "@/utils/api";
 
 export default function CreateBulkUser() {
+  const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({
     name: "", // Default state
   });

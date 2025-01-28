@@ -16,8 +16,10 @@ import FacilityDetails from "@/components/facility-management/view-facility";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import CreateCategory from "@/components/facility-management/create-category";
 import CreateAsset from "@/components/facility-management/create-asset";
+import createAxiosInstance from "@/utils/api";
 
 function FacilityManagement() {
+  const axiosInstance = createAxiosInstance();
   const tabs = ["Facilities", "Blocks", "Units", "Assets", "Categories"];
 
   // States

@@ -154,6 +154,7 @@ import { FormEvent, useState, useEffect } from "react";
 import { LabelInputComponent } from "../input-container";
 import axiosInstance from "@/utils/api";
 import { DropDownArrow } from "@/utils/svg";
+import createAxiosInstance from "@/utils/api";
 
 interface Permission {
   id: number;
@@ -165,6 +166,7 @@ export default function CreateRole({
   setSuccessState,
   activeRowId,
 }) {
+  const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({
     name: "",
     permissions: [] as number[],

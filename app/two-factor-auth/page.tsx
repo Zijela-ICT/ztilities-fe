@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 
 import axiosInstance from "@/utils/api";
 import UnprotectedRoute from "@/components/auth/unprotected-routes";
+import createAxiosInstance from "@/utils/api";
 
 const Logo = "/assets/logo.png";
 const images = [
@@ -17,6 +18,7 @@ const images = [
 ];
 
 export default function Authenticate() {
+  const axiosInstance = createAxiosInstance();
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
 

@@ -7,8 +7,10 @@ import axiosInstance from "@/utils/api";
 import { SuccessModalCompoenent } from "@/components/modal-component";
 import { useDataPermission } from "@/context";
 import { toast } from "react-toastify";
+import createAxiosInstance from "@/utils/api";
 
 export default function ChangeMyPassword() {
+  const axiosInstance = createAxiosInstance();
   const { user, setUser } = useDataPermission();
   const [toggleView, setToggleView] = useState(false);
 

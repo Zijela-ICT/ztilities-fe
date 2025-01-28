@@ -7,9 +7,11 @@ interface ContextType {
   user: AuthUser | null;
   userPermissions: Permission[];
   userRoles: any[]; // Permissions should be an array
+  loading: boolean;
   setUser: (user: AuthUser | null) => void;
   setUserPermissions: (permissions: Permission[]) => void;
   setUserRoles: (roles: any[]) => void;
+  setLoading: (state: boolean) => void;
 }
 
 // Create context with initial values
@@ -24,6 +26,7 @@ export const DataPermissionProvider = ({
   const [user, setUser] = useState<AuthUser | null>(null); // User starts as null
   const [userPermissions, setUserPermissions] = useState<Permission[]>([]);
   const [userRoles, setUserRoles] = useState<any[]>([]); // Permissions start as an empty array
+  const [loading, setLoading] = useState<boolean>(false);
 
   return (
     <DataPermissionContext.Provider
@@ -34,6 +37,8 @@ export const DataPermissionProvider = ({
         setUser,
         setUserPermissions,
         setUserRoles,
+        loading,
+        setLoading,
       }}
     >
       {children}

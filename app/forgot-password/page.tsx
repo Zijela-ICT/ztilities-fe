@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { SuccessModalCompoenent } from "@/components/modal-component";
 import UnprotectedRoute from "@/components/auth/unprotected-routes";
 import axiosInstance from "@/utils/api";
+import createAxiosInstance from "@/utils/api";
 
 const Logo = "/assets/logo.png";
 const images = [
@@ -18,6 +19,7 @@ const images = [
 ];
 
 export default function ForgotPassword() {
+  const axiosInstance = createAxiosInstance();
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [email, setEmail] = useState("");

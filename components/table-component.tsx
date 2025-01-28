@@ -1302,5 +1302,4 @@ export default function TableComponent({
   );
 }
 
-
 // bg-white sticky right-0 z-10

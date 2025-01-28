@@ -9,6 +9,7 @@ import {
 } from "./input-container";
 import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
+import createAxiosInstance from "@/utils/api";
 
 interface InputField {
   name: string;
@@ -49,6 +50,7 @@ export default function DynamicCreateForm({
   fetchResource,
   title,
 }: CreateUnitProps) {
+  const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState<any>({});
   const [resource, setResource] = useState<any>(null);
 

@@ -2,6 +2,7 @@
 
 import ButtonComponent from "@/components/button-component";
 import DashboardLayout from "@/components/dashboard-layout-component";
+import createAxiosInstance from "@/utils/api";
 import { SearchIcon } from "@/utils/svg";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
@@ -9,6 +10,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function Ppm() {
+  const axiosInstance = createAxiosInstance();
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   // Function to get all days in the selected month

@@ -15,8 +15,10 @@ import { JSX, useEffect, useState } from "react";
 import WorkOrders from "../work-orders/page";
 import { useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
+import createAxiosInstance from "@/utils/api";
 
 function Dashboard() {
+  const axiosInstance = createAxiosInstance();
   const router = useRouter();
   const { user, setUser, setUserPermissions, setUserRoles } =
     useDataPermission();
