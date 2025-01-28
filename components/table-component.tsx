@@ -483,7 +483,7 @@ export default function TableComponent({
                                   </li>
                                   <li>
                                     <DropdownButtonComponent
-                                      text="Assign a User"
+                                      text="Assign Users"
                                       onClick={() =>
                                         setModalState("assignUserToFacility")
                                       }
@@ -557,7 +557,7 @@ export default function TableComponent({
                                   </li>
                                   <li>
                                     <DropdownButtonComponent
-                                      text="Assign a User"
+                                      text="Assign Users"
                                       onClick={() =>
                                         setModalState("assignUserToBlock")
                                       }

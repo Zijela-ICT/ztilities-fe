@@ -335,8 +335,7 @@ function WorkOrders({ nowrap }: Props) {
           { name: "title", label: "Title", type: "text" },
           { name: "file", label: "FIle", type: "file" },
           { name: "amount", label: "Amount", type: "number" },
-          { name: "startDate", label: "Start Date", type: "date" },
-          { name: "endDate", label: "End Date", type: "date" },
+          { name: "dueDate", label: "Due Date", type: "date" },
         ]}
         title="Add Quotation"
         apiEndpoint={`/work-requests/${activeRowId}/upload-quotation`}

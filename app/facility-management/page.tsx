@@ -601,13 +601,14 @@ function FacilityManagement() {
         inputs={[]}
         selects={[
           {
-            name: "userId",
+            name: "userIds",
             label: "Facility Manager",
             placeholder: "Assign Facility to a User",
             options: users?.map((user: User) => ({
               value: user.id,
               label: `${user.firstName} ${user.lastName}`,
             })),
+            isMulti: true,
           },
         ]}
         title="Assign Facility"
@@ -622,13 +623,14 @@ function FacilityManagement() {
         inputs={[]}
         selects={[
           {
-            name: "userId",
+            name: "userIds",
             label: "Facility Manager",
             placeholder: "Assign Block to a User",
             options: users?.map((user: User) => ({
               value: user.id,
               label: `${user.firstName} ${user.lastName}`,
             })),
+            isMulti: true,
           },
         ]}
         title="Assign Block"
