@@ -39,7 +39,6 @@ export default function Navigation() {
 
   return (
     <>
-      {" "}
       <ModalCompoenent
         title={"Profile view"}
         detail={""}
@@ -49,21 +48,44 @@ export default function Navigation() {
         systemColor
       >
         <div className="flex flex-col items-center justify-center py-8 px-8">
-          <Image
-            src={user.avatar}
-            alt={"#"}
-            width={200}
-            height={200}
-            className=" rounded-full"
-          />
+          {user?.avatar ? (
+            <>
+              <Image
+                src={user.avatar}
+                alt={"#"}
+                width={200}
+                height={200}
+                className=" rounded-full"
+              />
+            </>
+          ) : (
+            <>
+              <div
+                className="rounded-full flex items-center justify-center text-[#A8353A] font-semibold text-6xl"
+                style={{
+                  width: 200,
+                  height: 200,
+                  backgroundColor: "#fff", // Ensures dark monotone color
+                }}
+              >
+                {`${user?.firstName?.[0] || ""}${
+                  user?.lastName?.[0] || ""
+                }`.toUpperCase()}
+              </div>
+            </>
+          )}
+
           <h2 className="text-xl font-bold text-white mt-2">
-            {user?.firstName} {"   "} {user?.lastName}{" "}
+            {user?.firstName} {"   "} {user?.lastName}
           </h2>
           <p className="text-white text-base">{user?.email}</p>
 
           {userRoles?.map((role) => {
             return (
-              <div key={role.name} className="text-xs mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm">
+              <div
+                key={role.name}
+                className="text-xs mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm"
+              >
                 <p key={role.name}> {role.name} </p>
               </div>
             );
