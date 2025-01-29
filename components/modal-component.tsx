@@ -12,6 +12,7 @@ interface ModalProps {
   bulk?: any;
   activeRowId?: number;
   width?: string;
+  systemColor?: boolean;
 }
 
 export default function ModalCompoenent({
@@ -22,6 +23,7 @@ export default function ModalCompoenent({
   setModalState,
   bulk,
   width,
+  systemColor,
 }: ModalProps) {
   return (
     <>
@@ -41,12 +43,18 @@ export default function ModalCompoenent({
           {/* Modal content */}
           <div
             className={`relative ${
-              bulk ? "bg-[#FBFBFC]" : "bg-white"
+              bulk ? "bg-[#FBFBFC]" : systemColor ? "bg-[#A8353A]" : "bg-white"
             } rounded-xl shadow`}
           >
             {/* Modal header */}
             <div className="flex items-center justify-between pt-10 pb-2 px-4 md:px-5 rounded-t">
-              <h3 className="text-2xl font-semibold text-gray-900 ">{title}</h3>
+              <h3
+                className={`text-2xl font-semibold ${
+                  systemColor ? "text-white" : "text-gray-900 "
+                } `}
+              >
+                {title}
+              </h3>
               <button
                 onClick={setModalState}
                 type="button"

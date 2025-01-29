@@ -4,6 +4,8 @@ import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { DataPermissionProvider } from "@/context";
+import { Suspense } from "react";
+import MyLoader from "@/components/loader-components";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,8 +42,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-satoshi antialiased`}
       >
         <div className="relative bg-[#F8FAFC] min-h-screen">
-        <DataPermissionProvider>
-          {children}
+          <DataPermissionProvider>
+            <Suspense fallback={<MyLoader />}>
+              {children}
+            </Suspense>
           </DataPermissionProvider>
           <div className="z-100">
             <ToastContainer

@@ -43,4 +43,4 @@ function WorkRequests() {
   );
 }
 
-export default withPermissions(WorkRequests, ["work-orders"]);
+export default withPermissions(WorkRequests, ["power-charges"]);
