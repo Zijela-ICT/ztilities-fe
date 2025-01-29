@@ -189,6 +189,10 @@ export default function TableComponent({
                         type === "assets" ||
                         type === "workrequests" ||
                         type === "workorders" ||
+                        type === "facilities" ||
+                        type === "blocks" ||
+                        type === "bills" ||
+                        type === "categories" ||
                         type === "powers" ? (
                           // Show the length of the array for specific types
                           row[column]?.length
@@ -908,7 +912,8 @@ export default function TableComponent({
                                     <DropdownButtonComponent
                                       text="View"
                                       onClick={() =>
-                                        setModalState("viewPowerCharge")
+                                        // setModalState("viewPowerCharge")
+                                        router.push(`/power/${row.id}`)
                                       }
                                       permissions={["read_power-charges:id"]}
                                     />
@@ -976,7 +981,8 @@ export default function TableComponent({
                                     <DropdownButtonComponent
                                       text="View"
                                       onClick={() =>
-                                        setModalState("viewWorkRequest")
+                                        // setModalState("viewWorkRequest")
+                                        router.push(`/work-requests/${row.id}`)
                                       }
                                       permissions={["read_work-requests:id"]}
                                     />
@@ -1064,7 +1070,8 @@ export default function TableComponent({
                                     <DropdownButtonComponent
                                       text="View"
                                       onClick={() =>
-                                        setModalState("viewWorkOrder")
+                                        // setModalState("viewWorkOrder")
+                                        router.push(`/work-orders/${row.id}`)
                                       }
                                       permissions={["read_work-requests:id"]}
                                     />

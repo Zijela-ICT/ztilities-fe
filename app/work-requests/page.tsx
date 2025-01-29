@@ -356,7 +356,6 @@ function WorkRequests() {
         setSuccessState={setSuccessState}
       />
     ),
-
     viewWorkRequest: (
       <div className="p-4">
         <FacilityDetails facility={workRequest} title="Work Request" />

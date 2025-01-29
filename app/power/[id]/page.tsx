@@ -19,7 +19,7 @@ function WorkRequests() {
   const [workRequest, setWorkRequest] = useState<any>();
 
   const getAWorkRequest = async () => {
-    const response = await axiosInstance.get(`/work-requests/${id}`);
+    const response = await axiosInstance.get(`/power-charges/${id}`);
     setWorkRequest(response.data.data);
   };
 
@@ -31,16 +31,16 @@ function WorkRequests() {
 
   return (
     <DashboardLayout
-      title={`Work Request ${workRequest?.workRequestNumber}`}
-      detail="Work Request Details"
+      title={`Power charge`}
+      detail="Power Charge details"
       dynamic
       onclick={() => router.back()}
     >
       <div className="relative bg-white rounded-2xl p-8 ">
-        <FacilityDetails facility={workRequest} title="Work Request" />
+        <FacilityDetails facility={workRequest} title="Work Order" />
       </div>
     </DashboardLayout>
   );
 }
 
-export default withPermissions(WorkRequests, ["work-requests"]);
+export default withPermissions(WorkRequests, ["work-orders"]);

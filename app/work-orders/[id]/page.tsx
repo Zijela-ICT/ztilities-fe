@@ -31,16 +31,16 @@ function WorkRequests() {
 
   return (
     <DashboardLayout
-      title={`Work Request ${workRequest?.workRequestNumber}`}
-      detail="Work Request Details"
+      title={`Work Order ${workRequest?.workOrderNumber}`}
+      detail="Work Order Details"
       dynamic
       onclick={() => router.back()}
     >
       <div className="relative bg-white rounded-2xl p-8 ">
-        <FacilityDetails facility={workRequest} title="Work Request" />
+        <FacilityDetails facility={workRequest} title="Work Order" />
       </div>
     </DashboardLayout>
   );
 }
 
-export default withPermissions(WorkRequests, ["work-requests"]);
+export default withPermissions(WorkRequests, ["work-orders"]);

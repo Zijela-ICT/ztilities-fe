@@ -557,7 +557,7 @@ function FacilityManagement() {
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={(id) =>
-          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
+          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data.facilityOfficers)
         }
       />
     ),

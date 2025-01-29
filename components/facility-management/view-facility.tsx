@@ -245,7 +245,8 @@ export default function FacilityDetails({
                               {/* Access the property you want to display, e.g., blockNumber or assetName */}
                               {item.blockNumber ||
                                 item.assetName ||
-                                item.unitNumber}
+                                item.unitNumber ||
+                                item.firstName + " " + item.lastName}
                               {item.units && item.units.length > 0 && (
                                 <span className="transform transition-transform duration-100 ml-3">
                                   <DropDownArrow />
