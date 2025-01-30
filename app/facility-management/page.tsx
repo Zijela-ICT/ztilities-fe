@@ -541,7 +541,7 @@ function FacilityManagement() {
         inputs={[]}
         selects={[
           {
-            name: "userIds",
+            name: "facilityOfficers",
             label: "Facility Manager",
             placeholder: "Assign Facility to Users",
             options: users?.map((user: User) => ({
@@ -557,7 +557,7 @@ function FacilityManagement() {
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={(id) =>
-          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data.facilityOfficers)
+          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
         }
       />
     ),
@@ -566,7 +566,7 @@ function FacilityManagement() {
         inputs={[]}
         selects={[
           {
-            name: "userIds",
+            name: "blockOfficers",
             label: "Facility Manager",
             placeholder: "Assign Block to a User",
             options: users?.map((user: User) => ({

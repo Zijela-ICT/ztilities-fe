@@ -25,6 +25,9 @@ export default function CreateWorkRequest({
   const [facility, setAFacility] = useState<Facility>();
   const [block, setABlock] = useState<Block>();
   const [unit, setAUnit] = useState<Unit>();
+  const [myFacilities, setMyFacilities] = useState<Facility[]>([]);
+  const [myBlocks, setMyBlocks] = useState<Block[]>([]);
+  const [myUnits, setMyUnits] = useState<Unit[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -47,6 +50,21 @@ export default function CreateWorkRequest({
         description: data.description,
       });
     }
+  };
+
+  const getMyFacilities = async () => {
+    const response = await axiosInstance.get("/facilities/my-facilities/all");
+    setMyFacilities(response.data.data);
+  };
+
+  const getMyBlocks = async () => {
+    const response = await axiosInstance.get("/blocks/my-blocks/all");
+    setMyBlocks(response.data.data);
+  };
+
+  const getMyUnits = async () => {
+    const response = await axiosInstance.get("/units/my-units/all");
+    setMyUnits(response.data.data);
   };
 
   const getAFacility = async () => {
@@ -113,17 +131,17 @@ export default function CreateWorkRequest({
     { value: "facility", label: "Facility" },
   ];
 
-  const unitOptions = user?.units?.map((unit: Unit) => ({
+  const unitOptions = (user.units || myUnits)?.map((unit: Unit) => ({
     value: unit.id.toString(),
     label: unit.unitNumber,
   }));
 
-  const blockOptions = user?.blocks?.map((unit: Block) => ({
+  const blockOptions = myBlocks?.map((unit: Block) => ({
     value: unit.id.toString(),
     label: unit.blockNumber,
   }));
 
-  const facilityOptions = user?.facilities?.map((unit: Facility) => ({
+  const facilityOptions = myFacilities?.map((unit: Facility) => ({
     value: unit.id.toString(),
     label: unit.name,
   }));
@@ -151,6 +169,12 @@ export default function CreateWorkRequest({
       getWorkRequest();
     }
   }, [activeRowId]);
+
+  useEffect(() => {
+    getMyFacilities();
+    getMyUnits();
+    getMyBlocks();
+  }, []);
 
   useEffect(() => {
     if (formData.unit) {

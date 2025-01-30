@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
 import { LabelInputComponent } from "../input-container";
-import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import createAxiosInstance from "@/utils/api";
@@ -18,6 +17,9 @@ export default function CreateWorkRequestForUser({
   const [facility, setAFacility] = useState<Facility>();
   const [block, setABlock] = useState<Block>();
   const [unit, setAUnit] = useState<Unit>();
+  const [myFacilities, setMyFacilities] = useState<Facility[]>([]);
+  const [myBlocks, setMyBlocks] = useState<Block[]>([]);
+  const [myUnits, setMyUnits] = useState<Unit[]>([]);
 
   const [formData, setFormData] = useState({
     userId: "",
@@ -46,6 +48,21 @@ export default function CreateWorkRequestForUser({
   const getUsers = async () => {
     const response = await axiosInstance.get("/users");
     setUsers(response.data.data);
+  };
+
+  const getMyFacilities = async () => {
+    const response = await axiosInstance.get("/facilities/my-facilities/all");
+    setMyFacilities(response.data.data);
+  };
+
+  const getMyBlocks = async () => {
+    const response = await axiosInstance.get("/blocks/my-blocks/all");
+    setMyBlocks(response.data.data);
+  };
+
+  const getMyUnits = async () => {
+    const response = await axiosInstance.get("/units/my-units/all");
+    setMyUnits(response.data.data);
   };
 
   const getAFacility = async () => {
@@ -118,17 +135,17 @@ export default function CreateWorkRequestForUser({
     label: unit.firstName + unit.lastName,
   }));
 
-  const unitOptions = user?.units?.map((unit: Unit) => ({
+  const unitOptions = (user.units || myUnits)?.map((unit: Unit) => ({
     value: unit.id.toString(),
     label: unit.unitNumber,
   }));
 
-  const blockOptions = user?.blocks?.map((unit: Block) => ({
+  const blockOptions = myBlocks?.map((unit: Block) => ({
     value: unit.id.toString(),
     label: unit.blockNumber,
   }));
 
-  const facilityOptions = user?.facilities?.map((unit: Facility) => ({
+  const facilityOptions = myFacilities?.map((unit: Facility) => ({
     value: unit.id.toString(),
     label: unit.name,
   }));
@@ -159,6 +176,9 @@ export default function CreateWorkRequestForUser({
 
   useEffect(() => {
     getUsers();
+    getMyFacilities();
+    getMyUnits();
+    getMyBlocks();
   }, []);
 
   useEffect(() => {

@@ -27,7 +27,7 @@ function WorkRequests() {
   const axiosInstance = createAxiosInstance();
   const { user, setUser, setUserPermissions } = useDataPermission();
 
-  const tabs = ["All Work Request", "Facility Work Request"];
+  const tabs = ["All Work Request", "My Work Request"];
 
   const [successState, setSuccessState] = useState({
     title: "",
@@ -41,17 +41,13 @@ function WorkRequests() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
-  const [facilities, setFacilities] = useState<Facility[]>();
-  const [blocks, setBlocks] = useState<Block[]>();
-  const [units, setUnits] = useState<Unit[]>();
-  const [assets, setAssets] = useState<Asset[]>();
   const [vendors, setVendors] = useState<Vendor[]>();
   const [technician, setTechnicians] = useState<Technician[]>();
 
   // Fetch data functions
   const getAssignedWorkRequests = async () => {
     const response = await axiosInstance.get(
-      "/work-requests/my-facilities-work-request/all"
+      "/work-requests/my-work-requests/all"
     );
     setAssignedWorkRequests(response.data.data);
   };
@@ -111,30 +107,10 @@ function WorkRequests() {
     });
   };
 
-  const getFacilities = async () => {
-    const response = await axiosInstance.get("/facilities");
-    setFacilities(response.data.data);
-  };
-
-  const getBlocks = async () => {
-    const response = await axiosInstance.get("/blocks");
-    setBlocks(response.data.data);
-  };
-
-  const getUnits = async () => {
-    const response = await axiosInstance.get("/units");
-    setUnits(response.data.data);
-  };
-
-  const getAssets = async () => {
-    const response = await axiosInstance.get("/assets");
-    setAssets(response.data.data);
-  };
-
   // Toggle actions
   const toggleActions = (rowId: string) => {
     if (
-      selectedTab === "Facility Work Request" ||
+      selectedTab === "My Work Request" ||
       selectedTab === "All Work Request"
     ) {
       setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
@@ -377,9 +353,7 @@ function WorkRequests() {
   }, [centralState]);
 
   const tabPermissions: { [key: string]: string[] } = {
-    "Facility Work Request": [
-      "read_work-requests:my-facilities-work-request/all",
-    ],
+    "My Work Request": ["read_work-requests:my-work-requests/all"],
     "All Work Request": ["read_work-requests"],
   };
 
@@ -402,21 +376,11 @@ function WorkRequests() {
   useEffect(() => {
     if (selectedTab === "All Work Request") {
       const fetchData = async () => {
-        await Promise.all([
-          getOtherWorkRequests(),
-          getFacilities(),
-          getBlocks(),
-          getUnits(),
-          getAssets(),
-        ]);
+        await Promise.all([getOtherWorkRequests()]);
       };
       fetchData();
     } else {
       getAssignedWorkRequests();
-      getFacilities();
-      getBlocks();
-      getUnits();
-      getAssets();
     }
   }, [centralState, centralStateDelete, selectedTab]);
 
@@ -467,6 +431,7 @@ function WorkRequests() {
         requiredPermissions={[
           "read_work-requests",
           "read_work-requests:my-facilities-work-request/all",
+          "read_work-requests:my-work-requests/all",
         ]}
       >
         <div className="relative bg-white rounded-2xl p-4">
@@ -500,10 +465,11 @@ function WorkRequests() {
         requiredPermissions={[
           "read_work-requests",
           "read_work-requests:my-facilities-work-request/all",
+          "read_work-requests:my-work-requests/all",
         ]}
       >
         <div className="relative bg-white rounded-2xl p-4 mt-4">
-          {selectedTab === "Facility Work Request" && (
+          {selectedTab === "My Work Request" && (
             <TableComponent
               data={assignedworkRequests}
               type="workrequests"

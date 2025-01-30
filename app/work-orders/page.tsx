@@ -7,7 +7,7 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import axiosInstance from "@/utils/api";
+
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
@@ -16,7 +16,7 @@ import FacilityDetails from "@/components/facility-management/view-facility";
 import CreateWorkOrder from "@/components/work-order/create-work-order";
 import UpdateWorkOrder from "@/components/work-order/update-work-order";
 import AcceptQuotation from "@/components/work-order/acceptQuotation";
-import EntityDetails from "@/components/facility-management/view-entitty";
+
 import ButtonComponent from "@/components/button-component";
 import createAxiosInstance from "@/utils/api";
 
@@ -26,9 +26,7 @@ interface Props {
 
 function WorkOrders({ nowrap }: Props) {
   const axiosInstance = createAxiosInstance();
-  const { user, setUser, setUserPermissions } = useDataPermission();
-
-  const tabs = ["All Work Order"];
+  const tabs = ["All Work Order", "My Work Order"];
 
   const [successState, setSuccessState] = useState({
     title: "",
@@ -37,6 +35,7 @@ function WorkOrders({ nowrap }: Props) {
   });
 
   const [users, setUsers] = useState<User[]>();
+  const [assignedworkOrders, setAssignedWorkOrders] = useState<any[]>();
   const [workOrders, setWorkOrders] = useState<any[]>();
   const [workOrder, setWorkOrder] = useState<any>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
@@ -54,6 +53,13 @@ function WorkOrders({ nowrap }: Props) {
   const getWorkOrders = async () => {
     const response = await axiosInstance.get("/work-requests/work-order/all");
     setWorkOrders(response.data.data);
+  };
+
+  const getAssignedWorkOrders = async () => {
+    const response = await axiosInstance.get(
+      "/work-requests/my-work-orders/all"
+    );
+    setAssignedWorkOrders(response.data.data);
   };
 
   const getVendors = async () => {
@@ -486,7 +492,8 @@ function WorkOrders({ nowrap }: Props) {
   }, [centralState]);
 
   const tabPermissions: { [key: string]: string[] } = {
-    "All Work Order": ["create_work-orders"],
+    "My Work Order": ["read_work-requests:my-work-orders/all"],
+    "All Work Order": ["read_work-requests:work-order/all"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -506,10 +513,15 @@ function WorkOrders({ nowrap }: Props) {
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
 
   useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([getWorkOrders(), getUsers()]);
-    };
-    fetchData();
+    if (selectedTab === "All Work Order") {
+      const fetchData = async () => {
+        await Promise.all([getWorkOrders()]);
+      };
+      fetchData();
+    } else {
+      getAssignedWorkOrders();
+    }
+    getUsers();
   }, [centralState, centralStateDelete, selectedTab]);
 
   return (
@@ -564,8 +576,15 @@ function WorkOrders({ nowrap }: Props) {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      {/* <PermissionGuard requiredPermissions={["create_work-orders"]}>
-        <div className="relative bg-white rounded-2xl p-4">
+      <PermissionGuard
+        requiredPermissions={[
+          "read_work-requests:my-work-orders/all",
+          "read_work-requests:work-order/all",
+        ]}
+      >
+        <div
+          className={`relative ${nowrap && "hidden"} bg-white rounded-2xl p-4`}
+        >
           <div className="flex space-x-4 pb-2">
             {tabs.map((tab) => (
               <PermissionGuard
@@ -590,24 +609,18 @@ function WorkOrders({ nowrap }: Props) {
             ))}
           </div>
         </div>
-      </PermissionGuard> */}
+      </PermissionGuard>
 
-      <PermissionGuard requiredPermissions={["create_work-orders"]}>
+      <PermissionGuard
+        requiredPermissions={[
+          "read_work-requests:my-work-orders/all",
+          "read_work-requests:work-order/all",
+        ]}
+      >
         <div className="relative bg-white rounded-2xl p-4 mt-4">
-          <TableComponent
-            data={workOrders}
-            type="workorders"
-            setModalState={setCentralState}
-            setModalStateDelete={setCentralStateDelete}
-            toggleActions={toggleActions}
-            activeRowId={activeRowId}
-            setActiveRowId={setActiveRowId}
-            deleteAction={setCentralStateDelete}
-          />
-
-          {/* {selectedTab === "All Work Order" && (
+          {selectedTab === "My Work Order" && (
             <TableComponent
-              data={otherWorkOrders}
+              data={assignedworkOrders}
               type="workorders"
               setModalState={setCentralState}
               setModalStateDelete={setCentralStateDelete}
@@ -616,7 +629,19 @@ function WorkOrders({ nowrap }: Props) {
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
             />
-          )} */}
+          )}
+          {selectedTab === "All Work Order" && (
+            <TableComponent
+              data={workOrders}
+              type="workorders"
+              setModalState={setCentralState}
+              setModalStateDelete={setCentralStateDelete}
+              toggleActions={toggleActions}
+              activeRowId={activeRowId}
+              setActiveRowId={setActiveRowId}
+              deleteAction={setCentralStateDelete}
+            />
+          )}
         </div>
       </PermissionGuard>
     </DashboardLayout>
