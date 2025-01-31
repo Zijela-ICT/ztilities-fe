@@ -279,6 +279,50 @@ export const NotifIcon = () => {
   );
 };
 
+export const TransactionIcon = ({width = "21", height = "21" }:any) => {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 21 21"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <mask
+        id="mask0_1188_10543"
+        // style="mask-type:luminance"
+        maskUnits="userSpaceOnUse"
+        x="0"
+        y="0"
+        width="21"
+        height="21"
+      >
+        <path
+          d="M18.2385 1.18359H3.23846C2.84064 1.18359 2.45911 1.34163 2.1778 1.62293C1.8965 1.90424 1.73846 2.28577 1.73846 2.68359V17.6836C1.73846 18.0814 1.8965 18.4629 2.1778 18.7443C2.45911 19.0256 2.84064 19.1836 3.23846 19.1836H18.2385C18.6363 19.1836 19.0178 19.0256 19.2991 18.7443C19.5804 18.4629 19.7385 18.0814 19.7385 17.6836V2.68359C19.7385 2.28577 19.5804 1.90424 19.2991 1.62293C19.0178 1.34163 18.6363 1.18359 18.2385 1.18359Z"
+          fill="white"
+          stroke="white"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M9.23846 13.6836L11.7385 15.6836L15.7385 10.6836M5.73846 5.68359H15.7385M5.73846 9.68359H9.73846"
+          stroke="black"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </mask>
+      <g mask="url(#mask0_1188_10543)">
+        <path
+          d="M-1.26154 -1.81641H22.7385V22.1836H-1.26154V-1.81641Z"
+          fill="#A8353A"
+        />
+      </g>
+    </svg>
+  );
+};
+
 export const UserProfile = () => {
   return (
     <svg
@@ -404,7 +448,7 @@ export const UploadIcon = () => {
   );
 };
 
-export const RefreshIcon = () => {
+export const RefreshIcon = ({stroke ="white"}) => {
   return (
     <svg
       width="14"
@@ -416,7 +460,7 @@ export const RefreshIcon = () => {
       <g clipPath="url(#clip0_1031_7236)">
         <path
           d="M12.25 5.83333C12.25 5.83333 11.0804 4.23979 10.1302 3.28898C9.18006 2.33816 7.86703 1.75 6.41663 1.75C3.51713 1.75 1.16663 4.1005 1.16663 7C1.16663 9.89949 3.51713 12.25 6.41663 12.25C8.8101 12.25 10.8295 10.6483 11.4614 8.45833M12.25 5.83333V2.33333M12.25 5.83333H8.74996"
-          stroke="white"
+          stroke={stroke}
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"

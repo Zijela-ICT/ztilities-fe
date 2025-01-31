@@ -1,5 +1,7 @@
 "use client";
 import {
+  IncomingIcon,
+  OutgoingIcon,
   SearchIcon,
   TrashIcon,
   TrashIconGray,
@@ -83,7 +85,6 @@ export default function TableComponent({
     <div className="p-4">
       {noSearch ? null : (
         <>
-          {" "}
           <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0  font-semibold text-md mb-4">
             <div
               className={`flex items-center border rounded-md focus-within:ring-2 focus-within:ring-blue-500 w-full ${
@@ -147,7 +148,7 @@ export default function TableComponent({
                     column !== "updatedAt" &&
                     // column !== "avatar" &&
                     column !== "assets" &&
-                    column !== "user" &&
+                    // column !== "user" &&
                     column !== "isApproved" &&
                     column !== "isApportioned" &&
                     column !== "isWorkOrder"
@@ -178,7 +179,7 @@ export default function TableComponent({
                       column !== "updatedAt" &&
                       // column !== "avatar" &&
                       column !== "assets" &&
-                      column !== "user" &&
+                      // column !== "user" &&
                       column !== "isApproved" &&
                       column !== "isApportioned" &&
                       column !== "isWorkOrder"
@@ -259,10 +260,14 @@ export default function TableComponent({
                                 "reopened"
                               ? "text-[#0E6655] bg-[#D1F2EB]"
                               : row[column]?.toString().toLowerCase() ===
-                                "accepted"
+                                  "accepted" ||
+                                row[column]?.toString().toLowerCase() ===
+                                  "payment order raised"
                               ? "text-[#1E8449] bg-[#D4EFDF]"
                               : row[column]?.toString().toLowerCase() ===
-                                "initiated"
+                                  "initiated" ||
+                                row[column]?.toString().toLowerCase() ===
+                                  "assigned to procurement"
                               ? "text-[#2874A6] bg-[#D6EAF8]"
                               : row[column]?.toString().toLowerCase() ===
                                 "quotation selected"
@@ -273,7 +278,9 @@ export default function TableComponent({
                                   "apportionment_approved"
                               ? "text-[#28A745] bg-[#DFF6DF]"
                               : row[column]?.toString().toLowerCase() ===
-                                "awaiting selection"
+                                  "awaiting selection" ||
+                                row[column]?.toString().toLowerCase() ===
+                                  "uploading quotations"
                               ? "text-[#FFC107] bg-[#FFF8E1]"
                               : row[column]?.toString().toLowerCase() ===
                                 "waiting for quotations"
@@ -312,6 +319,12 @@ export default function TableComponent({
                             }`.toUpperCase()}
                           </div>
                         )
+                      ) : column === "category" ? (
+                        row[column] === "INFLOW" ? (
+                          <IncomingIcon />
+                        ) : (
+                          <OutgoingIcon />
+                        )
                       ) : (
                         // Default case for other columns
                         row[column]?.toString()
@@ -322,7 +335,6 @@ export default function TableComponent({
                 {/* Actions based on type */}
                 {noSearch ? null : (
                   <>
-                    {" "}
                     <td className="py-3 px-4">
                       {type === "users" ? (
                         <>
@@ -1193,6 +1205,17 @@ export default function TableComponent({
                                     <>
                                       <li>
                                         <DropdownButtonComponent
+                                          text="View Service Charge"
+                                          onClick={() =>
+                                            setModalState("viewServiceCharge")
+                                          }
+                                          permissions={[
+                                            "update_work-requests:id/apportion/service-charge/approve",
+                                          ]}
+                                        />
+                                      </li>
+                                      <li>
+                                        <DropdownButtonComponent
                                           text="Apportion Service Charge"
                                           onClick={() =>
                                             setModalStateDelete(
@@ -1201,18 +1224,6 @@ export default function TableComponent({
                                           }
                                           permissions={[
                                             "update_work-requests:id/apportion/service-charge",
-                                          ]}
-                                        />
-                                      </li>
-
-                                      <li>
-                                        <DropdownButtonComponent
-                                          text="View Service Charge"
-                                          onClick={() =>
-                                            setModalState("viewServiceCharge")
-                                          }
-                                          permissions={[
-                                            "update_work-requests:id/apportion/service-charge/approve",
                                           ]}
                                         />
                                       </li>
@@ -1245,6 +1256,20 @@ export default function TableComponent({
                               }}
                               permissions={["read_bills:id"]}
                               className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
+                            />
+                          </div>
+                        </div>
+                      ) : type === "transactions" ? (
+                        <div className="flex items-center space-x-5">
+                          <div className="flex items-center space-x-2 w-full md:w-4/5 ">
+                            <ButtonComponent
+                              text="View"
+                              onClick={() => {
+                                toggleActions(row.id);
+                                router.push(`/transaction/${row.id}`);
+                              }}
+                              permissions={["read_bills:id"]}
+                              className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-white text-[#A8353A] border border-gray-200 rounded-md"
                             />
                           </div>
                         </div>

@@ -10,6 +10,7 @@ interface User {
   lastName: string | null;
   password: string | null;
   email: string;
+  approvalLimit : number
   roles: Role[];
 }
 
@@ -29,10 +30,10 @@ interface AuthUser {
   isVendor: boolean;
   isDeactivated: boolean;
   twoFAMethod: string;
-  units : Unit[]
-  facilities : Facility[]
-  blocks : Block[]
-  wallets : any []
+  units: Unit[];
+  facilities: Facility[];
+  blocks: Block[];
+  wallets: any[];
 }
 
 interface Permission {
@@ -84,8 +85,8 @@ interface Unit {
   commonArea: string | null;
   address: string | null;
   assets: Asset[];
-  bills : any[]
-  user : User
+  bills: any[];
+  user: User;
 }
 
 interface Asset {
@@ -103,12 +104,12 @@ interface Vendor {
   vendorName: string;
   vendorType: string;
   category: string;
-  WHTCode : string;
+  WHTCode: string;
   phoneNumber: string;
   email: string;
   address: string;
   rating: number | null;
-  isDeactivated :boolean
+  isDeactivated: boolean;
 }
 
 interface Technician {
@@ -121,4 +122,17 @@ interface Technician {
   address: string;
   rating: number | null;
   isDeactivated: boolean;
+}
+
+interface Transaction {
+  id: number;
+  amount: string;
+  status: string;
+  type: string;
+  category: "INFLOW" | "OUTFLOW";
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  facility: Facility;
+  user: User;
 }

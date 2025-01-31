@@ -423,7 +423,7 @@ function WorkOrders({ nowrap }: Props) {
               placeholder: "Select Approval Officer",
               options: users?.map((user: User) => ({
                 value: user.id,
-                label: `${user.firstName} ${user.lastName}`,
+                label: `${user.firstName} ${user.lastName} - Approval Limit ( ${user.approvalLimit || ""} )`,
               })),
             },
           ]}

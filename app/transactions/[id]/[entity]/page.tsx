@@ -25,8 +25,10 @@ import withPermissions from "@/components/auth/permission-protected-routes";
 import createAxiosInstance from "@/utils/api";
 import { chartOptions } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
+import TableComponent from "@/components/table-component";
 import PermissionGuard from "@/components/auth/permission-protected-components";
-import MyLoader, { MyLoaderFinite } from "@/components/loader-components";
+import { useParams } from "next/navigation";
+import { MyLoaderFinite } from "@/components/loader-components";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -42,6 +44,7 @@ ChartJS.register(
 function Transactions() {
   const axiosInstance = createAxiosInstance();
   const { user } = useDataPermission();
+  const { id, entity } = useParams();
   const [filters, setFilters] = useState({
     User: "",
     Facility: "",
@@ -50,16 +53,22 @@ function Transactions() {
   });
 
   const [loading, setLoading] = useState<boolean>()
-  const [transactionId, setTransactionId] = useState<any>();
-  const [entity, setEntity] = useState<any>();
-
   const [vendors, setVendors] = useState<Vendor[]>();
   const [technicians, setTechnicians] = useState<Technician[]>();
   const [facilities, setFacilities] = useState<Facility[]>();
   const [users, setUsers] = useState<User[]>();
 
+  //for table
+  const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
+  const [centralState, setCentralState] = useState<string>();
+  const [centralStateDelete, setCentralStateDelete] = useState<string>();
+
   const [filteredTransactions, setFilteredTransactions] =
     useState<Transaction[]>();
+
+  const myFormattedTransactions = filteredTransactions?.map(
+    ({ category, ...rest }) => ({ category, ...rest })
+  );
 
   const filterOptions = [
     {
@@ -79,10 +88,6 @@ function Transactions() {
       ...prevFilters,
       [label]: value,
     }));
-  };
-
-  const handleApplyFilters = () => {
-    console.log("Filters Applied:", filters);
   };
 
   const getUsers = async () => {
@@ -111,27 +116,32 @@ function Transactions() {
 
   const getAUserTransactions = async () => {
     const response = await axiosInstance.get(
-      `/transactions/user-transactions/all/${filters.User}`
+      `/transactions/user-transactions/all/${filters.User || id}`
     );
     setFilteredTransactions(response.data.data);
   };
   const getAVendorTransactions = async () => {
     const response = await axiosInstance.get(
-      `/transactions/user-transactions/all/${filters.Vendor}`
+      `/transactions/user-transactions/all/${filters.Vendor || id}`
     );
     setFilteredTransactions(response.data.data);
   };
   const getATechnicianTransactions = async () => {
     const response = await axiosInstance.get(
-      `/transactions/user-transactions/all/${filters.Technician}`
+      `/transactions/user-transactions/all/${filters.Technician || id}`
     );
     setFilteredTransactions(response.data.data);
   };
   const getAFacilityTransactions = async () => {
     const response = await axiosInstance.get(
-      `/transactions/facility-transactions/all/${filters.Facility}`
+      `/transactions/facility-transactions/all/${filters.Facility || id}`
     );
     setFilteredTransactions(response.data.data);
+  };
+
+  // Toggle actions
+  const toggleActions = (rowId: string) => {
+    setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
   };
 
   useEffect(() => {
@@ -148,18 +158,31 @@ function Transactions() {
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      setLoading(true);
-      await getMyTransactions();
-      setTimeout(() => setLoading(false), 1500);
+      if (user.wallets.length > 0) {
+        await getMyTransactions();
+      } else {
+        if (id && entity) {
+          if (entity === "User") {
+            await getAUserTransactions();
+          } else if (entity === "Vendor") {
+            await getAVendorTransactions();
+          } else if (entity === "Technician") {
+            await getATechnicianTransactions();
+          } else if (entity === "Facility") {
+            await getAFacilityTransactions();
+          }
+        }
+      }
+      
+      setTimeout(() => setLoading(false), 1000);
     };
   
+    setLoading(true);
     fetchTransactions();
-  }, []);
+  }, [id, entity, user.wallets]);
   
   useEffect(() => {
     const fetchFilteredTransactions = async () => {
-      setLoading(true);
-  
       if (filters.User) {
         await getAUserTransactions();
       } else if (filters.Vendor) {
@@ -170,21 +193,34 @@ function Transactions() {
         await getAFacilityTransactions();
       }
   
-      setTimeout(() => setLoading(false), 1500);
+      setTimeout(() => setLoading(false), 1000);
     };
   
+    setLoading(true);
     fetchFilteredTransactions();
   }, [filters]);
   
-  
+
+ 
   // useEffect(() => {
-  //   setLoading(true)
-  //   getMyTransactions();
-  //   setLoading(false)
-  // }, []);
+  //   if (user.wallets.length > 0) {
+  //     getMyTransactions();
+  //   } else {
+  //     if (id && entity) {
+  //       if (entity === "User") {
+  //         getAUserTransactions();
+  //       } else if (entity === "Vendor") {
+  //         getAVendorTransactions();
+  //       } else if (entity === "Technician") {
+  //         getATechnicianTransactions();
+  //       } else if (entity === "Facility") {
+  //         getAFacilityTransactions();
+  //       }
+  //     }
+  //   }
+  // }, [id, entity, user.wallets]);
 
   // useEffect(() => {
-  //   setLoading(true)
   //   if (filters.User) {
   //     getAUserTransactions();
   //   } else if (filters.Vendor) {
@@ -194,7 +230,6 @@ function Transactions() {
   //   } else if (filters.Facility) {
   //     getAFacilityTransactions();
   //   }
-  //   setLoading(false)
   // }, [filters]);
 
   useEffect(() => {
@@ -233,52 +268,12 @@ function Transactions() {
     }
   });
 
-  // Prepare the final chart data
-  const chartData = {
-    labels: [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ],
-    datasets: [
-      {
-        label: "Inflow",
-        data: monthlyData.INFLOW, // Cumulative inflow values per month
-        fill: true,
-        borderColor: "rgb(75, 192, 192)",
-        tension: 0.4,
-        pointRadius: 0,
-        pointBackgroundColor: "rgb(75, 192, 192)",
-      },
-      {
-        label: "Outflow",
-        data: monthlyData.OUTFLOW, // Cumulative outflow values per month
-        fill: true,
-        borderColor: "rgb(255, 99, 132)",
-        tension: 0.4,
-        pointRadius: 0,
-        pointBackgroundColor: "rgb(255, 99, 132)",
-      },
-    ],
-  };
-
-
   return (
     <DashboardLayout
       title="Transactions"
       detail="See balance and all transactions here"
     >
-      {loading &&  <MyLoaderFinite/>}
-      
+         {loading &&  <MyLoaderFinite/>}
       <>
         <PermissionGuard
           requiredPermissions={[
@@ -322,11 +317,9 @@ function Transactions() {
                     <select
                       className="border border-gray-300 rounded-md p-2"
                       value={filters[filter.label]?.id}
-                      onChange={(e) => {
-                        handleFilterChange(filter.label, e.target.value);
-                        setTransactionId(e.target.value);
-                        setEntity(filter.label);
-                      }}
+                      onChange={(e) =>
+                        handleFilterChange(filter.label, e.target.value)
+                      }
                     >
                       <option value="">{`Filter by ${filter.label}`}</option>
                       {filter?.options?.map((option, idx) => (
@@ -342,131 +335,18 @@ function Transactions() {
           </div>
         </PermissionGuard>
 
-        {user.wallets.length > 1 && (
-          <div
-            className="relative bg-cover bg-center bg-no-repeat rounded-2xl px-4 py-6 my-6 "
-            style={{
-              backgroundImage: "url('/assets/wallet-bg.jpeg')",
-            }}
-          >
-            <div className="flex justify-between items-center pb-2">
-              <span className="text-gray-200 ">Account Balance</span>
-              <div className="text-white py-2 flex items-center space-x-1">
-                <RefreshIcon /> <p>Refresh </p>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <span className="text-white font-bold text-2xl">
-                N {parseFloat(user.wallets[0]?.balance).toFixed(2)}{" "}
-              </span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-white cursor-pointer"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 12c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z"
-                />
-              </svg>
-            </div>
-          </div>
-        )}
-
-        {filteredTransactions?.length < 1 ? (
-          <>
-            <div className="flex flex-col items-center justify-center h-64 bg-white ">
-              <TransactionIcon width="71" height="71" />
-
-              <p className="mt-4 text-gray-600 text-lg font-medium">
-                No Transactions Found
-              </p>
-              <p className="text-sm text-gray-500">
-                You haven't made any transactions yet.
-              </p>
-            </div>
-          </>
-        ) : (
-          <>
-            {" "}
-            <div className="flex flex-col md:flex-row w-full h-auto space-y-4 md:space-y-0 md:space-x-4">
-              {/* Left Section (Graph) */}
-              <div className="w-full md:w-3/5 bg-white rounded-lg  p-6">
-                <h2 className="text-base font-semibold mb-4 text-black">
-                  Transaction Trend
-                </h2>
-                <div className="h-full ">
-                  {/* Placeholder for the Graph */}
-
-                  <Line data={chartData} options={chartOptions} />
-                </div>
-              </div>
-
-              {/* Right Section (Simple List) */}
-              <div className="w-full md:w-2/5 bg-white p-4 rounded-lg">
-                <div className="flex items-baseline text-base justify-between mb-6">
-                  <h2 className="font-semibold text-black">
-                    Recent Transactions
-                  </h2>
-                  <h2 className="font-medium text-[#A8353A] flex items-center space-x-1 cursor-pointer">
-                    <Link
-                      href={`/transactions/${transactionId || "*"}/${
-                        entity || "*"
-                      }`}
-                    >
-                      See all
-                    </Link>
-                    <div className="rotate-180">
-                      <ArrowLeft />
-                    </div>
-                  </h2>
-                </div>
-                <ul>
-                  {filteredTransactions?.map((log, index) => (
-                    <li
-                      key={log.id}
-                      className="flex justify-between items-start mb-4 border-b border-gray-100 last:border-b-0 pb-4"
-                    >
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                          {log.category === "INFLOW" ? (
-                            <IncomingIcon />
-                          ) : (
-                            <OutgoingIcon />
-                          )}
-                        </div>
-                        <div className="ml-4 flex flex-col">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-semibold text-base text-gray-700">
-                              {log.description}
-                            </span>
-                          </div>
-                          <p className="text-gray-700 mt-1 font-thin text-sm">
-                            {log.createdAt}
-                          </p>
-                        </div>
-                      </div>
-                      {/* Price or additional information */}
-                      <span className="text-gray-600 text-base font-medium">
-                        N {parseFloat(log.amount).toFixed(2)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </>
-        )}
+        <div className="relative bg-white rounded-2xl p-4 mt-4">
+          <TableComponent
+            data={myFormattedTransactions}
+            type="transactions"
+            setModalState={setCentralState}
+            setModalStateDelete={setCentralStateDelete}
+            toggleActions={toggleActions}
+            activeRowId={activeRowId}
+            setActiveRowId={setActiveRowId}
+            deleteAction={setCentralStateDelete}
+          />
+        </div>
       </>
     </DashboardLayout>
   );
