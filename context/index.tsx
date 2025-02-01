@@ -12,6 +12,20 @@ interface ContextType {
   setUserPermissions: (permissions: Permission[]) => void;
   setUserRoles: (roles: any[]) => void;
   setLoading: (state: boolean) => void;
+  pagination: {
+    currentPage: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+  setPagination: React.Dispatch<
+    React.SetStateAction<{
+      currentPage: number;
+      pageSize: number;
+      total: number;
+      totalPages: number;
+    }>
+  >
 }
 
 // Create context with initial values
@@ -27,6 +41,12 @@ export const DataPermissionProvider = ({
   const [userPermissions, setUserPermissions] = useState<Permission[]>([]);
   const [userRoles, setUserRoles] = useState<any[]>([]); // Permissions start as an empty array
   const [loading, setLoading] = useState<boolean>(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    pageSize: 10,
+    total: 0,
+    totalPages: 0,
+  });
 
   return (
     <DataPermissionContext.Provider
@@ -39,6 +59,8 @@ export const DataPermissionProvider = ({
         setUserRoles,
         loading,
         setLoading,
+        pagination,
+        setPagination,
       }}
     >
       {children}

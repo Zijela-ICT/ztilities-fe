@@ -1,6 +1,6 @@
 "use client";
 
-import { JSX, use, useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
 import ModalCompoenent, {
@@ -8,7 +8,6 @@ import ModalCompoenent, {
   SuccessModalCompoenent,
 } from "@/components/modal-component";
 import CreateBulkUser from "@/components/user-management/create-bulk-user";
-import axiosInstance from "@/utils/api";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
@@ -20,9 +19,18 @@ import createAxiosInstance from "@/utils/api";
 
 function FacilityManagement() {
   const axiosInstance = createAxiosInstance();
-  const tabs = ["Facilities", "Blocks", "Units", "Assets", "Categories"];
+  const { pagination, setPagination } = useDataPermission();
+  const tabs = [
+    "Facilities",
+    "My Facilities",
+    "Blocks",
+    "My Blocks",
+    "Units",
+    "My Units",
+    "Assets",
+    "Categories",
+  ];
 
-  // States
   const [successState, setSuccessState] = useState({
     title: "",
     detail: "",
@@ -30,13 +38,18 @@ function FacilityManagement() {
   });
 
   const [users, setUsers] = useState<User[]>();
+
   const [facilities, setFacilities] = useState<Facility[]>();
   const [blocks, setBlocks] = useState<Block[]>();
   const [units, setUnits] = useState<Unit[]>();
+
+  const [myFacilities, setMyFacilities] = useState<Facility[]>();
+  const [myBlocks, setMyBlocks] = useState<Block[]>();
+  const [myUnits, setMyUnits] = useState<Unit[]>();
+
   const [assets, setAssets] = useState<Asset[]>();
   const [categories, setCategories] = useState<any[]>();
   const [facility, setAFacility] = useState<Facility>();
-  const [asset, setAAsset] = useState<Asset>();
   const [block, setABlock] = useState<Block>();
   const [unit, setAUnit] = useState<Unit>();
   const [category, setACategory] = useState<any>();
@@ -52,23 +65,87 @@ function FacilityManagement() {
   };
 
   const getFacilities = async () => {
-    const response = await axiosInstance.get("/facilities");
+    const response = await axiosInstance.get(
+      `/facilities?page=${pagination.currentPage}`
+    );
     setFacilities(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
-  const getAFacility = async () => {
-    const response = await axiosInstance.get(`/facilities/${activeRowId}`);
-    setAFacility(response.data.data);
+  const getMyFacilities = async () => {
+    const response = await axiosInstance.get(
+      `/facilities/my-facilities/all?page=${pagination.currentPage}`
+    );
+    setMyFacilities(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   const getBlocks = async () => {
-    const response = await axiosInstance.get("/blocks");
+    const response = await axiosInstance.get(
+      `/blocks?page=${pagination.currentPage}`
+    );
     setBlocks(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
+  };
+
+  const getMyBlocks = async () => {
+    const response = await axiosInstance.get(
+      `/blocks/my-blocks/all?page=${pagination.currentPage}`
+    );
+    setMyBlocks(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   const getUnits = async () => {
-    const response = await axiosInstance.get("/units");
+    const response = await axiosInstance.get(
+      `/units?page=${pagination.currentPage}`
+    );
     setUnits(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
+  };
+
+  const getMyUnits = async () => {
+    const response = await axiosInstance.get(
+      `/units/my-units/all?page=${pagination.currentPage}`
+    );
+    setMyUnits(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   const getAssets = async () => {
@@ -81,6 +158,11 @@ function FacilityManagement() {
     setCategories(response.data.data);
   };
 
+  const getAFacility = async () => {
+    const response = await axiosInstance.get(`/facilities/${activeRowId}`);
+    setAFacility(response.data.data);
+  };
+
   const getABlock = async () => {
     const response = await axiosInstance.get(`/blocks/${activeRowId}`);
     setABlock(response.data.data);
@@ -91,11 +173,6 @@ function FacilityManagement() {
     setAUnit(response.data.data);
   };
 
-  const getAAsset = async () => {
-    const response = await axiosInstance.get(`/assets/${activeRowId}`);
-    setAAsset(response.data.data);
-  };
-
   const getACategory = async () => {
     const response = await axiosInstance.get(
       `/assets/category/sub-category/${activeRowId}`
@@ -103,7 +180,6 @@ function FacilityManagement() {
     setACategory(response.data.data);
   };
 
-  // Delete functions
   const deleteFacility = async () => {
     await axiosInstance.delete(`/facilities/${activeRowId}`);
     setCentralStateDelete("");
@@ -148,9 +224,12 @@ function FacilityManagement() {
   const toggleActions = (rowId: string) => {
     if (
       selectedTab === "Facilities" ||
+      selectedTab === "My Facilities" ||
       selectedTab === "Blocks" ||
-      selectedTab === "Assets" ||
+      selectedTab === "My Blocks" ||
       selectedTab === "Units" ||
+      selectedTab === "My Units" ||
+      selectedTab === "Assets" ||
       selectedTab === "Categories"
     ) {
       setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
@@ -618,10 +697,13 @@ function FacilityManagement() {
   // Permissions and default tab logic
   const tabPermissions: { [key: string]: string[] } = {
     Facilities: ["read_facilities"],
+    "My Facilities": ["read_facilities:my-facilities/all"],
     Blocks: ["read_blocks"],
+    "My Blocks": ["read_blocks:my-blocks/all"],
     Units: ["read_units"],
+    "My Units": ["read_units:my-units/all"],
     Assets: ["read_assets"],
-    categories: ["read_assets:/category/all"],
+    Categories: ["read_assets:/category/all"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -646,14 +728,33 @@ function FacilityManagement() {
       getBlocks();
       getUnits();
       getAssets();
+    } else if (selectedTab === "My Blocks") {
+      getMyBlocks();
+      getMyUnits();
+      getAssets();
     } else if (selectedTab === "Units") {
       getUnits();
+      getAssets();
+      getUsers();
+    } else if (selectedTab === "My Units") {
+      getMyUnits();
       getAssets();
       getUsers();
     } else if (selectedTab === "Assets") {
       getAssets();
     } else if (selectedTab === "Categories") {
       getCategories();
+    } else if (selectedTab === "My Facilities") {
+      const fetchData = async () => {
+        await Promise.all([
+          getMyFacilities(),
+          getMyBlocks(),
+          getMyUnits(),
+          getAssets(),
+          getUsers(),
+        ]);
+      };
+      fetchData();
     } else {
       const fetchData = async () => {
         await Promise.all([
@@ -666,7 +767,7 @@ function FacilityManagement() {
       };
       fetchData();
     }
-  }, [centralState, centralStateDelete, selectedTab]);
+  }, [centralState, centralStateDelete, selectedTab, , pagination.currentPage]);
 
   useEffect(() => {
     if (centralState === "viewFacility") {
@@ -725,7 +826,16 @@ function FacilityManagement() {
       </ModalCompoenent>
 
       <PermissionGuard
-        requiredPermissions={["read_facilities", "read_blocks", "read_units"]}
+        requiredPermissions={[
+          "read_facilities",
+          "read_facilities:my-facilities/all",
+          "read_blocks",
+          "read_blocks:my-blocks/all",
+          "read_units",
+          "read_units:my-units/all",
+          "read_assets",
+          "read_assets:/category/all",
+        ]}
       >
         <div className="relative bg-white rounded-2xl p-4">
           <div className="flex space-x-4 pb-2">
@@ -738,9 +848,7 @@ function FacilityManagement() {
                   key={tab}
                   onClick={() => setSelectedTab(tab)}
                   className={`relative text-gray-500 hover:text-gray-900 px-4 py-2 text-xs font-medium focus:outline-none group ${
-                    selectedTab === tab
-                      ? "text-[#A8353A] font-semibold" // Active tab styles
-                      : ""
+                    selectedTab === tab ? "text-[#A8353A] font-semibold" : ""
                   }`}
                 >
                   {tab}
@@ -755,7 +863,16 @@ function FacilityManagement() {
       </PermissionGuard>
 
       <PermissionGuard
-        requiredPermissions={["read_facilities", "read_blocks", "read_units"]}
+        requiredPermissions={[
+          "read_facilities",
+          "read_facilities:my-facilities/all",
+          "read_blocks",
+          "read_blocks:my-blocks/all",
+          "read_units",
+          "read_units:my-units/all",
+          "read_assets",
+          "read_assets:/category/all",
+        ]}
       >
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           {selectedTab === "Facilities" && (
@@ -768,6 +885,31 @@ function FacilityManagement() {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
+            />
+          )}
+
+          {selectedTab === "My Facilities" && (
+            <TableComponent
+              data={myFacilities}
+              type="facilities"
+              setModalState={setCentralState}
+              setModalStateDelete={setCentralStateDelete}
+              toggleActions={toggleActions}
+              activeRowId={activeRowId}
+              setActiveRowId={setActiveRowId}
+              deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
           {selectedTab === "Blocks" && (
@@ -780,6 +922,31 @@ function FacilityManagement() {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
+            />
+          )}
+
+          {selectedTab === "My Blocks" && (
+            <TableComponent
+              data={myBlocks}
+              type="blocks"
+              setModalState={setCentralState}
+              setModalStateDelete={setCentralStateDelete}
+              toggleActions={toggleActions}
+              activeRowId={activeRowId}
+              setActiveRowId={setActiveRowId}
+              deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
           {selectedTab === "Units" && (
@@ -792,6 +959,30 @@ function FacilityManagement() {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
+            />
+          )}
+          {selectedTab === "My Units" && (
+            <TableComponent
+              data={myUnits}
+              type="units"
+              setModalState={setCentralState}
+              setModalStateDelete={setCentralStateDelete}
+              toggleActions={toggleActions}
+              activeRowId={activeRowId}
+              setActiveRowId={setActiveRowId}
+              deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
           {selectedTab === "Assets" && (

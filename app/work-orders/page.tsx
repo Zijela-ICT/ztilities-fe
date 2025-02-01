@@ -26,6 +26,7 @@ interface Props {
 
 function WorkOrders({ nowrap }: Props) {
   const axiosInstance = createAxiosInstance();
+  const { pagination, setPagination } = useDataPermission();
   const tabs = ["All Work Order", "My Work Order"];
 
   const [successState, setSuccessState] = useState({
@@ -51,15 +52,29 @@ function WorkOrders({ nowrap }: Props) {
   };
 
   const getWorkOrders = async () => {
-    const response = await axiosInstance.get("/work-requests/work-order/all");
+    const response = await axiosInstance.get(`/work-requests/work-order/all?page=${pagination.currentPage}`);
     setWorkOrders(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   const getAssignedWorkOrders = async () => {
     const response = await axiosInstance.get(
-      "/work-requests/my-work-orders/all"
+      `/work-requests/my-work-orders/all?page=${pagination.currentPage}`
     );
     setAssignedWorkOrders(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   const getVendors = async () => {
@@ -522,7 +537,7 @@ function WorkOrders({ nowrap }: Props) {
       getAssignedWorkOrders();
     }
     getUsers();
-  }, [centralState, centralStateDelete, selectedTab]);
+  }, [centralState, centralStateDelete, selectedTab, pagination.currentPage]);
 
   return (
     <DashboardLayout
@@ -628,6 +643,12 @@ function WorkOrders({ nowrap }: Props) {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
           {selectedTab === "All Work Order" && (
@@ -640,6 +661,12 @@ function WorkOrders({ nowrap }: Props) {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
         </div>

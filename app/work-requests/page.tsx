@@ -25,7 +25,7 @@ import createAxiosInstance from "@/utils/api";
 
 function WorkRequests() {
   const axiosInstance = createAxiosInstance();
-  const { user, setUser, setUserPermissions } = useDataPermission();
+  const { pagination, setPagination } = useDataPermission();
 
   const tabs = ["All Work Request", "My Work Request"];
 
@@ -47,14 +47,31 @@ function WorkRequests() {
   // Fetch data functions
   const getAssignedWorkRequests = async () => {
     const response = await axiosInstance.get(
-      "/work-requests/my-work-requests/all"
+      `/work-requests/my-work-requests/all?page=${pagination.currentPage}`
     );
     setAssignedWorkRequests(response.data.data);
+    const extra = response.data?.extra;
+    setPagination({
+      currentPage: extra?.page,
+      pageSize: extra?.pageSize,
+      total: extra?.total,
+      totalPages: extra?.totalPages,
+    });
   };
 
   const getOtherWorkRequests = async () => {
-    const response = await axiosInstance.get("/work-requests");
+    const response = await axiosInstance.get(`/work-requests?page=${pagination.currentPage}`);
     setOtherWorkRequests(response.data.data);
+    const extra = response?.data.extra;
+    if(extra){
+      setPagination({
+        currentPage: extra?.page,
+        pageSize: extra?.pageSize,
+        total: extra?.total,
+        totalPages: extra?.totalPages,
+      });
+    }
+
   };
 
   const getVendors = async () => {
@@ -382,7 +399,7 @@ function WorkRequests() {
     } else {
       getAssignedWorkRequests();
     }
-  }, [centralState, centralStateDelete, selectedTab]);
+  }, [centralState, centralStateDelete, selectedTab, pagination.currentPage]);
 
   return (
     <DashboardLayout
@@ -479,6 +496,12 @@ function WorkRequests() {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
           {selectedTab === "All Work Request" && (
@@ -491,6 +514,12 @@ function WorkRequests() {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
         </div>

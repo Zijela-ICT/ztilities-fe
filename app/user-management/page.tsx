@@ -20,6 +20,7 @@ import createAxiosInstance from "@/utils/api";
 
 function UserManagement() {
   const axiosInstance = createAxiosInstance();
+  const { pagination, setPagination } = useDataPermission();
   const tabs = ["All Users", "Role", "Permissions"];
 
   const [successState, setSuccessState] = useState({
@@ -36,10 +37,18 @@ function UserManagement() {
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
-  // Fetch data functions
   const getUsers = async () => {
-    const response = await axiosInstance.get("/users");
+    const response = await axiosInstance.get(
+      `/users?page=${pagination.currentPage}`
+    );
     setUsers(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   const getRoles = async () => {
@@ -250,7 +259,7 @@ function UserManagement() {
       };
       fetchData();
     }
-  }, [centralState, centralStateDelete, selectedTab]);
+  }, [centralState, centralStateDelete, selectedTab, pagination.currentPage]);
 
   return (
     <DashboardLayout
@@ -332,6 +341,13 @@ function UserManagement() {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              //new
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
           {selectedTab === "Role" && (

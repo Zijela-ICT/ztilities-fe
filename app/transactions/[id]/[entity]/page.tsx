@@ -43,7 +43,7 @@ ChartJS.register(
 
 function Transactions() {
   const axiosInstance = createAxiosInstance();
-  const { user } = useDataPermission();
+  const { user, pagination, setPagination } = useDataPermission();
   const { id, entity } = useParams();
   const [filters, setFilters] = useState({
     User: "",
@@ -52,7 +52,7 @@ function Transactions() {
     Technician: "",
   });
 
-  const [loading, setLoading] = useState<boolean>()
+  const [loading, setLoading] = useState<boolean>();
   const [vendors, setVendors] = useState<Vendor[]>();
   const [technicians, setTechnicians] = useState<Technician[]>();
   const [facilities, setFacilities] = useState<Facility[]>();
@@ -109,34 +109,77 @@ function Transactions() {
 
   const getMyTransactions = async () => {
     const response = await axiosInstance.get(
-      `/transactions/my-transactions/all`
+      `/transactions/my-transactions/all?page=${pagination.currentPage}`
     );
     setFilteredTransactions(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   const getAUserTransactions = async () => {
     const response = await axiosInstance.get(
-      `/transactions/user-transactions/all/${filters.User || id}`
+      `/transactions/user-transactions/all/${filters.User || id}?page=${
+        pagination.currentPage
+      }`
     );
     setFilteredTransactions(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
   const getAVendorTransactions = async () => {
     const response = await axiosInstance.get(
-      `/transactions/user-transactions/all/${filters.Vendor || id}`
+      `/transactions/user-transactions/all/${filters.Vendor || id}?page=${
+        pagination.currentPage
+      }`
     );
     setFilteredTransactions(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
   const getATechnicianTransactions = async () => {
     const response = await axiosInstance.get(
-      `/transactions/user-transactions/all/${filters.Technician || id}`
+      `/transactions/user-transactions/all/${filters.Technician || id}?page=${
+        pagination.currentPage
+      }`
     );
     setFilteredTransactions(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
   const getAFacilityTransactions = async () => {
     const response = await axiosInstance.get(
-      `/transactions/facility-transactions/all/${filters.Facility || id}`
+      `/transactions/facility-transactions/all/${filters.Facility || id}?page=${
+        pagination.currentPage
+      }`
     );
     setFilteredTransactions(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   // Toggle actions
@@ -173,14 +216,14 @@ function Transactions() {
           }
         }
       }
-      
+
       setTimeout(() => setLoading(false), 1000);
     };
-  
+
     setLoading(true);
     fetchTransactions();
-  }, [id, entity, user.wallets]);
-  
+  }, [id, entity, user.wallets, pagination.currentPage]);
+
   useEffect(() => {
     const fetchFilteredTransactions = async () => {
       if (filters.User) {
@@ -192,45 +235,13 @@ function Transactions() {
       } else if (filters.Facility) {
         await getAFacilityTransactions();
       }
-  
+
       setTimeout(() => setLoading(false), 1000);
     };
-  
+
     setLoading(true);
     fetchFilteredTransactions();
   }, [filters]);
-  
-
- 
-  // useEffect(() => {
-  //   if (user.wallets.length > 0) {
-  //     getMyTransactions();
-  //   } else {
-  //     if (id && entity) {
-  //       if (entity === "User") {
-  //         getAUserTransactions();
-  //       } else if (entity === "Vendor") {
-  //         getAVendorTransactions();
-  //       } else if (entity === "Technician") {
-  //         getATechnicianTransactions();
-  //       } else if (entity === "Facility") {
-  //         getAFacilityTransactions();
-  //       }
-  //     }
-  //   }
-  // }, [id, entity, user.wallets]);
-
-  // useEffect(() => {
-  //   if (filters.User) {
-  //     getAUserTransactions();
-  //   } else if (filters.Vendor) {
-  //     getAVendorTransactions();
-  //   } else if (filters.Technician) {
-  //     getATechnicianTransactions();
-  //   } else if (filters.Facility) {
-  //     getAFacilityTransactions();
-  //   }
-  // }, [filters]);
 
   useEffect(() => {
     if (
@@ -273,7 +284,7 @@ function Transactions() {
       title="Transactions"
       detail="See balance and all transactions here"
     >
-         {loading &&  <MyLoaderFinite/>}
+      {loading && <MyLoaderFinite />}
       <>
         <PermissionGuard
           requiredPermissions={[
@@ -345,6 +356,12 @@ function Transactions() {
             activeRowId={activeRowId}
             setActiveRowId={setActiveRowId}
             deleteAction={setCentralStateDelete}
+            currentPage={pagination.currentPage}
+            setCurrentPage={(page) =>
+              setPagination({ ...pagination, currentPage: page })
+            }
+            itemsPerPage={pagination.pageSize}
+            totalPages={pagination.totalPages}
           />
         </div>
       </>

@@ -2,19 +2,16 @@
 
 import ButtonComponent from "@/components/button-component";
 import DashboardLayout from "@/components/dashboard-layout-component";
-import DynamicCreateForm from "@/components/dynamic-create-form";
 import ModalCompoenent, {
   SuccessModalCompoenent,
 } from "@/components/modal-component";
 import CreateWorkOrder from "@/components/work-order/create-work-order";
 import CreateWorkRequest from "@/components/work-request/create-work-request";
 import { useDataPermission } from "@/context";
-import axiosInstance from "@/utils/api";
 import { BarChartIcon, WorkIcon } from "@/utils/svg";
-import { JSX, Suspense, useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import WorkOrders from "../work-orders/page";
 import { useRouter } from "next/navigation";
-import withPermissions from "@/components/auth/permission-protected-routes";
 import createAxiosInstance from "@/utils/api";
 import MyLoader from "@/components/loader-components";
 
@@ -30,7 +27,7 @@ function Dashboard() {
   }, [user?.wallets]);
 
   const handleWalletChange = (event) => {
-    setSelectedWallet(parseInt(event.target.value)); // Update selected wallet
+    setSelectedWallet(parseInt(event.target.value));
   };
 
   const [assignedworkRequests, setAssignedWorkRequests] = useState<any[]>();
@@ -163,7 +160,6 @@ function Dashboard() {
     return "Zijela";
   };
 
-  console.log(centralState);
   return (
     <>
       {!loading ? (
@@ -309,5 +305,4 @@ function Dashboard() {
   );
 }
 
-// export default withPermissions(Dashboard, ["users", "admin"]);
 export default Dashboard;

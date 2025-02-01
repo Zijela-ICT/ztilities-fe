@@ -7,7 +7,6 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import axiosInstance from "@/utils/api";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
@@ -17,6 +16,7 @@ import createAxiosInstance from "@/utils/api";
 
 function Power() {
   const axiosInstance = createAxiosInstance();
+  const { pagination, setPagination } = useDataPermission();
   const tabs = ["Power Apportion"];
 
   const [successState, setSuccessState] = useState({
@@ -30,15 +30,18 @@ function Power() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
-  const [facilities, setFacilities] = useState<Facility[]>();
-  const [blocks, setBlocks] = useState<Block[]>();
-  const [units, setUnits] = useState<Unit[]>();
-  const [assets, setAssets] = useState<Asset[]>();
 
   // Fetch data functions
   const getPowerCharges = async () => {
-    const response = await axiosInstance.get("/power-charges");
+    const response = await axiosInstance.get(`/power-charges?page=${pagination.currentPage}`);
     setPowerCharges(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   const getAPowerCharge = async () => {
@@ -75,26 +78,6 @@ function Power() {
       detail: "You have successfully apportioned power charge",
       status: true,
     });
-  };
-
-  const getFacilities = async () => {
-    const response = await axiosInstance.get("/facilities");
-    setFacilities(response.data.data);
-  };
-
-  const getBlocks = async () => {
-    const response = await axiosInstance.get("/blocks");
-    setBlocks(response.data.data);
-  };
-
-  const getUnits = async () => {
-    const response = await axiosInstance.get("/units");
-    setUnits(response.data.data);
-  };
-
-  const getAssets = async () => {
-    const response = await axiosInstance.get("/assets");
-    setAssets(response.data.data);
   };
 
   // Toggle actions
@@ -207,14 +190,10 @@ function Power() {
     const fetchData = async () => {
       await Promise.all([
         getPowerCharges(),
-        // getFacilities(),
-        // getBlocks(),
-        // getUnits(),
-        // getAssets(),
       ]);
     };
     fetchData();
-  }, [centralState, centralStateDelete]);
+  }, [centralState, centralStateDelete, pagination.currentPage]);
 
   return (
     <DashboardLayout
@@ -309,6 +288,12 @@ function Power() {
             activeRowId={activeRowId}
             setActiveRowId={setActiveRowId}
             deleteAction={setCentralStateDelete}
+            currentPage={pagination.currentPage}
+            setCurrentPage={(page) =>
+              setPagination({ ...pagination, currentPage: page })
+            }
+            itemsPerPage={pagination.pageSize}
+            totalPages={pagination.totalPages}
           />
         </div>
       </PermissionGuard>

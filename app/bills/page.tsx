@@ -7,17 +7,15 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import axiosInstance from "@/utils/api";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
-import DynamicCreateForm from "@/components/dynamic-create-form";
 import FacilityDetails from "@/components/facility-management/view-facility";
 import createAxiosInstance from "@/utils/api";
 
 function VendorManagement() {
   const axiosInstance = createAxiosInstance();
-  const { user, setUser, setUserPermissions } = useDataPermission();
+  const { pagination, setPagination } = useDataPermission();
 
   const tabs = ["My Bills", "All Bills"];
 
@@ -35,8 +33,15 @@ function VendorManagement() {
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   const getBills = async () => {
-    const response = await axiosInstance.get("/bills");
+    const response = await axiosInstance.get(`/bills?page=${pagination.currentPage}`);
     setBills(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   const getABill = async () => {
@@ -131,7 +136,7 @@ function VendorManagement() {
       };
       fetchData();
     }
-  }, [centralState, centralStateDelete, selectedTab]);
+  }, [centralState, centralStateDelete, selectedTab, pagination.currentPage]);
 
   return (
     <DashboardLayout title="Bills" detail="Manage all bills here">
@@ -205,6 +210,12 @@ function VendorManagement() {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
           {selectedTab === "All Bills" && (
@@ -218,6 +229,12 @@ function VendorManagement() {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
         </div>
