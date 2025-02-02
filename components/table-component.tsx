@@ -1584,19 +1584,35 @@ export default function TableComponent({
         </button>
 
         {/* Page number buttons */}
-        {Array.from({ length: totalPages }, (_, index) => (
+        {totalPages ? (
+          <>
+            {" "}
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => handlePageClick(index + 1)}
+                className={`px-4 py-2 rounded-md ${
+                  currentPage === index + 1
+                    ? "bg-[#FBC2B61A] text-[#A8353A]"
+                    : " text-gray-700 "
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </>
+        ) : (
           <button
-            key={index}
-            onClick={() => handlePageClick(index + 1)}
             className={`px-4 py-2 rounded-md ${
-              currentPage === index + 1
+              currentPage !== 1
                 ? "bg-[#FBC2B61A] text-[#A8353A]"
                 : " text-gray-700 "
             }`}
           >
-            {index + 1}
+            {1}
           </button>
-        ))}
+        )}
+
         <button
           onClick={handleNext}
           disabled={currentPage === totalPages}

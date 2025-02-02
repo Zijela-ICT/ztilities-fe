@@ -230,6 +230,7 @@ export default function DynamicCreateForm({
   return (
     <>
       <form
+        key={title}
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
