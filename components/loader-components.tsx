@@ -20,9 +20,13 @@ export default function MyLoader() {
   );
 }
 
-export function MyLoaderFinite() {
+export function MyLoaderFinite({ height }: any) {
   return (
-    <div className="flex w-full h-screen justify-center items-center">
+    <div
+      className={`flex w-full ${
+        height ? height : "h-screen"
+      }  justify-center items-center`}
+    >
       {/* <svg
         className="w-20 h-20 text-[#A8353A] animate-spin"
         viewBox="0 0 50 50"
@@ -86,9 +90,9 @@ export function MyLoaderFinite() {
           </g>
         </g>
       </svg>
-      <p className="text-[#A8353A] ml-6 text-base">
+      {/* <p className="text-[#A8353A] ml-6 text-base">
         Hold on, getting transactions
-      </p>
+      </p> */}
     </div>
   );
 }

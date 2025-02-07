@@ -33,7 +33,7 @@ function VendorManagement() {
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   const getBills = async () => {
-    const response = await axiosInstance.get(`/bills?page=${pagination.currentPage}`);
+    const response = await axiosInstance.get(`/bills?page=${pagination.currentPage}&&paginate=true`);
     setBills(response.data.data);
     const extra = response.data.extra;
     setPagination({
@@ -201,7 +201,7 @@ function VendorManagement() {
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           {selectedTab === "My Bills" && (
             <TableComponent
-              data={bills}
+              data={[]}
               type="bills"
               setModalState={setCentralState}
               setModalStateDelete={setCentralStateDelete}

@@ -49,7 +49,7 @@ function Transactions() {
     Technician: "",
   });
 
-  const [loading, setLoading] = useState<boolean>()
+  const [loading, setLoading] = useState<boolean>();
   const [transactionId, setTransactionId] = useState<any>();
   const [entity, setEntity] = useState<any>();
 
@@ -152,14 +152,14 @@ function Transactions() {
       await getMyTransactions();
       setTimeout(() => setLoading(false), 1500);
     };
-  
+
     fetchTransactions();
   }, []);
-  
+
   useEffect(() => {
     const fetchFilteredTransactions = async () => {
       setLoading(true);
-  
+
       if (filters.User) {
         await getAUserTransactions();
       } else if (filters.Vendor) {
@@ -169,14 +169,13 @@ function Transactions() {
       } else if (filters.Facility) {
         await getAFacilityTransactions();
       }
-  
+
       setTimeout(() => setLoading(false), 1500);
     };
-  
+
     fetchFilteredTransactions();
   }, [filters]);
-  
-  
+
   // useEffect(() => {
   //   setLoading(true)
   //   getMyTransactions();
@@ -271,14 +270,20 @@ function Transactions() {
     ],
   };
 
-
   return (
     <DashboardLayout
       title="Transactions"
       detail="See balance and all transactions here"
     >
-      {loading &&  <MyLoaderFinite/>}
-      
+      {loading && (
+        <div className="flex items-center justify-center space-x-4">
+          <div>
+            <MyLoaderFinite />
+          </div>
+          <div>Hold on, getting transactions</div>
+        </div>
+      )}
+
       <>
         <PermissionGuard
           requiredPermissions={[

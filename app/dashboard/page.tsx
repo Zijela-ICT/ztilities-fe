@@ -101,26 +101,35 @@ function Dashboard() {
 
   const data = [
     {
-      title: "Create Work Request",
-      number: assignedworkRequests?.length,
-      rate: "5 days",
-    },
-    {
       title: "Initiated Work Request",
       number: pendingRequests?.length,
-      rate: "7 days",
+      rate: "",
+      path: "/work-requests",
     },
     {
       title: "Created Work Order",
       number: workOrders?.length,
-      rate: "3 days",
+      rate: "",
+      path: "/work-orders",
     },
     {
       title: "initiated Work Order",
       number: pendingOrders?.length,
-      rate: "10 days",
+      rate: "",
+      path: "/work-orders",
     },
-    { title: "Wallet Balance", number: 0, rate: "" },
+    {
+      title: "initiated Work Order",
+      number: pendingOrders?.length,
+      rate: "",
+      path: "/work-orders",
+    },    {
+      title: "initiated Work Order",
+      number: pendingOrders?.length,
+      rate: "",
+      path: "/work-orders",
+    },
+    { title: "Wallet Balance", number: 0, rate: "", path: null },
   ];
 
   // Mapping centralState values to components
@@ -200,7 +209,8 @@ function Dashboard() {
                 item.title !== "Wallet Balance" ? (
                   <div
                     key={index}
-                    className="bg-white py-3 px-4 rounded-lg flex items-center justify-between"
+                    onClick={() => item?.path && router.push(item?.path)}
+                    className="bg-white py-3 px-4 rounded-lg flex items-center justify-between cursor-pointer"
                   >
                     {/* Left Content */}
                     <div className="relative">
@@ -243,9 +253,9 @@ function Dashboard() {
                             {item.number}
                           </p>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
+                            {/* <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
                               0%
-                            </span>
+                            </span> */}
                             <span className="text-xs text-gray-500">
                               {item.rate}
                             </span>

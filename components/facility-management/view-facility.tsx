@@ -272,6 +272,7 @@ export default function FacilityDetails({
                               {item.blockNumber ||
                                 item.assetName ||
                                 item.unitNumber ||
+                                item.walletType + " " + "₦" + item.balance ||
                                 item.firstName + " " + item.lastName}
                               {item.units && item.units.length > 0 && (
                                 <span className="transform transition-transform duration-100 ml-3">

@@ -1,0 +1,211 @@
+"use client";
+
+import { JSX, useEffect, useState } from "react";
+import DashboardLayout from "@/components/dashboard-layout-component";
+import TableComponent from "@/components/table-component";
+import ModalCompoenent, {
+  ActionModalCompoenent,
+  SuccessModalCompoenent,
+} from "@/components/modal-component";
+import withPermissions from "@/components/auth/permission-protected-routes";
+import PermissionGuard from "@/components/auth/permission-protected-components";
+import { useDataPermission } from "@/context";
+import createAxiosInstance from "@/utils/api";
+import DynamicCreateForm from "@/components/dynamic-create-form";
+import PermissionList from "@/components/user-management/view-permissions";
+
+function Approvers() {
+  const axiosInstance = createAxiosInstance();
+  const { pagination, setPagination } = useDataPermission();
+  const tabs = ["Power Apportion"];
+
+  const [successState, setSuccessState] = useState({
+    title: "",
+    detail: "",
+    status: false,
+  });
+
+  const [approvers, setApprovers] = useState<any[]>();
+  const [approver, setApprover] = useState<any[]>();
+  const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
+  const [centralState, setCentralState] = useState<string>();
+  const [centralStateDelete, setCentralStateDelete] = useState<string>();
+
+  // Fetch data functions
+  const getApprovers = async () => {
+    const response = await axiosInstance.get(
+      `/users?page=${pagination.currentPage}&&paginate=true`
+    );
+    const usersWithApprovalRole = response.data.data?.filter((user) =>
+      user?.roles?.some((role) => role?.name === "APPROVAL_ROLE")
+    );
+    setApprovers(usersWithApprovalRole);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
+  };
+
+  const getAApprover = async () => {
+    const response = await axiosInstance.get(`/users/${activeRowId}`);
+    setApprover(response.data.data);
+  };
+
+  // Toggle actions
+  const toggleActions = (rowId: string) => {
+    setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
+  };
+
+  // Dynamic title and detail logic
+  const getTitle = () => {
+    switch (centralState) {
+      case "editApprover":
+        return "Edit Approver";
+      case "viewApprover":
+        return "Role permissions";
+    }
+    switch (centralStateDelete) {
+      case "deleteUser":
+        return "De-activate User";
+      case "activateUser":
+        return "Re-activate User";
+    }
+    return "Zijela";
+  };
+
+  const getDetail = () => {
+    switch (centralState) {
+      case "editApprover":
+        return "You can edit approval limits here.";
+      case "viewApprover":
+        return "";
+    }
+    switch (centralStateDelete) {
+      case "activateUser":
+        return "Are you sure you want to Re-activate this user";
+      case "deleteUser":
+        return "Are you sure you want to de-activate this user";
+    }
+    return "Zijela";
+  };
+
+  // Mapping centralState values to components
+  const componentMap: Record<string, JSX.Element> = {
+    editApprover: (
+      <DynamicCreateForm
+        inputs={[{ name: "limit", label: "Approval Limit", type: "number" }]}
+        selects={[]}
+        title="Edit Limit"
+        apiEndpoint={`${
+          activeRowId && `/users/${activeRowId}/update-approval-limit`
+        }`}
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/users/${id}`).then((res) => res.data.data)
+        }
+      />
+    ),
+    viewApprover: (
+      <div className="p-4">
+        <PermissionList groupedPermissions={[]} />
+      </div>
+    ),
+  };
+
+  useEffect(() => {
+    if (centralState === "viewApprover") {
+      getAApprover();
+    }
+  }, [centralState]);
+
+  const tabPermissions: { [key: string]: string[] } = {
+    Approver: ["read_users"],
+  };
+
+  const { userPermissions } = useDataPermission();
+
+  const getDefaultTab = () => {
+    const userPermissionStrings = userPermissions.map(
+      (perm) => perm.permissionString
+    );
+
+    return tabs.find((tab) =>
+      (tabPermissions[tab] || []).every((permission) =>
+        userPermissionStrings.includes(permission)
+      )
+    );
+  };
+
+  const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([getApprovers()]);
+    };
+    fetchData();
+  }, [centralState, centralStateDelete, pagination.currentPage]);
+
+  return (
+    <DashboardLayout
+      title="Approvers"
+      detail="Manage and track all appprovers here"
+    >
+      <SuccessModalCompoenent
+        title={successState.title}
+        detail={successState.detail}
+        modalState={successState.status}
+        setModalState={(state: boolean) =>
+          setSuccessState((prevState) => ({ ...prevState, status: state }))
+        }
+      ></SuccessModalCompoenent>
+
+      <ActionModalCompoenent
+        title={getTitle()}
+        detail={getDetail()}
+        modalState={centralStateDelete}
+        setModalState={setCentralStateDelete}
+        takeAction={null}
+      ></ActionModalCompoenent>
+
+      <ModalCompoenent
+        title={getTitle()}
+        detail={getDetail()}
+        modalState={centralState}
+        setModalState={() => {
+          setCentralState("");
+          setActiveRowId(null);
+        }}
+      >
+        {componentMap[centralState]}
+      </ModalCompoenent>
+
+      <PermissionGuard requiredPermissions={["read_users"]}>
+        <div className="relative bg-white rounded-2xl p-4 mt-4">
+          <TableComponent
+            data={approvers}
+            type="approvers"
+            setModalState={setCentralState}
+            setModalStateDelete={setCentralStateDelete}
+            toggleActions={toggleActions}
+            activeRowId={activeRowId}
+            setActiveRowId={setActiveRowId}
+            deleteAction={setCentralStateDelete}
+            currentPage={pagination.currentPage}
+            setCurrentPage={(page) =>
+              setPagination({ ...pagination, currentPage: page })
+            }
+            itemsPerPage={pagination.pageSize}
+            totalPages={pagination.totalPages}
+          />
+        </div>
+      </PermissionGuard>
+    </DashboardLayout>
+  );
+}
+
+export default withPermissions(Approvers, ["users"]);

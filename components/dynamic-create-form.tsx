@@ -141,6 +141,10 @@ export default function DynamicCreateForm({
       );
     }
 
+    if (updatedFormData.limit) {
+      updatedFormData.limit = Number(updatedFormData.limit);
+    }
+
     try {
       if (
         [
@@ -221,6 +225,10 @@ export default function DynamicCreateForm({
           dynamicProcessedData.blockId = data.block.id; // Example: Keep only the user ID
         }
 
+        if (data.approvalLimit) {
+          dynamicProcessedData.limit = data.approvalLimit; // Example: Keep only the user ID
+        }
+
         setResource(data);
         setFormData(dynamicProcessedData);
       });
@@ -284,16 +292,6 @@ export default function DynamicCreateForm({
 
         {/* Render selects dynamically */}
         {selects?.map((select, index) => {
-          // Skip rendering 'facilitId' when the title is 'Blocks' and there is an activeRowId
-          // if (
-          //   (title === "Block" &&
-          //     activeRowId &&
-          //     select.name === "facilityId") ||
-          //   (title === "Units" && activeRowId && select.name === "blockId")
-          // ) {
-          //   return null;
-          // }
-          // Conditionally render based on `typeSelected`
           if (
             (select.name === "unit" && formData.typeSelected !== "unit") ||
             (select.name === "facility" &&
@@ -306,7 +304,7 @@ export default function DynamicCreateForm({
               select.label === "Technician" &&
               formData.entity !== "Technician")
           ) {
-            return null; // Skip rendering this select if typeSelected does not match
+            return null;
           }
 
           return (

@@ -52,7 +52,7 @@ function WorkOrders({ nowrap }: Props) {
   };
 
   const getWorkOrders = async () => {
-    const response = await axiosInstance.get(`/work-requests/work-order/all?page=${pagination.currentPage}`);
+    const response = await axiosInstance.get(`/work-requests/work-order/all?page=${pagination.currentPage}&&paginate=true`);
     setWorkOrders(response.data.data);
     const extra = response.data.extra;
     setPagination({
@@ -65,7 +65,7 @@ function WorkOrders({ nowrap }: Props) {
 
   const getAssignedWorkOrders = async () => {
     const response = await axiosInstance.get(
-      `/work-requests/my-work-orders/all?page=${pagination.currentPage}`
+      `/work-requests/my-work-orders/all?page=${pagination.currentPage}&&paginate=true`
     );
     setAssignedWorkOrders(response.data.data);
     const extra = response.data.extra;

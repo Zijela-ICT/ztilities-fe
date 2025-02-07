@@ -642,6 +642,43 @@ export default function TableComponent({
                               )}
                             </div>
                           </>
+                        ) : type === "approvers" ? (
+                          <>
+                            <div className="relative">
+                              {/* Button */}
+                              <PermissionGuard
+                                requiredPermissions={[
+                                  "delete_users:id",
+                                  "update_users:id",
+                                  "update_users:reset-password/admin",
+                                ]}
+                              >
+                                <button
+                                  onClick={() => toggleActions(row.id)}
+                                  className="text-blue-500 hover:text-blue-700"
+                                >
+                                  <TripleDotsIcon />
+                                </button>
+                              </PermissionGuard>
+
+                              {/* Dropdown Menu */}
+                              {activeRowId === row.id && (
+                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                  <ul className="py-2">
+                                    <li>
+                                      <DropdownButtonComponent
+                                        text="Edit Approval Limit"
+                                        onClick={() =>
+                                          setModalState("editApprover")
+                                        }
+                                        permissions={["update_users:id"]}
+                                      />
+                                    </li>
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          </>
                         ) : type === "roles" ? (
                           <>
                             <div className="flex items-center space-x-2 w-full md:w-4/5 ">
@@ -722,7 +759,10 @@ export default function TableComponent({
                                       <DropdownButtonComponent
                                         text="View"
                                         onClick={() =>
-                                          setModalState("viewFacility")
+                                          // setModalState("viewFacility")
+                                          router.push(
+                                            `/facility-management/entity/facility/${row.id}`
+                                          )
                                         }
                                         permissions={["read_facilities:id"]}
                                       />
@@ -745,6 +785,15 @@ export default function TableComponent({
                                         permissions={[
                                           "update_facilities:id/assign",
                                         ]}
+                                      />
+                                    </li>
+                                    <li>
+                                      <DropdownButtonComponent
+                                        text="Fund Wallet"
+                                        onClick={() =>
+                                          setModalState("fundWallet")
+                                        }
+                                        permissions={["update_facilities:id"]}
                                       />
                                     </li>
                                     <li>
@@ -802,7 +851,10 @@ export default function TableComponent({
                                       <DropdownButtonComponent
                                         text="View"
                                         onClick={() =>
-                                          setModalState("viewBlock")
+                                          // setModalState("viewBlock")
+                                          router.push(
+                                            `/facility-management/entity/block/${row.id}`
+                                          )
                                         }
                                         permissions={["read_blocks:id"]}
                                       />
@@ -876,7 +928,10 @@ export default function TableComponent({
                                       <DropdownButtonComponent
                                         text="View"
                                         onClick={() =>
-                                          setModalState("viewUnit")
+                                          // setModalState("viewUnit")
+                                          router.push(
+                                            `/facility-management/entity/unit/${row.id}`
+                                          )
                                         }
                                         permissions={["read_units:id"]}
                                       />
@@ -886,6 +941,15 @@ export default function TableComponent({
                                         text="Edit"
                                         onClick={() =>
                                           setModalState("createUnit")
+                                        }
+                                        permissions={["update_units:id"]}
+                                      />
+                                    </li>
+                                    <li>
+                                      <DropdownButtonComponent
+                                        text="Fund Wallet"
+                                        onClick={() =>
+                                          setModalState("fundWallet")
                                         }
                                         permissions={["update_units:id"]}
                                       />

@@ -19,7 +19,7 @@ export default function UpdateWorkRequest({
 
   const statusOptions = [
     { value: "closed", label: "Closed" },
-    { value: "rejected", label: "Rejected" },
+    // { value: "rejected", label: "Rejected" },
     { value: "accepted", label: "Accepted" },
   ];
 

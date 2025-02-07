@@ -16,6 +16,7 @@ import DynamicCreateForm from "@/components/dynamic-create-form";
 import CreateCategory from "@/components/facility-management/create-category";
 import CreateAsset from "@/components/facility-management/create-asset";
 import createAxiosInstance from "@/utils/api";
+import FundWallet from "@/components/facility-management/fund-wallet";
 
 function FacilityManagement() {
   const axiosInstance = createAxiosInstance();
@@ -49,9 +50,6 @@ function FacilityManagement() {
 
   const [assets, setAssets] = useState<Asset[]>();
   const [categories, setCategories] = useState<any[]>();
-  const [facility, setAFacility] = useState<Facility>();
-  const [block, setABlock] = useState<Block>();
-  const [unit, setAUnit] = useState<Unit>();
   const [category, setACategory] = useState<any>();
 
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -66,7 +64,7 @@ function FacilityManagement() {
 
   const getFacilities = async () => {
     const response = await axiosInstance.get(
-      `/facilities?page=${pagination.currentPage}`
+      `/facilities?page=${pagination.currentPage}&&paginate=true`
     );
     setFacilities(response.data.data);
     const extra = response.data.extra;
@@ -78,9 +76,14 @@ function FacilityManagement() {
     });
   };
 
+  const getFacilitiesUnpaginated = async () => {
+    const response = await axiosInstance.get(`/facilities`);
+    setFacilities(response.data.data);
+  };
+
   const getMyFacilities = async () => {
     const response = await axiosInstance.get(
-      `/facilities/my-facilities/all?page=${pagination.currentPage}`
+      `/facilities/my-facilities/all?page=${pagination.currentPage}&&paginate=true`
     );
     setMyFacilities(response.data.data);
     const extra = response.data.extra;
@@ -92,9 +95,14 @@ function FacilityManagement() {
     });
   };
 
+  const getMyFacilitiesUnpaginated = async () => {
+    const response = await axiosInstance.get(`/facilities/my-facilities/all`);
+    setFacilities(response.data.data);
+  };
+
   const getBlocks = async () => {
     const response = await axiosInstance.get(
-      `/blocks?page=${pagination.currentPage}`
+      `/blocks?page=${pagination.currentPage}&&paginate=true`
     );
     setBlocks(response.data.data);
     const extra = response.data.extra;
@@ -106,9 +114,14 @@ function FacilityManagement() {
     });
   };
 
+  const getBlocksUnpaginated = async () => {
+    const response = await axiosInstance.get(`/blocks`);
+    setBlocks(response.data.data);
+  };
+
   const getMyBlocks = async () => {
     const response = await axiosInstance.get(
-      `/blocks/my-blocks/all?page=${pagination.currentPage}`
+      `/blocks/my-blocks/all?page=${pagination.currentPage}&&paginate=true`
     );
     setMyBlocks(response.data.data);
     const extra = response.data.extra;
@@ -120,9 +133,14 @@ function FacilityManagement() {
     });
   };
 
+  const getMyBlocksUnpaginated = async () => {
+    const response = await axiosInstance.get(`/blocks/my-blocks/all`);
+    setMyBlocks(response.data.data);
+  };
+
   const getUnits = async () => {
     const response = await axiosInstance.get(
-      `/units?page=${pagination.currentPage}`
+      `/units?page=${pagination.currentPage}&&paginate=true`
     );
     setUnits(response.data.data);
     const extra = response.data.extra;
@@ -136,7 +154,7 @@ function FacilityManagement() {
 
   const getMyUnits = async () => {
     const response = await axiosInstance.get(
-      `/units/my-units/all?page=${pagination.currentPage}`
+      `/units/my-units/all?page=${pagination.currentPage}&&paginate=true`
     );
     setMyUnits(response.data.data);
     const extra = response.data.extra;
@@ -156,21 +174,6 @@ function FacilityManagement() {
   const getCategories = async () => {
     const response = await axiosInstance.get("/assets/category/all");
     setCategories(response.data.data);
-  };
-
-  const getAFacility = async () => {
-    const response = await axiosInstance.get(`/facilities/${activeRowId}`);
-    setAFacility(response.data.data);
-  };
-
-  const getABlock = async () => {
-    const response = await axiosInstance.get(`/blocks/${activeRowId}`);
-    setABlock(response.data.data);
-  };
-
-  const getAUnit = async () => {
-    const response = await axiosInstance.get(`/units/${activeRowId}`);
-    setAUnit(response.data.data);
   };
 
   const getACategory = async () => {
@@ -266,6 +269,8 @@ function FacilityManagement() {
         return "Assign User";
       case "assignUserToBlock":
         return "Assign User";
+      case "fundWallet":
+        return "Fund Wallet";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -312,6 +317,8 @@ function FacilityManagement() {
         return "";
       case "viewAssetCategory":
         return "";
+      case "fundWallet":
+        return "";
       case "assignUserToFacility":
         return "Assign facility to users";
       case "assignUserToBlock":
@@ -329,6 +336,34 @@ function FacilityManagement() {
     }
     return "Zijela";
   };
+
+  // Permissions and default tab logic
+  const tabPermissions: { [key: string]: string[] } = {
+    Facilities: ["read_facilities"],
+    "My Facilities": ["read_facilities:my-facilities/all"],
+    Blocks: ["read_blocks"],
+    "My Blocks": ["read_blocks:my-blocks/all"],
+    Units: ["read_units"],
+    "My Units": ["read_units:my-units/all"],
+    Assets: ["read_assets"],
+    Categories: ["read_assets:/category/all"],
+  };
+
+  const { userPermissions } = useDataPermission();
+
+  const getDefaultTab = () => {
+    const userPermissionStrings = userPermissions.map(
+      (perm) => perm.permissionString
+    );
+
+    return tabs.find((tab) =>
+      (tabPermissions[tab] || []).every((permission) =>
+        userPermissionStrings.includes(permission)
+      )
+    );
+  };
+
+  const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
 
   // Component mapping
   const componentMap: Record<string, JSX.Element> = {
@@ -450,7 +485,7 @@ function FacilityManagement() {
           {
             name: "facilityId",
             label: "Facility",
-            placeholder: "Assign a Block to facility",
+            placeholder: "Assign Block to facility",
             options: facilities?.map((asset: Facility) => ({
               value: asset.id,
               label: asset.name,
@@ -608,6 +643,14 @@ function FacilityManagement() {
         }
       />
     ),
+    fundWallet: (
+      <FundWallet
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        type={selectedTab}
+      />
+    ),
     createAsset: (
       <CreateAsset
         activeRowId={activeRowId}
@@ -672,21 +715,6 @@ function FacilityManagement() {
         setSuccessState={setSuccessState}
       />
     ),
-    viewFacility: (
-      <div className="p-4">
-        <FacilityDetails facility={facility} />
-      </div>
-    ),
-    viewBlock: (
-      <div className="p-4">
-        <FacilityDetails facility={block} />
-      </div>
-    ),
-    viewUnit: (
-      <div className="p-4">
-        <FacilityDetails facility={unit} />
-      </div>
-    ),
     viewAssetCategory: (
       <div className="p-4">
         <FacilityDetails facility={category} title="Category" />
@@ -694,89 +722,68 @@ function FacilityManagement() {
     ),
   };
 
-  // Permissions and default tab logic
-  const tabPermissions: { [key: string]: string[] } = {
-    Facilities: ["read_facilities"],
-    "My Facilities": ["read_facilities:my-facilities/all"],
-    Blocks: ["read_blocks"],
-    "My Blocks": ["read_blocks:my-blocks/all"],
-    Units: ["read_units"],
-    "My Units": ["read_units:my-units/all"],
-    Assets: ["read_assets"],
-    Categories: ["read_assets:/category/all"],
-  };
-
-  const { userPermissions } = useDataPermission();
-
-  const getDefaultTab = () => {
-    const userPermissionStrings = userPermissions.map(
-      (perm) => perm.permissionString
-    );
-
-    return tabs.find((tab) =>
-      (tabPermissions[tab] || []).every((permission) =>
-        userPermissionStrings.includes(permission)
-      )
-    );
-  };
-
-  const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
-
   // Fetch data on tab change or state change
   useEffect(() => {
     if (selectedTab === "Blocks") {
       getBlocks();
-      getUnits();
+      getFacilitiesUnpaginated();
       getAssets();
+      getUsers();
     } else if (selectedTab === "My Blocks") {
       getMyBlocks();
-      getMyUnits();
+      getMyFacilitiesUnpaginated();
       getAssets();
+      getUsers();
     } else if (selectedTab === "Units") {
       getUnits();
+      getBlocksUnpaginated();
       getAssets();
       getUsers();
     } else if (selectedTab === "My Units") {
       getMyUnits();
+      getMyBlocksUnpaginated();
       getAssets();
       getUsers();
+      getMyBlocks();
     } else if (selectedTab === "Assets") {
       getAssets();
     } else if (selectedTab === "Categories") {
       getCategories();
     } else if (selectedTab === "My Facilities") {
       const fetchData = async () => {
-        await Promise.all([
-          getMyFacilities(),
-          getMyBlocks(),
-          getMyUnits(),
-          getAssets(),
-          getUsers(),
-        ]);
+        await Promise.all([getMyFacilities(), getAssets(), getUsers()]);
       };
       fetchData();
     } else {
       const fetchData = async () => {
-        await Promise.all([
-          getFacilities(),
-          getBlocks(),
-          getUnits(),
-          getAssets(),
-          getUsers(),
-        ]);
+        await Promise.all([getFacilities(), getAssets(), getUsers()]);
       };
       fetchData();
     }
-  }, [centralState, centralStateDelete, selectedTab, , pagination.currentPage]);
+  }, [selectedTab, pagination.currentPage]);
 
   useEffect(() => {
-    if (centralState === "viewFacility") {
-      getAFacility();
-    } else if (centralState === "viewBlock") {
-      getABlock();
-    } else if (centralState === "viewUnit") {
-      getAUnit();
-    } else if (centralState === "viewAssetCategory") {
+    if (selectedTab === "Blocks") {
+      getBlocks();
+    } else if (selectedTab === "My Blocks") {
+      getMyBlocks();
+    } else if (selectedTab === "Units") {
+      getUnits();
+    } else if (selectedTab === "My Units") {
+      getMyUnits();
+    } else if (selectedTab === "Assets") {
+      getAssets();
+    } else if (selectedTab === "Categories") {
+      getCategories();
+    } else if (selectedTab === "My Facilities") {
+      getMyFacilities();
+    } else {
+      getFacilities();
+    }
+  }, [centralState, centralStateDelete]);
+
+  useEffect(() => {
+    if (centralState === "viewAssetCategory") {
       getACategory();
     }
   }, [centralState]);

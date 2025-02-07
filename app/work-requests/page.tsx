@@ -47,7 +47,7 @@ function WorkRequests() {
   // Fetch data functions
   const getAssignedWorkRequests = async () => {
     const response = await axiosInstance.get(
-      `/work-requests/my-work-requests/all?page=${pagination.currentPage}`
+      `/work-requests/my-work-requests/all?page=${pagination.currentPage}&&paginate=true`
     );
     setAssignedWorkRequests(response.data.data);
     const extra = response.data?.extra;
@@ -60,7 +60,7 @@ function WorkRequests() {
   };
 
   const getOtherWorkRequests = async () => {
-    const response = await axiosInstance.get(`/work-requests?page=${pagination.currentPage}`);
+    const response = await axiosInstance.get(`/work-requests?page=${pagination.currentPage}&&paginate=true`);
     setOtherWorkRequests(response.data.data);
     const extra = response?.data.extra;
     if(extra){

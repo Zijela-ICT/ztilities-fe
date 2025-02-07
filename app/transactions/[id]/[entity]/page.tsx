@@ -109,7 +109,7 @@ function Transactions() {
 
   const getMyTransactions = async () => {
     const response = await axiosInstance.get(
-      `/transactions/my-transactions/all?page=${pagination.currentPage}`
+      `/transactions/my-transactions/all?page=${pagination.currentPage}&&paginate=true`
     );
     setFilteredTransactions(response.data.data);
     const extra = response.data.extra;
@@ -284,7 +284,14 @@ function Transactions() {
       title="Transactions"
       detail="See balance and all transactions here"
     >
-      {loading && <MyLoaderFinite />}
+      {loading && (
+        <div className="flex items-center justify-center space-x-4">
+          <div>
+            <MyLoaderFinite />
+          </div>
+          <div>Hold on, getting transactions</div>
+        </div>
+      )}
       <>
         <PermissionGuard
           requiredPermissions={[

@@ -9,10 +9,10 @@ export default function ProtectedRoute({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    if (!token) {
-      router.push("/"); 
-    } else {
+    if (token) {
       setIsAuthenticated(true);
+    } else {
+      router.push("/");
     }
   }, []);
 

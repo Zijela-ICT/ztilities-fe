@@ -21,7 +21,10 @@ export default function Navigation() {
   const isActive = useCallback((path: string) => pathname === path, [pathname]);
 
   const logout = async () => {
-    localStorage.removeItem("authToken"); // Remove the token
+    localStorage.removeItem("authToken"); // Remove auth token
+    localStorage.removeItem("user"); // Remove user data
+    localStorage.removeItem("userPermissions"); // Remove permissions
+    localStorage.removeItem("userRoles"); // Remove the token
     router.push("/");
   };
 
@@ -178,7 +181,12 @@ export default function Navigation() {
               permissions: ["units"],
               iconPath: paths.path6,
             },
-
+            {
+              href: "/approvers",
+              label: "Approvers",
+              permissions: ["users"],
+              iconPath: paths.path9,
+            },
             // {
             //   href: "/ppm",
             //   label: "PPM",

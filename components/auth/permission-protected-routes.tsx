@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useDataPermission } from "@/context";
 
 // Higher-Order Component
@@ -11,6 +11,8 @@ const withPermissions = (
 ) => {
   return function PermissionWrapper(props: any) {
     const router = useRouter();
+    const pathName = usePathname();
+
     const { userPermissions } = useDataPermission(); // Move the hook here
 
     // Helper function to check for permission matches
@@ -25,9 +27,10 @@ const withPermissions = (
     useEffect(() => {
       if (!hasPermissionForRoute(requiredPermissions)) {
         // router.back();
-        router.push("/dashboard");
+        router.push(pathName && pathName);
+        router.push(`/dashboard`);
       }
-    }, [router, userPermissions, requiredPermissions]);
+    }, [router, pathName, userPermissions, requiredPermissions]);
 
     if (!hasPermissionForRoute(requiredPermissions)) {
       return null; // Optionally show loading spinner or fallback content here

@@ -8,11 +8,8 @@ import ModalCompoenent, {
   SuccessModalCompoenent,
 } from "@/components/modal-component";
 import CreateBulkUser from "@/components/user-management/create-bulk-user";
-import axiosInstance from "@/utils/api";
-
 import { useParams, useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
-import FacilityDetails from "@/components/facility-management/view-facility";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import createAxiosInstance from "@/utils/api";
 
@@ -53,12 +50,6 @@ function FacilityManagement() {
     setUsers(response.data.data);
   };
 
-  const [facility, setAFacility] = useState<Facility>();
-  const getAFacility = async () => {
-    const response = await axiosInstance.get(`/facilities/${activeRowId}`);
-    setAFacility(response.data.data);
-  };
-
   // Single role state and fetch function
   const [asset, setAsset] = useState<Asset>();
   const getAAsset = async () => {
@@ -83,6 +74,10 @@ function FacilityManagement() {
       await Promise.all([getAssets(), getAAsset(), getUsers()]);
     };
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    getAAsset();
   }, [centralState, centralStateDelete]);
 
   // Dynamic title logic
@@ -275,11 +270,6 @@ function FacilityManagement() {
         }
       />
     ),
-    viewFacility: (
-      <div className="p-4">
-        <FacilityDetails facility={facility} />
-      </div>
-    ),
   };
 
   // Utility function to format role names
@@ -290,12 +280,6 @@ function FacilityManagement() {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ")} `;
   }
-
-  useEffect(() => {
-    if (centralState === "viewFacility") {
-      getAFacility();
-    }
-  }, [centralState]);
 
   return (
     <DashboardLayout

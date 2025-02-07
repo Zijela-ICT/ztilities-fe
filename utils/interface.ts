@@ -86,6 +86,7 @@ interface Unit {
   address: string | null;
   assets: Asset[];
   bills: any[];
+  wallets: any[];
   user: User;
 }
 

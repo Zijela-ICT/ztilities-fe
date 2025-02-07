@@ -33,7 +33,7 @@ function Power() {
 
   // Fetch data functions
   const getPowerCharges = async () => {
-    const response = await axiosInstance.get(`/power-charges?page=${pagination.currentPage}`);
+    const response = await axiosInstance.get(`/power-charges?page=${pagination.currentPage}&&paginate=true`);
     setPowerCharges(response.data.data);
     const extra = response.data.extra;
     setPagination({
