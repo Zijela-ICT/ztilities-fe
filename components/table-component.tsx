@@ -530,7 +530,7 @@ export default function TableComponent({
                                 : row[column]?.toString().toLowerCase() ===
                                   "apportioned"
                                 ? "text-[#6A1B9A] bg-[#F3E5F5]"
-                                : ""
+                                : "text-[#2874A6] bg-[#D6EAF8]"
                             } rounded-full`}
                           >
                             {row[column]?.toString()}
