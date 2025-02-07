@@ -8,7 +8,7 @@ import {
   RefreshIcon,
   TransactionIcon,
 } from "@/utils/svg";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -26,7 +26,9 @@ import createAxiosInstance from "@/utils/api";
 import { chartOptions } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import PermissionGuard from "@/components/auth/permission-protected-components";
-import MyLoader, { MyLoaderFinite } from "@/components/loader-components";
+import { MyLoaderFinite } from "@/components/loader-components";
+import FundWallet from "@/components/facility-management/fund-wallet";
+import ModalCompoenent from "@/components/modal-component";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -67,6 +69,7 @@ function Transactions() {
       options: users,
     },
     { label: "Facility", options: facilities },
+    // { label: "Unit", options: [] },
     { label: "Vendor", options: vendors },
     {
       label: "Technician",
@@ -176,26 +179,6 @@ function Transactions() {
     fetchFilteredTransactions();
   }, [filters]);
 
-  // useEffect(() => {
-  //   setLoading(true)
-  //   getMyTransactions();
-  //   setLoading(false)
-  // }, []);
-
-  // useEffect(() => {
-  //   setLoading(true)
-  //   if (filters.User) {
-  //     getAUserTransactions();
-  //   } else if (filters.Vendor) {
-  //     getAVendorTransactions();
-  //   } else if (filters.Technician) {
-  //     getATechnicianTransactions();
-  //   } else if (filters.Facility) {
-  //     getAFacilityTransactions();
-  //   }
-  //   setLoading(false)
-  // }, [filters]);
-
   useEffect(() => {
     if (
       filters.User ||
@@ -270,11 +253,35 @@ function Transactions() {
     ],
   };
 
+  const [centralState, setCentralState] = useState<string>();
+  const [selectedWalletIndex, setSelectedWalletIndex] = useState(0);
+  const [showBalance, setShowBalance] = useState(true);
+  // Component mapping
+  const componentMap: Record<string, JSX.Element> = {
+    fundWallet: (
+      <FundWallet
+        activeRowId={user.wallets[selectedWalletIndex]?.id}
+        setModalState={setCentralState}
+        type={"User"}
+      />
+    ),
+  };
+
   return (
     <DashboardLayout
       title="Transactions"
       detail="See balance and all transactions here"
     >
+      <ModalCompoenent
+        title={"Fund Wallet"}
+        detail={""}
+        modalState={centralState}
+        setModalState={() => {
+          setCentralState("");
+        }}
+      >
+        {componentMap[centralState]}
+      </ModalCompoenent>
       {loading && (
         <div className="flex items-center justify-center space-x-4">
           <div>
@@ -304,7 +311,7 @@ function Transactions() {
                     onClick={() => getMyTransactions()}
                     className="text-black flex items-center space-x-1 cursor-pointer"
                   >
-                    <p>Refresh my transactions : </p>{" "}
+                    <p>Refresh my transactions : </p>
                     <RefreshIcon stroke="black" />
                   </div>
                 </PermissionGuard>
@@ -349,11 +356,41 @@ function Transactions() {
 
         {user.wallets.length > 1 && (
           <div
-            className="relative bg-cover bg-center bg-no-repeat rounded-2xl px-4 py-6 my-6 "
+            className="relative bg-cover bg-center bg-no-repeat rounded-2xl px-4 py-4 "
             style={{
               backgroundImage: "url('/assets/wallet-bg.jpeg')",
             }}
           >
+            {user.wallets.length > 1 && (
+              <div className="mb-2 flex flex-wrap gap-2">
+                {user.wallets.map((wallet, index) => (
+                  <button
+                    key={wallet.id || index}
+                    onClick={() => setSelectedWalletIndex(index)}
+                    className={`px-3 py-1 rounded ${
+                      selectedWalletIndex === index
+                        ? "bg-[#A8353A] text-white"
+                        : "bg-white text-black"
+                    }`}
+                  >
+                    {wallet.walletType}
+                    {/* Optionally show a short hash if available */}
+                    {wallet.hash && (
+                      <span className="ml-2 text-xs text-gray-600">
+                        {wallet.hash.slice(0, 6)}...
+                      </span>
+                    )}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => setCentralState("fundWallet")}
+                  className="px-3 py-1 rounded bg-white text-black"
+                >
+                  Fund Wallet
+                </button>
+              </div>
+            )}
             <div className="flex justify-between items-center pb-2">
               <span className="text-gray-200 ">Account Balance</span>
               <div className="text-white py-2 flex items-center space-x-1">
@@ -363,9 +400,19 @@ function Transactions() {
 
             <div className="flex justify-between items-center">
               <span className="text-white font-bold text-2xl">
-                N {parseFloat(user.wallets[0]?.balance).toFixed(2)}{" "}
+                {showBalance ? (
+                  <>
+                    N
+                    {parseFloat(
+                      user.wallets[selectedWalletIndex]?.balance
+                    ).toFixed(2)}
+                  </>
+                ) : (
+                  "****"
+                )}
               </span>
               <svg
+                onClick={() => setShowBalance(!showBalance)}
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6 text-white cursor-pointer"
                 fill="none"
@@ -403,7 +450,6 @@ function Transactions() {
           </>
         ) : (
           <>
-            {" "}
             <div className="flex flex-col md:flex-row w-full h-auto space-y-4 md:space-y-0 md:space-x-4">
               {/* Left Section (Graph) */}
               <div className="w-full md:w-3/5 bg-white rounded-lg  p-6">

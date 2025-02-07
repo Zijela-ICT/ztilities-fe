@@ -1,15 +1,14 @@
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
-import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
-import { FileInputComponent, LabelInputComponent } from "../input-container";
+import { LabelInputComponent } from "../input-container";
 import createAxiosInstance from "@/utils/api";
 import { MyLoaderFinite } from "../loader-components";
 
 interface FundWalletProps {
   setModalState: (state: any) => void;
   activeRowId: number | string;
-  setSuccessState: (state: any) => void;
+  setSuccessState?: (state: any) => void;
   type?: string;
 }
 export default function FundWallet({
@@ -20,7 +19,7 @@ export default function FundWallet({
 }: FundWalletProps) {
   const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({
-    walletId: "", // Status field
+    walletId: "", 
     amount: "",
   });
   const [loading, setLoading] = useState<boolean>(false);
@@ -34,9 +33,16 @@ export default function FundWallet({
     setAUnit(response.data.data);
   };
 
+  const getMe = async () => {
+    const response = await axiosInstance.get(`/auth/me`);
+    setAUnit(response.data.data?.user);
+  };
+
   useEffect(() => {
     if (type === "Facilities" || type === "My Facilities") {
       getAFacility();
+    } else if (type === "User") {
+      getMe();
     } else {
       getAUnit();
     }
