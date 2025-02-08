@@ -278,6 +278,7 @@ export default function FacilityDetails({
                               {item.blockNumber ??
                                 item.assetName ??
                                 item.unitNumber ??
+                                item.title ??
                                 (item.firstName && item.lastName
                                   ? item.firstName + " " + item.lastName
                                   : item.walletType + " ₦" + item.balance)}

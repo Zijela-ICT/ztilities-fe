@@ -132,7 +132,7 @@ export default function CreatePPM({
       title: "Successful",
       detail: `You have successfully ${
         activeRowId ? "edited" : "created"
-      } this Work Order`,
+      } this PPM`,
       status: true,
     });
   };

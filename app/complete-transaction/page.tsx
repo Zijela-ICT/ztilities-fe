@@ -91,6 +91,7 @@ import { useParams, useRouter } from "next/navigation";
 import createAxiosInstance from "@/utils/api";
 import ButtonComponent from "@/components/button-component";
 import { MyLoaderFinite } from "@/components/loader-components";
+import axios from "axios";
 
 function CompleteTransaction() {
   const axiosInstance = createAxiosInstance();
@@ -124,7 +125,7 @@ function CompleteTransaction() {
   const verifyTransaction = async () => {
     if (!query) return; // Prevent API call if query is missing
     try {
-      await axiosInstance.patch(`/payments/verify/${query}`);
+      await axios.patch(`/payments/verify/${query}`);
       sendMessageToReactNative(query, "success");
     } catch (error) {
       console.error("Transaction verification failed:", error);
