@@ -125,7 +125,7 @@ function CompleteTransaction() {
   const verifyTransaction = async () => {
     if (!query) return; // Prevent API call if query is missing
     try {
-      await axios.patch(`/payments/verify/${query}`);
+      await axios.patch(`https://updc-dev.zijela.com/api/v1/payments/verify/${query}`);
       sendMessageToReactNative(query, "success");
     } catch (error) {
       console.error("Transaction verification failed:", error);

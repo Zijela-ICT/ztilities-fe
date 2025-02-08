@@ -147,7 +147,7 @@ export default function CreatePPM({
   ];
 
   const frequencyOptions = [
-    { value: "days", label: "dayss" },
+    { value: "days", label: "Days" },
     { value: "weeks", label: "Weeks" },
     { value: "months", label: "Months" },
     { value: "years", label: "Years" },
