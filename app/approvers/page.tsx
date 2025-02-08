@@ -34,12 +34,12 @@ function Approvers() {
   // Fetch data functions
   const getApprovers = async () => {
     const response = await axiosInstance.get(
-      `/users?page=${pagination.currentPage}&&paginate=true`
+      `/users/users-with-approval-limit/all?page=${pagination.currentPage}&&paginate=true`
     );
-    const usersWithApprovalRole = response.data.data?.filter((user) =>
-      user?.roles?.some((role) => role?.name === "APPROVAL_ROLE")
-    );
-    setApprovers(usersWithApprovalRole);
+    // const usersWithApprovalRole = response.data.data?.filter((user) =>
+    //   user?.roles?.some((role) => role?.name === "APPROVAL_ROLE")
+    // );
+    setApprovers(response.data.data);
     const extra = response.data.extra;
     setPagination({
       currentPage: extra.page,
