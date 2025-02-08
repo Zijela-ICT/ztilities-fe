@@ -2,9 +2,11 @@
 
 import ButtonComponent from "@/components/button-component";
 import DashboardLayout from "@/components/dashboard-layout-component";
+import ModalCompoenent from "@/components/modal-component";
+import CreatePPM from "@/components/ppm/createPPM";
 import createAxiosInstance from "@/utils/api";
 import { SearchIcon } from "@/utils/svg";
-import { useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,6 +14,21 @@ import "react-datepicker/dist/react-datepicker.css";
 export default function Ppm() {
   const axiosInstance = createAxiosInstance();
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const [successState, setSuccessState] = useState({
+    title: "",
+    detail: "",
+    status: false,
+  });
+  const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
+  const [centralState, setCentralState] = useState<string>();
+  const [centralStateDelete, setCentralStateDelete] = useState<string>();
+  const [ppms, setPpms] = useState<any[]>([]);
+
+  const getPPMS = async () => {
+    const response = await axiosInstance.get(`/ppms`);
+    setPpms(response.data.data);
+  };
 
   // Function to get all days in the selected month
   const getDaysInMonth = (date) => {
@@ -30,15 +47,39 @@ export default function Ppm() {
     `Task ${day}-3`,
   ];
 
+  const componentMap: Record<string, JSX.Element> = {
+    createPPM: (
+      <CreatePPM
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+  };
+
+  useEffect(() => {
+    getPPMS();
+  }, []);
+
   return (
     <DashboardLayout title="PPM" detail="View Work Calender">
-      {/* <>
+      <ModalCompoenent
+        title={"CretePPM"}
+        detail={""}
+        modalState={centralState}
+        setModalState={() => {
+          setCentralState("");
+          setActiveRowId(null);
+        }}
+      >
+        {componentMap[centralState]}
+      </ModalCompoenent>
+      <>
         <div className="relative bg-white rounded-2xl p-4">
           <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0 font-semibold text-md">
             <div
               className={`flex items-center border rounded-md focus-within:ring-2 focus-within:ring-blue-500 w-full sm:w-[70%]`}
             >
-    
               <span className="pl-3 text-gray-400 mt-2">
                 <SearchIcon />
               </span>
@@ -51,10 +92,9 @@ export default function Ppm() {
               />
             </div>
 
-     
             <ButtonComponent
               text={"Add New PPM"}
-              onClick={() => {}}
+              onClick={() => setCentralState("createPPM")}
               className="flex-1 px-4 py-3 text-white bg-[#A8353A]"
               permissions={["create_work-orders"]}
             />
@@ -65,7 +105,7 @@ export default function Ppm() {
           <div className="w-1/5 bg-white rounded-xl p-2">
             <DatePicker
               selected={selectedDate}
-              onChange={(date) => setSelectedDate(date)}
+              onChange={(date: Date) => setSelectedDate(date)}
               dateFormat="MMMM d, yyyy"
               inline
               className="w-full"
@@ -107,7 +147,7 @@ export default function Ppm() {
             </div>
           </div>
         </div>
-      </> */}
+      </>
       PPm
     </DashboardLayout>
   );

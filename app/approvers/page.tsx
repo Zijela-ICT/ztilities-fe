@@ -25,28 +25,41 @@ function Approvers() {
     status: false,
   });
 
+  const [roles, setRoles] = useState<Role[]>();
   const [approvers, setApprovers] = useState<any[]>();
+
   const [approver, setApprover] = useState<any[]>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   // Fetch data functions
+
+  const getRoles = async () => {
+    const response = await axiosInstance.get("/roles");
+    setRoles(response.data.data);
+  };
+
   const getApprovers = async () => {
-    const response = await axiosInstance.get(
-      `/users/users-with-approval-limit/all?page=${pagination.currentPage}&&paginate=true`
+    const APPROVAL_ROLE = roles.find(
+      (role: Role) => role.name === "APPROVAL_ROLE"
     );
-    // const usersWithApprovalRole = response.data.data?.filter((user) =>
-    //   user?.roles?.some((role) => role?.name === "APPROVAL_ROLE")
-    // );
-    setApprovers(response.data.data);
-    const extra = response.data.extra;
-    setPagination({
-      currentPage: extra.page,
-      pageSize: extra.pageSize,
-      total: extra.total,
-      totalPages: extra.totalPages,
-    });
+    if (APPROVAL_ROLE) {
+      const response = await axiosInstance.get(
+        `/roles/${APPROVAL_ROLE.id}?page=${pagination.currentPage}&&paginate=true`
+      );
+      setApprovers(response.data.data?.users);
+
+      const extra = response.data.extra;
+      if (extra) {
+        setPagination({
+          currentPage: extra.page,
+          pageSize: extra.pageSize,
+          total: extra.total,
+          totalPages: extra.totalPages,
+        });
+      }
+    }
   };
 
   const getAApprover = async () => {
@@ -144,11 +157,14 @@ function Approvers() {
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
 
   useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([getApprovers()]);
-    };
-    fetchData();
-  }, [centralState, centralStateDelete, pagination.currentPage]);
+    getRoles();
+  }, []);
+
+  useEffect(() => {
+    if (roles) {
+      getApprovers();
+    }
+  }, [roles, centralState, centralStateDelete, pagination.currentPage]);
 
   return (
     <DashboardLayout
