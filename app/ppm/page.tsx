@@ -360,7 +360,6 @@ export default function Ppm() {
     setPpms(response.data.data);
   };
 
-  console.log(showAll);
   const componentMap: Record<string, JSX.Element> = {
     createPPM: (
       <CreatePPM
@@ -467,6 +466,7 @@ export default function Ppm() {
   };
 
   const days = getDaysInMonth(selectedMonth);
+  console.log(days, "days");
   return (
     <DashboardLayout title="PPM" detail="View Work Calendar">
       <SuccessModalCompoenent

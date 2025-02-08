@@ -38,6 +38,7 @@ export default function CreatePPM({
     facility: "",
     asset: "",
     frequency: "",
+    frequencyType: "",
     duration: "",
     startDate: "",
   });
@@ -106,14 +107,15 @@ export default function CreatePPM({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log(formData)
+    const payload = {
+      ...formData,
+      frequency: formData.frequency + " " + formData.frequencyType,
+    };
+    console.log(payload);
     if (activeRowId) {
-      await axiosInstance.patch(
-        `/ppms/${activeRowId}`,
-        formData
-      );
+      await axiosInstance.patch(`/ppms/${activeRowId}`, payload);
     } else {
-      await axiosInstance.post("/ppms", formData);
+      await axiosInstance.post("/ppms", payload);
     }
     setFormData({
       title: "",
@@ -124,6 +126,7 @@ export default function CreatePPM({
       facility: "",
       asset: "",
       frequency: "",
+      frequencyType: "",
       duration: "",
       startDate: "",
     });
@@ -141,6 +144,13 @@ export default function CreatePPM({
     { value: "unit", label: "Unit" },
     { value: "block", label: "Block" },
     { value: "facility", label: "Facility" },
+  ];
+
+  const frequencyOptions = [
+    { value: "days", label: "dayss" },
+    { value: "weeks", label: "Weeks" },
+    { value: "months", label: "Months" },
+    { value: "years", label: "Years" },
   ];
 
   const unitOptions = (user.units || myUnits)?.map((unit: Unit) => ({
@@ -233,15 +243,30 @@ export default function CreatePPM({
           />
         </div>
 
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="frequency"
-            value={formData.frequency}
-            onChange={handleChange}
-            label="Frequncy"
-          />
+        <div className="flex space-x-3">
+          {" "}
+          <div className="relative w-full mt-6">
+            <LabelInputComponent
+              type="number"
+              name="frequency"
+              value={formData.frequency}
+              onChange={handleChange}
+              label="Frequncy"
+            />
+          </div>
+          <div className="relative w-full mt-6">
+            <Select
+              options={frequencyOptions}
+              value={frequencyOptions?.find(
+                (option) => option.value === formData.frequencyType
+              )}
+              onChange={handleSelectChange("frequencyType")}
+              styles={multiSelectStyle}
+              placeholder="Frequency type "
+            />
+          </div>{" "}
         </div>
+
         <div className="relative w-full mt-6">
           <LabelInputComponent
             type="text"
