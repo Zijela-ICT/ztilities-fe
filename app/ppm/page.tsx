@@ -1099,7 +1099,7 @@ export default function Ppm() {
     const token = localStorage.getItem("authToken");
     try {
       const response = await axiosInstance.get(
-        `ppms?startDate=${startDate}&endDate=${endDate}`
+        `/ppms?startDate=${startDate}&endDate=${endDate}`
       );
       setPpms(response.data);
     } catch (error) {
@@ -1348,7 +1348,8 @@ export default function Ppm() {
                   return (
                     <li key={index}>
                       <Link
-                        href={`/ppm/${work.id}`}
+                        // href={`/ppm/${work.id}`}
+                        href={"/ppm"}
                         className="flex items-center"
                       >
                         <span
