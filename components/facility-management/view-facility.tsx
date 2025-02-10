@@ -135,6 +135,8 @@ export default function FacilityDetails({
                                   .slice(1)}{" "}
                               {idx + 1} */}
                               {item.action ||
+                                item.assetName ||
+                                item.walletType ||
                                 key
                                   .replace(/([a-z])([A-Z])/g, "$1 $2")
                                   .replace(/^./, (str) => str.toUpperCase()) + // Capitalize first letter

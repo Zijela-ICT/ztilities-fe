@@ -431,6 +431,7 @@ export default function TableComponent({
                           type === "facilities" ||
                           type === "blocks" ||
                           type === "bills" ||
+                          type === "units" ||
                           type === "categories" ||
                           type === "powers" ? (
                             // Show the length of the array for specific types
