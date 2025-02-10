@@ -39,7 +39,7 @@ export default function CreatePPM({
     asset: "",
     frequency: "",
     frequencyType: "",
-    duration: "",
+    endDate: "",
     startDate: "",
   });
 
@@ -109,7 +109,7 @@ export default function CreatePPM({
 
     const payload = {
       ...formData,
-      frequency: formData.frequency + " " + formData.frequencyType,
+      frequency: formData.frequency,
     };
     console.log(payload);
     if (activeRowId) {
@@ -127,7 +127,7 @@ export default function CreatePPM({
       asset: "",
       frequency: "",
       frequencyType: "",
-      duration: "",
+      endDate: "",
       startDate: "",
     });
     setModalState("");
@@ -147,10 +147,10 @@ export default function CreatePPM({
   ];
 
   const frequencyOptions = [
-    { value: "days", label: "Days" },
-    { value: "weeks", label: "Weeks" },
-    { value: "months", label: "Months" },
-    { value: "years", label: "Years" },
+    { value: "DAILY", label: "Daily" },
+    { value: "WEEKLY", label: "Weekly" },
+    { value: "MONTHLY", label: "Monthly" },
+    { value: "YEARLY", label: "Yearly" },
   ];
 
   const unitOptions = (user.units || myUnits)?.map((unit: Unit) => ({
@@ -235,7 +235,7 @@ export default function CreatePPM({
 
         <div className="relative w-full mt-6">
           <LabelInputComponent
-            type="date"
+            type="datetime-local"
             name="startDate"
             value={formData.startDate}
             onChange={handleChange}
@@ -245,7 +245,7 @@ export default function CreatePPM({
 
         <div className="flex space-x-3">
           {" "}
-          <div className="relative w-full mt-6">
+          {/* <div className="relative w-full mt-6">
             <LabelInputComponent
               type="number"
               name="frequency"
@@ -253,27 +253,27 @@ export default function CreatePPM({
               onChange={handleChange}
               label="Frequncy"
             />
-          </div>
+          </div> */}
           <div className="relative w-full mt-6">
             <Select
               options={frequencyOptions}
               value={frequencyOptions?.find(
-                (option) => option.value === formData.frequencyType
+                (option) => option.value === formData.frequency
               )}
-              onChange={handleSelectChange("frequencyType")}
+              onChange={handleSelectChange("frequency")}
               styles={multiSelectStyle}
-              placeholder="Frequency type "
+              placeholder="Frequency"
             />
           </div>{" "}
         </div>
 
         <div className="relative w-full mt-6">
           <LabelInputComponent
-            type="text"
-            name="duration"
-            value={formData.duration}
+            type="datetime-local"
+            name="endDate"
+            value={formData.endDate}
             onChange={handleChange}
-            label="Duration"
+            label="End Date"
           />
         </div>
 
