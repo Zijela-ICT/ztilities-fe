@@ -1358,7 +1358,7 @@ export default function Ppm() {
                         <span
                           className={`truncate ${statusColor} hover:text-blue-500 text-xs`}
                         >
-                          {work.title} {moment(work.startDate).format("LT")}
+                          {work.title} {moment(work.occurrenceDate).format("LT")}
                         </span>
                       </Link>
                     </li>
