@@ -167,7 +167,7 @@ function WorkOrders({ nowrap }: Props) {
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully apportion service charge",
+      detail: "You have successfully apportion cost",
       status: true,
     });
   };
@@ -179,7 +179,7 @@ function WorkOrders({ nowrap }: Props) {
     setCentralState("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully approved apportion service charge",
+      detail: "You have successfully approved apportion cost",
       status: true,
     });
   };
@@ -226,7 +226,7 @@ function WorkOrders({ nowrap }: Props) {
       case "activateWorkOrder":
         return "Re-activate Work Order";
       case "apportionServiceCharge":
-        return "Apportion Service charge";
+        return "Apportion Cost";
       case "approveQuotation":
         return "Approve Quotation";
       case "acceptWorkOrder":
@@ -234,7 +234,7 @@ function WorkOrders({ nowrap }: Props) {
       case "requestquotationsselection":
         return "Request quotation selection";
       case "raisePaymentOrder":
-        return "Raise Payment Order";
+        return "Raise Purchase Order";
     }
     return "Zijela";
   };
@@ -277,7 +277,7 @@ function WorkOrders({ nowrap }: Props) {
       case "deactivateWorkOrder":
         return "Are you sure you want to de-activate this work order";
       case "apportionServiceCharge":
-        return "You want to apportion service charge for this work order";
+        return "You want to apportion cost for this work order";
       case "requestquotationsselection":
         return "You want to request this quotation for selection";
       case "approveQuotation":
@@ -285,7 +285,7 @@ function WorkOrders({ nowrap }: Props) {
       case "acceptWorkOrder":
         return "Are you sure you want to approve this work order";
       case "raisePaymentOrder":
-        return "Are you sure you want to raise payment order";
+        return "Are you sure you want to raise purchase order";
     }
     return "Zijela";
   };

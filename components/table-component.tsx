@@ -248,6 +248,7 @@ import { tableMainButtonConfigs } from "@/utils/tableConfig";
 import Image from "next/image";
 import { useDataPermission } from "@/context";
 import StatusBadge from "./status-component";
+import ActionDropdownComponent from "./action-dropdown-component";
 
 interface TableProps {
   data: Record<string, any>[];
@@ -409,7 +410,15 @@ export default function TableComponent({
 
             <tbody>
               {filteredData?.map((row: any, index) => (
-                <tr key={index} className="border-b border-gray-200 h-20">
+                <tr
+                  // onContextMenu={(e) => {
+                  //   e.preventDefault(); // Prevents the default browser context menu
+                  //   toggleActions(row.id)
+                  //   console.log(row.id)
+                  // }}
+                  key={index}
+                  className="border-b border-gray-200  h-20 "
+                >
                   {columns
                     .filter(
                       (column) =>
@@ -545,7 +554,9 @@ export default function TableComponent({
 
                               {/* Dropdown Menu */}
                               {activeRowId === row.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ActionDropdownComponent
+                                  toggleActions={() => toggleActions(null)}
+                                >
                                   <ul className="py-2">
                                     <li>
                                       <DropdownButtonComponent
@@ -587,7 +598,7 @@ export default function TableComponent({
                                       )}
                                     </li>
                                   </ul>
-                                </div>
+                                </ActionDropdownComponent>
                               )}
                             </div>
                           </>
@@ -612,7 +623,9 @@ export default function TableComponent({
 
                               {/* Dropdown Menu */}
                               {activeRowId === row.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ActionDropdownComponent
+                                  toggleActions={() => toggleActions(null)}
+                                >
                                   <ul className="py-2">
                                     <li>
                                       <DropdownButtonComponent
@@ -624,7 +637,7 @@ export default function TableComponent({
                                       />
                                     </li>
                                   </ul>
-                                </div>
+                                </ActionDropdownComponent>
                               )}
                             </div>
                           </>
@@ -702,7 +715,9 @@ export default function TableComponent({
 
                               {/* Dropdown Menu */}
                               {activeRowId === row.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ActionDropdownComponent
+                                  toggleActions={() => toggleActions(null)}
+                                >
                                   <ul className="py-2">
                                     <li>
                                       <DropdownButtonComponent
@@ -769,7 +784,7 @@ export default function TableComponent({
                                       )}
                                     </li>
                                   </ul>
-                                </div>
+                                </ActionDropdownComponent>
                               )}
                             </div>
                           </>
@@ -794,7 +809,9 @@ export default function TableComponent({
 
                               {/* Dropdown Menu */}
                               {activeRowId === row.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ActionDropdownComponent
+                                  toggleActions={() => toggleActions(null)}
+                                >
                                   <ul className="py-2">
                                     <li>
                                       <DropdownButtonComponent
@@ -846,7 +863,7 @@ export default function TableComponent({
                                       )}
                                     </li>
                                   </ul>
-                                </div>
+                                </ActionDropdownComponent>
                               )}
                             </div>
                           </>
@@ -871,7 +888,9 @@ export default function TableComponent({
 
                               {/* Dropdown Menu */}
                               {activeRowId === row.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ActionDropdownComponent
+                                  toggleActions={() => toggleActions(null)}
+                                >
                                   <ul className="py-2">
                                     <li>
                                       <DropdownButtonComponent
@@ -923,7 +942,7 @@ export default function TableComponent({
                                       )}
                                     </li>
                                   </ul>
-                                </div>
+                                </ActionDropdownComponent>
                               )}
                             </div>
                           </>
@@ -994,7 +1013,9 @@ export default function TableComponent({
 
                               {/* Dropdown Menu */}
                               {activeRowId === row.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ActionDropdownComponent
+                                  toggleActions={() => toggleActions(null)}
+                                >
                                   <ul className="py-2">
                                     <li>
                                       <DropdownButtonComponent
@@ -1019,7 +1040,7 @@ export default function TableComponent({
                                       />
                                     </li>
                                   </ul>
-                                </div>
+                                </ActionDropdownComponent>
                               )}
                             </div>
                           </>
@@ -1043,7 +1064,9 @@ export default function TableComponent({
 
                               {/* Dropdown Menu */}
                               {activeRowId === row.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ActionDropdownComponent
+                                  toggleActions={() => toggleActions(null)}
+                                >
                                   <ul className="py-2">
                                     <li>
                                       <DropdownButtonComponent
@@ -1087,7 +1110,7 @@ export default function TableComponent({
                                       )}
                                     </li>
                                   </ul>
-                                </div>
+                                </ActionDropdownComponent>
                               )}
                             </div>
                           </>
@@ -1111,7 +1134,9 @@ export default function TableComponent({
 
                               {/* Dropdown Menu */}
                               {activeRowId === row.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ActionDropdownComponent
+                                  toggleActions={() => toggleActions(null)}
+                                >
                                   <ul className="py-2">
                                     <li>
                                       <DropdownButtonComponent
@@ -1157,7 +1182,7 @@ export default function TableComponent({
                                       )}
                                     </li>
                                   </ul>
-                                </div>
+                                </ActionDropdownComponent>
                               )}
                             </div>
                           </>
@@ -1182,7 +1207,9 @@ export default function TableComponent({
 
                               {/* Dropdown Menu */}
                               {activeRowId === row.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ActionDropdownComponent
+                                  toggleActions={() => toggleActions(null)}
+                                >
                                   <ul className="py-2">
                                     <li>
                                       <DropdownButtonComponent
@@ -1233,7 +1260,7 @@ export default function TableComponent({
                                       />
                                     </li>
                                   </ul>
-                                </div>
+                                </ActionDropdownComponent>
                               )}
                             </div>
                           </>
@@ -1257,7 +1284,9 @@ export default function TableComponent({
 
                               {/* Dropdown Menu */}
                               {activeRowId === row.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ActionDropdownComponent
+                                  toggleActions={() => toggleActions(null)}
+                                >
                                   <ul className="py-2">
                                     <li>
                                       <DropdownButtonComponent
@@ -1315,7 +1344,7 @@ export default function TableComponent({
                                     {row.amount > 0 && (
                                       <li>
                                         <DropdownButtonComponent
-                                          text="Apportion Service Charge"
+                                          text="Apportion Cost"
                                           onClick={() =>
                                             setModalStateDelete(
                                               "apportionServiceCharge"
@@ -1328,7 +1357,7 @@ export default function TableComponent({
                                       </li>
                                     )}
                                   </ul>
-                                </div>
+                                </ActionDropdownComponent>
                               )}
                             </div>
                           </>
@@ -1352,7 +1381,9 @@ export default function TableComponent({
 
                               {/* Dropdown Menu */}
                               {activeRowId === row.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm">
+                                <ActionDropdownComponent
+                                  toggleActions={() => toggleActions(null)}
+                                >
                                   <ul className="py-2">
                                     <li>
                                       <DropdownButtonComponent
@@ -1379,7 +1410,7 @@ export default function TableComponent({
 
                                     <li>
                                       <DropdownButtonComponent
-                                        text="Accept work order"
+                                        text="Accept Request"
                                         onClick={() =>
                                           setModalStateDelete("acceptWorkOrder")
                                         }
@@ -1457,7 +1488,7 @@ export default function TableComponent({
 
                                     <li>
                                       <DropdownButtonComponent
-                                        text="Raise Payment Order"
+                                        text="Raise Purchase Order"
                                         onClick={() =>
                                           setModalStateDelete(
                                             "raisePaymentOrder"
@@ -1485,7 +1516,7 @@ export default function TableComponent({
                                       <>
                                         <li>
                                           <DropdownButtonComponent
-                                            text="View Service Charge"
+                                            text="View and Approve Apportionment"
                                             onClick={() =>
                                               setModalState("viewServiceCharge")
                                             }
@@ -1496,7 +1527,7 @@ export default function TableComponent({
                                         </li>
                                         <li>
                                           <DropdownButtonComponent
-                                            text="Apportion Service Charge"
+                                            text="Apportion Cost"
                                             onClick={() =>
                                               setModalStateDelete(
                                                 "apportionServiceCharge"
@@ -1510,7 +1541,7 @@ export default function TableComponent({
                                       </>
                                     )}
                                   </ul>
-                                </div>
+                                </ActionDropdownComponent>
                               )}
                             </div>
                           </>

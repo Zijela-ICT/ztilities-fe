@@ -107,7 +107,7 @@ function WorkRequests() {
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully apportion service charge",
+      detail: "You have successfully apportion cost",
       status: true,
     });
   };
@@ -167,7 +167,7 @@ function WorkRequests() {
       case "activateWorkRequest":
         return "Re-activate Work Request";
       case "apportionServiceCharge":
-        return "Apportion Service charge";
+        return "Apportion Cost";
       case "assignProcurement":
         return "Assign Procurement";
     }
@@ -206,7 +206,7 @@ function WorkRequests() {
       case "deactivateWorkRequest":
         return "Are you sure you want to de-activate this work request";
       case "apportionServiceCharge":
-        return "You want to apportion service charge for this work request";
+        return "You want to apportion cost for this work request";
       case "assignProcurement":
         return "You want to assign Procurement";
     }
