@@ -29,6 +29,7 @@ import PermissionGuard from "@/components/auth/permission-protected-components";
 import { MyLoaderFinite } from "@/components/loader-components";
 import FundWallet from "@/components/facility-management/fund-wallet";
 import ModalCompoenent from "@/components/modal-component";
+import formatCurrency from "@/utils/formatCurrency";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -486,7 +487,7 @@ function Transactions() {
                   {filteredTransactions?.map((log, index) => (
                     <li
                       key={log.id}
-                      className="flex justify-between items-start mb-4 border-b border-gray-100 last:border-b-0 pb-4"
+                      className="flex justify-between items-start mb-4 border-b text-sm border-gray-100 last:border-b-0 pb-4"
                     >
                       <div className="flex items-start">
                         <div className="flex-shrink-0">
@@ -498,18 +499,18 @@ function Transactions() {
                         </div>
                         <div className="ml-4 flex flex-col">
                           <div className="flex items-center space-x-2">
-                            <span className="font-semibold text-base text-gray-700">
+                            <span className="font-semibold text-gray-700">
                               {log.description}
                             </span>
                           </div>
-                          <p className="text-gray-700 mt-1 font-thin text-sm">
+                          <p className="text-gray-700 mt-1 font-thin ">
                             {log.createdAt}
                           </p>
                         </div>
                       </div>
                       {/* Price or additional information */}
-                      <span className="text-gray-600 text-base font-medium">
-                        N {parseFloat(log.amount).toFixed(2)}
+                      <span className="text-gray-600 font-medium">
+                        ₦ {formatCurrency(log.amount)}
                       </span>
                     </li>
                   ))}

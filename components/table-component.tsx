@@ -249,6 +249,7 @@ import Image from "next/image";
 import { useDataPermission } from "@/context";
 import StatusBadge from "./status-component";
 import ActionDropdownComponent from "./action-dropdown-component";
+import formatCurrency from "@/utils/formatCurrency";
 
 interface TableProps {
   data: Record<string, any>[];
@@ -493,6 +494,8 @@ export default function TableComponent({
                           </span>
                         ) : column === "status" || column === "subStatus" ? (
                           <StatusBadge status={row[column]} />
+                        ): column === "amount"  ? (
+                         row[column] && formatCurrency(row[column])
                         ) : column === "avatar" ? (
                           row?.avatar ? (
                             <Image

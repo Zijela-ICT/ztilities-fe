@@ -1,7 +1,9 @@
 "use client";
 
 import { useDataPermission } from "@/context";
+import formatCurrency from "@/utils/formatCurrency";
 import { DropDownArrow } from "@/utils/svg";
+import moment from "moment";
 import Link from "next/link";
 import React from "react";
 
@@ -83,6 +85,9 @@ export default function FacilityDetails({
                     value !== null &&
                     typeof value === "object"
                   ? `${value?.firstName || "-"} ${value?.lastName || "-"} `
+                  : key === "createdAt" ||
+                    (key === "updatedAt" && value !== null)
+                  ? `${moment(value[key]).format("LL")} `
                   : Array.isArray(value)
                   ? value.length // Show array length
                   : typeof value === "object" && value !== null
