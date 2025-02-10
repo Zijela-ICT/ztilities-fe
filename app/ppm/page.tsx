@@ -1024,6 +1024,7 @@ import ModalCompoenent, {
 import CreatePPM from "@/components/ppm/createPPM";
 import createAxiosInstance from "@/utils/api";
 import { SearchIcon } from "@/utils/svg";
+import axios from "axios";
 import moment from "moment";
 import Link from "next/link";
 import { JSX, useEffect, useState } from "react";
@@ -1095,11 +1096,12 @@ export default function Ppm() {
       endDate = `${endYear}-${endMonthString}-01`;
     }
 
+    const token = localStorage.getItem("authToken");
     try {
       const response = await axiosInstance.get(
-        `/ppms?startDate=${startDate}&endDate=${endDate}`
+        `ppms?startDate=${startDate}&endDate=${endDate}`
       );
-      setPpms(response.data.data);
+      setPpms(response.data);
     } catch (error) {
       console.error("Error fetching PPMs:", error);
     }
@@ -1108,8 +1110,8 @@ export default function Ppm() {
   // UPDATED: Only show the event on the day its startDate occurs.
   const getWorkForDay = (day: number) => {
     const currentDate = new Date(selectedYear, selectedMonth, day);
-    return ppms.filter(({ startDate }) => {
-      const eventDate = new Date(startDate);
+    return ppms.filter(({ occurrenceDate }) => {
+      const eventDate = new Date(occurrenceDate);
       return (
         eventDate.getFullYear() === currentDate.getFullYear() &&
         eventDate.getMonth() === currentDate.getMonth() &&
@@ -1154,13 +1156,13 @@ export default function Ppm() {
               ? "text-green-700"
               : work.status === "Active"
               ? "text-blue-500"
-              : "text-red-500";
+              : "text-blue-500";
           const statusColorBg =
             work.status === "Initiated"
               ? "bg-green-500"
               : work.status === "Active"
               ? "bg-blue-500"
-              : "bg-red-500";
+              : "bg-blue-500";
 
           return (
             <Link
@@ -1174,7 +1176,7 @@ export default function Ppm() {
               <span
                 className={`truncate ${statusColor} hover:text-blue-500 text-xs`}
               >
-                {work.title} - {moment(work.startDate).format("lll")}
+                {work.title} - {moment(work.occurrenceDate).format("lll")}
               </span>
             </Link>
           );
@@ -1206,9 +1208,9 @@ export default function Ppm() {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      <div className="relative bg-white rounded-2xl p-4">
+      <div className="relative bg-white rounded-2xl p-4 mb-4">
         <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0 font-semibold text-md">
-          <div className="flex items-center border rounded-md w-full sm:w-[70%]">
+          {/* <div className="flex items-center border rounded-md w-full sm:w-[70%]">
             <span className="pl-3 text-gray-400 mt-2">
               <SearchIcon />
             </span>
@@ -1218,6 +1220,76 @@ export default function Ppm() {
               placeholder="Search..."
               className="px-1 py-4 w-full focus:outline-none"
             />
+          </div> */}
+
+          <div className="flex items-center border rounded-md w-full sm:w-[70%]">
+            {/* <label className="block text-sm font-semibold mb-2">Date</label> */}
+            <div className="flex items-center border p-3 rounded-md bg-gray-50 w-full">
+              {/* Start Date */}
+              <div className="flex items-center">
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                  className="p-2 border rounded-md"
+                >
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                  className="p-2 border rounded-md ml-2"
+                >
+                  {months.map((month, index) => (
+                    <option key={index} value={index}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Separator */}
+              <span className="hidden mx-3 text-gray-500">to</span>
+
+              {/* End Date (Optional) */}
+              <div className="hidden flex items-center">
+                <select
+                  value={selectedEndYear !== null ? selectedEndYear : ""}
+                  onChange={(e) =>
+                    setSelectedEndYear(
+                      e.target.value === "" ? null : parseInt(e.target.value)
+                    )
+                  }
+                  className="p-2 border rounded-md"
+                >
+                  <option value="">Default</option>
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={selectedEndMonth !== null ? selectedEndMonth : ""}
+                  onChange={(e) =>
+                    setSelectedEndMonth(
+                      e.target.value === "" ? null : parseInt(e.target.value)
+                    )
+                  }
+                  className="p-2 border rounded-md ml-2"
+                >
+                  <option value="">Default</option>
+                  {months.map((month, index) => (
+                    <option key={index} value={index}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
           <ButtonComponent
             text="Add New PPM"
@@ -1228,75 +1300,6 @@ export default function Ppm() {
       </div>
 
       {/* Unified Date Range Picker */}
-      <div className="my-4">
-        <label className="block text-sm font-semibold mb-2">Date </label>
-        <div className="flex items-center border p-3 rounded-md bg-gray-50">
-          {/* Start Date */}
-          <div className="flex items-center">
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-              className="p-2 border rounded-md"
-            >
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-              className="p-2 border rounded-md ml-2"
-            >
-              {months.map((month, index) => (
-                <option key={index} value={index}>
-                  {month}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Separator */}
-          <span className="hidden mx-3 text-gray-500">to</span>
-
-          {/* End Date (Optional) */}
-          <div className=" hidden flex items-center">
-            <select
-              value={selectedEndYear !== null ? selectedEndYear : ""}
-              onChange={(e) =>
-                setSelectedEndYear(
-                  e.target.value === "" ? null : parseInt(e.target.value)
-                )
-              }
-              className="p-2 border rounded-md"
-            >
-              <option value="">Default</option>
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-            <select
-              value={selectedEndMonth !== null ? selectedEndMonth : ""}
-              onChange={(e) =>
-                setSelectedEndMonth(
-                  e.target.value === "" ? null : parseInt(e.target.value)
-                )
-              }
-              className="p-2 border rounded-md ml-2"
-            >
-              <option value="">Default</option>
-              {months.map((month, index) => (
-                <option key={index} value={index}>
-                  {month}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
 
       <div className="p-4 bg-white rounded-xl">
         {/* <h2 className="text-base font-bold mb-4">
@@ -1334,13 +1337,13 @@ export default function Ppm() {
                       ? "text-green-700"
                       : work.status === "Active"
                       ? "text-blue-500"
-                      : "text-red-500";
+                      : "text-blue-500";
                   const statusColorBg =
                     work.status === "Initiated"
                       ? "bg-green-500"
                       : work.status === "Active"
                       ? "bg-blue-500"
-                      : "bg-red-500";
+                      : "bg-blue-500";
 
                   return (
                     <li key={index}>
