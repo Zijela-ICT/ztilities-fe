@@ -1073,7 +1073,7 @@ export default function Ppm() {
 
   // Define a range of years (e.g. currentYear-2 to currentYear+2)
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+  const years = Array.from({ length: 20 }, (_, i) => currentYear - 10 + i);
 
   // Build the API query using the start date and either a custom end date (if selected)
   // or the default (the first day of the next month).
@@ -1210,18 +1210,6 @@ export default function Ppm() {
 
       <div className="relative bg-white rounded-2xl p-4 mb-4">
         <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0 font-semibold text-md">
-          {/* <div className="flex items-center border rounded-md w-full sm:w-[70%]">
-            <span className="pl-3 text-gray-400 mt-2">
-              <SearchIcon />
-            </span>
-            <input
-              id="searchInput"
-              type="text"
-              placeholder="Search..."
-              className="px-1 py-4 w-full focus:outline-none"
-            />
-          </div> */}
-
           <div className="flex items-center border rounded-md w-full sm:w-[70%]">
             {/* <label className="block text-sm font-semibold mb-2">Date</label> */}
             <div className="flex items-center border p-3 rounded-md bg-gray-50 w-full">
@@ -1314,7 +1302,15 @@ export default function Ppm() {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-7 gap-0">
-          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+          {[
+            "Mon 🧟",
+            "Tue ☕",
+            "Wed 🐪",
+            "Thu 🧠",
+            "Fri 🍸",
+            "Sat 🎉",
+            "Sun 💆‍♂",
+          ].map((day) => (
             <div
               key={day}
               className="text-center font-semibold text-gray-500 p-2"
@@ -1348,8 +1344,7 @@ export default function Ppm() {
                   return (
                     <li key={index}>
                       <Link
-                        // href={`/ppm/${work.id}`}
-                        href={"/ppm"}
+                        href={`/ppm/${work.id}`}
                         className="flex items-center"
                       >
                         <span
@@ -1358,7 +1353,8 @@ export default function Ppm() {
                         <span
                           className={`truncate ${statusColor} hover:text-blue-500 text-xs`}
                         >
-                          {work.title} {moment(work.occurrenceDate).format("LT")}
+                          {work.title}{" "}
+                          {moment(work.occurrenceDate).format("LT")}
                         </span>
                       </Link>
                     </li>

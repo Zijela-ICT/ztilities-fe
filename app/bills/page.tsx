@@ -33,7 +33,9 @@ function VendorManagement() {
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   const getBills = async () => {
-    const response = await axiosInstance.get(`/bills?page=${pagination.currentPage}&&paginate=true`);
+    const response = await axiosInstance.get(
+      `/bills?page=${pagination.currentPage}&&paginate=true`
+    );
     setBills(response.data.data);
     const extra = response.data.extra;
     setPagination({
@@ -42,6 +44,22 @@ function VendorManagement() {
       total: extra.total,
       totalPages: extra.totalPages,
     });
+  };
+
+  const getMyBills = async () => {
+    const response = await axiosInstance.get(
+      `/bills/my-bills/all?page=${pagination.currentPage}&&paginate=true`
+    );
+    setBills(response.data.data);
+    const extra = response.data.extra;
+    if (extra) {
+      setPagination({
+        currentPage: extra.page,
+        pageSize: extra.pageSize,
+        total: extra.total,
+        totalPages: extra.totalPages,
+      });
+    }
   };
 
   const getABill = async () => {
@@ -132,7 +150,7 @@ function VendorManagement() {
       getBills();
     } else {
       const fetchData = async () => {
-        await Promise.all([getBills()]);
+        await Promise.all([getMyBills()]);
       };
       fetchData();
     }

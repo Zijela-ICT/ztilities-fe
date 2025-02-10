@@ -246,6 +246,8 @@ import ButtonComponent, { DropdownButtonComponent } from "./button-component";
 import PermissionGuard from "./auth/permission-protected-components";
 import { tableMainButtonConfigs } from "@/utils/tableConfig";
 import Image from "next/image";
+import { useDataPermission } from "@/context";
+import StatusBadge from "./status-component";
 
 interface TableProps {
   data: Record<string, any>[];
@@ -282,7 +284,6 @@ export default function TableComponent({
   const router = useRouter(); // Get the dynamic route parameters
 
   const [searchQuery, setSearchQuery] = useState("");
-
   const handleSearch = (event: any) => {
     setSearchQuery(event.target.value);
   };
@@ -482,60 +483,7 @@ export default function TableComponent({
                             {row[column] === true ? "Inactive" : "Active"}
                           </span>
                         ) : column === "status" || column === "subStatus" ? (
-                          <span
-                            className={`px-2.5 py-1 ${
-                              row[column]?.toString().toLowerCase() ===
-                              "approved"
-                                ? "text-[#1E8449] bg-[#D4EFDF]"
-                                : row[column]?.toString().toLowerCase() ===
-                                  "pending"
-                                ? "text-[#FF8C00] bg-[#FFEFD5]"
-                                : row[column]?.toString().toLowerCase() ===
-                                  "rejected"
-                                ? "text-[#C0392B] bg-[#FADBD8]"
-                                : row[column]?.toString().toLowerCase() ===
-                                  "closed"
-                                ? "text-[#5D6D7E] bg-[#D6DBDF]"
-                                : row[column]?.toString().toLowerCase() ===
-                                  "reopened"
-                                ? "text-[#0E6655] bg-[#D1F2EB]"
-                                : row[column]?.toString().toLowerCase() ===
-                                    "accepted" ||
-                                  row[column]?.toString().toLowerCase() ===
-                                    "payment order raised"
-                                ? "text-[#1E8449] bg-[#D4EFDF]"
-                                : row[column]?.toString().toLowerCase() ===
-                                    "initiated" ||
-                                  row[column]?.toString().toLowerCase() ===
-                                    "assigned to procurement"
-                                ? "text-[#2874A6] bg-[#D6EAF8]"
-                                : row[column]?.toString().toLowerCase() ===
-                                  "quotation selected"
-                                ? "text-[#1E90FF] bg-[#D6E9FF]"
-                                : row[column]?.toString().toLowerCase() ===
-                                    "quotation approved" ||
-                                  row[column]?.toString().toLowerCase() ===
-                                    "apportionment_approved"
-                                ? "text-[#28A745] bg-[#DFF6DF]"
-                                : row[column]?.toString().toLowerCase() ===
-                                    "awaiting selection" ||
-                                  row[column]?.toString().toLowerCase() ===
-                                    "uploading quotations"
-                                ? "text-[#FFC107] bg-[#FFF8E1]"
-                                : row[column]?.toString().toLowerCase() ===
-                                  "waiting for quotations"
-                                ? "text-[#FF8C00] bg-[#FFF4E1]"
-                                : row[column]?.toString().toLowerCase() ===
-                                  "quotations uploaded"
-                                ? "text-[#1E90FF] bg-[#D6E9FF]"
-                                : row[column]?.toString().toLowerCase() ===
-                                  "apportioned"
-                                ? "text-[#6A1B9A] bg-[#F3E5F5]"
-                                : "text-[#2874A6] bg-[#D6EAF8]"
-                            } rounded-full`}
-                          >
-                            {row[column]?.toString()}
-                          </span>
+                          <StatusBadge status={row[column]} />
                         ) : column === "avatar" ? (
                           row?.avatar ? (
                             <Image

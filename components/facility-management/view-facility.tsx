@@ -1,5 +1,6 @@
 "use client";
 
+import { useDataPermission } from "@/context";
 import { DropDownArrow } from "@/utils/svg";
 import Link from "next/link";
 import React from "react";
@@ -17,14 +18,30 @@ interface FacilityDetailsProps {
 export default function FacilityDetails({
   title,
   facility,
-  groupedPermissions,
-  excludedKeys = ["facility", "block", "id", "createdAt", "updatedAt"],
+  excludedKeys = [
+    "facility",
+    "block",
+    "id",
+    "createdAt",
+    "updatedAt",
+    "workOrderNumber",
+  ],
 }: FacilityDetailsProps) {
+  const { userRoles } = useDataPermission();
+  const hasTenantRole = userRoles.some(
+    (role: Role) => role.name === "TENANT_ROLE"
+  );
+
   const filteredExcludedKeys =
     title === "Transactions"
       ? excludedKeys.filter((key) => key !== "facility")
       : title === "Work Order"
-      ? excludedKeys.filter((key) => key !== "createdAt" && key !== "updatedAt")
+      ? excludedKeys.filter(
+          (key) =>
+            key !== "createdAt" &&
+            key !== "updatedAt" &&
+            key !== "workOrderNumber"
+        )
       : excludedKeys;
   return (
     <>
@@ -78,15 +95,6 @@ export default function FacilityDetails({
           ))}
       </div>
 
-      {/* : key === "workRequestNumber" && value !== null ? (
-                  <Link
-                    className="underline text-[#A8353A]"
-                    href={`work-requests/${value}`}
-                  >
-                    {value || "-"}
-                  </Link>
-                ) */}
-
       {/* for request */}
       {title === "Work Request" ||
       title === "Bills" ||
@@ -97,7 +105,18 @@ export default function FacilityDetails({
           {" "}
           <div className="space-y-5 px-2 text-gray-500">
             {Object.entries(facility || {})
-              .filter(([key, value]) => Array.isArray(value)) // Only keys with array values
+              // .filter(([key, value]) => Array.isArray(value)  && (!hasTenantRole || key !== "activities")) // Only keys with array values
+              .filter(
+                ([key, value]) =>
+                  Array.isArray(value) &&
+                  (!hasTenantRole ||
+                    ![
+                      "activities",
+                      "quotations",
+                      "approvals",
+                      "apportionmentDetails",
+                    ].includes(key))
+              )
               .map(([key, array], index) => {
                 return (
                   <details
@@ -324,4 +343,15 @@ export default function FacilityDetails({
       )}
     </>
   );
+}
+
+{
+  /* : key === "workRequestNumber" && value !== null ? (
+                  <Link
+                    className="underline text-[#A8353A]"
+                    href={`work-requests/${value}`}
+                  >
+                    {value || "-"}
+                  </Link>
+                ) */
 }
