@@ -40,6 +40,10 @@ export default function Navigation() {
     );
   };
 
+  const hasTenantRole = userRoles.some(
+    (role: Role) => role.name === "TENANT_ROLE"
+  );
+
   return (
     <>
       <ModalCompoenent
@@ -211,8 +215,12 @@ export default function Navigation() {
               permissions: ["transactions", "users"],
               iconPath: paths.path3,
             },
-          ].map(
-            ({ href, label, permissions, iconPath }) =>
+          ].map(({ href, label, permissions, iconPath }) => {
+            // For the work request, check if the condition is true
+            if (href === "/work-orders" && hasTenantRole) {
+              return null; // Skip rendering this route if condition is not met
+            }
+            return (
               hasPermissionForRoute(permissions) && (
                 <li key={href} className="w-full px-4">
                   <Link
@@ -237,7 +245,8 @@ export default function Navigation() {
                   </Link>
                 </li>
               )
-          )}
+            );
+          })}
 
           <div className="flex items-center px-4 pt-32 "></div>
           {/* Logout Button */}

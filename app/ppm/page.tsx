@@ -1203,7 +1203,7 @@ export default function Ppm() {
           setCentralState("");
           setActiveRowId(null);
         }}
-        width={centralState === "showAll" ? "w-[30rem]" : undefined}
+        // width={centralState === "showAll" ? "w-[}
       >
         {componentMap[centralState]}
       </ModalCompoenent>

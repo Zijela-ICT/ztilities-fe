@@ -25,7 +25,11 @@ import createAxiosInstance from "@/utils/api";
 
 function WorkRequests() {
   const axiosInstance = createAxiosInstance();
-  const { pagination, setPagination } = useDataPermission();
+  const { pagination, setPagination, userRoles } = useDataPermission();
+
+  const hasTenantRole = userRoles.some(
+    (role: Role) => role.name === "TENANT_ROLE"
+  );
 
   const tabs = ["All Work Request", "My Work Request"];
 
@@ -59,11 +63,27 @@ function WorkRequests() {
     });
   };
 
+  const getAssignedWorkRequestsOrder = async () => {
+    const response = await axiosInstance.get(
+      `/work-requests/my-requests/all?page=${pagination.currentPage}&&paginate=true`
+    );
+    setAssignedWorkRequests(response.data.data);
+    const extra = response.data?.extra;
+    setPagination({
+      currentPage: extra?.page,
+      pageSize: extra?.pageSize,
+      total: extra?.total,
+      totalPages: extra?.totalPages,
+    });
+  };
+
   const getOtherWorkRequests = async () => {
-    const response = await axiosInstance.get(`/work-requests?page=${pagination.currentPage}&&paginate=true`);
+    const response = await axiosInstance.get(
+      `/work-requests?page=${pagination.currentPage}&&paginate=true`
+    );
     setOtherWorkRequests(response.data.data);
     const extra = response?.data.extra;
-    if(extra){
+    if (extra) {
       setPagination({
         currentPage: extra?.page,
         pageSize: extra?.pageSize,
@@ -71,7 +91,6 @@ function WorkRequests() {
         totalPages: extra?.totalPages,
       });
     }
-
   };
 
   const getVendors = async () => {
@@ -396,7 +415,9 @@ function WorkRequests() {
         await Promise.all([getOtherWorkRequests()]);
       };
       fetchData();
-    } else {
+    } else if (selectedTab === "My Work Request" && hasTenantRole) {
+      getAssignedWorkRequestsOrder();
+    } else if (selectedTab === "My Work Request") {
       getAssignedWorkRequests();
     }
   }, [centralState, centralStateDelete, selectedTab, pagination.currentPage]);

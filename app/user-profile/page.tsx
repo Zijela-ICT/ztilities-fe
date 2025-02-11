@@ -488,4 +488,4 @@ import createAxiosInstance from "@/utils/api";
 }
 
 
-export default withPermissions(UserProfile, ["users"]);
+export default withPermissions(UserProfile, [""]);
