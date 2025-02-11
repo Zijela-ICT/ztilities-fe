@@ -320,19 +320,19 @@ export default function TableComponent({
 
   const columns = data && data.length > 0 ? Object.keys(data[0]) : [];
 
-  const [contextMenued, setContextMenued] = useState<string | null>(null);
+  // const [contextMenued, setContextMenued] = useState<string | null>(null);
 
-  const contextMenuedActions = (rowId: string) => {
-    setContextMenued((prevId) => (prevId === rowId ? null : rowId));
-  };
+  // const contextMenuedActions = (rowId: string) => {
+  //   setContextMenued((prevId) => (prevId === rowId ? null : rowId));
+  // };
 
   console.log(activeRowId);
 
-  //   useEffect(()=> {
-  // if(contextMenued === true){
-  //   setContextMenued(false)
-  // }
-  //   }, [toggleActions])
+  // //   useEffect(()=> {
+  // // if(contextMenued === true){
+  // //   setContextMenued(false)
+  // // }
+  // //   }, [toggleActions])
   return (
     <div className="p-4">
       {noSearch ? null : (
