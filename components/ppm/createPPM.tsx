@@ -128,14 +128,11 @@ export default function CreatePPM({
     const { files } = e.target;
     if (files?.length) {
       const file = files[0];
+      setUploadedFile(file);
       const reader = new FileReader();
-
       reader.onload = () => {
-        if (typeof reader.result === "string") {
-          setFile(reader.result); // Store the file URL
-        }
+        setFile(reader.result as string); // Store the file URL
       };
-
       reader.readAsDataURL(file);
     }
   };
