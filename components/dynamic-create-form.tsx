@@ -7,7 +7,6 @@ import {
   LabelInputComponent,
   LabelTextareaComponent,
 } from "./input-container";
-import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import createAxiosInstance from "@/utils/api";
 
@@ -77,24 +76,42 @@ export default function DynamicCreateForm({
     };
 
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, files } = e.target;
+
+  //   if (files && files[0]) {
+  //     const file = files[0];
+  //     setUploadedFile(file);
+  //     const reader = new FileReader();
+
+  //     reader.onload = () => {
+  //       // Update avatar preview
+  //       setFormData((prev) => ({ ...prev, [name]: reader.result as string }));
+  //     };
+  //     reader.readAsDataURL(file);
+  //     //Update formData with the selected file
+  //     setFormData({
+  //       ...formData,
+  //       [name]: file,
+  //     });
+  //   }
+  // };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
-
     if (files && files[0]) {
       const file = files[0];
       setUploadedFile(file);
       const reader = new FileReader();
-
       reader.onload = () => {
-        // Update avatar preview
-        setFormData((prev) => ({ ...prev, [name]: reader.result as string }));
+        setFormData((prev) => ({
+          ...prev,
+          [name]: {
+            file,
+            preview: reader.result as string,
+          },
+        }));
       };
       reader.readAsDataURL(file);
-      //Update formData with the selected file
-      setFormData({
-        ...formData,
-        [name]: file,
-      });
     }
   };
 
@@ -204,7 +221,7 @@ export default function DynamicCreateForm({
         // Dynamically process multi-select fields based on the 'selects' configuration
         const dynamicProcessedData = { ...data };
 
-        selects.forEach((select) => {
+        selects?.forEach((select) => {
           if (select.isMulti && Array.isArray(data[select.name])) {
             dynamicProcessedData[select.name] = data[select.name]?.map(
               (item: any) => (typeof item === "object" ? item.id : item)
@@ -238,7 +255,6 @@ export default function DynamicCreateForm({
   return (
     <>
       <form
-        key={title}
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
@@ -308,27 +324,25 @@ export default function DynamicCreateForm({
           }
 
           return (
-            <>
-              <div key={index} className="relative w-full mt-6">
-                <Select
-                  isMulti={select.isMulti}
-                  name={select.name}
-                  options={select.options}
-                  value={
-                    select.isMulti
-                      ? select.options?.filter((option) =>
-                          formData[select.name]?.includes(option.value)
-                        )
-                      : select.options?.find(
-                          (option) => option.value === formData[select.name]
-                        )
-                  }
-                  onChange={handleSelectChange(select.name, select.isMulti)}
-                  styles={multiSelectStyle}
-                  placeholder={select.placeholder}
-                />
-              </div>
-            </>
+            <div key={index} className="relative w-full mt-6">
+              <Select
+                isMulti={select.isMulti}
+                name={select.name}
+                options={select.options}
+                value={
+                  select.isMulti
+                    ? select.options?.filter((option) =>
+                        formData[select.name]?.includes(option.value)
+                      )
+                    : select.options?.find(
+                        (option) => option.value === formData[select.name]
+                      )
+                }
+                onChange={handleSelectChange(select.name, select.isMulti)}
+                styles={multiSelectStyle}
+                placeholder={select.placeholder}
+              />
+            </div>
           );
         })}
 

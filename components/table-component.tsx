@@ -241,7 +241,7 @@ import {
   WorkIcon,
 } from "@/utils/svg";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ButtonComponent, { DropdownButtonComponent } from "./button-component";
 import PermissionGuard from "./auth/permission-protected-components";
 import { tableMainButtonConfigs } from "@/utils/tableConfig";
@@ -320,6 +320,19 @@ export default function TableComponent({
 
   const columns = data && data.length > 0 ? Object.keys(data[0]) : [];
 
+  const [contextMenued, setContextMenued] = useState<string | null>(null);
+
+  const contextMenuedActions = (rowId: string) => {
+    setContextMenued((prevId) => (prevId === rowId ? null : rowId));
+  };
+
+  console.log(activeRowId);
+
+  //   useEffect(()=> {
+  // if(contextMenued === true){
+  //   setContextMenued(false)
+  // }
+  //   }, [toggleActions])
   return (
     <div className="p-4">
       {noSearch ? null : (
@@ -414,8 +427,9 @@ export default function TableComponent({
                 <tr
                   // onContextMenu={(e) => {
                   //   e.preventDefault(); // Prevents the default browser context menu
-                  //   toggleActions(row.id)
-                  //   console.log(row.id)
+                  //   toggleActions(row.id);
+                  //   contextMenuedActions(row.id);
+
                   // }}
                   key={index}
                   className="border-b border-gray-200  h-20 "
@@ -494,8 +508,8 @@ export default function TableComponent({
                           </span>
                         ) : column === "status" || column === "subStatus" ? (
                           <StatusBadge status={row[column]} />
-                        ): column === "amount"  ? (
-                         row[column] && formatCurrency(row[column])
+                        ) : column === "amount" ? (
+                          row[column] && formatCurrency(row[column])
                         ) : column === "avatar" ? (
                           row?.avatar ? (
                             <Image
@@ -535,7 +549,7 @@ export default function TableComponent({
                   {/* Actions based on type */}
                   {noSearch ? null : (
                     <>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-4 ">
                         {type === "users" ? (
                           <>
                             <div className="relative">
@@ -559,6 +573,10 @@ export default function TableComponent({
                               {activeRowId === row.id && (
                                 <ActionDropdownComponent
                                   toggleActions={() => toggleActions(null)}
+                                  // contextMenuedActions={() =>
+                                  //   contextMenuedActions(null)
+                                  // }
+                                  // contextMenued={contextMenued}
                                 >
                                   <ul className="py-2">
                                     <li>

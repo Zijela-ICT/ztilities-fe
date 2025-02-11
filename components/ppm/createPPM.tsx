@@ -38,12 +38,17 @@ export default function CreatePPM({
     facility: "",
     asset: "",
     frequency: "",
-    frequencyType: "",
     endDate: "",
     startDate: "",
+    userType: "",
+    vendor: "",
+    technician: "",
   });
 
-  // Fetch work request if activeRowId exists
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const [showUserSelection, setShowUserSelection] = useState(false);
+
   const getWorkRequest = async () => {
     if (activeRowId) {
       const response = await axiosInstance.get(
@@ -90,6 +95,16 @@ export default function CreatePPM({
     setAUnit(response.data.data);
   };
 
+  const getVendors = async () => {
+    const response = await axiosInstance.get("/vendors");
+    setVendors(response.data.data);
+  };
+
+  const getTechnicians = async () => {
+    const response = await axiosInstance.get("/technicians");
+    setTechnicians(response.data.data);
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -107,11 +122,7 @@ export default function CreatePPM({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const payload = {
-      ...formData,
-      frequency: formData.frequency,
-    };
-    console.log(payload);
+    const { userType, ...payload } = formData;
     if (activeRowId) {
       await axiosInstance.patch(`/ppms/${activeRowId}`, payload);
     } else {
@@ -126,9 +137,11 @@ export default function CreatePPM({
       facility: "",
       asset: "",
       frequency: "",
-      frequencyType: "",
       endDate: "",
       startDate: "",
+      userType: "",
+      vendor: "",
+      technician: "",
     });
     setModalState("");
     setSuccessState({
@@ -139,6 +152,7 @@ export default function CreatePPM({
       status: true,
     });
   };
+
 
   const entityOptions = [
     { value: "unit", label: "Unit" },
@@ -158,32 +172,50 @@ export default function CreatePPM({
     label: unit.unitNumber,
   }));
 
-  const blockOptions = myBlocks?.map((unit: Block) => ({
-    value: unit.id.toString(),
-    label: unit.blockNumber,
+  const blockOptions = myBlocks?.map((block: Block) => ({
+    value: block.id.toString(),
+    label: block.blockNumber,
   }));
 
-  const facilityOptions = myFacilities?.map((unit: Facility) => ({
-    value: unit.id.toString(),
-    label: unit.name,
+  const facilityOptions = myFacilities?.map((facility: Facility) => ({
+    value: facility.id.toString(),
+    label: facility.name,
   }));
+
   const assetOptions =
     formData.entity === "unit"
-      ? unit?.assets?.map((unit: Asset) => ({
-          value: unit.id.toString(),
-          label: unit.assetName,
+      ? unit?.assets?.map((asset: Asset) => ({
+          value: asset.id.toString(),
+          label: asset.assetName,
         }))
-      : formData?.entity === "facility"
-      ? facility?.assets?.map((block: Asset) => ({
-          value: block.id.toString(),
-          label: block.assetName,
+      : formData.entity === "facility"
+      ? facility?.assets?.map((asset: Asset) => ({
+          value: asset.id.toString(),
+          label: asset.assetName,
         }))
-      : formData?.entity === "block"
-      ? block?.assets?.map((otherBlock: Asset) => ({
-          value: otherBlock.id.toString(),
-          label: otherBlock.assetName,
+      : formData.entity === "block"
+      ? block?.assets?.map((asset: Asset) => ({
+          value: asset.id.toString(),
+          label: asset.assetName,
         }))
       : [];
+
+  // Options for userType select
+  const userTypeOptions = [
+    { value: "vendor", label: "Vendor" },
+    { value: "technician", label: "Technician" },
+  ];
+
+  // Map vendor and technician data into select options
+  const vendorOptions = vendors.map((vendor: Vendor) => ({
+    value: vendor.id.toString(),
+    label: vendor.vendorName, // adjust as needed
+  }));
+
+  const technicianOptions = technicians.map((tech: Technician) => ({
+    value: tech.id.toString(),
+    label: tech.firstName + tech.surname, // adjust as needed
+  }));
 
   useEffect(() => {
     if (activeRowId) {
@@ -207,12 +239,21 @@ export default function CreatePPM({
     }
   }, [formData.unit, formData.block, formData.facility]);
 
+  useEffect(() => {
+    if (formData.userType === "vendor") {
+      getVendors();
+    } else if (formData.userType === "technician") {
+      getTechnicians();
+    }
+  }, [formData.userType]);
+
   return (
     <div>
       <form
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
+        {/* Title */}
         <div className="relative w-full mt-6">
           <LabelInputComponent
             type="text"
@@ -223,6 +264,7 @@ export default function CreatePPM({
           />
         </div>
 
+        {/* Description */}
         <div className="relative w-full mt-6">
           <LabelInputComponent
             type="text"
@@ -233,6 +275,7 @@ export default function CreatePPM({
           />
         </div>
 
+        {/* Start Date */}
         <div className="relative w-full mt-6">
           <LabelInputComponent
             type="datetime-local"
@@ -243,17 +286,8 @@ export default function CreatePPM({
           />
         </div>
 
+        {/* Frequency */}
         <div className="flex space-x-3">
-          {" "}
-          {/* <div className="relative w-full mt-6">
-            <LabelInputComponent
-              type="number"
-              name="frequency"
-              value={formData.frequency}
-              onChange={handleChange}
-              label="Frequncy"
-            />
-          </div> */}
           <div className="relative w-full mt-6">
             <Select
               options={frequencyOptions}
@@ -264,9 +298,10 @@ export default function CreatePPM({
               styles={multiSelectStyle}
               placeholder="Frequency"
             />
-          </div>{" "}
+          </div>
         </div>
 
+        {/* End Date */}
         <div className="relative w-full mt-6">
           <LabelInputComponent
             type="datetime-local"
@@ -277,9 +312,10 @@ export default function CreatePPM({
           />
         </div>
 
-        {/* Only show the rest of the form if there is no activeRowId */}
+        {/* Only show the additional selections if not editing an existing PPM */}
         {!activeRowId && (
           <>
+            {/* Entity Selection */}
             <div className="relative w-full mt-6">
               <Select
                 options={entityOptions}
@@ -334,6 +370,7 @@ export default function CreatePPM({
               </div>
             )}
 
+            {/* Asset Selection */}
             <div className="relative w-full mt-6">
               <Select
                 options={assetOptions}
@@ -345,9 +382,78 @@ export default function CreatePPM({
                 placeholder="Select Assets"
               />
             </div>
+
+            <div className="relative w-full mt-6 flex items-center">
+              <input
+                type="checkbox"
+                id="showUserSelection"
+                checked={showUserSelection}
+                onChange={() => {
+                  setShowUserSelection(!showUserSelection);
+                  // If turning off, reset user-related fields
+                  if (showUserSelection) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      userType: "",
+                      vendor: "",
+                      technician: "",
+                    }));
+                  }
+                }}
+                className="mr-2"
+              />
+              <label htmlFor="showUserSelection" className="text-sm">
+                Contacted ?
+              </label>
+            </div>
+
+            {showUserSelection && (
+              <>
+                <div className="relative w-full mt-6">
+                  <Select
+                    options={userTypeOptions}
+                    value={userTypeOptions?.find(
+                      (option) => option.value === formData.userType
+                    )}
+                    onChange={handleSelectChange("userType")}
+                    styles={multiSelectStyle}
+                    placeholder="Select User Type"
+                  />
+                </div>
+
+                {formData.userType === "vendor" && (
+                  <div className="relative w-full mt-6">
+                    <Select
+                      options={vendorOptions}
+                      value={vendorOptions?.find(
+                        (option) => option.value === formData.vendor
+                      )}
+                      onChange={handleSelectChange("vendor")}
+                      styles={multiSelectStyle}
+                      placeholder="Select Vendor"
+                    />
+                  </div>
+                )}
+
+                {formData.userType === "technician" && (
+                  <div className="relative w-full mt-6">
+                    <Select
+                      options={technicianOptions}
+                      value={technicianOptions?.find(
+                        (option) => option.value === formData.technician
+                      )}
+                      onChange={handleSelectChange("technician")}
+                      styles={multiSelectStyle}
+                      placeholder="Select Technician"
+                    />
+                  </div>
+                )}
+              </>
+            )}
           </>
         )}
 
+        {/* Submit Button */}
         <div className="mt-10 flex w-full justify-end">
           <button
             type="submit"
