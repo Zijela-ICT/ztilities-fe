@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
-import { LabelInputComponent } from "../input-container";
+import { FileInputComponent, LabelInputComponent } from "../input-container";
 import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
@@ -43,6 +43,7 @@ export default function CreatePPM({
     userType: "",
     vendor: "",
     technician: "",
+    amount: "",
   });
 
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -119,14 +120,42 @@ export default function CreatePPM({
     });
   };
 
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
+  const [file, setFile] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    if (files?.length) {
+      const file = files[0];
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          setFile(reader.result); // Store the file URL
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // const { userType, ...payload } = formData;
     const { userType, ...payload } = formData;
+
+    const updatedPayload = {
+      ...payload,
+
+      file,
+    };
+
     if (activeRowId) {
-      await axiosInstance.patch(`/ppms/${activeRowId}`, payload);
+      await axiosInstance.patch(`/ppms/${activeRowId}`, updatedPayload);
     } else {
-      await axiosInstance.post("/ppms", payload);
+      await axiosInstance.post("/ppms", updatedPayload);
     }
     setFormData({
       title: "",
@@ -142,6 +171,7 @@ export default function CreatePPM({
       userType: "",
       vendor: "",
       technician: "",
+      amount: "",
     });
     setModalState("");
     setSuccessState({
@@ -152,7 +182,6 @@ export default function CreatePPM({
       status: true,
     });
   };
-
 
   const entityOptions = [
     { value: "unit", label: "Unit" },
@@ -403,7 +432,7 @@ export default function CreatePPM({
                 className="mr-2"
               />
               <label htmlFor="showUserSelection" className="text-sm">
-                Contacted ?
+                Is there an existing contract?
               </label>
             </div>
 
@@ -448,6 +477,26 @@ export default function CreatePPM({
                     />
                   </div>
                 )}
+
+                <div className="relative w-full mt-6">
+                  <LabelInputComponent
+                    type="number"
+                    name="amount"
+                    value={formData.amount}
+                    onChange={handleChange}
+                    label="Amount"
+                    required
+                  />
+                </div>
+
+                <div className="relative w-full mt-6">
+                  <FileInputComponent
+                    name="file"
+                    onChange={handleFileChange}
+                    label="File"
+                    uploadedFile={uploadedFile}
+                  />
+                </div>
               </>
             )}
           </>
