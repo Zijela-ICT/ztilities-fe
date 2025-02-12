@@ -216,7 +216,7 @@ function VendorManagement() {
         </div>
       </PermissionGuard>
 
-      <PermissionGuard requiredPermissions={["read_bills"]}>
+      <PermissionGuard requiredPermissions={["read_bills","read_bills:my-bills/all" ]}>
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           {selectedTab === "My Bills" && (
             <TableComponent
