@@ -101,7 +101,7 @@ export default function FacilityDetails({
                   ? `${value?.firstName || "-"} ${value?.lastName || "-"} `
                   : key === "createdAt" ||
                     (key === "updatedAt" && value !== null)
-                  ? `${moment(value[key]).format("LL")} `
+                  ? `${moment.utc(value[key]).format("LL")} `
                   : Array.isArray(value)
                   ? value.length // Show array length
                   : typeof value === "object" && value !== null

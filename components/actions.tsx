@@ -890,7 +890,7 @@ const Actions: React.FC<UserActionsProps> = ({
         </>
       ) : type === "bills" ? (
         <div className="flex items-center space-x-5">
-          {!row.isPaid && (
+          {!row.isPaid ? (
             <div className="flex items-center space-x-2 w-full md:w-full ">
               <ButtonComponent
                 text="Pay"
@@ -900,6 +900,14 @@ const Actions: React.FC<UserActionsProps> = ({
                 }}
                 permissions={["update_bills:id/pay"]}
                 className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-[#A8353A] text-white border border-gray-200 rounded-md"
+              />
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2 w-full md:w-full ">
+              <ButtonComponent
+                text="Paid"
+                permissions={["update_bills:id/pay"]}
+                className="px-2.5 py-1 h-[2.8rem] md:h-[2rem] text-sm text-gray-700 font-semibold bg-white text-[#A8353A] border border-gray-200 rounded-md"
               />
             </div>
           )}

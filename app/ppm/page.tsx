@@ -1357,7 +1357,7 @@ export default function Ppm() {
                     );
                   })}
               </ul>
-              {getWorkForDay(day).length > 2 && (
+              {getWorkForDay(day).length > 3 && (
                 <div
                   onClick={() => {
                     setCentralState("showAll");

@@ -98,7 +98,7 @@ export default function Navigation() {
             );
           })}
           <ButtonComponent
-            text="Got to Profile"
+            text="Go to Profile"
             className="bg-white mt-6 "
             onClick={() => {
               router.push(`/user-profile`);
