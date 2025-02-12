@@ -105,10 +105,12 @@ export default function DynamicCreateForm({
       reader.onload = () => {
         setFormData((prev) => ({
           ...prev,
-          [name]: {
-            file,
-            preview: reader.result as string,
-          },
+          // [name]: {
+          //   file,
+          //   preview: reader.result as string,
+          // },
+          [name]: reader.result as string,
+          
         }));
       };
       reader.readAsDataURL(file);

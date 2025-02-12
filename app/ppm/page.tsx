@@ -1017,19 +1017,14 @@
 
 import ButtonComponent from "@/components/button-component";
 import DashboardLayout from "@/components/dashboard-layout-component";
-import FacilityDetails from "@/components/facility-management/view-facility";
 import ModalCompoenent, {
   SuccessModalCompoenent,
 } from "@/components/modal-component";
 import CreatePPM from "@/components/ppm/createPPM";
 import createAxiosInstance from "@/utils/api";
-import { SearchIcon } from "@/utils/svg";
-import axios from "axios";
 import moment from "moment";
 import Link from "next/link";
 import { JSX, useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function Ppm() {
@@ -1203,7 +1198,6 @@ export default function Ppm() {
           setCentralState("");
           setActiveRowId(null);
         }}
-        // width={centralState === "showAll" ? "w-[}
       >
         {componentMap[centralState]}
       </ModalCompoenent>
@@ -1327,39 +1321,41 @@ export default function Ppm() {
                 {day}
               </div>
               <ul className="text-sm text-gray-600">
-                {getWorkForDay(day).slice(0,3).map((work, index) => {
-                  const statusColor =
-                    work.status === "Initiated"
-                      ? "text-green-700"
-                      : work.status === "Active"
-                      ? "text-blue-500"
-                      : "text-blue-500";
-                  const statusColorBg =
-                    work.status === "Initiated"
-                      ? "bg-green-500"
-                      : work.status === "Active"
-                      ? "bg-blue-500"
-                      : "bg-blue-500";
+                {getWorkForDay(day)
+                  .slice(0, 3)
+                  .map((work, index) => {
+                    const statusColor =
+                      work.status === "Initiated"
+                        ? "text-green-700"
+                        : work.status === "Active"
+                        ? "text-blue-500"
+                        : "text-blue-500";
+                    const statusColorBg =
+                      work.status === "Initiated"
+                        ? "bg-green-500"
+                        : work.status === "Active"
+                        ? "bg-blue-500"
+                        : "bg-blue-500";
 
-                  return (
-                    <li key={index}>
-                      <Link
-                        href={`/ppm/${work.id}`}
-                        className="flex items-center"
-                      >
-                        <span
-                          className={`${statusColorBg} hover:bg-blue-500 h-1.5 w-1.5 rounded-full mr-2`}
-                        ></span>
-                        <span
-                          className={`truncate ${statusColor} hover:text-blue-500 text-xs`}
+                    return (
+                      <li key={index}>
+                        <Link
+                          href={`/ppm/${work.id}`}
+                          className="flex items-center"
                         >
-                          {work.title}{" "}
-                          {moment(work.occurrenceDate).format("LT")}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
+                          <span
+                            className={`${statusColorBg} hover:bg-blue-500 h-1.5 w-1.5 rounded-full mr-2`}
+                          ></span>
+                          <span
+                            className={`truncate ${statusColor} hover:text-blue-500 text-xs`}
+                          >
+                            {work.title}{" "}
+                            {moment(work.occurrenceDate).format("LT")}
+                          </span>
+                        </Link>
+                      </li>
+                    );
+                  })}
               </ul>
               {getWorkForDay(day).length > 2 && (
                 <div

@@ -1,25 +1,42 @@
-import React from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface DropdownProps {
   toggleActions: (value: any) => void;
-  contextMenued? :boolean;
+  contextMenued?: boolean;
   children: any;
 }
 
-export default function ActionDropdownComponent({ toggleActions, contextMenued, children }:DropdownProps) {
+export default function ActionDropdownComponent({ children }: DropdownProps) {
+  const [isOpen, setIsOpen] = useState(true);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  if (!isOpen) return null;
+
   return (
-    <>
     <div
-      // onMouseLeave={toggleActions}
+      ref={dropdownRef}
       className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm"
     >
       {children}
     </div>
-    </>
   );
 }
-
-// import React from "react";
 
 // interface DropdownProps {
 //   toggleActions: (value: any) => void;
@@ -29,37 +46,31 @@ export default function ActionDropdownComponent({ toggleActions, contextMenued, 
 // }
 
 // export default function ActionDropdownComponent({
-//   toggleActions,
-//   contextMenuedActions,
 //   contextMenued,
 //   children,
 // }: DropdownProps) {
-//   if (contextMenued) {
-//     return (
-//       // Full-screen overlay with a gray background and opacity
-//       <div
-//         onClick={() => {
-//           toggleActions(null);
-//           contextMenuedActions(null);
-//         }}
-//         onMouseLeave={toggleActions}
-//         className="fixed inset-0 z-10 bg-gray-200 bg-opacity-30"
-//       >
-//         {/* Centered dropdown. Clicking inside stops propagation */}
-//         <div
-//           onClick={(e) => e.stopPropagation()}
-//           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 bg-white border border-gray-200 rounded-2xl shadow-sm"
-//         >
-//           {children}
-//         </div>
-//       </div>
-//     );
-//   }
+//   const [isOpen, setIsOpen] = useState(true);
+//   const dropdownRef = useRef<HTMLDivElement>(null);
+
+//   useEffect(() => {
+//     function handleClickOutside(event: MouseEvent) {
+//       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+//         setIsOpen(false);
+//       }
+//     }
+
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => {
+//       document.removeEventListener("mousedown", handleClickOutside);
+//     };
+//   }, []);
+
+//   if (!isOpen) return null;
 
 //   return (
 //     <div
-//       onMouseLeave={toggleActions}
-//       className="absolute right-0 mt-2 w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm"
+//       ref={dropdownRef}
+//       className={`absolute ${contextMenued ? "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" : "right-0 mt-2"} w-48 bg-white z-40 border border-gray-200 rounded-2xl shadow-sm`}
 //     >
 //       {children}
 //     </div>

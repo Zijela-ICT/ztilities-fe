@@ -26,6 +26,7 @@ function VendorManagement() {
   });
 
   const [bills, setBills] = useState<any[]>([]);
+  const [mybills, setMyBills] = useState<any[]>([]);
   const [bill, setABill] = useState<any>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [extraRowId, setExtraROwId] = useState<string | null>(null);
@@ -50,7 +51,7 @@ function VendorManagement() {
     const response = await axiosInstance.get(
       `/bills/my-bills/all?page=${pagination.currentPage}&&paginate=true`
     );
-    setBills(response.data.data);
+    setMyBills(response.data.data);
     const extra = response.data.extra;
     if (extra) {
       setPagination({
@@ -219,7 +220,7 @@ function VendorManagement() {
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           {selectedTab === "My Bills" && (
             <TableComponent
-              data={[]}
+              data={mybills}
               type="bills"
               setModalState={setCentralState}
               setModalStateDelete={setCentralStateDelete}
