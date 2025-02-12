@@ -94,6 +94,7 @@ const tenantInProgressStatuses: string[] = [
   "approved",
   "apportioned",
   "reopened",
+  "accepted"
 ];
 
 const tenantClosedStatuses: string[] = ["closed"];
