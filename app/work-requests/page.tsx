@@ -22,6 +22,7 @@ import UpdateWorkRequest from "@/components/work-request/update-work-request";
 import AcceptQuotation from "@/components/work-request/acceptQuotation";
 import ApportionPower from "@/components/work-request/apportionPower";
 import createAxiosInstance from "@/utils/api";
+import CommentWorkRequestOrder from "@/components/work-request/comment-request-order";
 
 function WorkRequests() {
   const axiosInstance = createAxiosInstance();
@@ -249,15 +250,13 @@ function WorkRequests() {
       />
     ),
     commentWorkRequest: (
-      <DynamicCreateForm
-        inputs={[{ name: "comment", label: "Comment", type: "textarea" }]}
-        selects={[]}
-        title="Add Comment"
-        apiEndpoint={`/work-requests/${activeRowId}/comments`}
-        activeRowId={activeRowId}
-        setModalState={setCentralState}
-        setSuccessState={setSuccessState}
-      />
+      <>
+        <CommentWorkRequestOrder
+          activeRowId={activeRowId}
+          setModalState={setCentralState}
+          setSuccessState={setSuccessState}
+        />
+      </>
     ),
     attatchmentWorkRequest: (
       <DynamicCreateForm

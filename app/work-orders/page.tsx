@@ -19,6 +19,7 @@ import AcceptQuotation from "@/components/work-order/acceptQuotation";
 
 import ButtonComponent from "@/components/button-component";
 import createAxiosInstance from "@/utils/api";
+import CommentWorkRequestOrder from "@/components/work-request/comment-request-order";
 
 interface Props {
   nowrap: boolean;
@@ -52,7 +53,9 @@ function WorkOrders({ nowrap }: Props) {
   };
 
   const getWorkOrders = async () => {
-    const response = await axiosInstance.get(`/work-requests/work-order/all?page=${pagination.currentPage}&&paginate=true`);
+    const response = await axiosInstance.get(
+      `/work-requests/work-order/all?page=${pagination.currentPage}&&paginate=true`
+    );
     setWorkOrders(response.data.data);
     const extra = response.data.extra;
     setPagination({
@@ -300,11 +303,7 @@ function WorkOrders({ nowrap }: Props) {
       />
     ),
     commentWorkOrder: (
-      <DynamicCreateForm
-        inputs={[{ name: "comment", label: "Comment", type: "textarea" }]}
-        selects={[]}
-        title="Add Comment"
-        apiEndpoint={`/work-requests/${activeRowId}/comments`}
+      <CommentWorkRequestOrder
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
@@ -438,7 +437,9 @@ function WorkOrders({ nowrap }: Props) {
               placeholder: "Select Approval Officer",
               options: users?.map((user: User) => ({
                 value: user.id,
-                label: `${user.firstName} ${user.lastName} - Approval Limit ( ${user.approvalLimit || ""} )`,
+                label: `${user.firstName} ${user.lastName} - Approval Limit ( ${
+                  user.approvalLimit || ""
+                } )`,
               })),
             },
           ]}

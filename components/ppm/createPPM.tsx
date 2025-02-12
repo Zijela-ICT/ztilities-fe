@@ -409,7 +409,7 @@ export default function CreatePPM({
               />
             </div>
 
-            <div className="relative w-full mt-6 flex items-center">
+            {/* <div className="relative w-full mt-6 flex items-center">
               <input
                 type="checkbox"
                 id="showUserSelection"
@@ -430,6 +430,52 @@ export default function CreatePPM({
               />
               <label htmlFor="showUserSelection" className="text-sm">
                 Is there an existing contract?
+              </label>
+            </div> */}
+
+            <div className="relative w-full mt-6 flex items-center">
+              <label
+                htmlFor="showUserSelection"
+                className="relative inline-flex items-center cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  id="showUserSelection"
+                  checked={showUserSelection}
+                  onChange={() => {
+                    setShowUserSelection(!showUserSelection);
+                    // If turning off, reset user-related fields
+                    if (showUserSelection) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        userType: "",
+                        vendor: "",
+                        technician: "",
+                      }));
+                    }
+                  }}
+                  className="sr-only peer"
+                />
+                <div
+                  className="w-8 h-4 bg-gray-900 rounded-full peer
+                    peer-checked:after:translate-x-4
+                    peer-checked:after:border-white
+                    after:content-['']
+                    after:absolute
+                    after:top-[3.6px]
+                    after:left-[2px]
+                    after:bg-white
+                    after:border-gray-300
+                    after:border
+                    after:rounded-full
+                    after:h-3
+                    after:w-3
+                    after:transition-all
+                    peer-checked:bg-green-600"
+                ></div>
+                <span className="ml-2 text-sm">
+                  Is there an existing contract?
+                </span>
               </label>
             </div>
 

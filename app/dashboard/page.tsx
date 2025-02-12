@@ -152,7 +152,7 @@ function Dashboard() {
       path: "/work-orders",
     },
     {
-      title: "initiated Work Orders",
+      title: "Initiated Work Orders",
       number: !hasNoTenantRole
         ? mypendingOrders?.length
         : pendingOrders?.length,

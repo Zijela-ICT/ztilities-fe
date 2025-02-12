@@ -34,6 +34,13 @@ export default function FacilityDetails({
     (role: Role) => role.name === "TENANT_ROLE"
   );
 
+  const hasThisRole = userRoles.some(
+    (role: Role) =>
+      role.name === "TENANT_ROLE" ||
+      role.name === "VENDOR_ROLE" ||
+      role.name === "TECHNICIAN_ROLE"
+  );
+
   const filteredExcludedKeys =
     title === "Transactions"
       ? excludedKeys.filter((key) => key !== "facility")
@@ -79,7 +86,11 @@ export default function FacilityDetails({
                       key === "assignedTechnician") &&
                     value !== null &&
                     typeof value === "object"
-                  ? `${(value?.vendorName || value?.technician?.technicianName ) || "-"}`
+                  ? `${
+                      value?.vendorName ||
+                      value?.technician?.technicianName ||
+                      "-"
+                    }`
                   : key === "asset" &&
                     value !== null &&
                     typeof value === "object"
@@ -126,6 +137,15 @@ export default function FacilityDetails({
                     ].includes(key))
               )
               .map(([key, array], index) => {
+                //this handles the isinternal kini
+                let filteredArray = array;
+                if (key === "comments") {
+                  if (hasThisRole) {
+                    filteredArray = array.filter(
+                      (comment: any) => comment.isInternal !== true
+                    );
+                  }
+                }
                 return (
                   <details
                     key={index}
@@ -146,8 +166,8 @@ export default function FacilityDetails({
 
                     <div className="mt-3 space-y-3">
                       {/* Check if Array has Items */}
-                      {array.length > 0 ? (
-                        array.map((item, idx) => (
+                      {filteredArray.length > 0 ? (
+                        filteredArray.map((item, idx) => (
                           <details
                             key={idx}
                             className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4"
