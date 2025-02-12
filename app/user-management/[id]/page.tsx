@@ -7,7 +7,7 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import CreateBulkUser from "@/components/user-management/create-bulk-user";
+import CreateBulkUser from "@/components/user-management/create-bulk";
 import axiosInstance from "@/utils/api";
 import ResetPassword from "@/components/user-management/reset-password";
 import { useParams, useRouter } from "next/navigation";

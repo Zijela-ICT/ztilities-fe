@@ -163,58 +163,58 @@ export default function DynamicCreateForm({
     if (updatedFormData.limit) {
       updatedFormData.limit = Number(updatedFormData.limit);
     }
+console.log(formData)
+    // try {
+    //   if (
+    //     [
+    //       "User",
+    //       "Facility",
+    //       "Units",
+    //       "Vendor",
+    //       "Technician",
+    //       "Assets",
+    //       "Block",
+    //       "Work Request",
+    //     ].includes(title)
+    //   ) {
+    //     if (activeRowId) {
+    //       await axiosInstance.patch(
+    //         `${apiEndpoint}/${activeRowId}`,
+    //         updatedFormData
+    //       );
+    //     } else {
+    //       await axiosInstance.post(apiEndpoint, updatedFormData);
+    //     }
+    //   } else {
+    //     await axiosInstance.patch(apiEndpoint, updatedFormData);
+    //   }
 
-    try {
-      if (
-        [
-          "User",
-          "Facility",
-          "Units",
-          "Vendor",
-          "Technician",
-          "Assets",
-          "Block",
-          "Work Request",
-        ].includes(title)
-      ) {
-        if (activeRowId) {
-          await axiosInstance.patch(
-            `${apiEndpoint}/${activeRowId}`,
-            updatedFormData
-          );
-        } else {
-          await axiosInstance.post(apiEndpoint, updatedFormData);
-        }
-      } else {
-        await axiosInstance.patch(apiEndpoint, updatedFormData);
-      }
+    //   setFormData({});
+    //   setModalState("");
 
-      setFormData({});
-      setModalState("");
-
-      setSuccessState({
-        title: "Successful",
-        detail: `${
-          [
-            "User",
-            "Facility",
-            "Units",
-            "Vendor",
-            "Technician",
-            "Assets",
-            "Block",
-            "Work Request",
-          ].includes(title)
-            ? activeRowId
-              ? `You have successfully edited ${title}`
-              : `You have successfully created ${title}`
-            : `Your action has been successful`
-        }.`,
-        status: true,
-      });
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
+    //   setSuccessState({
+    //     title: "Successful",
+    //     detail: `${
+    //       [
+    //         "User",
+    //         "Facility",
+    //         "Units",
+    //         "Vendor",
+    //         "Technician",
+    //         "Assets",
+    //         "Block",
+    //         "Work Request",
+    //       ].includes(title)
+    //         ? activeRowId
+    //           ? `You have successfully edited ${title}`
+    //           : `You have successfully created ${title}`
+    //         : `Your action has been successful`
+    //     }.`,
+    //     status: true,
+    //   });
+    // } catch (error) {
+    //   console.error("Error submitting form:", error);
+    // }
   };
 
   useEffect(() => {

@@ -1350,7 +1350,7 @@ export default function Ppm() {
                             className={`truncate ${statusColor} hover:text-blue-500 text-xs`}
                           >
                             {work.title}{" "}
-                            {moment(work.occurrenceDate).format("LT")}
+                            {moment.utc(work.occurrenceDate).format("LT")}
                           </span>
                         </Link>
                       </li>

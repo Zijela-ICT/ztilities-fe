@@ -44,6 +44,13 @@ export const tableMainButtonConfigs = {
       permissions: ["create_blocks"],
       action: "createBlock",
     },
+    {
+      text: "Bulk Blocks",
+      className:
+        "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["create_blocks"],
+      action: "createBulkBlock",
+    },
   ],
   units: [
     {
@@ -51,6 +58,13 @@ export const tableMainButtonConfigs = {
       className: "flex-1 px-4 py-3 text-white bg-[#A8353A]",
       permissions: ["create_units"],
       action: "createUnit",
+    },
+    {
+      text: "Bulk Units",
+      className:
+        "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["create_units"],
+      action: "createBulkUnit",
     },
   ],
   assets: [

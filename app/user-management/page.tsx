@@ -8,7 +8,7 @@ import ModalCompoenent, {
   SuccessModalCompoenent,
 } from "@/components/modal-component";
 import CreateRole from "@/components/user-management/create-role";
-import CreateBulkUser from "@/components/user-management/create-bulk-user";
+import CreateBulkUser from "@/components/user-management/create-bulk";
 import axiosInstance from "@/utils/api";
 import ResetPassword from "@/components/user-management/reset-password";
 import PermissionList from "@/components/user-management/view-permissions";
@@ -197,7 +197,7 @@ function UserManagement() {
         }
       />
     ),
-    createBulkUser: <CreateBulkUser />,
+    createBulkUser: <CreateBulkUser type="Users" />,
     createRole: (
       <CreateRole
         setModalState={setCentralState}

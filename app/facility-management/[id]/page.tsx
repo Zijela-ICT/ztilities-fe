@@ -7,7 +7,7 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import CreateBulkUser from "@/components/user-management/create-bulk-user";
+import CreateBulkUser from "@/components/user-management/create-bulk";
 import { useParams, useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import DynamicCreateForm from "@/components/dynamic-create-form";

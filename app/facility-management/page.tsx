@@ -7,7 +7,7 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import CreateBulkUser from "@/components/user-management/create-bulk-user";
+import CreateBulkUser from "@/components/user-management/create-bulk";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
@@ -257,6 +257,10 @@ function FacilityManagement() {
 
       case "createBulkFacility":
         return "Upload Bulk Facility";
+        case "createBulkBlock":
+          return "Upload Bulk Block";
+          case "createBulkUnit":
+            return "Upload Bulk Unit";
       case "viewFacility":
         return "Facility Details";
       case "viewBlock":
@@ -300,6 +304,10 @@ function FacilityManagement() {
           ? "You can edit units details here."
           : "You can manage units here.";
       case "createBulkFacility":
+        return "Import CSV/Excel file";
+      case "createBulkBlock":
+        return "Import CSV/Excel file";
+      case "createBulkUnit":
         return "Import CSV/Excel file";
       case "createAsset":
         return activeRowId
@@ -459,7 +467,9 @@ function FacilityManagement() {
         }
       />
     ),
-    createBulkUser: <CreateBulkUser />,
+    createBulkFacility: <CreateBulkUser type="Facilities" />,
+    createBulkBlock: <CreateBulkUser type="Blocks" />,
+    createBulkUnit: <CreateBulkUser type="Units" />,
     createBlock: (
       <DynamicCreateForm
         inputs={[
