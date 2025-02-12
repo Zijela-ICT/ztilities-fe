@@ -63,8 +63,6 @@ export default function FacilityDetails({
               {/* Handle various value types */}
               <p className="text-gray-900">
                 {key === "user" ||
-                key === "assignedVendor" ||
-                key === "assignedTechnician" ||
                 (key === "requestedBy" &&
                   value !== null &&
                   typeof value === "object")
@@ -77,6 +75,11 @@ export default function FacilityDetails({
                     value !== null &&
                     typeof value === "object"
                   ? `${value?.name || "-"}`
+                  : (key === "assignedVendor" ||
+                      key === "assignedTechnician") &&
+                    value !== null &&
+                    typeof value === "object"
+                  ? `${(value?.vendorName || value?.technician?.technicianName ) || "-"}`
                   : key === "asset" &&
                     value !== null &&
                     typeof value === "object"

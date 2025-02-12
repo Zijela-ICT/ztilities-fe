@@ -490,6 +490,8 @@ export default function TableComponent({
                             `firstName`,
                             "lastName",
                             "subCategoryName",
+                            "vendorName",
+                            "techniacianName"
                           ]
                             .map((prop) => row[column]?.[prop]) // Optional chaining here
                             .filter(Boolean)
