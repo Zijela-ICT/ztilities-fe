@@ -301,56 +301,58 @@ function Transactions() {
           ]}
         >
           <div className="relative bg-white rounded-2xl p-4 mb-4">
-            <div className="flex justify-end items-center space-x-4 pb-2">
-              {user.wallets.length > 1 && (
-                <PermissionGuard
-                  requiredPermissions={[
-                    "read_transactions:my-transactions/all",
-                  ]}
-                >
-                  <div
-                    onClick={() => getMyTransactions()}
-                    className="text-black flex items-center space-x-1 cursor-pointer"
-                  >
-                    <p>Refresh my transactions : </p>
-                    <RefreshIcon stroke="black" />
-                  </div>
-                </PermissionGuard>
-              )}
-              {filterOptions.map((filter, index) => {
-                const permissionMap: Record<string, string[]> = {
-                  User: ["read_transactions:users-transactions/all"],
-                  Facility: ["read_transactions:facilities-transactions/all"],
-                  Vendor: ["read_transactions:users-transactions/all"],
-                  Technician: ["read_transactions:users-transactions/all"],
-                };
-
-                const requiredPermissions = permissionMap[filter.label] || [];
-
-                return (
+            <div className="overflow-x-auto whitespace-nowrap pb-2">
+              <div className="flex md:justify-end items-center space-x-4 ">
+                {user.wallets.length > 1 && (
                   <PermissionGuard
-                    key={index}
-                    requiredPermissions={requiredPermissions}
+                    requiredPermissions={[
+                      "read_transactions:my-transactions/all",
+                    ]}
                   >
-                    <select
-                      className="border border-gray-300 rounded-md p-2"
-                      value={filters[filter.label]?.id}
-                      onChange={(e) => {
-                        handleFilterChange(filter.label, e.target.value);
-                        setTransactionId(e.target.value);
-                        setEntity(filter.label);
-                      }}
+                    <div
+                      onClick={() => getMyTransactions()}
+                      className="text-black flex items-center space-x-1 cursor-pointer"
                     >
-                      <option value="">{`Filter by ${filter.label}`}</option>
-                      {filter?.options?.map((option, idx) => (
-                        <option key={idx} value={option.id}>
-                          {option.firstName + option.lastName || option.name}
-                        </option>
-                      ))}
-                    </select>
+                      <p>Refresh my transactions : </p>
+                      <RefreshIcon stroke="black" />
+                    </div>
                   </PermissionGuard>
-                );
-              })}
+                )}
+                {filterOptions.map((filter, index) => {
+                  const permissionMap: Record<string, string[]> = {
+                    User: ["read_transactions:users-transactions/all"],
+                    Facility: ["read_transactions:facilities-transactions/all"],
+                    Vendor: ["read_transactions:users-transactions/all"],
+                    Technician: ["read_transactions:users-transactions/all"],
+                  };
+
+                  const requiredPermissions = permissionMap[filter.label] || [];
+
+                  return (
+                    <PermissionGuard
+                      key={index}
+                      requiredPermissions={requiredPermissions}
+                    >
+                      <select
+                        className="border border-gray-300 rounded-md p-2"
+                        value={filters[filter.label]?.id}
+                        onChange={(e) => {
+                          handleFilterChange(filter.label, e.target.value);
+                          setTransactionId(e.target.value);
+                          setEntity(filter.label);
+                        }}
+                      >
+                        <option value="">{`Filter by ${filter.label}`}</option>
+                        {filter?.options?.map((option, idx) => (
+                          <option key={idx} value={option.id}>
+                            {option.firstName + option.lastName || option.name}
+                          </option>
+                        ))}
+                      </select>
+                    </PermissionGuard>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </PermissionGuard>
@@ -403,10 +405,8 @@ function Transactions() {
               <span className="text-white font-bold text-2xl">
                 {showBalance ? (
                   <>
-                    N
-                    {parseFloat(
-                      user.wallets[selectedWalletIndex]?.balance
-                    ).toFixed(2)}
+                    ₦{" "}
+                    {formatCurrency(user.wallets[selectedWalletIndex]?.balance)}
                   </>
                 ) : (
                   "****"
@@ -438,7 +438,7 @@ function Transactions() {
 
         {filteredTransactions?.length < 1 ? (
           <>
-            <div className="flex flex-col items-center justify-center h-64 bg-white ">
+            <div className="flex flex-col items-center justify-center h-64 bg-white mt-4">
               <TransactionIcon width="71" height="71" />
 
               <p className="mt-4 text-gray-600 text-lg font-medium">
@@ -451,7 +451,7 @@ function Transactions() {
           </>
         ) : (
           <>
-            <div className="flex flex-col md:flex-row w-full h-auto space-y-4 md:space-y-0 md:space-x-4">
+            <div className="flex flex-col md:flex-row w-full h-auto space-y-4 md:space-y-0 md:space-x-4 mt-4">
               {/* Left Section (Graph) */}
               <div className="w-full md:w-3/5 bg-white rounded-lg  p-6">
                 <h2 className="text-base font-semibold mb-4 text-black">

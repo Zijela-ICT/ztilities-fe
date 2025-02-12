@@ -845,26 +845,28 @@ function FacilityManagement() {
         ]}
       >
         <div className="relative bg-white rounded-2xl p-4">
-          <div className="flex space-x-4 pb-2">
-            {tabs.map((tab) => (
-              <PermissionGuard
-                key={tab}
-                requiredPermissions={tabPermissions[tab] || []} // Match tab to permissions
-              >
-                <button
+          <div className="overflow-x-auto whitespace-nowrap pb-2">
+            <div className="flex space-x-4 ">
+              {tabs.map((tab) => (
+                <PermissionGuard
                   key={tab}
-                  onClick={() => setSelectedTab(tab)}
-                  className={`relative text-gray-500 hover:text-gray-900 px-4 py-2 text-xs font-medium focus:outline-none group ${
-                    selectedTab === tab ? "text-[#A8353A] font-semibold" : ""
-                  }`}
+                  requiredPermissions={tabPermissions[tab] || []} // Match tab to permissions
                 >
-                  {tab}
-                  {selectedTab === tab && (
-                    <span className="absolute left-0 bottom-[-5px] w-full h-[2px] bg-[#A8353A]"></span>
-                  )}
-                </button>
-              </PermissionGuard>
-            ))}
+                  <button
+                    key={tab}
+                    onClick={() => setSelectedTab(tab)}
+                    className={`relative text-gray-500 hover:text-gray-900 px-4 py-2 text-xs font-medium focus:outline-none group ${
+                      selectedTab === tab ? "text-[#A8353A] font-semibold" : ""
+                    }`}
+                  >
+                    {tab}
+                    {selectedTab === tab && (
+                      <span className="absolute left-0 bottom-[-5px] w-full h-[2px] bg-[#A8353A]"></span>
+                    )}
+                  </button>
+                </PermissionGuard>
+              ))}
+            </div>
           </div>
         </div>
       </PermissionGuard>

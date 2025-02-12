@@ -126,7 +126,7 @@ function VendorManagement() {
   }, [centralState]);
 
   const tabPermissions: { [key: string]: string[] } = {
-    "My Bills": ["read_bills"],
+    "My Bills": ["read_bills:my-bills/all"],
     "All Bills": ["read_bills"],
   };
 

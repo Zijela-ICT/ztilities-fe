@@ -14,12 +14,19 @@ import WorkOrders from "../work-orders/page";
 import { useRouter } from "next/navigation";
 import createAxiosInstance from "@/utils/api";
 import MyLoader from "@/components/loader-components";
+import formatCurrency from "@/utils/formatCurrency";
 
 function Dashboard() {
   const axiosInstance = createAxiosInstance();
   const router = useRouter();
-  const { user, setUser, userPermissions, setUserPermissions, setUserRoles } =
-    useDataPermission();
+  const {
+    user,
+    setUser,
+    userPermissions,
+    userRoles,
+    setUserPermissions,
+    setUserRoles,
+  } = useDataPermission();
 
   const [selectedWallet, setSelectedWallet] = useState<any>();
   useEffect(() => {
@@ -30,7 +37,13 @@ function Dashboard() {
     setSelectedWallet(parseInt(event.target.value));
   };
 
-  const [assignedworkRequests, setAssignedWorkRequests] = useState<any[]>();
+  const hasNoTenantRole = userRoles.some(
+    (role: Role) => role.name !== "TENANT_ROLE"
+  );
+
+  const [myworkRequests, setMyWorkRequests] = useState<any[]>();
+  const [myworkOrders, setMyWorkOrders] = useState<any[]>();
+  const [workRequests, setWorkRequests] = useState<any[]>();
   const [workOrders, setWorkOrders] = useState<any[]>();
   const [centralState, setCentralState] = useState<string>();
   const [tempcentralState, setTmpCentralState] = useState<string>();
@@ -58,14 +71,28 @@ function Dashboard() {
     console.log(response.data.data);
   };
 
-  const getAssignedWorkRequests = async () => {
+  const getWorkRequests = async () => {
     const response = await axiosInstance.get("/work-requests");
-    setAssignedWorkRequests(response.data.data);
+    setWorkRequests(response.data.data);
   };
 
   const getWorkOrders = async () => {
     const response = await axiosInstance.get("/work-requests/work-order/all");
     setWorkOrders(response.data.data);
+  };
+
+  const getMyWorkRequests = async () => {
+    const response = await axiosInstance.get(
+      "/work-requests/my-work-requests/all"
+    );
+    setMyWorkRequests(response.data.data);
+  };
+
+  const getMyWorkOrders = async () => {
+    const response = await axiosInstance.get(
+      "/work-requests/my-work-orders/all"
+    );
+    setMyWorkOrders(response.data.data);
   };
 
   // useEffect to fetch getMe initially and every 5 minutes
@@ -84,14 +111,16 @@ function Dashboard() {
       await Promise.all([
         getMe(),
         getWallet(),
-        getAssignedWorkRequests(),
+        getWorkRequests(),
         getWorkOrders(),
+        getMyWorkOrders(),
+        getMyWorkRequests(),
       ]);
     };
     fetchData();
   }, []);
 
-  const pendingRequests = assignedworkRequests?.filter(
+  const pendingRequests = workRequests?.filter(
     (request) => request.status === "Initiated"
   );
 
@@ -99,36 +128,49 @@ function Dashboard() {
     (request) => request.status === "Initiated"
   );
 
+  const mypendingRequests = myworkRequests?.filter(
+    (request) => request.status === "Initiated"
+  );
+
+  const mypendingOrders = myworkOrders?.filter(
+    (request) => request.status === "Initiated"
+  );
+
   const data = [
     {
-      title: "Initiated Work Request",
-      number: pendingRequests?.length,
+      title: "Initiated Work Requests",
+      number: !hasNoTenantRole
+        ? mypendingRequests?.length
+        : pendingRequests?.length,
       rate: "",
       path: "/work-requests",
     },
     {
-      title: "Created Work Order",
-      number: workOrders?.length,
+      title: "Created Work Requests",
+      number: !hasNoTenantRole ? myworkRequests?.length : workRequests?.length,
       rate: "",
       path: "/work-orders",
     },
     {
-      title: "initiated Work Order",
-      number: pendingOrders?.length,
+      title: "initiated Work Orders",
+      number: !hasNoTenantRole
+        ? mypendingOrders?.length
+        : pendingOrders?.length,
       rate: "",
       path: "/work-orders",
     },
     {
-      title: "initiated Work Order",
-      number: pendingOrders?.length,
-      rate: "",
-      path: "/work-orders",
-    },    {
-      title: "initiated Work Order",
-      number: pendingOrders?.length,
+      title: "Created Work Orders",
+      number: !hasNoTenantRole ? myworkOrders?.length : workOrders?.length,
       rate: "",
       path: "/work-orders",
     },
+    // {
+    //   title: "initiated Work Order",
+    //   number: pendingOrders?.length,
+    //   rate: "",
+    //   path: "/work-orders",
+    // },
     { title: "Wallet Balance", number: 0, rate: "", path: null },
   ];
 
@@ -168,7 +210,7 @@ function Dashboard() {
     }
     return "Zijela";
   };
-
+  const [showBalance, setShowBalance] = useState(true);
   return (
     <>
       {!loading ? (
@@ -210,7 +252,11 @@ function Dashboard() {
                   <div
                     key={index}
                     onClick={() => item?.path && router.push(item?.path)}
-                    className="bg-white py-3 px-4 rounded-lg flex items-center justify-between cursor-pointer"
+                    className={`${
+                      item.title === "Wallet Balance"
+                        ? "bg-[#FBC2B6]"
+                        : "bg-white"
+                    } py-3 px-4 rounded-lg flex items-center justify-between cursor-pointer`}
                   >
                     {/* Left Content */}
                     <div className="relative">
@@ -235,15 +281,19 @@ function Dashboard() {
                               </option>
                             ))}
                           </select>
-                          <p className="text-xl font-bold text-gray-800 mb-3">
-                            ₦
-                            {parseFloat(
-                              user.wallets.find(
-                                (wallet) => wallet.id === selectedWallet
-                              )?.balance || 0
-                            )
-                              .toFixed(1)
-                              .toLocaleString()}
+                          <p className="text-xl font-bold text-[#A8353A] mb-3">
+                            {showBalance ? (
+                              <>
+                                ₦
+                                {formatCurrency(
+                                  user.wallets.find(
+                                    (wallet) => wallet.id === selectedWallet
+                                  )?.balance || 0
+                                )}
+                              </>
+                            ) : (
+                              "****"
+                            )}
                           </p>
                           <div className="flex items-center gap-2 h-6"></div>
                         </div>
@@ -263,8 +313,31 @@ function Dashboard() {
                         </div>
                       ) : null}
                     </div>
+                    {item.title === "Wallet Balance" ? (
+                      <svg
+                        onClick={() => setShowBalance(!showBalance)}
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 text-white cursor-pointer"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15 12c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    ) : (
+                      <BarChartIcon />
+                    )}
                     {/* Right Icon */}
-                    <BarChartIcon />
                   </div>
                 ) : null
               )}

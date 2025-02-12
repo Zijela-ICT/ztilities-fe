@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import ChangeMyPassword from "./change-my-password";
 import Link from "next/link";
 import Image from "next/image";
+import formatCurrency from "@/utils/formatCurrency";
 
 export default function DashboardLayout({
   children,
@@ -107,7 +108,7 @@ export default function DashboardLayout({
                 {selectedWallet && (
                   <div className="flex items-center space-x-2">
                     <span className="text-lg text-black font-medium">
-                      ₦{parseFloat(selectedWallet?.balance || 0).toFixed(2)}
+                      ₦ {formatCurrency(selectedWallet?.balance || 0)}
                     </span>
                     <select
                       value={selectedWallet?.id}
