@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
-import { LabelInputComponent } from "../input-container";
+import { FileInputComponent, LabelInputComponent } from "../input-container";
 import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
@@ -91,6 +91,22 @@ export default function CreateWorkRequest({
     setFormData({ ...formData, [name]: value });
   };
 
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
+  const [file, setFile] = useState<string | null>(null);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    if (files?.length) {
+      const file = files[0];
+      setUploadedFile(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFile(reader.result as string); // Store the file URL
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSelectChange = (fieldName: string) => (selected: any) => {
     setFormData({
       ...formData,
@@ -101,10 +117,14 @@ export default function CreateWorkRequest({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const payload = {
+      ...formData,
+      file : file
+    }
     if (activeRowId) {
-      await axiosInstance.patch(`/work-requests/${activeRowId}`, formData);
+      await axiosInstance.patch(`/work-requests/${activeRowId}`, payload);
     } else {
-      await axiosInstance.post("/work-requests", formData);
+      await axiosInstance.post("/work-requests", payload);
     }
     setFormData({
       title: "",
@@ -278,6 +298,15 @@ export default function CreateWorkRequest({
                 onChange={handleSelectChange("asset")}
                 styles={multiSelectStyle}
                 placeholder="Select Assets"
+              />
+            </div>
+
+            <div className="relative w-full mt-6">
+              <FileInputComponent
+                name="file"
+                onChange={handleFileChange}
+                label="File"
+                uploadedFile={uploadedFile}
               />
             </div>
           </>
