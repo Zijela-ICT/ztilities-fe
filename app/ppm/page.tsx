@@ -1327,7 +1327,7 @@ export default function Ppm() {
                 {day}
               </div>
               <ul className="text-sm text-gray-600">
-                {getWorkForDay(day).map((work, index) => {
+                {getWorkForDay(day).slice(0,3).map((work, index) => {
                   const statusColor =
                     work.status === "Initiated"
                       ? "text-green-700"
