@@ -68,7 +68,7 @@ function Dashboard() {
 
   const getWallet = async () => {
     const response = await axiosInstance.get("/wallets/user-wallets");
-    console.log(response.data.data);
+
   };
 
   const getWorkRequests = async () => {

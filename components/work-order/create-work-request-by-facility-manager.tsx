@@ -33,7 +33,7 @@ export default function CreateWorkRequestForUser({
   // Fetch work request if activeRowId exists
   const getWorkRequest = async () => {
     if (activeRowId) {
-      const response = await axiosInstance.get(`/work-requests/${activeRowId}`);
+      const response = await axiosInstance.get(`/work-orders/${activeRowId}`);
       const data = response.data.data;
       setFormData({
         ...formData,
@@ -83,9 +83,9 @@ export default function CreateWorkRequestForUser({
     e.preventDefault();
 
     if (activeRowId) {
-      await axiosInstance.patch(`/work-requests/${activeRowId}`, formData);
+      await axiosInstance.patch(`/work-orders/${activeRowId}`, formData);
     } else {
-      await axiosInstance.post("/work-requests/for-a-user", formData);
+      await axiosInstance.post("/work-orders/for-a-user", formData);
     }
     setFormData({
       userId: "",

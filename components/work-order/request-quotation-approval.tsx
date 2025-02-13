@@ -49,7 +49,7 @@ export default function RequestQuotationApproval({
 
   const getWorkRequest = async () => {
     if (activeRowId) {
-      const response = await axiosInstance.get(`/work-requests/${activeRowId}`);
+      const response = await axiosInstance.get(`/work-orders/${activeRowId}`);
       const data = response.data.data;
       setFormData({
         ...formData,
@@ -77,7 +77,7 @@ export default function RequestQuotationApproval({
     e.preventDefault();
     const { amount, ...payload } = formData;
     await axiosInstance.patch(
-      `/work-requests/${activeRowId}/quotations/request-quotation-approval`,
+      `/work-orders/${activeRowId}/quotations/request-quotation-approval`,
       payload
     );
     setModalState("");

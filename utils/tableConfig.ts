@@ -181,14 +181,14 @@ export const tableMainButtonConfigs = {
     {
       text: "Create Work Order",
       className: "flex-1 px-4 py-3 text-white bg-[#A8353A]",
-      permissions: ["create_work-orders"],
+      permissions: ["create_work-orders:/work-order"],
       action: "createWorkOrder",
     },
     {
       text: "Bulk Work Order",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-      permissions: ["create_work-orders"],
+      permissions: ["create_work-orders:/work-order"],
       action: "createBulkWorkOrder",
     },
   ],

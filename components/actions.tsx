@@ -11,6 +11,8 @@ interface UserActionsProps {
   setModalStateDelete?: (state: string) => void;
   activeRowId?: any;
   toggleActions: any;
+  contextMenuedActions?: any;
+  contextMenued?: any;
 }
 
 const Actions: React.FC<UserActionsProps> = ({
@@ -20,6 +22,8 @@ const Actions: React.FC<UserActionsProps> = ({
   setModalStateDelete,
   activeRowId,
   toggleActions,
+  contextMenued,
+  contextMenuedActions,
 }) => {
   const router = useRouter();
   return (
@@ -47,10 +51,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {activeRowId === row.id && (
               <ActionDropdownComponent
                 toggleActions={() => toggleActions(null)}
-                // contextMenuedActions={() =>
-                //   contextMenuedActions(null)
-                // }
-                // contextMenued={contextMenued}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
               >
                 <ul className="py-2">
                   <li>
@@ -110,6 +112,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {activeRowId === row.id && (
               <ActionDropdownComponent
                 toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
               >
                 <ul className="py-2">
                   <li>
@@ -196,6 +200,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {activeRowId === row.id && (
               <ActionDropdownComponent
                 toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
               >
                 <ul className="py-2">
                   <li>
@@ -274,6 +280,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {activeRowId === row.id && (
               <ActionDropdownComponent
                 toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
               >
                 <ul className="py-2">
                   <li>
@@ -345,6 +353,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {activeRowId === row.id && (
               <ActionDropdownComponent
                 toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
               >
                 <ul className="py-2">
                   <li>
@@ -458,6 +468,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {activeRowId === row.id && (
               <ActionDropdownComponent
                 toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
               >
                 <ul className="py-2">
                   <li>
@@ -498,6 +510,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {activeRowId === row.id && (
               <ActionDropdownComponent
                 toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
               >
                 <ul className="py-2">
                   <li>
@@ -553,6 +567,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {activeRowId === row.id && (
               <ActionDropdownComponent
                 toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
               >
                 <ul className="py-2">
                   <li>
@@ -616,6 +632,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {activeRowId === row.id && (
               <ActionDropdownComponent
                 toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
               >
                 <ul className="py-2">
                   <li>
@@ -661,12 +679,7 @@ const Actions: React.FC<UserActionsProps> = ({
         <>
           <div className="relative">
             {/* Button */}
-            <PermissionGuard
-              requiredPermissions={[
-                "create_work-requests",
-                "read_work-requests:id",
-              ]}
-            >
+            <PermissionGuard requiredPermissions={["read_work-requests:id"]}>
               <button
                 onClick={() => toggleActions(row.id)}
                 className="text-blue-500 hover:text-blue-700"
@@ -679,6 +692,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {activeRowId === row.id && (
               <ActionDropdownComponent
                 toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
               >
                 <ul className="py-2">
                   <li>
@@ -744,8 +759,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {/* Button */}
             <PermissionGuard
               requiredPermissions={[
-                "create_work-orders",
-                "create_work-requests:/work-order",
+                "read_work-orders:id",
+                "read_work-orders:id/users-with-work-request-approval-limit/all",
               ]}
             >
               <button
@@ -760,6 +775,8 @@ const Actions: React.FC<UserActionsProps> = ({
             {activeRowId === row.id && (
               <ActionDropdownComponent
                 toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
               >
                 <ul className="py-2">
                   <li>
@@ -769,7 +786,9 @@ const Actions: React.FC<UserActionsProps> = ({
                         // setModalState("viewWorkOrder")
                         router.push(`/work-orders/${row.id}`)
                       }
-                      permissions={["read_work-requests:id"]}
+                      permissions={[
+                        "read_work-orders:id/users-with-work-request-approval-limit/all",
+                      ]}
                     />
                   </li>
 
@@ -786,7 +805,7 @@ const Actions: React.FC<UserActionsProps> = ({
                       text="Accept Request"
                       onClick={() => setModalStateDelete("acceptWorkOrder")}
                       permissions={[
-                        "update_work-requests:id/accept/work-order-by-procurement",
+                        "update_work-orders:id/accept/work-order-by-procurement",
                       ]}
                     />
                   </li>
@@ -795,7 +814,7 @@ const Actions: React.FC<UserActionsProps> = ({
                     <DropdownButtonComponent
                       text="Add Quotations"
                       onClick={() => setModalState("quotationsWorkOrder")}
-                      permissions={["update_work-requests:id/upload-quotation"]}
+                      permissions={["update_work-orders:id/upload-quotation"]}
                     />
                   </li>
 
@@ -806,7 +825,7 @@ const Actions: React.FC<UserActionsProps> = ({
                         setModalStateDelete("requestquotationsselection")
                       }
                       permissions={[
-                        "update_work-requests:id/quotations/request-quotation-selection",
+                        "update_work-orders:id/quotations/request-quotation-selection",
                       ]}
                     />
                   </li>
@@ -816,7 +835,7 @@ const Actions: React.FC<UserActionsProps> = ({
                       text="Select Quotation"
                       onClick={() => setModalState("acceptQuotation")}
                       permissions={[
-                        "update_work-requests:id/accept-quotation/quotationId",
+                        "update_work-orders:id/accept-quotation/quotationId",
                       ]}
                     />
                   </li>
@@ -826,7 +845,7 @@ const Actions: React.FC<UserActionsProps> = ({
                       text="Request Quotation Approval"
                       onClick={() => setModalState("requestquotationsapproval")}
                       permissions={[
-                        "update_work-requests:id/quotations/request-quotation-approval",
+                        "update_work-orders:id/quotations/request-quotation-approval",
                       ]}
                     />
                   </li>
@@ -836,7 +855,7 @@ const Actions: React.FC<UserActionsProps> = ({
                       text="Approve Quotation"
                       onClick={() => setModalStateDelete("approveQuotation")}
                       permissions={[
-                        "update_work-requests:id/quotations/approve-quotation",
+                        "update_work-orders:id/quotations/approve-quotation",
                       ]}
                     />
                   </li>
@@ -846,7 +865,9 @@ const Actions: React.FC<UserActionsProps> = ({
                       text="Raise Purchase Order"
                       onClick={() => setModalStateDelete("raisePaymentOrder")}
                       permissions={[
-                        "update_work-requests:id/quotations/raise-payment-order",
+                        "update_work-orders:id/quotations/raise-payment-order/debit-facility",
+                        "update_work-orders:id/quotations/raise-payment-order",
+                        "update_work-orders:id/quotations/raise-payment-order/credit-vendor-or-technician",
                       ]}
                     />
                   </li>
@@ -855,7 +876,7 @@ const Actions: React.FC<UserActionsProps> = ({
                     <DropdownButtonComponent
                       text="Close"
                       onClick={() => setModalState("closeWorkOrder")}
-                      permissions={["update_work-requests:id/status/close"]}
+                      permissions={["update_work-orders:id/status/close"]}
                     />
                   </li>
 
@@ -866,7 +887,7 @@ const Actions: React.FC<UserActionsProps> = ({
                           text="View and Approve Apportionment"
                           onClick={() => setModalState("viewServiceCharge")}
                           permissions={[
-                            "update_work-requests:id/apportion/service-charge/approve",
+                            "update_work-orders:id/apportion/service-charge/approve",
                           ]}
                         />
                       </li>
@@ -877,7 +898,7 @@ const Actions: React.FC<UserActionsProps> = ({
                             setModalStateDelete("apportionServiceCharge")
                           }
                           permissions={[
-                            "update_work-requests:id/apportion/service-charge",
+                            "update_work-orders:id/apportion/service-charge",
                           ]}
                         />
                       </li>

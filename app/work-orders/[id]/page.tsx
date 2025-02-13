@@ -19,7 +19,7 @@ function WorkRequests() {
   const [workRequest, setWorkRequest] = useState<any>();
 
   const getAWorkRequest = async () => {
-    const response = await axiosInstance.get(`/work-requests/${id}`);
+    const response = await axiosInstance.get(`/work-orders/${id}`);
     setWorkRequest(response.data.data);
   };
 

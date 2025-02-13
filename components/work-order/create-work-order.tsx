@@ -43,7 +43,7 @@ export default function CreateWorkOrder({
   const getWorkRequest = async () => {
     if (activeRowId) {
       const response = await axiosInstance.get(
-        `/work-requests/work-order/${activeRowId}`
+        `/work-orders/work-order/${activeRowId}`
       );
       const data = response.data.data;
       setFormData({
@@ -105,11 +105,11 @@ export default function CreateWorkOrder({
 
     if (activeRowId) {
       await axiosInstance.patch(
-        `/work-requests/work-order/${activeRowId}`,
+        `/work-orders/work-order/${activeRowId}`,
         formData
       );
     } else {
-      await axiosInstance.post("/work-requests/work-order/", formData);
+      await axiosInstance.post("/work-orders/work-order/", formData);
     }
     setFormData({
       title: "",

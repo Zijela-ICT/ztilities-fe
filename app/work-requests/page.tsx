@@ -163,10 +163,10 @@ function WorkRequests() {
       case "createWorkRequest":
       case "createWorkRequestforUser":
         return activeRowId ? "Edit Work Request" : "Create Work Request";
-        case "createBulkWorkRequest":
-          return "Upload Bulk Work Request";
-          case "createBulkWorkRequestforUser":
-            return "Upload Bulk Work Request for User";
+      case "createBulkWorkRequest":
+        return "Upload Bulk Work Request";
+      case "createBulkWorkRequestforUser":
+        return "Upload Bulk Work Request for User";
       case "viewWorkRequest":
         return "Work Request Details";
       case "commentWorkRequest":
@@ -208,8 +208,8 @@ function WorkRequests() {
           : "You can create and manage work request here.";
       case "createBulkWorkRequest":
         return "Import CSV/Excel file";
-        case "createBulkWorkRequestforUser":
-          return "Import CSV/Excel file";
+      case "createBulkWorkRequestforUser":
+        return "Import CSV/Excel file";
       case "viewWorkRequest":
         return "";
       case "commentWorkRequest":
@@ -280,6 +280,7 @@ function WorkRequests() {
           activeRowId={activeRowId}
           setModalState={setCentralState}
           setSuccessState={setSuccessState}
+          type={"requests"}
         />
       </>
     ),

@@ -7,9 +7,11 @@ export default function CommentWorkRequestOrder({
   setModalState,
   activeRowId,
   setSuccessState,
+  type,
 }: {
   setModalState: (state: string) => void;
   activeRowId?: string | null;
+  type: string;
   setSuccessState: (state: {
     title: string;
     detail: string;
@@ -52,12 +54,18 @@ export default function CommentWorkRequestOrder({
     e.preventDefault();
 
     const payload = { ...formData };
-    console.log(payload, activeRowId);
 
-    await axiosInstance.patch(
-      `/work-requests/${activeRowId}/comments`,
-      payload
-    );
+    if (type === "requests") {
+      await axiosInstance.patch(
+        `/work-requests/${activeRowId}/comments`,
+        payload
+      );
+    } else {
+      await axiosInstance.patch(
+        `/work-orders/${activeRowId}/comments`,
+        payload
+      );
+    }
 
     setFormData({ comment: "", isInternal: false });
     setModalState("");

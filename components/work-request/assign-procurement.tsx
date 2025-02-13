@@ -50,7 +50,7 @@ export default function CommentWorkRequestOrder({
       ...formData,
       file: file,
     };
-console.log(payload,activeRowId)
+
     // await axiosInstance.patch(
     //   `/work-requests/${activeRowId}/comments`,
     //   payload

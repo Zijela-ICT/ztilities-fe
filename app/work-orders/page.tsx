@@ -56,7 +56,7 @@ function WorkOrders({ nowrap }: Props) {
 
   const getWorkOrders = async () => {
     const response = await axiosInstance.get(
-      `/work-requests/work-order/all?page=${pagination.currentPage}&&paginate=true`
+      `/work-orders/work-order/all?page=${pagination.currentPage}&&paginate=true`
     );
     setWorkOrders(response.data.data);
     const extra = response.data.extra;
@@ -70,7 +70,7 @@ function WorkOrders({ nowrap }: Props) {
 
   const getAssignedWorkOrders = async () => {
     const response = await axiosInstance.get(
-      `/work-requests/my-work-orders/all?page=${pagination.currentPage}&&paginate=true`
+      `/work-orders/my-work-orders/all?page=${pagination.currentPage}&&paginate=true`
     );
     setAssignedWorkOrders(response.data.data);
     const extra = response.data.extra;
@@ -93,7 +93,7 @@ function WorkOrders({ nowrap }: Props) {
   };
 
   const getAWorkOrder = async () => {
-    const response = await axiosInstance.get(`/work-requests/${activeRowId}`);
+    const response = await axiosInstance.get(`/work-orders/${activeRowId}`);
     setWorkOrder(response.data.data);
   };
 
@@ -110,7 +110,7 @@ function WorkOrders({ nowrap }: Props) {
 
   // Delete functions
   const closeWorkOrder = async () => {
-    await axiosInstance.patch(`/work-requests/${activeRowId}/status/close`);
+    await axiosInstance.patch(`/work-orders/${activeRowId}/status/close`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
@@ -120,7 +120,7 @@ function WorkOrders({ nowrap }: Props) {
   };
 
   const approveWorkOrder = async () => {
-    await axiosInstance.patch(`/work-requests/${activeRowId}/status/approve`);
+    await axiosInstance.patch(`/work-orders/${activeRowId}/status/approve`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
@@ -131,7 +131,7 @@ function WorkOrders({ nowrap }: Props) {
 
   const acceptWorkOrder = async () => {
     await axiosInstance.patch(
-      `/work-requests/${activeRowId}/accept/work-order-by-procurement`
+      `/work-orders/${activeRowId}/accept/work-order-by-procurement`
     );
     setCentralStateDelete("");
     setSuccessState({
@@ -143,7 +143,7 @@ function WorkOrders({ nowrap }: Props) {
 
   const raisePaymentOrder = async () => {
     await axiosInstance.patch(
-      `/work-requests/${activeRowId}/quotations/raise-payment-order`
+      `/work-orders/${activeRowId}/quotations/raise-payment-order`
     );
     setCentralStateDelete("");
     setSuccessState({
@@ -155,7 +155,7 @@ function WorkOrders({ nowrap }: Props) {
 
   const requestQuotationSelection = async () => {
     await axiosInstance.patch(
-      `/work-requests/${activeRowId}/quotations/request-quotation-selection`
+      `/work-orders/${activeRowId}/quotations/request-quotation-selection`
     );
     setCentralStateDelete("");
     setSuccessState({
@@ -167,7 +167,7 @@ function WorkOrders({ nowrap }: Props) {
 
   const apportionServiceCharge = async () => {
     await axiosInstance.patch(
-      `/work-requests/${activeRowId}/apportion/service-charge`
+      `/work-orders/${activeRowId}/apportion/service-charge`
     );
     setCentralStateDelete("");
     setSuccessState({
@@ -179,7 +179,7 @@ function WorkOrders({ nowrap }: Props) {
 
   const approveApportionServiceCharge = async () => {
     await axiosInstance.patch(
-      `/work-requests/${activeRowId}/apportion/service-charge/approve`
+      `/work-orders/${activeRowId}/apportion/service-charge/approve`
     );
     setCentralState("");
     setSuccessState({
@@ -321,6 +321,7 @@ function WorkOrders({ nowrap }: Props) {
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
+        type = "orders"
       />
     ),
     attatchmentWorkOrder: (
@@ -331,7 +332,7 @@ function WorkOrders({ nowrap }: Props) {
         ]}
         selects={[]}
         title="Add Attachment"
-        apiEndpoint={`/work-requests/${activeRowId}/upload-attachment`}
+        apiEndpoint={`/work-orders/${activeRowId}/upload-attachment`}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
@@ -374,7 +375,7 @@ function WorkOrders({ nowrap }: Props) {
           { name: "dueDate", label: "Due Date", type: "date" },
         ]}
         title="Add Quotation"
-        apiEndpoint={`/work-requests/${activeRowId}/upload-quotation`}
+        apiEndpoint={`/work-orders/${activeRowId}/upload-quotation`}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
@@ -394,7 +395,7 @@ function WorkOrders({ nowrap }: Props) {
           { name: "file", label: "Attachment", type: "file" },
         ]}
         title="Close Work Order"
-        apiEndpoint={`/work-requests/${activeRowId}/status/close`}
+        apiEndpoint={`/work-orders/${activeRowId}/status/close`}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
@@ -496,8 +497,12 @@ function WorkOrders({ nowrap }: Props) {
   }, [centralState]);
 
   const tabPermissions: { [key: string]: string[] } = {
-    "My Work Order": ["read_work-requests:my-work-orders/all"],
-    "All Work Order": ["read_work-requests:work-order/all"],
+    "My Work Order": [
+      "read_work-orders:my-work-orders/all",
+      "read_work-orders:my-work-orders/vendor/all",
+      "read_work-orders:my-work-orders/technician/all",
+    ],
+    "All Work Order": ["read_work-orders:work-order/all"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -582,8 +587,8 @@ function WorkOrders({ nowrap }: Props) {
 
       <PermissionGuard
         requiredPermissions={[
-          "read_work-requests:my-work-orders/all",
-          "read_work-requests:work-order/all",
+          "read_work-orders:my-work-orders/all",
+          "read_work-orders:work-order/all",
         ]}
       >
         <div
@@ -617,8 +622,8 @@ function WorkOrders({ nowrap }: Props) {
 
       <PermissionGuard
         requiredPermissions={[
-          "read_work-requests:my-work-orders/all",
-          "read_work-requests:work-order/all",
+          "read_work-orders:my-work-orders/all",
+          "read_work-orders:work-order/all",
         ]}
       >
         <div className="relative bg-white rounded-2xl p-4 mt-4">

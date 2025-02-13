@@ -50,10 +50,10 @@ export default function UpdateWorkRequest({
 
     const endpoint =
       formData.status === "closed"
-        ? `/work-requests/${activeRowId}/status/close`
+        ? `/work-orders/${activeRowId}/status/close`
         : formData.status === "rejected"
-        ? `/work-requests/${activeRowId}/status/reject`
-        : `/work-requests/${activeRowId}/status/approve`;
+        ? `/work-orders/${activeRowId}/status/reject`
+        : `/work-orders/${activeRowId}/status/approve`;
 
     try {
       if (formData.status === "closed") {

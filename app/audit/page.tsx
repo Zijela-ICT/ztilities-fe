@@ -31,7 +31,7 @@ function Power() {
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
-  const formAudit = auditLogs?.slice(0,10)
+  // const formAudit = auditLogs?.slice(0,10)
 
   // Fetch data functions
   const getPowerCharges = async () => {
@@ -281,7 +281,7 @@ function Power() {
             />
           )} */}
           <TableComponent
-            data={formAudit}
+            data={auditLogs}
             type="auditlogs"
             setModalState={setCentralState}
             setModalStateDelete={setCentralStateDelete}

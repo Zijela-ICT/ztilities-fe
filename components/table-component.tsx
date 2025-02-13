@@ -1,13 +1,7 @@
 "use client";
-import {
-  IncomingIcon,
-  OutgoingIcon,
-  SearchIcon,
+import { IncomingIcon, OutgoingIcon, SearchIcon, WorkIcon } from "@/utils/svg";
 
-  WorkIcon,
-} from "@/utils/svg";
-
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ButtonComponent from "./button-component";
 import { tableMainButtonConfigs } from "@/utils/tableConfig";
 import Image from "next/image";
@@ -83,14 +77,13 @@ export default function TableComponent({
 
   const columns = data && data.length > 0 ? Object.keys(data[0]) : [];
 
-  // const [contextMenued, setContextMenued] = useState<string | null>(null);
+  const [contextMenued, setContextMenued] = useState<string | null>(null);
 
-  // const contextMenuedActions = (rowId: string) => {
-  //   setContextMenued((prevId) => (prevId === rowId ? null : rowId));
-  // };
+  const contextMenuedActions = (rowId: string) => {
+    setContextMenued((prevId) => (prevId === rowId ? null : rowId));
+  };
 
-  console.log(activeRowId);
-
+  console.log(contextMenued, "contectid", activeRowId, "activroe id");
   // //   useEffect(()=> {
   // // if(contextMenued === true){
   // //   setContextMenued(false)
@@ -188,10 +181,15 @@ export default function TableComponent({
             <tbody>
               {filteredData?.map((row: any, index) => (
                 <tr
-                  // onContextMenu={(e) => {
-                  //   e.preventDefault(); // Prevents the default browser context menu
-                  //   toggleActions(row.id);
-                  //   contextMenuedActions(row.id);
+                  onContextMenu={(e) => {
+                    e.preventDefault(); // Prevents the default browser context menu
+                    toggleActions(row.id);
+                    contextMenuedActions(row.id);
+                  }}
+                  // onClick={(e) => {
+
+                  //   toggleActions(null);
+                  //   contextMenuedActions(null);
 
                   // }}
                   key={index}
@@ -255,7 +253,7 @@ export default function TableComponent({
                             "lastName",
                             "subCategoryName",
                             "vendorName",
-                            "techniacianName"
+                            "techniacianName",
                           ]
                             .map((prop) => row[column]?.[prop]) // Optional chaining here
                             .filter(Boolean)
@@ -276,8 +274,8 @@ export default function TableComponent({
                         ) : column === "amount" ? (
                           row[column] && formatCurrency(row[column])
                         ) : column === "paidAt" ? (
-                          row[column] && moment.utc((row[column])).format("lll")
-                        )  : column === "avatar" ? (
+                          row[column] && moment.utc(row[column]).format("lll")
+                        ) : column === "avatar" ? (
                           row?.avatar ? (
                             <Image
                               src={row.avatar}
@@ -324,6 +322,8 @@ export default function TableComponent({
                           setModalStateDelete={setModalStateDelete}
                           activeRowId={activeRowId}
                           toggleActions={toggleActions}
+                          contextMenued={contextMenued}
+                          contextMenuedActions={contextMenuedActions}
                         />
                       </td>
                     </>
@@ -344,56 +344,73 @@ export default function TableComponent({
 
       {/* Pagination Controls */}
 
-      <div className="flex justify-center text-xs space-x-4 mt-4">
-        <button
-          onClick={handlePrevious}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-100 text-black font-semibold rounded-md disabled:opacity-50"
-        >
-          Previous
-        </button>
+      <div className="flex justify-center text-xs space-x-2 mt-4">
+  <button
+    onClick={handlePrevious}
+    disabled={currentPage === 1}
+    className="px-4 py-2 bg-gray-100 text-black font-semibold rounded-md disabled:opacity-50"
+  >
+    Previous
+  </button>
 
-        {/* Page number buttons */}
-        {totalPages ? (
-          <>
-            {" "}
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index}
-                onClick={() => handlePageClick(index + 1)}
-                className={`px-4 py-2 rounded-md ${
-                  currentPage === index + 1
-                    ? "bg-[#FBC2B61A] text-[#A8353A]"
-                    : " text-gray-700 "
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </>
-        ) : (
-          <button
-            className={`px-4 py-2 rounded-md ${
-              currentPage !== 1
-                ? "bg-[#FBC2B61A] text-[#A8353A]"
-                : " text-gray-700 "
-            }`}
-          >
-            {1}
-          </button>
-        )}
+  {/* Left arrow for sliding pagination */}
+  {totalPages > 7 && currentPage > 4 && (
+    <button onClick={() => handlePageClick(currentPage - 3)} className="px-2 text-black">
+      ←
+    </button>
+  )}
 
-        <button
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-100 text-black font-semibold rounded-md disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+  {/* Page number buttons */}
+  {totalPages ? (
+    <>
+      {Array.from({ length: totalPages }, (_, index) => index + 1)
+        .filter((page) => {
+          if (totalPages <= 7) return true; // Show all if <= 7 pages
+          if (currentPage <= 4) return page <= 5 || page === totalPages; // Show first 5 + last
+          if (currentPage >= totalPages - 3)
+            return page >= totalPages - 4 || page === 1; // Show last 5 + first
+          return (
+            Math.abs(page - currentPage) <= 2 || page === 1 || page === totalPages
+          ); // Show range around current + first & last
+        })
+        .map((page, index, arr) => (
+          <React.Fragment key={page}>
+            {index > 0 && page !== arr[index - 1] + 1 && <span>...</span>}
+            <button
+              onClick={() => handlePageClick(page)}
+              className={`px-4 py-2 rounded-md ${
+                currentPage === page
+                  ? "bg-[#FBC2B61A] text-[#A8353A]"
+                  : "text-gray-700"
+              }`}
+            >
+              {page}
+            </button>
+          </React.Fragment>
+        ))}
+    </>
+  ) : (
+    <button className="px-4 py-2 rounded-md text-gray-700">1</button>
+  )}
+
+  {/* Right arrow for sliding pagination */}
+  {totalPages > 7 && currentPage < totalPages - 3 && (
+    <button onClick={() => handlePageClick(currentPage + 3)} className="px-2 text-black">
+      →
+    </button>
+  )}
+
+  <button
+    onClick={handleNext}
+    disabled={currentPage === totalPages}
+    className="px-4 py-2 bg-gray-100 text-black font-semibold rounded-md disabled:opacity-50"
+  >
+    Next
+  </button>
+</div>
+
     </div>
   );
 }
 
 // bg-white sticky right-0 z-10
-
