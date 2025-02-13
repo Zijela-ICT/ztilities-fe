@@ -1021,6 +1021,7 @@ import ModalCompoenent, {
   SuccessModalCompoenent,
 } from "@/components/modal-component";
 import CreatePPM from "@/components/ppm/createPPM";
+import CreateBulk from "@/components/user-management/create-bulk";
 import createAxiosInstance from "@/utils/api";
 import moment from "moment";
 import Link from "next/link";
@@ -1096,7 +1097,7 @@ export default function Ppm() {
       const response = await axiosInstance.get(
         `/ppms?startDate=${startDate}&endDate=${endDate}`
       );
-      setPpms(response.data);
+      setPpms(response.data.data);
     } catch (error) {
       console.error("Error fetching PPMs:", error);
     }
@@ -1138,6 +1139,14 @@ export default function Ppm() {
   const componentMap: Record<string, JSX.Element> = {
     createPPM: (
       <CreatePPM
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    createBulkPPM: (
+      <CreateBulk
+        type="PPMs"
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
@@ -1191,8 +1200,8 @@ export default function Ppm() {
         }
       />
       <ModalCompoenent
-        title={centralState === "showAll" ? "Show PPMs" : "Create PPM"}
-        detail=""
+        title={centralState === "showAll" ? "Show PPMs" : "Create PPMs"}
+        detail={centralState === "createBulkPPM" &&  "Import CSV/Excel file"}
         modalState={centralState}
         setModalState={() => {
           setCentralState("");
@@ -1277,6 +1286,11 @@ export default function Ppm() {
             text="Add New PPM"
             onClick={() => setCentralState("createPPM")}
             className="flex-1 px-4 py-3 text-white bg-[#A8353A]"
+          />
+          <ButtonComponent
+            text="Bulk PPM"
+            onClick={() => setCentralState("createBulkPPM")}
+            className="flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]"
           />
         </div>
       </div>

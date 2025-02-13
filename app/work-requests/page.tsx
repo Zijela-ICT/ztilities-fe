@@ -23,6 +23,7 @@ import AcceptQuotation from "@/components/work-request/acceptQuotation";
 import ApportionPower from "@/components/work-request/apportionPower";
 import createAxiosInstance from "@/utils/api";
 import CommentWorkRequestOrder from "@/components/work-request/comment-request-order";
+import CreateBulk from "@/components/user-management/create-bulk";
 
 function WorkRequests() {
   const axiosInstance = createAxiosInstance();
@@ -162,6 +163,10 @@ function WorkRequests() {
       case "createWorkRequest":
       case "createWorkRequestforUser":
         return activeRowId ? "Edit Work Request" : "Create Work Request";
+        case "createBulkWorkRequest":
+          return "Upload Bulk Work Request";
+          case "createBulkWorkRequestforUser":
+            return "Upload Bulk Work Request for User";
       case "viewWorkRequest":
         return "Work Request Details";
       case "commentWorkRequest":
@@ -201,6 +206,10 @@ function WorkRequests() {
         return activeRowId
           ? "You can edit work request details here."
           : "You can create and manage work request here.";
+      case "createBulkWorkRequest":
+        return "Import CSV/Excel file";
+        case "createBulkWorkRequestforUser":
+          return "Import CSV/Excel file";
       case "viewWorkRequest":
         return "";
       case "commentWorkRequest":
@@ -242,8 +251,24 @@ function WorkRequests() {
         setSuccessState={setSuccessState}
       />
     ),
+    createBulkWorkRequest: (
+      <CreateBulk
+        type="Work Requests"
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
     createWorkRequestforUser: (
       <CreateWorkRequestForUser
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    createBulkWorkRequestforUser: (
+      <CreateBulk
+        type="Work Requests for user"
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}

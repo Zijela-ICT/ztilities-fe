@@ -21,6 +21,13 @@ export const tableMainButtonConfigs = {
       permissions: ["create_roles"],
       action: "createRole",
     },
+    {
+      text: "Bulk Role",
+      className:
+        "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["create_roles"],
+      action: "createBulkRole",
+    },
   ],
   facilities: [
     {
@@ -71,8 +78,15 @@ export const tableMainButtonConfigs = {
     {
       text: "Add New Assets",
       className: "flex-1 px-4 py-3 text-white bg-[#A8353A]",
-      permissions: ["create_facilities"],
+      permissions: ["create_assets"],
       action: "createAsset",
+    },
+    {
+      text: "Bulk Assets",
+      className:
+        "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["create_assets"],
+      action: "createBulkAsset",
     },
   ],
   categories: [
@@ -82,21 +96,42 @@ export const tableMainButtonConfigs = {
       permissions: ["create_assets:/category"],
       action: "createAssetCategory",
     },
+    {
+      text: "Bulk Category",
+      className:
+        "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["create_assets:/category"],
+      action: "createBulkAssetCategory",
+    },
   ],
   vendors: [
     {
-      text: "Add New Vendor",
+      text: "Add Vendor",
       className: "flex-1 px-4 py-3 text-white bg-[#A8353A]",
       permissions: ["create_vendors"],
       action: "createVendor",
     },
+    {
+      text: "Bulk Vendor",
+      className:
+        "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["create_vendors"],
+      action: "createBulkVendor",
+    },
   ],
   technicians: [
     {
-      text: "Add New Technician",
+      text: "Add Technician",
       className: "flex-1 px-4 py-3 text-white bg-[#A8353A]",
-      permissions: ["create_vendors"],
+      permissions: ["create_technicians"],
       action: "createTechnician",
+    },
+    {
+      text: "Bulk Technician",
+      className:
+        "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["create_technicians"],
+      action: "createBulkTechnician",
     },
   ],
   powers: [
@@ -105,6 +140,13 @@ export const tableMainButtonConfigs = {
       className: "flex-1 px-4 py-3 text-white bg-[#A8353A]",
       permissions: ["create_power-charges"],
       action: "createPowerCharge",
+    },
+    {
+      text: "Bulk Power Charge",
+      className:
+        "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["create_power-charges"],
+      action: "createBulkPowerCharge",
     },
   ],
   workrequests: [
@@ -115,11 +157,24 @@ export const tableMainButtonConfigs = {
       action: "createWorkRequest",
     },
     {
-      text: "Create Work Request for User",
+      text: "Bulk Requests",
+      className:
+        "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["create_work-requests"],
+      action: "createBulkWorkRequest",
+    },
+    {
+      text: "Create Request for user",
+      className: "flex-1 px-4 py-3 text-white bg-[#A8353A]",
+      permissions: ["create_work-requests:for-a-user"],
+      action: "createWorkRequestforUser",
+    },
+    {
+      text: "Bulk Requests for a user",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
       permissions: ["create_work-requests:for-a-user"],
-      action: "createWorkRequestforUser",
+      action: "createBulkWorkRequestforUser",
     },
   ],
   workorders: [
@@ -128,6 +183,13 @@ export const tableMainButtonConfigs = {
       className: "flex-1 px-4 py-3 text-white bg-[#A8353A]",
       permissions: ["create_work-orders"],
       action: "createWorkOrder",
+    },
+    {
+      text: "Bulk Work Order",
+      className:
+        "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
+      permissions: ["create_work-orders"],
+      action: "createBulkWorkOrder",
     },
   ],
 };

@@ -86,7 +86,6 @@ const tenantInProgressStatuses: string[] = [
   "assigned to procurement",
   "quotation selected",
   "quotation approved",
-  "apportionment_approved",
   "awaiting selection",
   "uploading quotations",
   "waiting for quotations",
@@ -97,7 +96,7 @@ const tenantInProgressStatuses: string[] = [
   "accepted",
 ];
 
-const tenantClosedStatuses: string[] = ["closed"];
+const tenantClosedStatuses: string[] = ["closed", "apportionment_approved"];
 
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   const { userRoles } = useDataPermission();
@@ -106,7 +105,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
 
   // Check if the user has the TENANT_ROLE
   const hasTenantRole = userRoles.some(
-    (role: Role) => role.name === "TENANT_ROLE"
+    (role: Role) => role.name === "TENANT_ROLE" || role.name === "VENDOR_ROLE"
   );
 
   let finalStatus: { text: string; className: string };

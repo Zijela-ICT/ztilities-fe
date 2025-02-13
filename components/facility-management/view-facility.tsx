@@ -72,43 +72,60 @@ export default function FacilityDetails({
                 {key === "user" ||
                 (key === "requestedBy" &&
                   value !== null &&
-                  typeof value === "object")
-                  ? `${value?.firstName || "-"} ${value?.lastName || "-"}`
-                  : key === "unit" &&
-                    value !== null &&
-                    typeof value === "object"
-                  ? `${value?.unitNumber || "-"}`
-                  : key === "facility" &&
-                    value !== null &&
-                    typeof value === "object"
-                  ? `${value?.name || "-"}`
-                  : (key === "assignedVendor" ||
-                      key === "assignedTechnician") &&
-                    value !== null &&
-                    typeof value === "object"
-                  ? `${
-                      value?.vendorName ||
-                      value?.technician?.technicianName ||
-                      "-"
-                    }`
-                  : key === "asset" &&
-                    value !== null &&
-                    typeof value === "object"
-                  ? `${value?.assetName || "-"}`
-                  : key === "addedBy" &&
-                    value !== null &&
-                    typeof value === "object"
-                  ? `${value?.firstName || "-"} ${value?.lastName || "-"} `
-                  : key === "createdAt" ||
-                    (key === "updatedAt" && value !== null)
-                  ? `${moment.utc(value[key]).format("LL")} `
-                  : Array.isArray(value)
-                  ? value.length // Show array length
-                  : typeof value === "object" && value !== null
-                  ? JSON.stringify(value) // Show object as a JSON string
-                  : value !== null && value !== undefined
-                  ? String(value) // Convert other types to string
-                  : "-"}
+                  typeof value === "object") ? (
+                  `${value?.firstName || "-"} ${value?.lastName || "-"}`
+                ) : key === "unit" &&
+                  value !== null &&
+                  typeof value === "object" ? (
+                  `${value?.unitNumber || "-"}`
+                ) : key === "facility" &&
+                  value !== null &&
+                  typeof value === "object" ? (
+                  `${value?.name || "-"}`
+                ) : key === "purchaseOrderFileUrl" && value !== null ? (
+                  <>
+                    {value ? (
+                      <a
+                        className="px-3 py-2 bg-[#A8353A] text-white text-xs rounded-lg shadow-md inline-block hover:animate-tilt"
+                        href={value}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View Purchase Order PDF
+                      </a>
+                    ) : (
+                      <p>-</p>
+                    )}
+                  </>
+                ) : (key === "assignedVendor" ||
+                    key === "assignedTechnician") &&
+                  value !== null &&
+                  typeof value === "object" ? (
+                  `${
+                    value?.vendorName ||
+                    value?.technician?.technicianName ||
+                    "-"
+                  }`
+                ) : key === "asset" &&
+                  value !== null &&
+                  typeof value === "object" ? (
+                  `${value?.assetName || "-"}`
+                ) : key === "addedBy" &&
+                  value !== null &&
+                  typeof value === "object" ? (
+                  `${value?.firstName || "-"} ${value?.lastName || "-"} `
+                ) : key === "createdAt" ||
+                  (key === "updatedAt" && value !== null) ? (
+                  `${moment.utc(value[key]).format("LL")} `
+                ) : Array.isArray(value) ? (
+                  value.length // Show array length
+                ) : typeof value === "object" && value !== null ? (
+                  JSON.stringify(value) // Show object as a JSON string
+                ) : value !== null && value !== undefined ? (
+                  String(value) // Convert other types to string
+                ) : (
+                  "-"
+                )}
               </p>
             </div>
           ))}
@@ -181,14 +198,23 @@ export default function FacilityDetails({
                                   .replace(/([a-z])([A-Z])/g, "$1 $2")
                                   .slice(1)}{" "}
                               {idx + 1} */}
-                              {item.action ||
-                                item.assetName ||
-                                item.walletType ||
+
+                              {item.action ??
+                                item.assetName ??
+                                item.walletType ??
+                                item?.vendor?.vendorName ??
+                                item?.technician?.technicianName ??
+                                (item.user?.firstName &&
+                                  item.user?.lastName &&
+                                  item.user?.firstName +
+                                    " " +
+                                    item.user?.lastName) ??
                                 key
                                   .replace(/([a-z])([A-Z])/g, "$1 $2")
                                   .replace(/^./, (str) => str.toUpperCase()) + // Capitalize first letter
                                   " " +
                                   (idx + 1)}
+
                               <span className="transform transition-transform duration-100 group-open:rotate-180">
                                 <DropDownArrow />
                               </span>
@@ -231,6 +257,8 @@ export default function FacilityDetails({
                                                 [
                                                   "firstName",
                                                   "lastName",
+                                                  "vendorName",
+                                                  "technicianName",
                                                   "id",
                                                 ].includes(nestedKey)
                                               ) // Filter for only firstName and lastName
@@ -371,15 +399,4 @@ export default function FacilityDetails({
       )}
     </>
   );
-}
-
-{
-  /* : key === "workRequestNumber" && value !== null ? (
-                  <Link
-                    className="underline text-[#A8353A]"
-                    href={`work-requests/${value}`}
-                  >
-                    {value || "-"}
-                  </Link>
-                ) */
 }

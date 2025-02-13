@@ -9,7 +9,6 @@ import ModalCompoenent, {
 } from "@/components/modal-component";
 import CreateRole from "@/components/user-management/create-role";
 import CreateBulkUser from "@/components/user-management/create-bulk";
-import axiosInstance from "@/utils/api";
 import ResetPassword from "@/components/user-management/reset-password";
 import PermissionList from "@/components/user-management/view-permissions";
 import withPermissions from "@/components/auth/permission-protected-routes";
@@ -17,11 +16,12 @@ import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import createAxiosInstance from "@/utils/api";
+import CreateBulk from "@/components/user-management/create-bulk";
 
 function UserManagement() {
   const axiosInstance = createAxiosInstance();
   const { pagination, setPagination } = useDataPermission();
-  const tabs = ["All Users", "Role", "Permissions"];
+  const tabs = ["All Users", "Roles", "Permissions"];
 
   const [successState, setSuccessState] = useState({
     title: "",
@@ -106,7 +106,7 @@ function UserManagement() {
 
   // Toggle actions
   const toggleActions = (rowId: string) => {
-    if (selectedTab === "All Users") {
+    if (selectedTab === "All Users" || selectedTab === "Roles") {
       setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
     } else {
       setActiveRowId(rowId);
@@ -122,6 +122,8 @@ function UserManagement() {
         return activeRowId ? "Edit Role" : "Create Role";
       case "createBulkUser":
         return "Upload Bulk User";
+      case "createBulkRole":
+        return "Upload Bulk Role";
       case "resetPassword":
         return "Reset Password";
       case "viewPermissions":
@@ -149,6 +151,8 @@ function UserManagement() {
           ? "You can edit role details here."
           : "You can manage users' access here.";
       case "createBulkUser":
+        return "Import CSV/Excel file";
+      case "createBulkRole":
         return "Import CSV/Excel file";
       case "resetPassword":
         return "Change the password for this user";
@@ -197,9 +201,24 @@ function UserManagement() {
         }
       />
     ),
-    createBulkUser: <CreateBulkUser type="Users" />,
+    createBulkUser: (
+      <CreateBulk
+        type="Users"
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        activeRowId={activeRowId}
+      />
+    ),
     createRole: (
       <CreateRole
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        activeRowId={activeRowId}
+      />
+    ),
+    createBulkRole: (
+      <CreateBulk
+        type="Roles"
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         activeRowId={activeRowId}
@@ -350,7 +369,7 @@ function UserManagement() {
               totalPages={pagination.totalPages}
             />
           )}
-          {selectedTab === "Role" && (
+          {selectedTab === "Roles" && (
             <TableComponent
               data={roles}
               type="roles"

@@ -106,7 +106,7 @@ export default function TableComponent({
                 type === "users"
                   ? "sm:w-[60%]"
                   : type === "workrequests"
-                  ? "sm:w-[60%]"
+                  ? "sm:w-[30%]"
                   : type === "bills"
                   ? "w-full"
                   : type === "apportionmentDetails"

@@ -20,6 +20,8 @@ import AcceptQuotation from "@/components/work-order/acceptQuotation";
 import ButtonComponent from "@/components/button-component";
 import createAxiosInstance from "@/utils/api";
 import CommentWorkRequestOrder from "@/components/work-request/comment-request-order";
+import RequestQuotationApproval from "@/components/work-order/request-quotation-approval";
+import CreateBulk from "@/components/user-management/create-bulk";
 
 interface Props {
   nowrap: boolean;
@@ -198,6 +200,8 @@ function WorkOrders({ nowrap }: Props) {
       case "createWorkOrder":
       case "createWorkOrderforUser":
         return activeRowId ? "Edit Work Order" : "Create Work Order";
+      case "createBulkWorkOrder":
+        return "Upload Bulk Work Order";
       case "viewWorkOrder":
         return "Work Order Details";
       case "viewServiceCharge":
@@ -249,6 +253,8 @@ function WorkOrders({ nowrap }: Props) {
         return activeRowId
           ? "You can edit work order details here."
           : "You can create and manage work order here.";
+      case "createBulkWorkOrder":
+        return "Import CSV/Excel file";
       case "viewWorkOrder":
         return "";
       case "viewServiceCharge":
@@ -297,6 +303,14 @@ function WorkOrders({ nowrap }: Props) {
   const componentMap: Record<string, JSX.Element> = {
     createWorkOrder: (
       <CreateWorkOrder
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    createBulkWorkOrder: (
+      <CreateBulk
+        type="Work Orders"
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
@@ -424,37 +438,11 @@ function WorkOrders({ nowrap }: Props) {
       />
     ),
     requestquotationsapproval: (
-      <>
-        <DynamicCreateForm
-          inputs={[
-            { name: "title", label: "Title", type: "text" },
-            { name: "description", label: "Description", type: "textarea" },
-          ]}
-          selects={[
-            {
-              name: "userId",
-              label: "Approval Officer",
-              placeholder: "Select Approval Officer",
-              options: users?.map((user: User) => ({
-                value: user.id,
-                label: `${user.firstName} ${user.lastName} - Approval Limit ( ${
-                  user.approvalLimit || ""
-                } )`,
-              })),
-            },
-          ]}
-          title="Request Approval"
-          apiEndpoint={`/work-requests/${activeRowId}/quotations/request-quotation-approval`}
-          activeRowId={activeRowId}
-          setModalState={setCentralState}
-          setSuccessState={setSuccessState}
-          fetchResource={(id) =>
-            axiosInstance
-              .get(`/work-requests/${id}`)
-              .then((res) => res.data.data)
-          }
-        />
-      </>
+      <RequestQuotationApproval
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
     ),
     acceptQuotation: (
       <AcceptQuotation

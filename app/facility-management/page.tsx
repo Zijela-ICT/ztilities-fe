@@ -17,6 +17,7 @@ import CreateCategory from "@/components/facility-management/create-category";
 import CreateAsset from "@/components/facility-management/create-asset";
 import createAxiosInstance from "@/utils/api";
 import FundWallet from "@/components/facility-management/fund-wallet";
+import CreateBulk from "@/components/user-management/create-bulk";
 
 function FacilityManagement() {
   const axiosInstance = createAxiosInstance();
@@ -257,10 +258,14 @@ function FacilityManagement() {
 
       case "createBulkFacility":
         return "Upload Bulk Facility";
-        case "createBulkBlock":
-          return "Upload Bulk Block";
-          case "createBulkUnit":
-            return "Upload Bulk Unit";
+      case "createBulkBlock":
+        return "Upload Bulk Block";
+      case "createBulkUnit":
+        return "Upload Bulk Unit";
+      case "createBulkAsset":
+        return "Upload Bulk Asset";
+      case "createBulkAssetCategory":
+        return "Upload Bulk Category";
       case "viewFacility":
         return "Facility Details";
       case "viewBlock":
@@ -308,6 +313,10 @@ function FacilityManagement() {
       case "createBulkBlock":
         return "Import CSV/Excel file";
       case "createBulkUnit":
+        return "Import CSV/Excel file";
+      case "createBulkAsset":
+        return "Import CSV/Excel file";
+      case "createBulkAssetCategory":
         return "Import CSV/Excel file";
       case "createAsset":
         return activeRowId
@@ -467,9 +476,30 @@ function FacilityManagement() {
         }
       />
     ),
-    createBulkFacility: <CreateBulkUser type="Facilities" />,
-    createBulkBlock: <CreateBulkUser type="Blocks" />,
-    createBulkUnit: <CreateBulkUser type="Units" />,
+    createBulkFacility: (
+      <CreateBulkUser
+        type="Facilities"
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    createBulkBlock: (
+      <CreateBulkUser
+        type="Blocks"
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    createBulkUnit: (
+      <CreateBulkUser
+        type="Units"
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
     createBlock: (
       <DynamicCreateForm
         inputs={[
@@ -668,6 +698,14 @@ function FacilityManagement() {
         setSuccessState={setSuccessState}
       />
     ),
+    createBulkAsset: (
+      <CreateBulk
+        type="Assets"
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
     assignUserToFacility: (
       <DynamicCreateForm
         inputs={[]}
@@ -720,6 +758,14 @@ function FacilityManagement() {
     ),
     createAssetCategory: (
       <CreateCategory
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    createBulkAssetCategory: (
+      <CreateBulk
+        type="Categories"
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}

@@ -9,6 +9,9 @@ import { toast } from "react-toastify";
 
 interface BulkProps {
   type?: string;
+  setModalState?: any;
+  setSuccessState?: any;
+  activeRowId?: any;
 }
 export default function CreateBulk({ type }: BulkProps) {
   const axiosInstance = createAxiosInstance();
@@ -132,7 +135,28 @@ export default function CreateBulk({ type }: BulkProps) {
       endpoint = "/blocks/bulk";
     } else if (type === "Units") {
       endpoint = "/units/bulk";
-    }
+    } else if (type === "Work Orders") {
+      endpoint = "work-requests/work-orders/bulk";
+    } else if (type === "Work Requests") {
+      endpoint = "/work-requests/bulk";
+    } else if (type === "Work Requests for User") {
+      endpoint = "/work-requests/for-a-user/bulk";
+    } else if (type === "Roles") {
+      endpoint = "/roles/bulk";
+    } else if (type === "Assets") {
+      endpoint = "/assets/bulk";
+    } else if (type === "Categories") {
+      endpoint = "/categories/bulk";
+    } else if (type === "Power Charges") {
+      endpoint = "/power-charges/bulk";
+    } else if (type === "PPMs") {
+      endpoint = "/ppms/bulk";
+    } else if (type === "Vendors") {
+      endpoint = "/vendors/bulk";
+    } else if (type === "Technicians") {
+      endpoint = "/technicians/bulk";
+    } 
+    
 
     // if (type === " Users") {
     //   await axiosInstance.post("/users/pre-register/bulk", csvData);

@@ -13,6 +13,7 @@ import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import createAxiosInstance from "@/utils/api";
+import CreateBulk from "@/components/user-management/create-bulk";
 
 function VendorManagement() {
   const axiosInstance = createAxiosInstance();
@@ -113,6 +114,10 @@ function VendorManagement() {
         return activeRowId ? "Edit Vendor" : "Create Vendor";
       case "createTechnician":
         return activeRowId ? "Edit Technician" : "Create Technician";
+      case "createBulkVendor":
+        return "Upload Bulk Vendors";
+      case "createBulkTechnician":
+        return "Upload Bulk Technicians";
     }
     switch (centralStateDelete) {
       case "deactivateVendor":
@@ -137,10 +142,14 @@ function VendorManagement() {
         return activeRowId
           ? "You can edit vendor details here."
           : "You can create and manage vendor here.";
+      case "createBulkVendor":
+        return "Import CSV/Excel file";
       case "createTechnician":
         return activeRowId
           ? "You can edit technician details here."
           : "You can manage technicians here.";
+      case "createBulkTechnician":
+        return "Import CSV/Excel file";
       case "viewPermissions":
         return "All permissions available for this role";
     }
@@ -202,6 +211,14 @@ function VendorManagement() {
         }
       />
     ),
+    createBulkVendor: (
+      <CreateBulk
+        type="Vendors"
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
     createTechnician: (
       <DynamicCreateForm
         inputs={[
@@ -230,6 +247,14 @@ function VendorManagement() {
         fetchResource={(id) =>
           axiosInstance.get(`/technicians/${id}`).then((res) => res.data.data)
         }
+      />
+    ),
+    createBulkTechnician: (
+      <CreateBulk
+        type="Technicians"
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
       />
     ),
   };

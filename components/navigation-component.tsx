@@ -198,6 +198,12 @@ export default function Navigation() {
               iconPath: paths.path9,
             },
             {
+              href: "/audit",
+              label: "Audit Logs",
+              permissions: ["audit"],
+              iconPath: paths.path6,
+            },
+            {
               href: "/vendor-management",
               label: "Vendor & Tech Management",
               permissions: ["vendors"],
