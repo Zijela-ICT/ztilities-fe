@@ -3,6 +3,10 @@ import Select from "react-select";
 import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import createAxiosInstance from "@/utils/api";
+import {
+  LabelInputComponent,
+  LabelTextareaComponent,
+} from "../input-container";
 
 export default function AcceptQuotation({
   setModalState,
@@ -13,12 +17,23 @@ export default function AcceptQuotation({
   const [quotations, setQuotations] = useState([]);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
 
+  const [formData, setFormData] = useState({
+    reasonForQuotationSelection: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
   useEffect(() => {
     if (activeRowId) {
       const fetchQuotations = async () => {
-        const response = await axiosInstance.get(
-          `/work-orders/${activeRowId}`
-        );
+        const response = await axiosInstance.get(`/work-orders/${activeRowId}`);
         setQuotations(
           response.data.data?.quotations?.map((quotation: any) => ({
             value: quotation.quotationId,
@@ -33,7 +48,8 @@ export default function AcceptQuotation({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await axiosInstance.patch(
-      `/work-orders/${activeRowId}/accept-quotation/${selectedQuotation.value}`
+      `/work-orders/${activeRowId}/accept-quotation/${selectedQuotation?.value}`,
+      { reasonForQuotationSelection: formData.reasonForQuotationSelection }
     );
     setQuotations([]);
     setSelectedQuotation(null);
@@ -58,6 +74,15 @@ export default function AcceptQuotation({
             onChange={setSelectedQuotation}
             styles={multiSelectStyle}
             placeholder="Select Quotation"
+          />
+        </div>
+
+        <div className="relative w-full mt-6">
+          <LabelTextareaComponent
+            name="reasonForQuotationSelection"
+            value={formData.reasonForQuotationSelection}
+            onChange={handleChange}
+            label="Reason For Quotation Selection"
           />
         </div>
 
