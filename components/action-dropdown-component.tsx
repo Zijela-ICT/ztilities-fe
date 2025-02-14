@@ -61,7 +61,7 @@ export default function ActionDropdownComponent({
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
-        toggleActions(null);
+        // toggleActions(null);
         contextMenuedActions(null);
       }
     }
