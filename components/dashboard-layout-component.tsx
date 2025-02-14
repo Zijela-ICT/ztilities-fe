@@ -40,18 +40,6 @@ export default function DashboardLayout({
     setSelectedWallet(user?.wallets[0]);
   }, [user?.wallets]);
 
-  const handleWalletChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = user.wallets.find(
-      (wallet) => wallet.id === parseInt(event.target.value)
-    );
-    if (selected) setSelectedWallet(selected);
-  };
-
-  // If 'nowrap' is true, directly render children without wrapping them in the layout
-  if (nowrap) {
-    return <>{children}</>;
-  }
-
   const getMe = async () => {
     const response = await axiosInstance.get("/auth/me");
     setUser(response.data.data.user);
@@ -69,6 +57,20 @@ export default function DashboardLayout({
     getMe();
   }, []);
 
+
+  const handleWalletChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = user.wallets.find(
+      (wallet) => wallet.id === parseInt(event.target.value)
+    );
+    if (selected) setSelectedWallet(selected);
+  };
+
+  // If 'nowrap' is true, directly render children without wrapping them in the layout
+  if (nowrap) {
+    return <>{children}</>;
+  }
+
+ 
   return (
     <>
       <ModalCompoenent
