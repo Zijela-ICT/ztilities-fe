@@ -222,8 +222,8 @@ function WorkOrders({ nowrap }: Props) {
         return "Close Work Order ";
       case "requestquotationsapproval":
         return "Request quotation approval";
-        case "attachFile":
-          return "Upload File";
+      case "attachFile":
+        return "Upload File";
     }
     switch (centralStateDelete) {
       case "deactivateWorkOrder":
@@ -244,7 +244,6 @@ function WorkOrders({ nowrap }: Props) {
         return "Request quotation selection";
       case "raisePaymentOrder":
         return "Raise Purchase Order";
-
     }
     return "Zijela";
   };
@@ -331,7 +330,10 @@ function WorkOrders({ nowrap }: Props) {
     ),
     attachFile: (
       <DynamicCreateForm
-        inputs={[{ name: "file", label: "File", type: "file" }]}
+        inputs={[
+          { name: "file", label: "File", type: "file" },
+          { name: "title", label: "Title", type: "text" },
+        ]}
         selects={[]}
         title="Attach File"
         apiEndpoint={`/work-orders/${activeRowId}/upload-attachment`}
