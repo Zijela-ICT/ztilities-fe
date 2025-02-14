@@ -364,7 +364,7 @@ function Transactions() {
               backgroundImage: "url('/assets/wallet-bg.jpeg')",
             }}
           >
-            {user.wallets.length > 1 && (
+            {user.wallets.length > 0 && (
               <div className="mb-2 flex flex-wrap gap-2">
                 {user.wallets.map((wallet, index) => (
                   <button

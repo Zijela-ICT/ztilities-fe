@@ -334,7 +334,7 @@ function WorkOrders({ nowrap }: Props) {
         inputs={[{ name: "file", label: "File", type: "file" }]}
         selects={[]}
         title="Attach File"
-        apiEndpoint={`/${activeRowId}/upload-attachment`}
+        apiEndpoint={`/work-orders/${activeRowId}/upload-attachment`}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
