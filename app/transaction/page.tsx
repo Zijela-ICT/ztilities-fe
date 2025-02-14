@@ -357,7 +357,7 @@ function Transactions() {
           </div>
         </PermissionGuard>
 
-        {user.wallets.length > 1 && (
+        {user.wallets.length > 0 && (
           <div
             className="relative bg-cover bg-center bg-no-repeat rounded-2xl px-4 py-4 "
             style={{
