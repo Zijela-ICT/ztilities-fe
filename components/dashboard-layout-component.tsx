@@ -13,6 +13,7 @@ import ChangeMyPassword from "./change-my-password";
 import Link from "next/link";
 import Image from "next/image";
 import formatCurrency from "@/utils/formatCurrency";
+import createAxiosInstance from "@/utils/api";
 
 export default function DashboardLayout({
   children,
@@ -29,9 +30,10 @@ export default function DashboardLayout({
   onclick?: () => void;
   nowrap?: boolean; // Optional 'nowrap' prop
 }) {
-  const { user } = useDataPermission();
+  const axiosInstance = createAxiosInstance();
+  const { user, setUser, setUserPermissions, setUserRoles } =
+    useDataPermission();
   const [centralState, setCentralState] = useState<string>();
-
   const [selectedWallet, setSelectedWallet] = useState<any>();
 
   useEffect(() => {
@@ -49,6 +51,23 @@ export default function DashboardLayout({
   if (nowrap) {
     return <>{children}</>;
   }
+
+  const getMe = async () => {
+    const response = await axiosInstance.get("/auth/me");
+    setUser(response.data.data.user);
+    const roles = response.data.data?.roles || [];
+    setUserRoles(roles);
+    const allPermissions = roles
+      .map((role: any) => role.permissions || []) // Extract permissions from each role
+      .flat(); // Flatten the array of arrays
+    // Remove duplicate permissions using a Set
+    const uniquePermissions: Permission[] = Array.from(new Set(allPermissions));
+    setUserPermissions(uniquePermissions);
+  };
+
+  useEffect(() => {
+    getMe();
+  }, []);
 
   return (
     <>
