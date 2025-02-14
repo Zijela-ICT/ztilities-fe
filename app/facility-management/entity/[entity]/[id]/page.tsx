@@ -6,6 +6,7 @@ import withPermissions from "@/components/auth/permission-protected-routes";
 import { useParams, useRouter } from "next/navigation";
 import createAxiosInstance from "@/utils/api";
 import FacilityDetails from "@/components/facility-management/view-facility";
+import formatCurrency from "@/utils/formatCurrency";
 
 function FacilityManagementEntity() {
   const axiosInstance = createAxiosInstance();
@@ -53,6 +54,34 @@ function FacilityManagementEntity() {
     detailText = "Facility Details";
   }
 
+  // Extract and convert the wallet balances to numbers
+  const powerWalletBalance = formatCurrency(
+    unit?.wallets.find((wallet) => wallet.walletType === "POWER")?.balance
+  );
+  const serviceWalletBalance = formatCurrency(
+    unit?.wallets.find((wallet) => wallet.walletType === "SERVICE")?.balance
+  );
+  const powerWalletBalanceFac = formatCurrency(
+    facility?.wallets.find((wallet) => wallet.walletType === "POWER")?.balance
+  );
+  const serviceWalletBalanceFac = formatCurrency(
+    facility?.wallets.find((wallet) => wallet.walletType === "SERVICE")?.balance
+  );
+  const formattedPowerWallet = `₦ ${powerWalletBalance}`;
+  const formattedServiceWallet = `₦ ${serviceWalletBalance}`;
+  const formattedPowerWalletFac = `₦ ${powerWalletBalanceFac}`;
+  const formattedServiceWalletFac = `₦ ${serviceWalletBalanceFac}`;
+  const newUnit = {
+    powerWallet: formattedPowerWallet,
+    serviceWallet: formattedServiceWallet,
+    ...unit,
+  };
+  const newFacility = {
+    powerWallet: formattedPowerWalletFac,
+    serviceWallet: formattedServiceWalletFac,
+    ...facility,
+  };
+
   return (
     <DashboardLayout
       title={`${titlePrefix} ${
@@ -63,7 +92,7 @@ function FacilityManagementEntity() {
       onclick={() => router.back()}
     >
       <div className="relative bg-white rounded-2xl p-8 ">
-        <FacilityDetails facility={unit || facility || block} />
+        <FacilityDetails facility={newUnit || newFacility || block} />
       </div>
     </DashboardLayout>
   );

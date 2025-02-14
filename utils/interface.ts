@@ -60,6 +60,7 @@ interface Facility {
   blocks: Block[];
   units: Unit[];
   assets: Asset[];
+  wallets: any[];
 }
 
 interface Block {
