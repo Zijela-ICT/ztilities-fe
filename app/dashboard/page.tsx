@@ -71,11 +71,9 @@ function Dashboard() {
   };
 
   const getWorkRequestsDashboard = async () => {
-    const response = await axiosInstance.get("/work-requests/dashboard/all");
+    const response = await axiosInstance.get("/work-orders/dashboard/all");
     setWorkRequests(response.data.data);
   };
-
-
 
   // useEffect to fetch getMe initially and every 5 minutes
   useEffect(() => {
@@ -90,15 +88,10 @@ function Dashboard() {
   const loading = !(user && userPermissions);
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([
-        getMe(),
-        getWallet(),
-        getWorkRequestsDashboard(),
-      ]);
+      await Promise.all([getMe(), getWallet(), getWorkRequestsDashboard()]);
     };
     fetchData();
   }, []);
-
 
   const data = [
     {
@@ -133,7 +126,7 @@ function Dashboard() {
     },
     {
       title: "PurchaseOrdersRaised",
-      number: workRequests?.overDueWorkRequest,
+      number: workRequests?.purchaseOrdersRaised,
       rate: "",
       path: "/dashboard",
     },
