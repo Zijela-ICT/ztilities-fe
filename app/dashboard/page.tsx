@@ -43,7 +43,7 @@ function Dashboard() {
 
   const [myworkRequests, setMyWorkRequests] = useState<any[]>();
   const [myworkOrders, setMyWorkOrders] = useState<any[]>();
-  const [workRequests, setWorkRequests] = useState<any[]>();
+  const [workRequests, setWorkRequests] = useState<any>();
   const [workOrders, setWorkOrders] = useState<any[]>();
   const [centralState, setCentralState] = useState<string>();
   const [tempcentralState, setTmpCentralState] = useState<string>();
@@ -68,32 +68,14 @@ function Dashboard() {
 
   const getWallet = async () => {
     const response = await axiosInstance.get("/wallets/user-wallets");
-
   };
 
-  const getWorkRequests = async () => {
-    const response = await axiosInstance.get("/work-requests");
+  const getWorkRequestsDashboard = async () => {
+    const response = await axiosInstance.get("/work-requests/dashboard/all");
     setWorkRequests(response.data.data);
   };
 
-  const getWorkOrders = async () => {
-    const response = await axiosInstance.get("/work-requests/work-order/all");
-    setWorkOrders(response.data.data);
-  };
 
-  const getMyWorkRequests = async () => {
-    const response = await axiosInstance.get(
-      "/work-requests/my-work-requests/all"
-    );
-    setMyWorkRequests(response.data.data);
-  };
-
-  const getMyWorkOrders = async () => {
-    const response = await axiosInstance.get(
-      "/work-requests/my-work-orders/all"
-    );
-    setMyWorkOrders(response.data.data);
-  };
 
   // useEffect to fetch getMe initially and every 5 minutes
   useEffect(() => {
@@ -111,66 +93,50 @@ function Dashboard() {
       await Promise.all([
         getMe(),
         getWallet(),
-        getWorkRequests(),
-        getWorkOrders(),
-        getMyWorkOrders(),
-        getMyWorkRequests(),
+        getWorkRequestsDashboard(),
       ]);
     };
     fetchData();
   }, []);
 
-  const pendingRequests = workRequests?.filter(
-    (request) => request.status === "Initiated"
-  );
-
-  const pendingOrders = workOrders?.filter(
-    (request) => request.status === "Initiated"
-  );
-
-  const mypendingRequests = myworkRequests?.filter(
-    (request) => request.status === "Initiated"
-  );
-
-  const mypendingOrders = myworkOrders?.filter(
-    (request) => request.status === "Initiated"
-  );
 
   const data = [
     {
       title: "Initiated Work Requests",
-      number: !hasNoTenantRole
-        ? mypendingRequests?.length
-        : pendingRequests?.length,
+      number: workRequests?.initiatedWorkRequest,
       rate: "",
-      path: "/work-requests",
+      path: "/dashboard",
     },
     {
-      title: "Created Work Requests",
-      number: !hasNoTenantRole ? myworkRequests?.length : workRequests?.length,
+      title: "Pending Work Requests",
+      number: workRequests?.pendingWorkRequest,
       rate: "",
-      path: "/work-orders",
+      path: "/dashboard",
     },
     {
-      title: "Initiated Work Orders",
-      number: !hasNoTenantRole
-        ? mypendingOrders?.length
-        : pendingOrders?.length,
+      title: "OverDue Work Requests",
+      number: workRequests?.overdueWorkRequest,
       rate: "",
-      path: "/work-orders",
+      path: "/dashboard",
     },
     {
-      title: "Created Work Orders",
-      number: !hasNoTenantRole ? myworkOrders?.length : workOrders?.length,
+      title: "Pending Work Orders",
+      number: workRequests?.pendingWorkOrder,
       rate: "",
-      path: "/work-orders",
+      path: "/dashboard",
     },
-    // {
-    //   title: "initiated Work Order",
-    //   number: pendingOrders?.length,
-    //   rate: "",
-    //   path: "/work-orders",
-    // },
+    {
+      title: "Overdue Work Requests",
+      number: workRequests?.overdueWorkOrder,
+      rate: "",
+      path: "/dashboard",
+    },
+    {
+      title: "PurchaseOrdersRaised",
+      number: workRequests?.overDueWorkRequest,
+      rate: "",
+      path: "/dashboard",
+    },
     { title: "Wallet Balance", number: 0, rate: "", path: null },
   ];
 
@@ -361,7 +327,7 @@ function Dashboard() {
                     className={
                       "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]"
                     }
-                    permissions={["create_work-requests:/work-order"]}
+                    permissions={["create_work-orders:/work-order"]}
                   />
                   <ButtonComponent
                     text={"Create Work Request"}

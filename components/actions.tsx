@@ -904,6 +904,13 @@ const Actions: React.FC<UserActionsProps> = ({
                       </li>
                     </>
                   )}
+                  <li>
+                    <DropdownButtonComponent
+                      text="Attach File"
+                      onClick={() => setModalState("attachFile")}
+                      permissions={["create_files:upload"]}
+                    />
+                  </li>
                 </ul>
               </ActionDropdownComponent>
             )}

@@ -222,6 +222,8 @@ function WorkOrders({ nowrap }: Props) {
         return "Close Work Order ";
       case "requestquotationsapproval":
         return "Request quotation approval";
+        case "attachFile":
+          return "Upload File";
     }
     switch (centralStateDelete) {
       case "deactivateWorkOrder":
@@ -242,6 +244,7 @@ function WorkOrders({ nowrap }: Props) {
         return "Request quotation selection";
       case "raisePaymentOrder":
         return "Raise Purchase Order";
+
     }
     return "Zijela";
   };
@@ -275,6 +278,8 @@ function WorkOrders({ nowrap }: Props) {
         return "";
       case "closeWorkOrder":
         return "";
+      case "attachFile":
+        return "Upload a file here";
     }
     switch (centralStateDelete) {
       case "activateWorkOrder":
@@ -321,7 +326,17 @@ function WorkOrders({ nowrap }: Props) {
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-        type = "orders"
+        type="orders"
+      />
+    ),
+    attachFile: (
+      <DynamicCreateForm
+        inputs={[{ name: "file", label: "File", type: "file" }]}
+        selects={[]}
+        title="Attach File"
+        apiEndpoint={`/${activeRowId}/upload-attachment`}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
       />
     ),
     attatchmentWorkOrder: (
