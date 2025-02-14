@@ -331,8 +331,8 @@ function WorkOrders({ nowrap }: Props) {
     attachFile: (
       <DynamicCreateForm
         inputs={[
-          { name: "file", label: "File", type: "file" },
           { name: "title", label: "Title", type: "text" },
+          { name: "file", label: "File", type: "file" },
         ]}
         selects={[]}
         title="Attach File"
