@@ -7,7 +7,6 @@ import ModalCompoenent, {
   ActionModalCompoenent,
   SuccessModalCompoenent,
 } from "@/components/modal-component";
-import axiosInstance from "@/utils/api";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
@@ -17,6 +16,13 @@ import CreateBulk from "@/components/user-management/create-bulk";
 
 function VendorManagement() {
   const axiosInstance = createAxiosInstance();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
   const tabs = ["Vendors", "Technicians"];
 
   const [successState, setSuccessState] = useState({
@@ -35,13 +41,31 @@ function VendorManagement() {
 
   // Fetch data functions
   const getVendors = async () => {
-    const response = await axiosInstance.get("/vendors");
+    const response = await axiosInstance.get(
+      `/vendors?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
+    );
     setVendors(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   const getTechnicians = async () => {
-    const response = await axiosInstance.get("/technicians");
+    const response = await axiosInstance.get(
+      `/technicians?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
+    );
     setTechnicians(response.data.data);
+    const extra = response.data.extra;
+    setPagination({
+      currentPage: extra.page,
+      pageSize: extra.pageSize,
+      total: extra.total,
+      totalPages: extra.totalPages,
+    });
   };
 
   const getAVendor = async () => {
@@ -303,7 +327,19 @@ function VendorManagement() {
       };
       fetchData();
     }
-  }, [centralState, centralStateDelete, selectedTab]);
+  }, [
+    centralState,
+    centralStateDelete,
+    selectedTab,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+  ]);
+
+  //new clear
+  useEffect(() => {
+    clearSearchAndPagination();
+  }, [selectedTab]);
 
   return (
     <DashboardLayout
@@ -391,6 +427,12 @@ function VendorManagement() {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
           {selectedTab === "Technicians" && (
@@ -403,6 +445,12 @@ function VendorManagement() {
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
+              currentPage={pagination.currentPage}
+              setCurrentPage={(page) =>
+                setPagination({ ...pagination, currentPage: page })
+              }
+              itemsPerPage={pagination.pageSize}
+              totalPages={pagination.totalPages}
             />
           )}
         </div>
