@@ -6,7 +6,7 @@ export default function formatCurrency(amount: any) {
   }
 
   if (typeof amount !== "number" || isNaN(amount)) {
-    return "Invalid number";
+    return "--------";
   }
 
   return amount.toLocaleString("en-US", {
