@@ -279,7 +279,7 @@ export const NotifIcon = () => {
   );
 };
 
-export const TransactionIcon = ({width = "21", height = "21" }:any) => {
+export const TransactionIcon = ({ width = "21", height = "21" }: any) => {
   return (
     <svg
       width={width}
@@ -400,22 +400,41 @@ export const WorkIcon = () => {
 export const ArrowRightIcon = () => {
   return (
     <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M5.3335 2.66675L10.6668 8.00008L5.3335 13.3334"
-      stroke="#000"
-      strokeWidth="1.5"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5.3335 2.66675L10.6668 8.00008L5.3335 13.3334"
+        stroke="#000"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
+
+export const FilterIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-6 h-6 text-gray-600"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
-  </svg>
-  )
-}
+    >
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="8" y1="12" x2="16" y2="12" />
+      <line x1="10" y1="18" x2="14" y2="18" />
+    </svg>
+  );
+};
 
 export const UploadIcon = () => {
   return (
@@ -468,7 +487,7 @@ export const UploadIcon = () => {
   );
 };
 
-export const RefreshIcon = ({stroke ="white"}) => {
+export const RefreshIcon = ({ stroke = "white" }) => {
   return (
     <svg
       width="14"

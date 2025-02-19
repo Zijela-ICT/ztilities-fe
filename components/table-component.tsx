@@ -1,5 +1,11 @@
 "use client";
-import { IncomingIcon, OutgoingIcon, SearchIcon, WorkIcon } from "@/utils/svg";
+import {
+  FilterIcon,
+  IncomingIcon,
+  OutgoingIcon,
+  SearchIcon,
+  WorkIcon,
+} from "@/utils/svg";
 import React, { useEffect, useState } from "react";
 import ButtonComponent from "./button-component";
 import { tableMainButtonConfigs } from "@/utils/tableConfig";
@@ -9,9 +15,6 @@ import formatCurrency from "@/utils/formatCurrency";
 import Actions from "./actions";
 import moment from "moment";
 import Pagination from "./pagination-table";
-import { LabelInputComponent } from "./input-container";
-import Select from "react-select";
-import { multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import FilterComponent from "./table-filter-component";
 
@@ -47,7 +50,8 @@ export default function TableComponent({
   itemsPerPage,
   totalPages,
 }: TableProps) {
-  const { searchQuery, setSearchQuery, setFilterQuery } = useDataPermission();
+  const { setSearchQuery, setFilterQuery } = useDataPermission();
+  const [showFilter, setShowFilter] = useState<boolean>(false);
   // const [searchQuery, setSearchQuery] = useState("");
   // filters state now may hold a string (for normal filters)
   // or an object with min/max (for range filters) or from/to (for date filters)
@@ -133,7 +137,7 @@ export default function TableComponent({
   const displayedColumns = columns.filter(
     (column) =>
       column !== "id" &&
-      // column !== "createdAt" &&
+      column !== "createdAt" &&
       column !== "updatedAt" &&
       column !== "assets" &&
       column !== "isApproved" &&
@@ -307,7 +311,12 @@ export default function TableComponent({
                 className="px-1 py-4 w-full focus:outline-none"
               />
             </div>
-
+            <div
+              onClick={() => setShowFilter(!showFilter)}
+              className="flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-gray-200 cursor-pointer"
+            >
+              <FilterIcon />
+            </div>
             {tableMainButtonConfigs[type]?.map((button, index) => (
               <ButtonComponent
                 key={index}
@@ -320,22 +329,23 @@ export default function TableComponent({
                 permissions={button.permissions}
               />
             ))}
-            <div>Filters</div>
           </div>
         </>
       )}
 
       {/* Render filters with conditional input types */}
-      <FilterComponent
-        filterKeys={filterKeys}
-        data={data}
-        filters={filters}
-        rangeFilterKeys={rangeFilterKeys}
-        dateFilterKeys={dateFilterKeys}
-        handleFilterChange={handleFilterChange}
-        handleRangeFilterChange={handleRangeFilterChange}
-        handleDateRangeFilterChange={handleDateRangeFilterChange}
-      />
+      {showFilter && (
+        <FilterComponent
+          filterKeys={filterKeys}
+          data={data}
+          filters={filters}
+          rangeFilterKeys={rangeFilterKeys}
+          dateFilterKeys={dateFilterKeys}
+          handleFilterChange={handleFilterChange}
+          handleRangeFilterChange={handleRangeFilterChange}
+          handleDateRangeFilterChange={handleDateRangeFilterChange}
+        />
+      )}
 
       {/* Table rendering remains unchanged */}
       <div className="overflow-x-auto bg-white rounded-lg border border-gray-100 min-h-[40vh]">

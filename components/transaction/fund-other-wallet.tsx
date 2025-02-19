@@ -4,6 +4,7 @@ import { multiSelectStyle } from "@/utils/ojects";
 import { LabelInputComponent } from "../input-container";
 import createAxiosInstance from "@/utils/api";
 import { MyLoaderFinite } from "../loader-components";
+import { toast } from "react-toastify";
 
 interface FundWalletProps {
   setModalState: (state: any) => void;
@@ -29,7 +30,7 @@ export default function FundOtherWallet({
   const [walletDetails, setWalletDetails] = useState<any>(null);
 
   // The required length is based on "UPDCFMPW0000085"
-  const WALLET_ACCOUNT_NUMBER_LENGTH = "UPDCFMPW0000085".length; // 15
+  const WALLET_ACCOUNT_NUMBER_LENGTH = 15; // 15
 
   const getAUnit = async () => {
     const response = await axiosInstance.get(`/units/${activeRowId}`);
@@ -89,8 +90,13 @@ export default function FundOtherWallet({
   };
 
   const getWalletByAccountNumber = async (walletId: string) => {
-      const response = await axiosInstance.get(`/wallets/${walletId}`);
+    try {
+      const response = await axiosInstance.get(`/wallets/wallet/${walletId}`);
       setWalletDetails(response.data.data);
+    } catch (error) {
+      console.log(error);
+      toast.warning(error.response.data.message);
+    }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -141,7 +147,15 @@ export default function FundOtherWallet({
               <LabelInputComponent
                 type="text"
                 name="walletInfo"
-                value={`${walletDetails.walletID} (${walletDetails.walletType})`}
+                value={`${
+                  walletDetails?.user
+                    ? walletDetails.user.firstName + walletDetails.user.lastName
+                    : walletDetails?.unit
+                    ? walletDetails.unit.unitNumber
+                    : walletDetails?.facility
+                    ? walletDetails.facility.facilityName
+                    : ""
+                } (${walletDetails?.walletType || ""})`}
                 label="Wallet Info"
                 readOnly
               />

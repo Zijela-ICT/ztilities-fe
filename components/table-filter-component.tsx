@@ -41,7 +41,6 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
 }) => {
   if (!filterKeys.length) return null;
 
-  
   return (
     <div className="flex flex-wrap gap-4 my-4">
       {filterKeys.map((col) => {
