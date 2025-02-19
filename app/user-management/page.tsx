@@ -60,7 +60,7 @@ function UserManagement() {
 
   const getRoles = async () => {
     const response = await axiosInstance.get(
-      `/roles?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}`
+      `/roles?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setRoles(response.data.data);
     const extra = response.data.extra;

@@ -29,7 +29,13 @@ interface Props {
 
 function WorkOrders({ nowrap }: Props) {
   const axiosInstance = createAxiosInstance();
-  const { pagination, setPagination } = useDataPermission();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
   const tabs = ["All Work Order", "My Work Order"];
 
   const [successState, setSuccessState] = useState({
@@ -56,7 +62,7 @@ function WorkOrders({ nowrap }: Props) {
 
   const getWorkOrders = async () => {
     const response = await axiosInstance.get(
-      `/work-orders/work-order/all?page=${pagination.currentPage}&&paginate=true`
+      `/work-orders/work-order/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setWorkOrders(response.data.data);
     const extra = response.data.extra;
@@ -70,7 +76,7 @@ function WorkOrders({ nowrap }: Props) {
 
   const getAssignedWorkOrders = async () => {
     const response = await axiosInstance.get(
-      `/work-orders/my-work-orders/all?page=${pagination.currentPage}&&paginate=true`
+      `/work-orders/my-work-orders/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setAssignedWorkOrders(response.data.data);
     const extra = response.data.extra;
@@ -333,7 +339,6 @@ function WorkOrders({ nowrap }: Props) {
         inputs={[
           { name: "title", label: "Title", type: "text" },
           { name: "file", label: "File", type: "file" },
-
         ]}
         selects={[]}
         title="Attach File"
@@ -550,7 +555,19 @@ function WorkOrders({ nowrap }: Props) {
       getAssignedWorkOrders();
     }
     getUsers();
-  }, [centralState, centralStateDelete, selectedTab, pagination.currentPage]);
+  }, [
+    centralState,
+    centralStateDelete,
+    selectedTab,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+  ]);
+
+  //new clear
+  useEffect(() => {
+    clearSearchAndPagination();
+  }, [selectedTab]);
 
   return (
     <DashboardLayout

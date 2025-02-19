@@ -21,7 +21,13 @@ import CreateBulk from "@/components/user-management/create-bulk";
 
 function FacilityManagement() {
   const axiosInstance = createAxiosInstance();
-  const { pagination, setPagination } = useDataPermission();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
   const tabs = [
     "Facilities",
     "My Facilities",
@@ -65,7 +71,7 @@ function FacilityManagement() {
 
   const getFacilities = async () => {
     const response = await axiosInstance.get(
-      `/facilities?page=${pagination.currentPage}&&paginate=true`
+      `/facilities?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setFacilities(response.data.data);
     const extra = response.data.extra;
@@ -84,7 +90,7 @@ function FacilityManagement() {
 
   const getMyFacilities = async () => {
     const response = await axiosInstance.get(
-      `/facilities/my-facilities/all?page=${pagination.currentPage}&&paginate=true`
+      `/facilities/my-facilities/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setMyFacilities(response.data.data);
     const extra = response.data.extra;
@@ -103,7 +109,7 @@ function FacilityManagement() {
 
   const getBlocks = async () => {
     const response = await axiosInstance.get(
-      `/blocks?page=${pagination.currentPage}&&paginate=true`
+      `/blocks?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setBlocks(response.data.data);
     const extra = response.data.extra;
@@ -122,7 +128,7 @@ function FacilityManagement() {
 
   const getMyBlocks = async () => {
     const response = await axiosInstance.get(
-      `/blocks/my-blocks/all?page=${pagination.currentPage}&&paginate=true`
+      `/blocks/my-blocks/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setMyBlocks(response.data.data);
     const extra = response.data.extra;
@@ -141,7 +147,7 @@ function FacilityManagement() {
 
   const getUnits = async () => {
     const response = await axiosInstance.get(
-      `/units?page=${pagination.currentPage}&&paginate=true`
+      `/units?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setUnits(response.data.data);
     const extra = response.data.extra;
@@ -155,7 +161,7 @@ function FacilityManagement() {
 
   const getMyUnits = async () => {
     const response = await axiosInstance.get(
-      `/units/my-units/all?page=${pagination.currentPage}&&paginate=true`
+      `/units/my-units/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setMyUnits(response.data.data);
     const extra = response.data.extra;
@@ -836,13 +842,18 @@ function FacilityManagement() {
     } else {
       getFacilities();
     }
-  }, [centralState, centralStateDelete]);
+  }, [centralState, centralStateDelete, searchQuery, filterQuery]);
 
   useEffect(() => {
     if (centralState === "viewAssetCategory") {
       getACategory();
     }
   }, [centralState]);
+
+  //new clear
+  useEffect(() => {
+    clearSearchAndPagination();
+  }, [selectedTab]);
 
   return (
     <DashboardLayout

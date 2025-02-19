@@ -17,7 +17,13 @@ import CreateBulk from "@/components/user-management/create-bulk";
 
 function Power() {
   const axiosInstance = createAxiosInstance();
-  const { pagination, setPagination } = useDataPermission();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
   const tabs = ["Power Apportion"];
 
   const [successState, setSuccessState] = useState({
@@ -35,7 +41,7 @@ function Power() {
   // Fetch data functions
   const getPowerCharges = async () => {
     const response = await axiosInstance.get(
-      `/power-charges?page=${pagination.currentPage}&&paginate=true`
+      `/power-charges?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setPowerCharges(response.data.data);
     const extra = response.data.extra;
@@ -95,8 +101,8 @@ function Power() {
         return "Create Power Charge";
       case "viewPowerCharge":
         return "View Power Charge";
-        case "createBulkPowerCharge":
-          return "Upload Bulk Power Charge";
+      case "createBulkPowerCharge":
+        return "Upload Bulk Power Charge";
     }
     switch (centralStateDelete) {
       case "approvePowerCharge":
@@ -115,8 +121,8 @@ function Power() {
         return "";
       case "viewPowerCharge":
         return "";
-        case "createBulkPowerCharge":
-          return "Import CSV/Excel file";
+      case "createBulkPowerCharge":
+        return "Import CSV/Excel file";
     }
     switch (centralStateDelete) {
       case "approvePowerCharge":
@@ -164,7 +170,13 @@ function Power() {
       await Promise.all([getPowerCharges()]);
     };
     fetchData();
-  }, [centralState, centralStateDelete, pagination.currentPage]);
+  }, [
+    centralState,
+    centralStateDelete,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+  ]);
 
   return (
     <DashboardLayout

@@ -510,7 +510,7 @@ function Transactions() {
                   </h2>
                 </div>
                 <ul>
-                  {filteredTransactions?.map((log, index) => (
+                  {filteredTransactions?.slice(0, 6).map((log, index) => (
                     <li
                       key={log.id}
                       className="flex justify-between items-start mb-4 border-b text-sm border-gray-100 last:border-b-0 pb-4"

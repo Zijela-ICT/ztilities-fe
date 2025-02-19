@@ -23,30 +23,8 @@ export default function MyLoader() {
 export function MyLoaderFinite({ height }: any) {
   return (
     <div
-      className={`flex w-full ${
-        height ? height : "h-screen"
-      }  justify-center items-center`}
+      className={`fixed top-0 left-0 w-full h-full flex justify-center items-center bg-white z-50`}
     >
-      {/* <svg
-        className="w-20 h-20 text-[#A8353A] animate-spin"
-        viewBox="0 0 50 50"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <circle
-          className="opacity-25"
-          cx="25"
-          cy="25"
-          r="20"
-          stroke="currentColor"
-          strokeWidth="5"
-        />
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M25 5a20 20 0 0110 37.32A20 20 0 0025 45V5z"
-        />
-      </svg> */}
       <svg
         width="58"
         height="58"
@@ -64,7 +42,6 @@ export function MyLoaderFinite({ height }: any) {
           <g transform="translate(1 1)">
             <path
               d="M36 18c0-9.94-8.06-18-18-18"
-              id="Oval-2"
               stroke="url(#a)"
               strokeWidth="2"
             >
@@ -90,9 +67,6 @@ export function MyLoaderFinite({ height }: any) {
           </g>
         </g>
       </svg>
-      {/* <p className="text-[#A8353A] ml-6 text-base">
-        Hold on, getting transactions
-      </p> */}
     </div>
   );
 }

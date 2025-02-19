@@ -15,7 +15,13 @@ import createAxiosInstance from "@/utils/api";
 
 function VendorManagement() {
   const axiosInstance = createAxiosInstance();
-  const { pagination, setPagination } = useDataPermission();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
 
   const tabs = ["My Bills", "All Bills"];
 
@@ -35,7 +41,7 @@ function VendorManagement() {
 
   const getBills = async () => {
     const response = await axiosInstance.get(
-      `/bills?page=${pagination.currentPage}&&paginate=true`
+      `/bills?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setBills(response.data.data);
     const extra = response.data.extra;
@@ -49,7 +55,7 @@ function VendorManagement() {
 
   const getMyBills = async () => {
     const response = await axiosInstance.get(
-      `/bills/my-bills/all?page=${pagination.currentPage}&&paginate=true`
+      `/bills/my-bills/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setMyBills(response.data.data);
     const extra = response.data.extra;
@@ -155,7 +161,19 @@ function VendorManagement() {
       };
       fetchData();
     }
-  }, [centralState, centralStateDelete, selectedTab, pagination.currentPage]);
+  }, [
+    centralState,
+    centralStateDelete,
+    selectedTab,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+  ]);
+
+  //new clear
+  useEffect(() => {
+    clearSearchAndPagination();
+  }, [selectedTab]);
 
   return (
     <DashboardLayout title="Bills" detail="Manage all bills here">
@@ -216,7 +234,9 @@ function VendorManagement() {
         </div>
       </PermissionGuard>
 
-      <PermissionGuard requiredPermissions={["read_bills","read_bills:my-bills/all" ]}>
+      <PermissionGuard
+        requiredPermissions={["read_bills", "read_bills:my-bills/all"]}
+      >
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           {selectedTab === "My Bills" && (
             <TableComponent

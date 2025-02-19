@@ -43,7 +43,14 @@ ChartJS.register(
 
 function Transactions() {
   const axiosInstance = createAxiosInstance();
-  const { user, pagination, setPagination } = useDataPermission();
+  const {
+    user,
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
   const { id, entity } = useParams();
   const [filters, setFilters] = useState({
     User: "",
@@ -109,7 +116,7 @@ function Transactions() {
 
   const getMyTransactions = async () => {
     const response = await axiosInstance.get(
-      `/transactions/my-transactions/all?page=${pagination.currentPage}&&paginate=true`
+      `/transactions/my-transactions/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setFilteredTransactions(response.data.data);
     const extra = response.data.extra;
@@ -125,7 +132,7 @@ function Transactions() {
     const response = await axiosInstance.get(
       `/transactions/user-transactions/all/${filters.User || id}?page=${
         pagination.currentPage
-      }`
+      }&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setFilteredTransactions(response.data.data);
     const extra = response.data.extra;
@@ -140,7 +147,7 @@ function Transactions() {
     const response = await axiosInstance.get(
       `/transactions/user-transactions/all/${filters.Vendor || id}?page=${
         pagination.currentPage
-      }`
+      }&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setFilteredTransactions(response.data.data);
     const extra = response.data.extra;
@@ -155,7 +162,7 @@ function Transactions() {
     const response = await axiosInstance.get(
       `/transactions/user-transactions/all/${filters.Technician || id}?page=${
         pagination.currentPage
-      }`
+      }&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setFilteredTransactions(response.data.data);
     const extra = response.data.extra;
@@ -170,7 +177,7 @@ function Transactions() {
     const response = await axiosInstance.get(
       `/transactions/facility-transactions/all/${filters.Facility || id}?page=${
         pagination.currentPage
-      }`
+      }&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setFilteredTransactions(response.data.data);
     const extra = response.data.extra;
@@ -222,7 +229,14 @@ function Transactions() {
 
     setLoading(true);
     fetchTransactions();
-  }, [id, entity, user.wallets, pagination.currentPage]);
+  }, [
+    id,
+    entity,
+    user.wallets,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+  ]);
 
   useEffect(() => {
     const fetchFilteredTransactions = async () => {

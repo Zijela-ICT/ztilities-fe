@@ -27,7 +27,14 @@ import CreateBulk from "@/components/user-management/create-bulk";
 
 function WorkRequests() {
   const axiosInstance = createAxiosInstance();
-  const { pagination, setPagination, userRoles } = useDataPermission();
+  const {
+    pagination,
+    setPagination,
+    userRoles,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
 
   const hasTenantRole = userRoles.some(
     (role: Role) => role.name === "TENANT_ROLE"
@@ -53,7 +60,7 @@ function WorkRequests() {
   // Fetch data functions
   const getAssignedWorkRequests = async () => {
     const response = await axiosInstance.get(
-      `/work-requests/my-work-requests/all?page=${pagination.currentPage}&&paginate=true`
+      `/work-requests/my-work-requests/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setAssignedWorkRequests(response.data.data);
     const extra = response.data?.extra;
@@ -67,7 +74,7 @@ function WorkRequests() {
 
   const getAssignedWorkRequestsOrder = async () => {
     const response = await axiosInstance.get(
-      `/work-requests/my-requests/all?page=${pagination.currentPage}&&paginate=true`
+      `/work-requests/my-requests/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setAssignedWorkRequests(response.data.data);
     const extra = response.data?.extra;
@@ -81,7 +88,7 @@ function WorkRequests() {
 
   const getOtherWorkRequests = async () => {
     const response = await axiosInstance.get(
-      `/work-requests?page=${pagination.currentPage}&&paginate=true`
+      `/work-requests?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setOtherWorkRequests(response.data.data);
     const extra = response?.data.extra;
@@ -445,7 +452,19 @@ function WorkRequests() {
     } else if (selectedTab === "My Work Request") {
       getAssignedWorkRequests();
     }
-  }, [centralState, centralStateDelete, selectedTab, pagination.currentPage]);
+  }, [
+    centralState,
+    centralStateDelete,
+    selectedTab,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+  ]);
+
+  //new clear
+  useEffect(() => {
+    clearSearchAndPagination();
+  }, [selectedTab]);
 
   return (
     <DashboardLayout

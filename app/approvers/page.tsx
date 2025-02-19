@@ -16,7 +16,13 @@ import PermissionList from "@/components/user-management/view-permissions";
 
 function Approvers() {
   const axiosInstance = createAxiosInstance();
-  const { pagination, setPagination } = useDataPermission();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
   const tabs = ["Power Apportion"];
 
   const [successState, setSuccessState] = useState({
@@ -46,7 +52,7 @@ function Approvers() {
     );
     if (APPROVAL_ROLE) {
       const response = await axiosInstance.get(
-        `/roles/${APPROVAL_ROLE.id}?page=${pagination.currentPage}&&paginate=true`
+        `/roles/${APPROVAL_ROLE.id}?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
       );
       setApprovers(response.data.data?.users);
 
@@ -164,7 +170,19 @@ function Approvers() {
     if (roles) {
       getApprovers();
     }
-  }, [roles, centralState, centralStateDelete, pagination.currentPage]);
+  }, [
+    roles,
+    centralState,
+    centralStateDelete,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+  ]);
+
+  //new clear
+  useEffect(() => {
+    clearSearchAndPagination();
+  }, [selectedTab]);
 
   return (
     <DashboardLayout
