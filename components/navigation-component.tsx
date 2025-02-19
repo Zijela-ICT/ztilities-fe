@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import ModalCompoenent from "./modal-component";
-import UserProfile from "../app/user-profile/page";
 import ButtonComponent from "./button-component";
 
 const Logo = "/assets/logo.png";

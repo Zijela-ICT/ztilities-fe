@@ -1,7 +1,9 @@
+"use client";
 import React from "react";
 import Select from "react-select";
 import { LabelInputComponent } from "./input-container";
 import { multiSelectStyle } from "@/utils/ojects";
+import { useDataPermission } from "@/context";
 
 // Define the props for the component
 interface FilterComponentProps {
@@ -27,6 +29,7 @@ interface FilterComponentProps {
     key: "startDate" | "endDate",
     value: string
   ) => void;
+  sendQueryString: () => void;
 }
 
 const FilterComponent: React.FC<FilterComponentProps> = ({
@@ -38,7 +41,10 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
   handleFilterChange,
   handleRangeFilterChange,
   handleDateRangeFilterChange,
+  sendQueryString,
 }) => {
+  const { setSearchQuery, setFilterQuery, clearSearchAndPagination } =
+    useDataPermission();
   if (!filterKeys.length) return null;
 
   return (
@@ -101,7 +107,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                     placeholder="From"
                     value={
                       typeof filters[col] === "object"
-                        ? (filters[col] as any).from || ""
+                        ? (filters[col] as any).startDate || ""
                         : ""
                     }
                     onChange={(e) =>
@@ -122,7 +128,7 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                     placeholder="To"
                     value={
                       typeof filters[col] === "object"
-                        ? (filters[col] as any).to || ""
+                        ? (filters[col] as any).endDate || ""
                         : ""
                     }
                     onChange={(e) =>
@@ -211,6 +217,11 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
           </div>
         );
       })}
+      {/* {filterKeys.length === 0 ? (
+        <div onClick={() => clearSearchAndPagination()}>Clear Filter</div>
+      ) : (
+        <div onClick={() => sendQueryString()}>Filter</div>
+      )} */}
     </div>
   );
 };

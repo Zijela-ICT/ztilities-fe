@@ -50,7 +50,8 @@ export default function TableComponent({
   itemsPerPage,
   totalPages,
 }: TableProps) {
-  const { setSearchQuery, setFilterQuery } = useDataPermission();
+  const { setSearchQuery, setFilterQuery, clearSearchAndPagination } =
+    useDataPermission();
   const [showFilter, setShowFilter] = useState<boolean>(false);
   // const [searchQuery, setSearchQuery] = useState("");
   // filters state now may hold a string (for normal filters)
@@ -86,9 +87,6 @@ export default function TableComponent({
     "apportionmentMetric",
   ];
 
-  // const handleSearch = (event: any) => {
-  //   setSearchQuery(event.target.value);
-  // };
   const [input, setInput] = useState("");
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -101,33 +99,76 @@ export default function TableComponent({
     setInput(event.target.value);
   };
 
-  // Normal filter change for dropdowns
+  // For a simple dropdown filter
   const handleFilterChange = (column: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [column]: value }));
+    setFilters((prev) => {
+      const newFilters = { ...prev };
+      if (value === "") {
+        // Remove the filter if the value is empty
+        delete newFilters[column];
+      } else {
+        newFilters[column] = value;
+      }
+      return newFilters;
+    });
   };
-
-  // Handler for range filters
+  // For range filters (e.g., min/max)
   const handleRangeFilterChange = (
     col: string,
     field: "min" | "max",
     value: string
   ) => {
-    setFilters((prev) => ({
-      ...prev,
-      [col]: { ...(prev[col] as any), [field]: value },
-    }));
-  };
+    setFilters((prev) => {
+      const newFilters = { ...prev };
 
-  // Handler for date range filters
+      // Ensure that newFilters[col] is an object before spreading.
+      let current: Record<string, string> = {};
+      if (typeof newFilters[col] === "object" && newFilters[col] !== null) {
+        current = { ...(newFilters[col] as Record<string, string>) };
+      }
+
+      if (value === "") {
+        delete current[field];
+      } else {
+        current[field] = value;
+      }
+
+      if (Object.keys(current).length === 0) {
+        delete newFilters[col];
+      } else {
+        newFilters[col] = current;
+      }
+      return newFilters;
+    });
+  };
+  // For date range filters (e.g., startDate/endDate)
   const handleDateRangeFilterChange = (
     col: string,
     field: "startDate" | "endDate",
     value: string
   ) => {
-    setFilters((prev) => ({
-      ...prev,
-      [col]: { ...(prev[col] as any), [field]: value },
-    }));
+    setFilters((prev) => {
+      const newFilters = { ...prev };
+
+      // Make sure newFilters[col] is an object
+      let current: Record<string, string> = {};
+      if (typeof newFilters[col] === "object" && newFilters[col] !== null) {
+        current = { ...(newFilters[col] as Record<string, string>) };
+      }
+
+      if (value === "") {
+        delete current[field];
+      } else {
+        current[field] = value;
+      }
+
+      if (Object.keys(current).length === 0) {
+        delete newFilters[col];
+      } else {
+        newFilters[col] = current;
+      }
+      return newFilters;
+    });
   };
 
   // Get all keys from data (if available)
@@ -137,7 +178,7 @@ export default function TableComponent({
   const displayedColumns = columns.filter(
     (column) =>
       column !== "id" &&
-      column !== "createdAt" &&
+      // column !== "createdAt" &&
       column !== "updatedAt" &&
       column !== "assets" &&
       column !== "isApproved" &&
@@ -151,54 +192,7 @@ export default function TableComponent({
     displayedColumns.includes(key)
   );
 
-  // Filter data based on search query and dropdown/range/date filters
-  // const filteredData = data?.filter((row) => {
-  //   const matchesSearch = Object.values(row).some((value) =>
-  //     value?.toString().toLowerCase().includes(searchQuery.toLowerCase())
-  //   );
-
-  //   const matchesFilters = Object.entries(filters).every(
-  //     ([key, filterValue]) => {
-  //       if (
-  //         filterValue === undefined ||
-  //         filterValue === "" ||
-  //         filterValue === null
-  //       )
-  //         return true;
-
-  //       // For range filters (min/max)
-  //       if (
-  //         typeof filterValue === "object" &&
-  //         ("min" in filterValue || "max" in filterValue)
-  //       ) {
-  //         const rowValue = parseFloat(row[key]);
-  //         if (filterValue.min && rowValue < parseFloat(filterValue.min))
-  //           return false;
-  //         if (filterValue.max && rowValue > parseFloat(filterValue.max))
-  //           return false;
-  //         return true;
-  //       }
-  //       // For date range filters (from/to)
-  //       if (
-  //         typeof filterValue === "object" &&
-  //         ("from" in filterValue || "to" in filterValue)
-  //       ) {
-  //         const rowDate = new Date(row[key]);
-  //         if (filterValue.from && rowDate < new Date(filterValue.from))
-  //           return false;
-  //         if (filterValue.to && rowDate > new Date(filterValue.to))
-  //           return false;
-  //         return true;
-  //       }
-  //       // Normal dropdown filter check
-  //       return row[key]?.toString() === filterValue;
-  //     }
-  //   );
-  //   return matchesSearch && matchesFilters;
-  // });
-
-  // console.log({ searchQuery, filters, currentPage });
-  // console.log({ searchQuery });
+  //console.log({ filters });
 
   function convertFiltersToQueryString(
     filterObj: Record<string, unknown>,
@@ -247,6 +241,9 @@ export default function TableComponent({
   }
   const queryString = convertFiltersToQueryString(filters);
 
+  const sendQueryString = () => {
+    setFilterQuery(queryString);
+  };
   useEffect(() => {
     console.log(queryString);
     // setFilterQuery(queryString);
@@ -335,16 +332,42 @@ export default function TableComponent({
 
       {/* Render filters with conditional input types */}
       {showFilter && (
-        <FilterComponent
-          filterKeys={filterKeys}
-          data={data}
-          filters={filters}
-          rangeFilterKeys={rangeFilterKeys}
-          dateFilterKeys={dateFilterKeys}
-          handleFilterChange={handleFilterChange}
-          handleRangeFilterChange={handleRangeFilterChange}
-          handleDateRangeFilterChange={handleDateRangeFilterChange}
-        />
+        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm mb-5">
+          <FilterComponent
+            filterKeys={filterKeys}
+            data={data}
+            filters={filters}
+            rangeFilterKeys={rangeFilterKeys}
+            dateFilterKeys={dateFilterKeys}
+            handleFilterChange={handleFilterChange}
+            handleRangeFilterChange={handleRangeFilterChange}
+            handleDateRangeFilterChange={handleDateRangeFilterChange}
+            sendQueryString={sendQueryString}
+          />
+          <div
+            className={
+              filterKeys.length === 0
+                ? "flex justify-center mt-4"
+                : "flex justify-end mt-4 mr-9"
+            }
+          >
+            {filterKeys.length === 0 ? (
+              <button
+                className="px-4 py-2 border border-[#A8353A] text-[#A8353A] rounded hover:bg-[#A8353A] hover:text-white transition-colors"
+                onClick={() => clearSearchAndPagination()}
+              >
+                Clear Filter
+              </button>
+            ) : (
+              <button
+                className="px-4 py-2 bg-[#A8353A] text-white rounded transition-colors hover:bg-[#962d31]"
+                onClick={() => sendQueryString()}
+              >
+                Filter
+              </button>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Table rendering remains unchanged */}
@@ -438,8 +461,8 @@ export default function TableComponent({
                         <StatusBadge status={row[column]} />
                       ) : column === "amount" ? (
                         row[column] && formatCurrency(row[column])
-                      ) : column === "paidAt" ? (
-                        row[column] && moment.utc(row[column]).format("lll")
+                      ) : column === "paidAt" || column === "createdAt" ? (
+                        row[column] && moment.utc(row[column]).format("ll")
                       ) : column === "avatar" ? (
                         row?.avatar ? (
                           <Image

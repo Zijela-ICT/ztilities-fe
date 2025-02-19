@@ -16,7 +16,13 @@ import createAxiosInstance from "@/utils/api";
 
 function Power() {
   const axiosInstance = createAxiosInstance();
-  const { pagination, setPagination } = useDataPermission();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
   const tabs = ["Power Apportion"];
 
   const [successState, setSuccessState] = useState({
@@ -36,7 +42,7 @@ function Power() {
   // Fetch data functions
   const getPowerCharges = async () => {
     const response = await axiosInstance.get(
-      `/audit-logs?page=${pagination.currentPage}&&paginate=true`
+      `/audit-logs?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setAuditLogs(response.data.data);
     const extra = response.data.extra;
@@ -197,7 +203,18 @@ function Power() {
       await Promise.all([getPowerCharges()]);
     };
     fetchData();
-  }, [centralState, centralStateDelete, pagination.currentPage]);
+  }, [
+    centralState,
+    centralStateDelete,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+  ]);
+
+  //new clear
+  useEffect(() => {
+    clearSearchAndPagination();
+  }, [selectedTab]);
 
   return (
     <DashboardLayout title="Audit Logs" detail="View all audit logs here">
