@@ -28,7 +28,10 @@ export default function CreateWorkRequestForUser({
     block: "",
     facility: "",
     asset: "",
+    category: "",
   });
+
+  const [assetCategories, setAssetCategories] = useState<any[]>([]);
 
   // Fetch work request if activeRowId exists
   const getWorkRequest = async () => {
@@ -65,6 +68,23 @@ export default function CreateWorkRequestForUser({
     setAUnit(response.data.data);
   };
 
+  const getAssetCategories = async () => {
+    if (formData.asset) {
+      try {
+        const response = await axiosInstance.get(`/assets/${formData.asset}`);
+        const assetData = response.data.data;
+        if (assetData.categories && assetData.categories.length > 0) {
+          setAssetCategories(assetData.categories);
+        } else {
+          const catResponse = await axiosInstance.get("/assets/category/all");
+          setAssetCategories(catResponse.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching asset categories", error);
+      }
+    }
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -96,6 +116,7 @@ export default function CreateWorkRequestForUser({
       block: "",
       facility: "",
       asset: "",
+      category: "",
     });
     setModalState("");
     setSuccessState({
@@ -151,6 +172,11 @@ export default function CreateWorkRequestForUser({
         }))
       : [];
 
+  const categoryOptions = assetCategories?.map((cat: any) => ({
+    value: cat.id.toString(),
+    label: cat.categoryName, // Adjust property name as needed
+  }));
+
   useEffect(() => {
     if (activeRowId) {
       getWorkRequest();
@@ -171,6 +197,12 @@ export default function CreateWorkRequestForUser({
     }
   }, [formData.unit, formData.block, formData.facility]);
 
+  useEffect(() => {
+    if (formData.asset) {
+      getAssetCategories();
+    }
+  }, [formData.asset]);
+
   return (
     <div>
       <form
@@ -181,7 +213,7 @@ export default function CreateWorkRequestForUser({
           <Select
             options={userOptions}
             value={userOptions?.find(
-              (option) => option.value === formData.asset
+              (option) => option.value === formData.userId
             )}
             onChange={handleSelectChange("userId")}
             styles={multiSelectStyle}
@@ -276,6 +308,20 @@ export default function CreateWorkRequestForUser({
                 placeholder="Select Assets"
               />
             </div>
+
+            {formData.asset && (
+              <div className="relative w-full mt-6">
+                <Select
+                  options={categoryOptions}
+                  value={categoryOptions?.find(
+                    (option) => option.value === formData.category
+                  )}
+                  onChange={handleSelectChange("category")}
+                  styles={multiSelectStyle}
+                  placeholder="Select Category"
+                />
+              </div>
+            )}
           </>
         )}
 

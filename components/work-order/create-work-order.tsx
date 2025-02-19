@@ -37,19 +37,25 @@ export default function CreateWorkOrder({
     block: "",
     facility: "",
     asset: "",
+    category: "",
+    single: "", // Added new property for category
   });
+
+  // New state to hold the asset's categories
+  const [assetCategories, setAssetCategories] = useState<any[]>([]);
+  const [theAssetCategory, setTheAssetCategory] = useState<any>();
 
   // Fetch work request if activeRowId exists
   const getWorkRequest = async () => {
     if (activeRowId) {
-      const response = await axiosInstance.get(
-        `/work-orders/work-order/${activeRowId}`
-      );
+      const response = await axiosInstance.get(`/work-orders/${activeRowId}`);
       const data = response.data.data;
       setFormData({
         ...formData,
         title: data.title,
         description: data.description,
+        // Optionally, set category if your endpoint returns it:
+        // category: data.category || "",
       });
     }
   };
@@ -86,6 +92,36 @@ export default function CreateWorkOrder({
     setAUnit(response.data.data);
   };
 
+  // New function to fetch categories for the selected asset.
+  // If the asset has its own categories, use those.
+  // Otherwise, call the "all categories" endpoint.
+  const getAssetCategories = async () => {
+    if (formData.asset) {
+      try {
+        const response = await axiosInstance.get(`/assets/${formData.asset}`);
+        const assetData = response.data.data;
+        if (assetData.category) {
+          setFormData({
+            ...formData,
+            category: assetData.category.id,
+            single: assetData.category.categoryName,
+          });
+          setTheAssetCategory(assetData.category.categoryName);
+        } else {
+          const catResponse = await axiosInstance.get("/assets/category/all");
+          setAssetCategories(catResponse.data.data);
+          setFormData({
+            ...formData,
+            category: "",
+            single: ""
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching asset categories", error);
+      }
+    }
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -104,10 +140,7 @@ export default function CreateWorkOrder({
     e.preventDefault();
 
     if (activeRowId) {
-      await axiosInstance.patch(
-        `/work-orders/work-order/${activeRowId}`,
-        formData
-      );
+      await axiosInstance.patch(`/work-orders/${activeRowId}`, formData);
     } else {
       await axiosInstance.post("/work-orders/work-order/", formData);
     }
@@ -119,6 +152,8 @@ export default function CreateWorkOrder({
       block: "",
       facility: "",
       asset: "",
+      category: "",
+      single: "",
     });
     setModalState("");
     setSuccessState({
@@ -150,6 +185,7 @@ export default function CreateWorkOrder({
     value: unit.id.toString(),
     label: unit.name,
   }));
+
   const assetOptions =
     formData.entity === "unit"
       ? unit?.assets?.map((unit: Asset) => ({
@@ -167,6 +203,12 @@ export default function CreateWorkOrder({
           label: otherBlock.assetName,
         }))
       : [];
+
+  // Compute category options from the assetCategories state
+  const categoryOptions = assetCategories?.map((cat: any) => ({
+    value: cat.id.toString(),
+    label: cat.categoryName, // Adjust property name as needed
+  }));
 
   useEffect(() => {
     if (activeRowId) {
@@ -190,6 +232,13 @@ export default function CreateWorkOrder({
     }
   }, [formData.unit, formData.block, formData.facility]);
 
+  // Fetch the asset's categories when an asset is selected.
+  useEffect(() => {
+    if (formData.asset) {
+      getAssetCategories();
+    }
+  }, [formData.asset]);
+
   return (
     <div>
       <form
@@ -203,6 +252,7 @@ export default function CreateWorkOrder({
             value={formData.title}
             onChange={handleChange}
             label="Title"
+            required
           />
         </div>
 
@@ -284,6 +334,34 @@ export default function CreateWorkOrder({
                 placeholder="Select Assets"
               />
             </div>
+
+            {theAssetCategory && (
+              <div className="relative w-full mt-6">
+                <LabelInputComponent
+                  type="text"
+                  name="category"
+                  value={formData.single}
+                  onChange={handleChange}
+                  label="Category"
+                  readOnly
+                />
+              </div>
+            )}
+
+            {/* New: After selecting an asset, display its categories (or all categories if none exist) */}
+            {formData.asset && !formData.single && (
+              <div className="relative w-full mt-6">
+                <Select
+                  options={categoryOptions}
+                  value={categoryOptions?.find(
+                    (option) => option.value === formData.category
+                  )}
+                  onChange={handleSelectChange("category")}
+                  styles={multiSelectStyle}
+                  placeholder="Select Category"
+                />
+              </div>
+            )}
           </>
         )}
 

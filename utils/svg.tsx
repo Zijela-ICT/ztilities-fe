@@ -397,6 +397,26 @@ export const WorkIcon = () => {
   );
 };
 
+export const ArrowRightIcon = () => {
+  return (
+    <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M5.3335 2.66675L10.6668 8.00008L5.3335 13.3334"
+      stroke="#000"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+  )
+}
+
 export const UploadIcon = () => {
   return (
     <svg

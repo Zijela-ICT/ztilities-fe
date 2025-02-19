@@ -1,12 +1,18 @@
 // "use client";
 
-// import React, { createContext, useContext, useState, ReactNode } from "react";
+// import React, {
+//   createContext,
+//   useContext,
+//   useState,
+//   useEffect,
+//   ReactNode,
+// } from "react";
 
-// // Define the context type
+// // Define the types
 // interface ContextType {
 //   user: AuthUser | null;
 //   userPermissions: Permission[];
-//   userRoles: any[]; // Permissions should be an array
+//   userRoles: any[];
 //   loading: boolean;
 //   setUser: (user: AuthUser | null) => void;
 //   setUserPermissions: (permissions: Permission[]) => void;
@@ -25,10 +31,13 @@
 //       total: number;
 //       totalPages: number;
 //     }>
-//   >
+//   >;
+//   searchQuery: string;
+//   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  
 // }
 
-// // Create context with initial values
+// // Create context
 // const DataPermissionContext = createContext<ContextType | undefined>(undefined);
 
 // // Provider component
@@ -37,9 +46,12 @@
 // }: {
 //   children: ReactNode;
 // }) => {
-//   const [user, setUser] = useState<AuthUser | null>(null); // User starts as null
+//   const [hydrated, setHydrated] = useState(false); // NEW: Prevent hydration mismatch
+//   const [user, setUser] = useState<AuthUser | null>(null);
 //   const [userPermissions, setUserPermissions] = useState<Permission[]>([]);
-//   const [userRoles, setUserRoles] = useState<any[]>([]); // Permissions start as an empty array
+//   const [userRoles, setUserRoles] = useState<any[]>([]);
+
+//   // Keep loading and pagination in memory (do not persist)
 //   const [loading, setLoading] = useState<boolean>(false);
 //   const [pagination, setPagination] = useState({
 //     currentPage: 1,
@@ -47,6 +59,43 @@
 //     total: 0,
 //     totalPages: 0,
 //   });
+//   const [searchQuery, setSearchQuery] = useState("");
+
+//   // Load persisted data on client mount
+//   useEffect(() => {
+//     if (typeof window !== "undefined") {
+//       const storedUser = localStorage.getItem("user");
+//       const storedPermissions = localStorage.getItem("userPermissions");
+//       const storedRoles = localStorage.getItem("userRoles");
+
+//       if (storedUser) setUser(JSON.parse(storedUser));
+//       if (storedPermissions) setUserPermissions(JSON.parse(storedPermissions));
+//       if (storedRoles) setUserRoles(JSON.parse(storedRoles));
+
+//       setHydrated(true); // NEW: Mark hydration as complete
+//     }
+//   }, []);
+
+//   // Persist data in localStorage whenever state changes
+//   useEffect(() => {
+//     if (hydrated) {
+//       if (user !== null) localStorage.setItem("user", JSON.stringify(user));
+//     }
+//   }, [user, hydrated]);
+
+//   useEffect(() => {
+//     if (hydrated) {
+//       localStorage.setItem("userPermissions", JSON.stringify(userPermissions));
+//     }
+//   }, [userPermissions, hydrated]);
+
+//   useEffect(() => {
+//     if (hydrated) {
+//       localStorage.setItem("userRoles", JSON.stringify(userRoles));
+//     }
+//   }, [userRoles, hydrated]);
+
+//   if (!hydrated) return null; // NEW: Avoid SSR mismatch by skipping the initial render
 
 //   return (
 //     <DataPermissionContext.Provider
@@ -61,6 +110,8 @@
 //         setLoading,
 //         pagination,
 //         setPagination,
+//         searchQuery,
+//         setSearchQuery,
 //       }}
 //     >
 //       {children}
@@ -113,10 +164,23 @@ interface ContextType {
       totalPages: number;
     }>
   >;
+  searchQuery: string;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  filterQuery: string;
+  setFilterQuery: React.Dispatch<React.SetStateAction<string>>;
+  clearSearchAndPagination: () => void;
 }
 
 // Create context
 const DataPermissionContext = createContext<ContextType | undefined>(undefined);
+
+// Define initial pagination values
+const initialPagination = {
+  currentPage: 1,
+  pageSize: 10,
+  total: 0,
+  totalPages: 0,
+};
 
 // Provider component
 export const DataPermissionProvider = ({
@@ -124,19 +188,16 @@ export const DataPermissionProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [hydrated, setHydrated] = useState(false); // NEW: Prevent hydration mismatch
+  const [hydrated, setHydrated] = useState(false); // Prevent hydration mismatch
   const [user, setUser] = useState<AuthUser | null>(null);
   const [userPermissions, setUserPermissions] = useState<Permission[]>([]);
   const [userRoles, setUserRoles] = useState<any[]>([]);
 
   // Keep loading and pagination in memory (do not persist)
   const [loading, setLoading] = useState<boolean>(false);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    pageSize: 10,
-    total: 0,
-    totalPages: 0,
-  });
+  const [pagination, setPagination] = useState(initialPagination);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterQuery, setFilterQuery] = useState("");
 
   // Load persisted data on client mount
   useEffect(() => {
@@ -149,7 +210,7 @@ export const DataPermissionProvider = ({
       if (storedPermissions) setUserPermissions(JSON.parse(storedPermissions));
       if (storedRoles) setUserRoles(JSON.parse(storedRoles));
 
-      setHydrated(true); // NEW: Mark hydration as complete
+      setHydrated(true); // Mark hydration as complete
     }
   }, []);
 
@@ -172,7 +233,14 @@ export const DataPermissionProvider = ({
     }
   }, [userRoles, hydrated]);
 
-  if (!hydrated) return null; // NEW: Avoid SSR mismatch by skipping the initial render
+  if (!hydrated) return null; // Avoid SSR mismatch by skipping the initial render
+
+  // Function to clear searchQuery and reset pagination
+  const clearSearchAndPagination = () => {
+    setSearchQuery("");
+    setFilterQuery("")
+    // setPagination(initialPagination);
+  };
 
   return (
     <DataPermissionContext.Provider
@@ -187,6 +255,11 @@ export const DataPermissionProvider = ({
         setLoading,
         pagination,
         setPagination,
+        searchQuery,
+        setSearchQuery,
+        filterQuery,
+        setFilterQuery,
+        clearSearchAndPagination,
       }}
     >
       {children}

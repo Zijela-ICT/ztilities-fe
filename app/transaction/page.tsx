@@ -27,9 +27,12 @@ import { chartOptions } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { MyLoaderFinite } from "@/components/loader-components";
-import FundWallet from "@/components/facility-management/fund-wallet";
-import ModalCompoenent from "@/components/modal-component";
+import FundWallet from "@/components/transaction/fund-wallet";
+import ModalCompoenent, {
+  SuccessModalCompoenent,
+} from "@/components/modal-component";
 import formatCurrency from "@/utils/formatCurrency";
+import FundOtherWallet from "@/components/transaction/fund-other-wallet";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -50,6 +53,12 @@ function Transactions() {
     Facility: "",
     Vendor: "",
     Technician: "",
+  });
+
+  const [successState, setSuccessState] = useState({
+    title: "",
+    detail: "",
+    status: false,
   });
 
   const [loading, setLoading] = useState<boolean>();
@@ -266,6 +275,14 @@ function Transactions() {
         type={"User"}
       />
     ),
+    fundOtherWallet: (
+      <FundOtherWallet
+        activeRowId={user.wallets[selectedWalletIndex]?.id}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        type={"User"}
+      />
+    ),
   };
 
   return (
@@ -273,8 +290,16 @@ function Transactions() {
       title="Transactions"
       detail="See balance and all transactions here"
     >
+      <SuccessModalCompoenent
+        title={successState.title}
+        detail={successState.detail}
+        modalState={successState.status}
+        setModalState={(state: boolean) =>
+          setSuccessState((prevState) => ({ ...prevState, status: state }))
+        }
+      ></SuccessModalCompoenent>
       <ModalCompoenent
-        title={"Fund Wallet"}
+        title={centralState === "fundWallet" ? "Fund Wallet" : "Transfer"}
         detail={""}
         modalState={centralState}
         setModalState={() => {
@@ -303,7 +328,7 @@ function Transactions() {
           <div className="relative bg-white rounded-2xl p-4 mb-4">
             <div className="overflow-x-auto whitespace-nowrap pb-2">
               <div className="flex md:justify-end items-center space-x-4 ">
-                {user.wallets.length > 1 && (
+                {user.wallets.length > 0 && (
                   <PermissionGuard
                     requiredPermissions={[
                       "read_transactions:my-transactions/all",
@@ -366,31 +391,32 @@ function Transactions() {
           >
             {user.wallets.length > 0 && (
               <div className="mb-2 flex flex-wrap gap-2">
-                {user.wallets.map((wallet, index) => (
-                  <button
-                    key={wallet.id || index}
-                    onClick={() => setSelectedWalletIndex(index)}
-                    className={`px-3 py-1 rounded ${
-                      selectedWalletIndex === index
-                        ? "bg-[#A8353A] text-white"
-                        : "bg-white text-black"
-                    }`}
-                  >
-                    {wallet.walletType}
-                    {/* Optionally show a short hash if available */}
-                    {wallet.hash && (
-                      <span className="ml-2 text-xs text-gray-600">
-                        {wallet.hash.slice(0, 6)}...
-                      </span>
-                    )}
-                  </button>
-                ))}
+                <select
+                  value={selectedWalletIndex}
+                  onChange={(e) =>
+                    setSelectedWalletIndex(Number(e.target.value))
+                  }
+                  className=" rounded px-3 py-1 border border-gray-300 focus:outline-none focus:border-[#A8353A]"
+                >
+                  {user.wallets.map((wallet, index) => (
+                    <option key={wallet.id || index} value={index}>
+                      {wallet.walletType}
+                      {wallet.hash && ` - ${wallet.hash.slice(0, 6)}...`}
+                    </option>
+                  ))}
+                </select>
 
                 <button
                   onClick={() => setCentralState("fundWallet")}
                   className="px-3 py-1 rounded bg-white text-black"
                 >
                   Fund Wallet
+                </button>
+                <button
+                  onClick={() => setCentralState("fundOtherWallet")}
+                  className="px-3 py-1 rounded bg-white text-black"
+                >
+                  Transfer
                 </button>
               </div>
             )}

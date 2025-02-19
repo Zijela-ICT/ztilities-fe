@@ -1,25 +1,23 @@
 "use client";
 
 import { useDataPermission } from "@/context";
-import formatCurrency from "@/utils/formatCurrency";
-import { DropDownArrow } from "@/utils/svg";
+import { DropDownArrow, TrashIcon } from "@/utils/svg";
 import moment from "moment";
-import Link from "next/link";
 import React from "react";
 
 interface FacilityDetailsProps {
   title?: string;
   facility?: Record<string, any>;
-  groupedPermissions?: Record<
-    string,
-    { id: string; normalizedString: string; units: any[] }[]
-  >;
   excludedKeys?: string[]; // Array of keys to omit
+  toggleActions?: any;
+  setModalStateDelete?: any;
 }
 
 export default function FacilityDetails({
   title,
   facility,
+  toggleActions,
+  setModalStateDelete,
   excludedKeys = [
     "facility",
     "block",
@@ -29,7 +27,7 @@ export default function FacilityDetails({
     "workOrderNumber",
   ],
 }: FacilityDetailsProps) {
-  const { userRoles } = useDataPermission();
+  const { user, userRoles } = useDataPermission();
   const hasTenantRole = userRoles.some(
     (role: Role) => role.name === "TENANT_ROLE"
   );
@@ -189,16 +187,20 @@ export default function FacilityDetails({
                             key={idx}
                             className="border border-gray-200 rounded-lg px-4 py-5 relative group mt-4"
                           >
-                            <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
-                              {/* {key
-                                .replace(/([a-z])([A-Z])/g, "$1 $2")
-                                .charAt(0)
-                                .toUpperCase() +
-                                key
-                                  .replace(/([a-z])([A-Z])/g, "$1 $2")
-                                  .slice(1)}{" "}
-                              {idx + 1} */}
+                            {key === "comments" &&
+                              user.id === item?.user?.id && (
+                                <div
+                                  className="absolute right-12 top-6"
+                                  onClick={() => {
+                                    toggleActions(item.commentId);
+                                    setModalStateDelete("deleteComment");
+                                  }}
+                                >
+                                  <TrashIcon />
+                                </div>
+                              )}
 
+                            <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
                               {item.action ??
                                 item.assetName ??
                                 item.walletType ??
@@ -259,9 +261,8 @@ export default function FacilityDetails({
                                                   "lastName",
                                                   "vendorName",
                                                   "technicianName",
-                                                  "email"
+                                                  "email",
                                                   // "id"
-                                                  ,
                                                 ].includes(nestedKey)
                                               ) // Filter for only firstName and lastName
                                               .map(
@@ -348,12 +349,7 @@ export default function FacilityDetails({
                           <details className="w-full">
                             <summary className="flex items-center text-sm font-medium cursor-pointer">
                               {/* Access the property you want to display, e.g., blockNumber or assetName */}
-                              {/* {item.blockNumber ||
-                                item.assetName ||
-                                item.unitNumber ||
-                          
-                                (item.firstName + " " + item.lastName)         || (item.walletType + " " + "₦" + item.balance)    }
-                          */}
+
                               {item.blockNumber ??
                                 item.assetName ??
                                 item.unitNumber ??

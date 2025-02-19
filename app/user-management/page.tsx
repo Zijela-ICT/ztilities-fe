@@ -17,10 +17,17 @@ import { useDataPermission } from "@/context";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import createAxiosInstance from "@/utils/api";
 import CreateBulk from "@/components/user-management/create-bulk";
+import { SearchIcon } from "@/utils/svg";
 
 function UserManagement() {
   const axiosInstance = createAxiosInstance();
-  const { pagination, setPagination } = useDataPermission();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
   const tabs = ["All Users", "Roles", "Permissions"];
 
   const [successState, setSuccessState] = useState({
@@ -39,7 +46,7 @@ function UserManagement() {
 
   const getUsers = async () => {
     const response = await axiosInstance.get(
-      `/users?page=${pagination.currentPage}&&paginate=true`
+      `/users?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setUsers(response.data.data);
     const extra = response.data.extra;
@@ -52,8 +59,19 @@ function UserManagement() {
   };
 
   const getRoles = async () => {
-    const response = await axiosInstance.get("/roles");
+    const response = await axiosInstance.get(
+      `/roles?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}`
+    );
     setRoles(response.data.data);
+    const extra = response.data.extra;
+    if (extra) {
+      setPagination({
+        currentPage: extra.page,
+        pageSize: extra.pageSize,
+        total: extra.total,
+        totalPages: extra.totalPages,
+      });
+    }
   };
 
   const getARole = async () => {
@@ -278,7 +296,35 @@ function UserManagement() {
       };
       fetchData();
     }
-  }, [centralState, centralStateDelete, selectedTab, pagination.currentPage]);
+  }, [
+    centralState,
+    centralStateDelete,
+    selectedTab,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+  ]);
+
+  //new clear
+  useEffect(() => {
+    clearSearchAndPagination();
+  }, [selectedTab]);
+
+  const [searchData, setSearchQuery] = useState("");
+  const filteredPermissions = Object.entries(groupedPermissions).reduce(
+    (acc, [category, permissions]) => {
+      const filtered = permissions.filter(({ permissionString }) =>
+        permissionString.toLowerCase().includes(searchData.toLowerCase())
+      );
+
+      if (filtered.length > 0) {
+        acc[category] = filtered;
+      }
+
+      return acc;
+    },
+    {} as typeof groupedPermissions
+  );
 
   return (
     <DashboardLayout
@@ -361,6 +407,7 @@ function UserManagement() {
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
               //new
+
               currentPage={pagination.currentPage}
               setCurrentPage={(page) =>
                 setPagination({ ...pagination, currentPage: page })
@@ -379,7 +426,27 @@ function UserManagement() {
             />
           )}
           {selectedTab === "Permissions" && (
-            <PermissionList groupedPermissions={groupedPermissions} />
+            <>
+              <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0  font-semibold text-md mb-4">
+                <div
+                  className={`flex items-center border rounded-md focus-within:ring-2 focus-within:ring-blue-500 w-full`}
+                >
+                  {/* Search Icon */}
+                  <span className="pl-3 text-gray-400 mt-2">
+                    <SearchIcon />
+                  </span>
+                  <input
+                    id="searchInput"
+                    type="text"
+                    placeholder="Search for permission..."
+                    value={searchData}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="px-1 py-4 w-full focus:outline-none"
+                  />
+                </div>
+              </div>
+              <PermissionList groupedPermissions={filteredPermissions} />
+            </>
           )}
         </div>
       </PermissionGuard>

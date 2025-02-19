@@ -37,7 +37,12 @@ export default function CreateWorkRequest({
     block: "",
     facility: "",
     asset: "",
+    category: "",
+    single: "",
   });
+
+  const [assetCategories, setAssetCategories] = useState<any[]>([]);
+  const [theAssetCategory, setTheAssetCategory] = useState<any>();
 
   // Fetch work request if activeRowId exists
   const getWorkRequest = async () => {
@@ -84,6 +89,33 @@ export default function CreateWorkRequest({
     setAUnit(response.data.data);
   };
 
+  const getAssetCategories = async () => {
+    if (formData.asset) {
+      try {
+        const response = await axiosInstance.get(`/assets/${formData.asset}`);
+        const assetData = response.data.data;
+        if (assetData.category) {
+          setFormData({
+            ...formData,
+            category: assetData.id,
+            single: assetData.category.categoryName,
+          });
+          setTheAssetCategory(assetData.category.categoryName);
+        } else {
+          const catResponse = await axiosInstance.get("/assets/category/all");
+          setAssetCategories(catResponse.data.data);
+          setFormData({
+            ...formData,
+            category: "",
+            single: ""
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching asset categories", error);
+      }
+    }
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -119,8 +151,8 @@ export default function CreateWorkRequest({
 
     const payload = {
       ...formData,
-      file : file
-    }
+      file: file,
+    };
     if (activeRowId) {
       await axiosInstance.patch(`/work-requests/${activeRowId}`, payload);
     } else {
@@ -134,6 +166,8 @@ export default function CreateWorkRequest({
       block: "",
       facility: "",
       asset: "",
+      category: "",
+      single: "",
     });
     setModalState("");
     setSuccessState({
@@ -184,6 +218,11 @@ export default function CreateWorkRequest({
         }))
       : [];
 
+  const categoryOptions = assetCategories?.map((cat: any) => ({
+    value: cat.id.toString(),
+    label: cat.categoryName, // Adjust property name as needed
+  }));
+
   useEffect(() => {
     if (activeRowId) {
       getWorkRequest();
@@ -205,6 +244,12 @@ export default function CreateWorkRequest({
       getAFacility();
     }
   }, [formData.unit, formData.block, formData.facility]);
+
+  useEffect(() => {
+    if (formData.asset) {
+      getAssetCategories();
+    }
+  }, [formData.asset]);
 
   return (
     <div>
@@ -300,6 +345,33 @@ export default function CreateWorkRequest({
                 placeholder="Select Assets"
               />
             </div>
+
+            {theAssetCategory && (
+              <div className="relative w-full mt-6">
+                <LabelInputComponent
+                  type="text"
+                  name="category"
+                  value={formData.single}
+                  onChange={handleChange}
+                  label="Category"
+                  readOnly
+                />
+              </div>
+            )}
+
+            {formData.asset && !formData.single && (
+              <div className="relative w-full mt-6">
+                <Select
+                  options={categoryOptions}
+                  value={categoryOptions?.find(
+                    (option) => option.value === formData.category
+                  )}
+                  onChange={handleSelectChange("category")}
+                  styles={multiSelectStyle}
+                  placeholder="Select Category"
+                />
+              </div>
+            )}
 
             <div className="relative w-full mt-6">
               <FileInputComponent

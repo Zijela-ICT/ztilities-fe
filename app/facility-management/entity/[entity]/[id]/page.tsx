@@ -13,22 +13,21 @@ function FacilityManagementEntity() {
   const router = useRouter();
   const { entity, id } = useParams();
 
-  const [facility, setAFacility] = useState<Facility>();
-  const [block, setABlock] = useState<Block>();
-  const [unit, setAUnit] = useState<Unit>();
+  const [activeEntity, setAActiveEntity] = useState<any>();
+
   const getAFacility = async () => {
     const response = await axiosInstance.get(`/facilities/${id}`);
-    setAFacility(response.data.data);
+    setAActiveEntity(response.data.data);
   };
 
   const getABlock = async () => {
     const response = await axiosInstance.get(`/blocks/${id}`);
-    setABlock(response.data.data);
+    setAActiveEntity(response.data.data);
   };
 
   const getAUnit = async () => {
     const response = await axiosInstance.get(`/units/${id}`);
-    setAUnit(response.data.data);
+    setAActiveEntity(response.data.data);
   };
   useEffect(() => {
     if (id) {
@@ -56,43 +55,39 @@ function FacilityManagementEntity() {
 
   // Extract and convert the wallet balances to numbers
   const powerWalletBalance = formatCurrency(
-    unit?.wallets.find((wallet) => wallet.walletType === "POWER")?.balance
+    activeEntity?.wallets?.find((wallet) => wallet.walletType === "POWER")
+      ?.balance
   );
   const serviceWalletBalance = formatCurrency(
-    unit?.wallets.find((wallet) => wallet.walletType === "SERVICE")?.balance
+    activeEntity?.wallets?.find((wallet) => wallet.walletType === "SERVICE")
+      ?.balance
   );
-  const powerWalletBalanceFac = formatCurrency(
-    facility?.wallets.find((wallet) => wallet.walletType === "POWER")?.balance
-  );
-  const serviceWalletBalanceFac = formatCurrency(
-    facility?.wallets.find((wallet) => wallet.walletType === "SERVICE")?.balance
-  );
+
   const formattedPowerWallet = `₦ ${powerWalletBalance}`;
   const formattedServiceWallet = `₦ ${serviceWalletBalance}`;
-  const formattedPowerWalletFac = `₦ ${powerWalletBalanceFac}`;
-  const formattedServiceWalletFac = `₦ ${serviceWalletBalanceFac}`;
-  const newUnit = {
-    powerWallet: formattedPowerWallet,
-    serviceWallet: formattedServiceWallet,
-    ...unit,
-  };
-  const newFacility = {
-    powerWallet: formattedPowerWalletFac,
-    serviceWallet: formattedServiceWalletFac,
-    ...facility,
-  };
+
+  const newData =
+    entity !== "block"
+      ? {
+          powerWallet: formattedPowerWallet,
+          serviceWallet: formattedServiceWallet,
+          ...activeEntity,
+        }
+      : { ...activeEntity };
 
   return (
     <DashboardLayout
       title={`${titlePrefix} ${
-        unit?.unitNumber || block?.blockNumber || facility?.name
+        activeEntity?.unitNumber ||
+        activeEntity?.blockNumber ||
+        activeEntity?.name
       }`}
       detail={detailText}
       dynamic
       onclick={() => router.back()}
     >
       <div className="relative bg-white rounded-2xl p-8 ">
-        <FacilityDetails facility={newUnit || newFacility || block} />
+        <FacilityDetails facility={newData} />
       </div>
     </DashboardLayout>
   );

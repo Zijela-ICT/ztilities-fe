@@ -16,7 +16,7 @@ import DynamicCreateForm from "@/components/dynamic-create-form";
 import CreateCategory from "@/components/facility-management/create-category";
 import CreateAsset from "@/components/facility-management/create-asset";
 import createAxiosInstance from "@/utils/api";
-import FundWallet from "@/components/facility-management/fund-wallet";
+import FundWallet from "@/components/transaction/fund-wallet";
 import CreateBulk from "@/components/user-management/create-bulk";
 
 function FacilityManagement() {

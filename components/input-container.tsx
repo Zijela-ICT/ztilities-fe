@@ -117,7 +117,7 @@ export function LabelInputComponent({
         required={required}
         className="peer w-full rounded-lg px-4 pt-6 pb-2 text-base text-gray-900 outline-none bg-gray-100"
       />
-      <label className="absolute left-4 top-2 text-gray-600 text-sm transition-all duration-200 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-focus:top-2">
+      <label className="absolute left-4 top-2 text-gray-600 text-sm transition-all duration-200 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-focus:top-2  ">
         {label}
       </label>
     </>
@@ -143,6 +143,11 @@ export function LabelTextareaComponent({
 }) {
   return (
     <div className="relative w-full">
+      <div className="w-full bg-gray-100 rounded-t-lg pt-3">
+        <label className=" pl-4 text-gray-600 text-sm transition-all duration-200 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-focus:top-2">
+          {label}
+        </label>
+      </div>
       <textarea
         name={name}
         placeholder=" "
@@ -150,11 +155,11 @@ export function LabelTextareaComponent({
         onChange={onChange}
         readOnly={readOnly}
         required={required}
-        className={`peer w-full rounded-lg px-4 pt-6 pb-2 text-base text-gray-900 outline-none bg-gray-100 resize-none ${className}`}
+        className={`peer w-full rounded-b-lg px-4 pt-0 pb-2 text-base text-gray-900 outline-none bg-gray-100 resize-y ${className}`}
       />
-      <label className="absolute left-4 top-2 text-gray-600 text-sm transition-all duration-200 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-focus:top-2">
+      {/* <label className="absolute left-4 top-2 text-gray-600 text-sm transition-all duration-200 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-focus:top-2">
         {label}
-      </label>
+      </label> */}
     </div>
   );
 }
@@ -176,29 +181,52 @@ export function FileInputComponent({
     if (!uploadedFile) return null;
     if (uploadedFile.type.startsWith("image/")) {
       return (
-        <img
-          src={URL.createObjectURL(uploadedFile)}
-          alt="Uploaded"
-          className="w-32 h-32 object-cover rounded-lg"
-        />
+        <div className="flex flex-col items-center border rounded-lg overflow-hidden">
+          <span className=" font-semibold text-lg flex items-center gap-2">
+            ✔ Uploaded
+          </span>
+          <p className="text-gray-600 text-sm mt-2">
+            Your file has been uploaded successfully!
+          </p>
+          {/* <img
+           src={URL.createObjectURL(uploadedFile)}
+           alt="Uploaded"
+           className="w-32 h-32 object-cover rounded-lg"
+         /> */}
+        </div>
       );
     } else if (uploadedFile.type === "application/pdf") {
       return (
-        <div className="border rounded-lg overflow-hidden">
-          <object
+        <div className="flex flex-col items-center border rounded-lg overflow-hidden">
+          <span className=" font-semibold text-lg flex items-center gap-2">
+            ✔ Uploaded
+          </span>
+          <p className="text-gray-600 text-sm mt-2">
+            Your file has been uploaded successfully!
+          </p>
+          {/* <object
             data={URL.createObjectURL(uploadedFile)}
             title="PDF Preview"
             className="w-full h-full"
-          ></object>
+          ></object> */}
         </div>
       );
     } else {
       // Fallback for unsupported types
       return (
-        <div className="flex flex-col items-center justify-center w-32 h-32 bg-gray-200 rounded-lg">
-          <p className="text-gray-500 text-sm">Unsupported File</p>
-          <p className="text-gray-600 text-xs">{uploadedFile.name}</p>
+        <div className="flex flex-col items-center border rounded-lg overflow-hidden">
+          <span className=" font-semibold text-lg flex items-center gap-2">
+            ✔ Uploaded
+          </span>
+          <p className="text-gray-600 text-sm mt-2">
+            Your file has been uploaded successfully!
+          </p>
         </div>
+        // <div className="flex flex-col items-center justify-center w-32 h-32 bg-gray-200 rounded-lg">
+        //   {/* <p className="text-gray-500 text-sm">Unsupported File</p> */}
+
+        //   <p className="text-gray-600 text-xs">{uploadedFile.name}</p>
+        // </div>
       );
     }
   };

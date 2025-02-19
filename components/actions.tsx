@@ -70,7 +70,7 @@ const Actions: React.FC<UserActionsProps> = ({
                     />
                   </li>
                   <li>
-                    {row.isDeactivated === false ? (
+                    {row.status === "Active" ? (
                       <DropdownButtonComponent
                         text="De-activate User"
                         onClick={() => setModalStateDelete("deleteUser")}
@@ -529,17 +529,17 @@ const Actions: React.FC<UserActionsProps> = ({
                     />
                   </li>
                   <li>
-                    {row.isDeactivated === false ? (
+                    {row.status === "Active" ? (
                       <DropdownButtonComponent
                         text="De-activate"
                         onClick={() => setModalStateDelete("deactivateVendor")}
-                        permissions={["delete_vendors:id"]}
+                        permissions={["update_vendors:id"]}
                       />
                     ) : (
                       <DropdownButtonComponent
                         text="Re-activate"
                         onClick={() => setModalStateDelete("activateVendor")}
-                        permissions={["delete_vendors:id"]}
+                        permissions={["update_vendors:id"]}
                       />
                     )}
                   </li>
@@ -553,7 +553,10 @@ const Actions: React.FC<UserActionsProps> = ({
           <div className="relative">
             {/* Button */}
             <PermissionGuard
-              requiredPermissions={["delete_vendors:id", "update_vendors:id"]}
+              requiredPermissions={[
+                "delete_technicians:id",
+                "update_technicians:id",
+              ]}
             >
               <button
                 onClick={() => toggleActions(row.id)}
@@ -575,24 +578,24 @@ const Actions: React.FC<UserActionsProps> = ({
                     <DropdownButtonComponent
                       text="Edit"
                       onClick={() => setModalState("createTechnician")}
-                      permissions={["update_vendors:id"]}
+                      permissions={["update_technicians:id"]}
                     />
                   </li>
                   <li>
                     <DropdownButtonComponent
                       text="Delete"
                       onClick={() => setModalStateDelete("deleteTechnician")}
-                      permissions={["delete_vendors:id"]}
+                      permissions={["delete_technicians:id"]}
                     />
                   </li>
                   <li>
-                    {row.isDeactivated === false ? (
+                    {row.status === "Active" ? (
                       <DropdownButtonComponent
                         text="De-activate"
                         onClick={() =>
                           setModalStateDelete("deactivateTechnician")
                         }
-                        permissions={["delete_vendors:id"]}
+                        permissions={["update_technicians:id"]}
                       />
                     ) : (
                       <DropdownButtonComponent
@@ -600,7 +603,7 @@ const Actions: React.FC<UserActionsProps> = ({
                         onClick={() =>
                           setModalStateDelete("activateTechnician")
                         }
-                        permissions={["delete_vendors:id"]}
+                        permissions={["update_technicians:id"]}
                       />
                     )}
                   </li>
@@ -791,6 +794,18 @@ const Actions: React.FC<UserActionsProps> = ({
                       ]}
                     />
                   </li>
+
+                  {/* <li>
+                    <DropdownButtonComponent
+                      text="Edit"
+                      onClick={() =>
+                        setModalState("createWorkOrder")
+                      }
+                      permissions={[
+                        "read_work-orders:id/users-with-work-request-approval-limit/all",
+                      ]}
+                    />
+                  </li> */}
 
                   <li>
                     <DropdownButtonComponent

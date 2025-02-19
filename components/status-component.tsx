@@ -17,6 +17,8 @@ const defaultStatusMapping: Record<
   { text: string; className: string }
 > = {
   approved: { text: "Approved", className: "text-[#1E8449] bg-[#D4EFDF]" },
+  active : {text : "Active", className: "text-[#036B26] bg-[#E7F6EC]"},
+  inactive : {text : "In-active", className: "text-[#B76E00] bg-[#FFAB0014]"},
   pending: { text: "Pending", className: "text-[#FF8C00] bg-[#FFEFD5]" },
   rejected: { text: "Rejected", className: "text-[#C0392B] bg-[#FADBD8]" },
   closed: { text: "Closed", className: "text-[#5D6D7E] bg-[#D6DBDF]" },

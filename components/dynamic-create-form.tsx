@@ -75,7 +75,8 @@ export default function DynamicCreateForm({
       });
     };
 
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  // const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File | null }>({});
   // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   const { name, files } = e.target;
 
@@ -100,7 +101,11 @@ export default function DynamicCreateForm({
     const { name, files } = e.target;
     if (files && files[0]) {
       const file = files[0];
-      setUploadedFile(file);
+      // setUploadedFiles(file);
+      setUploadedFiles((prev) => ({
+        ...prev,
+        [name]: file,
+      }));
       const reader = new FileReader();
       reader.onload = () => {
         setFormData((prev) => ({
@@ -175,6 +180,8 @@ export default function DynamicCreateForm({
           "Assets",
           "Block",
           "Work Request",
+          "Work request overdue limit",
+          "Work order overdue limit"
         ].includes(title)
       ) {
         if (activeRowId) {
@@ -185,6 +192,7 @@ export default function DynamicCreateForm({
         } else {
           await axiosInstance.post(apiEndpoint, updatedFormData);
         }
+        
       } else {
         await axiosInstance.patch(apiEndpoint, updatedFormData);
       }
@@ -218,7 +226,8 @@ export default function DynamicCreateForm({
   };
 
   useEffect(() => {
-    if (activeRowId && fetchResource) {
+    //activeRowId &&
+    if (fetchResource) {
       fetchResource(activeRowId).then((data) => {
         // Dynamically process multi-select fields based on the 'selects' configuration
         const dynamicProcessedData = { ...data };
@@ -269,7 +278,8 @@ export default function DynamicCreateForm({
                   name={input.name}
                   onChange={handleFileChange}
                   label={input.label}
-                  uploadedFile={uploadedFile}
+                  // uploadedFile={uploadedFile}
+                  uploadedFile={uploadedFiles[input.name] || null}
                   // No value prop needed for file inputs
                 />
               </div>
