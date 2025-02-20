@@ -8,7 +8,6 @@ import ModalCompoenent, {
   SuccessModalCompoenent,
 } from "@/components/modal-component";
 import CreateRole from "@/components/user-management/create-role";
-import CreateBulkUser from "@/components/user-management/create-bulk";
 import ResetPassword from "@/components/user-management/reset-password";
 import PermissionList from "@/components/user-management/view-permissions";
 import withPermissions from "@/components/auth/permission-protected-routes";

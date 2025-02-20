@@ -34,7 +34,7 @@
 //   >;
 //   searchQuery: string;
 //   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
-  
+
 // }
 
 // // Create context
@@ -238,7 +238,7 @@ export const DataPermissionProvider = ({
   // Function to clear searchQuery and reset pagination
   const clearSearchAndPagination = () => {
     setSearchQuery("");
-    setFilterQuery("")
+    setFilterQuery("");
     // setPagination(initialPagination);
   };
 

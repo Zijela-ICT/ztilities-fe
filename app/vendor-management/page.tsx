@@ -283,6 +283,7 @@ function VendorManagement() {
     ),
   };
 
+  
   useEffect(() => {
     if (
       centralStateDelete === "deactivateVendor" ||

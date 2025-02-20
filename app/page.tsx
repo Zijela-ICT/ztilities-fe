@@ -7,7 +7,6 @@ import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import axiosInstance from "@/utils/api";
 import UnprotectedRoute from "@/components/auth/unprotected-routes";
 import { SuccessModalCompoenent } from "@/components/modal-component";
 import createAxiosInstance from "@/utils/api";
@@ -59,6 +58,7 @@ export default function LogIn() {
 
     if (response.data.message === "User login successful") {
       localStorage.setItem("authToken", response.data.data.access_token);
+      localStorage.setItem("refreshToken", response.data.data.refresh_token);
       router.push("/dashboard");
     } else {
       setUserId(response.data?.data?.userId);
