@@ -18,6 +18,7 @@ import CreateAsset from "@/components/facility-management/create-asset";
 import createAxiosInstance from "@/utils/api";
 import FundWallet from "@/components/transaction/fund-wallet";
 import CreateBulk from "@/components/user-management/create-bulk";
+import Payouts from "@/components/transaction/payout";
 
 function FacilityManagement() {
   const axiosInstance = createAxiosInstance();
@@ -286,6 +287,9 @@ function FacilityManagement() {
         return "Assign User";
       case "fundWallet":
         return "Fund Wallet";
+      case "payoutUnits":
+      case "payoutFacilities":
+        return "Transfer";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -341,6 +345,9 @@ function FacilityManagement() {
       case "viewAssetCategory":
         return "";
       case "fundWallet":
+        return "";
+      case "payoutUnits":
+      case "payoutFacilities":
         return "";
       case "assignUserToFacility":
         return "Assign facility to users";
@@ -695,6 +702,22 @@ function FacilityManagement() {
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         type={selectedTab}
+      />
+    ),
+    payoutFacilities: (
+      <Payouts
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        type={"Facilities"}
+      />
+    ),
+    payoutUnits: (
+      <Payouts
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        type={"Units"}
       />
     ),
     createAsset: (

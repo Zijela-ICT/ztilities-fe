@@ -33,6 +33,7 @@ import ModalCompoenent, {
 } from "@/components/modal-component";
 import formatCurrency from "@/utils/formatCurrency";
 import FundOtherWallet from "@/components/transaction/fund-other-wallet";
+import Payouts from "@/components/transaction/payout";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -283,6 +284,14 @@ function Transactions() {
         type={"User"}
       />
     ),
+    payout: (
+      <Payouts
+        activeRowId={user.wallets[selectedWalletIndex]?.id}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        type={"User"}
+      />
+    ),
   };
 
   return (
@@ -417,6 +426,12 @@ function Transactions() {
                   className="px-3 py-1 rounded bg-white text-black"
                 >
                   Transfer
+                </button>
+                <button
+                  onClick={() => setCentralState("payout")}
+                  className="px-3 py-1 rounded bg-white text-black"
+                >
+                  Payout
                 </button>
               </div>
             )}

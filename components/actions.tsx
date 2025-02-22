@@ -234,7 +234,16 @@ const Actions: React.FC<UserActionsProps> = ({
                     <DropdownButtonComponent
                       text="Fund Wallet"
                       onClick={() => setModalState("fundWallet")}
-                      permissions={["update_facilities:id"]}
+                      permissions={["create_payments:fund"]}
+                    />
+                  </li>
+                  <li>
+                    <DropdownButtonComponent
+                      text="Payout"
+                      onClick={() => setModalState("payoutFacilities")}
+                      permissions={[
+                        "create_payments:payout/bank-transfer/walledId",
+                      ]}
                     />
                   </li>
                   <li>
@@ -380,7 +389,16 @@ const Actions: React.FC<UserActionsProps> = ({
                     <DropdownButtonComponent
                       text="Fund Wallet"
                       onClick={() => setModalState("fundWallet")}
-                      permissions={["update_units:id"]}
+                      permissions={["create_payments:fund"]}
+                    />
+                  </li>
+                  <li>
+                    <DropdownButtonComponent
+                      text="Payout"
+                      onClick={() => setModalState("payoutUnits")}
+                      permissions={[
+                        "create_payments:payout/bank-transfer/walledId",
+                      ]}
                     />
                   </li>
                   <li>

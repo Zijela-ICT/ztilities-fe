@@ -31,8 +31,8 @@ function WorkRequests() {
 
   return (
     <DashboardLayout
-      title={`Power charge`}
-      detail="Power Charge details"
+      title={`Audit Log`}
+      detail="Audit Log Details details"
       dynamic
       onclick={() => router.back()}
     >
