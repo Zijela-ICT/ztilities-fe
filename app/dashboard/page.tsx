@@ -11,6 +11,7 @@ import { useDataPermission } from "@/context";
 import { BarChartIcon, WorkIcon } from "@/utils/svg";
 import { JSX, useEffect, useState } from "react";
 import WorkOrders from "../work-orders/page";
+import WorkRequests from "../work-requests/page";
 import { useRouter } from "next/navigation";
 import createAxiosInstance from "@/utils/api";
 import MyLoader from "@/components/loader-components";
@@ -335,7 +336,11 @@ function Dashboard() {
               </div>
             ) : (
               <>
-                <WorkOrders nowrap={true} />
+                {hasNoTenantRole ? (
+                  <WorkOrders nowrap={true} />
+                ) : (
+                  <WorkRequests nowrap={true} />
+                )}
               </>
             )}
           </DashboardLayout>

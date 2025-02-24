@@ -25,7 +25,11 @@ import createAxiosInstance from "@/utils/api";
 import CommentWorkRequestOrder from "@/components/work-request/comment-request-order";
 import CreateBulk from "@/components/user-management/create-bulk";
 
-function WorkRequests() {
+interface Props {
+  nowrap: boolean;
+}
+
+function WorkRequests({ nowrap }: Props) {
   const axiosInstance = createAxiosInstance();
   const {
     pagination,
@@ -37,7 +41,7 @@ function WorkRequests() {
   } = useDataPermission();
 
   const hasTenantRole = userRoles.some(
-    (role: Role) => role.name === "TENANT_ROLE"
+    (role: Role) => role.name === "TENANT_ROLE" || role.name === "VENDOR_ROLE"
   );
 
   const tabs = ["All Work Request", "My Work Request"];
@@ -470,6 +474,7 @@ function WorkRequests() {
     <DashboardLayout
       title="Work Request"
       detail="Submit work request here and view created work requests"
+      nowrap={nowrap}
     >
       <SuccessModalCompoenent
         title={successState.title}
@@ -516,7 +521,9 @@ function WorkRequests() {
           "read_work-requests:my-work-requests/all",
         ]}
       >
-        <div className="relative bg-white rounded-2xl p-4">
+        <div
+          className={`relative ${nowrap && "hidden"} bg-white rounded-2xl p-4`}
+        >
           <div className="flex space-x-4 pb-2">
             {tabs.map((tab) => (
               <PermissionGuard
