@@ -69,13 +69,17 @@ const defaultStatusMapping: Record<
 
 // Tenant simplified mapping for the three statuses
 const tenantSimplifiedMapping: Record<
-  "initiated" | "in progress" | "closed",
+  "initiated" | "in progress" | "awaiting acceptance" | "closed",
   { text: string; className: string }
 > = {
   initiated: { text: "Initiated", className: "text-blue-600 bg-blue-100" },
   "in progress": {
     text: "In Progress",
     className: "text-yellow-600 bg-yellow-100",
+  },
+  "awaiting acceptance" : {
+    text: "Awaiting Acceptance",
+    className: "text-blue-600 bg-blue-100",
   },
   closed: { text: "Closed", className: "text-gray-600 bg-gray-100" },
 };
@@ -97,6 +101,10 @@ const tenantInProgressStatuses: string[] = [
   "reopened",
   "accepted",
 ];
+
+const tenantAwaitingAcceptanceStatuses :string[] = [
+  "awaiting acceptance"
+]
 
 const tenantClosedStatuses: string[] = ["closed", "apportionment_approved"];
 
@@ -120,6 +128,8 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       finalStatus = tenantSimplifiedMapping["in progress"];
     } else if (tenantClosedStatuses.includes(rawStatus)) {
       finalStatus = tenantSimplifiedMapping.closed;
+    } else if (tenantAwaitingAcceptanceStatuses.includes(rawStatus)) {
+      finalStatus = tenantSimplifiedMapping["awaiting acceptance"];
     } else {
       // If the status doesn't fall into any of the simplified groups,
       // fall back to the default mapping (or customize as needed).
