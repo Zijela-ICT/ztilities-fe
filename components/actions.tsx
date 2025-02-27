@@ -889,6 +889,7 @@ const Actions: React.FC<UserActionsProps> = ({
                       onClick={() => setModalStateDelete("approveQuotation")}
                       permissions={[
                         "update_work-orders:id/quotations/approve-quotation",
+                        "update_work-orders:id/quotations/approve-quotation/tenant"
                       ]}
                     />
                   </li>
