@@ -90,6 +90,17 @@ function WorkRequests({ nowrap }: Props) {
     });
   };
 
+  //workordershere
+  const approveWorkOrder = async () => {
+    await axiosInstance.patch(`/work-orders/${activeRowId}/status/approve`);
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully approved work order",
+      status: true,
+    });
+  };
+
   const getOtherWorkRequests = async () => {
     const response = await axiosInstance.get(
       `/work-requests?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -202,6 +213,8 @@ function WorkRequests({ nowrap }: Props) {
         return "De-activate Work Request ";
       case "activateWorkRequest":
         return "Re-activate Work Request";
+      case "approveQuotation":
+        return "Approve Quotation";
       case "apportionServiceCharge":
         return "Apportion Cost";
       case "assignProcurement":
@@ -249,6 +262,8 @@ function WorkRequests({ nowrap }: Props) {
         return "You want to apportion cost for this work request";
       case "assignProcurement":
         return "You want to assign Procurement";
+      case "approveQuotation":
+        return "You want to approve this quuotation";
     }
     return "Zijela";
   };
@@ -496,6 +511,8 @@ function WorkRequests({ nowrap }: Props) {
             ? deleteWorkRequests
             : centralStateDelete === "apportionServiceCharge"
             ? apportionServiceCharge
+            : centralStateDelete === "approveQuotation"
+            ? approveWorkOrder
             : centralStateDelete === "assignProcurement"
             ? assignProcurement
             : deleteWorkRequests
