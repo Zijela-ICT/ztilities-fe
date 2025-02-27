@@ -113,7 +113,7 @@ export default function CreateWorkOrder({
           setFormData({
             ...formData,
             category: "",
-            single: ""
+            single: "",
           });
         }
       } catch (error) {
@@ -138,6 +138,11 @@ export default function CreateWorkOrder({
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const payload = {
+      ...formData,
+      category: formData.category as string,
+    };
 
     if (activeRowId) {
       await axiosInstance.patch(`/work-orders/${activeRowId}`, formData);

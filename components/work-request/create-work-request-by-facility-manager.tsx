@@ -131,10 +131,14 @@ export default function CreateWorkRequestForUser({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const payload = {
+      ...formData,
+      category : formData.category as string
+    };
     if (activeRowId) {
-      await axiosInstance.patch(`/work-requests/${activeRowId}`, formData);
+      await axiosInstance.patch(`/work-requests/${activeRowId}`, payload);
     } else {
-      await axiosInstance.post("/work-requests/for-a-user", formData);
+      await axiosInstance.post("/work-requests/for-a-user", payload);
     }
     setFormData({
       userId: "",
