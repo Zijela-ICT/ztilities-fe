@@ -485,7 +485,10 @@ function FacilityManagement() {
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={(id) =>
-          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
+          axiosInstance
+            .get(`/facilities/${id}`)
+            .then((res) => res.data.data)
+            .catch(() => ({ assets: [6] }))
         }
       />
     ),
@@ -570,7 +573,10 @@ function FacilityManagement() {
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={(id) =>
-          axiosInstance.get(`/blocks/${id}`).then((res) => res.data.data)
+          axiosInstance
+            .get(`/blocks/${id}`)
+            .then((res) => res.data.data)
+            .catch(() => ({ assets: [6] }))
         }
       />
     ),
@@ -692,7 +698,10 @@ function FacilityManagement() {
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={(id) =>
-          axiosInstance.get(`/units/${id}`).then((res) => res.data.data)
+          axiosInstance
+            .get(`/units/${id}`)
+            .then((res) => res.data.data)
+            .catch(() => ({ assets: [6] }))
         }
       />
     ),
