@@ -34,6 +34,7 @@ import ModalCompoenent, {
 import formatCurrency from "@/utils/formatCurrency";
 import FundOtherWallet from "@/components/transaction/fund-other-wallet";
 import Payouts from "@/components/transaction/payout";
+import moment from "moment";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -545,7 +546,7 @@ function Transactions() {
                             </span>
                           </div>
                           <p className="text-gray-700 mt-1 font-thin ">
-                            {log.createdAt}
+                            {moment.utc(log.createdAt).format("ll")}
                           </p>
                         </div>
                       </div>

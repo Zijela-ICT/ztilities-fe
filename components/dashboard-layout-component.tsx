@@ -85,7 +85,7 @@ export default function DashboardLayout({
       <ProtectedRoute>
         <div className="md:flex">
           <Navigation />
-          <div className="min-h-screen bg-gray-50 text-medium text-gray-500 w-full md:w-4/5">
+          <div className="min-h-screen bg-gray-50 text-medium text-gray-500 w-full flex-1 md:w-4/5">
             {/* Banner for titles */}
             <div className="flex items-center justify-between bg-white">
               <div

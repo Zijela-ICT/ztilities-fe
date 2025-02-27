@@ -1,6 +1,15 @@
 import { useDataPermission } from "@/context";
-import { paths } from "@/utils/ojects";
-import { LogoutIcon } from "@/utils/svg";
+import {
+  FacilityMIcon,
+  HomeIcon,
+  LogoutIcon,
+  PPMIcon,
+  TransactionMIcon,
+  UserMIcon,
+  VendorIcon,
+  WorkOrderIcon,
+  WorkRequestIcon,
+} from "@/utils/svg";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -15,22 +24,24 @@ export default function Navigation() {
   const router = useRouter();
 
   const { user, userRoles, userPermissions } = useDataPermission();
-  const [centralState, setCentralState] = useState<string>();
+  const [centralState, setCentralState] = useState<string>("");
+  const [isCollapsed, setIsCollapsed] = useState(false); // state to toggle sidebar collapse
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isActive = useCallback((path: string) => pathname === path, [pathname]);
 
   const logout = async () => {
-    localStorage.removeItem("authToken"); // Remove auth token
-    localStorage.removeItem("user"); // Remove user data
-    localStorage.removeItem("userPermissions"); // Remove permissions
-    localStorage.removeItem("userRoles"); // Remove the token
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("userPermissions");
+    localStorage.removeItem("userRoles");
     router.push("/");
   };
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  // Function to check if the user has any of the permissions for a route
+  // Check if the user has any of the permissions for a route
   const hasPermissionForRoute = (permissions: string[]) => {
     return permissions.some((permission) =>
       userPermissions.some((userPermission) =>
@@ -42,6 +53,81 @@ export default function Navigation() {
   const hasTenantRole = userRoles.some(
     (role: Role) => role.name === "TENANT_ROLE"
   );
+
+  const navItems = [
+    {
+      href: "/dashboard",
+      label: "Dashboard",
+      permissions: [""],
+      icon: <HomeIcon />,
+    },
+    {
+      href: "/facility-management",
+      label: "Facility Management",
+      permissions: ["units", "blocks", "facilities"],
+      icon: <FacilityMIcon />,
+    },
+    {
+      href: "/work-requests",
+      label: "Work Request",
+      permissions: ["work-requests"],
+      icon: <WorkRequestIcon />,
+    },
+    {
+      href: "/work-orders",
+      label: "Work Order",
+      permissions: ["work-orders"],
+      icon: <WorkOrderIcon />,
+    },
+    {
+      href: "/power",
+      label: "Power",
+      permissions: ["power-charges"],
+      icon: <WorkRequestIcon />,
+    },
+    {
+      href: "/bills",
+      label: "Bills",
+      permissions: ["units"],
+      icon: <WorkRequestIcon />,
+    },
+    {
+      href: "/approvers",
+      label: "Approvers",
+      permissions: ["users"],
+      icon: <WorkRequestIcon />,
+    },
+    {
+      href: "/ppm",
+      label: "PPM",
+      permissions: ["ppms"],
+      icon: <PPMIcon />,
+    },
+    {
+      href: "/audit",
+      label: "Audit Logs",
+      permissions: ["audit"],
+      icon: <WorkRequestIcon />,
+    },
+    {
+      href: "/vendor-management",
+      label: "Vendor & Tech Management",
+      permissions: ["vendors"],
+      icon: <VendorIcon />,
+    },
+    {
+      href: "/user-management",
+      label: "User Management",
+      permissions: ["roles", "users", "permissions", "auth"],
+      icon: <UserMIcon />,
+    },
+    {
+      href: "/transaction",
+      label: "Transactions",
+      permissions: ["transactions", "users"],
+      icon: <TransactionMIcon />,
+    },
+  ];
 
   return (
     <>
@@ -55,50 +141,44 @@ export default function Navigation() {
       >
         <div className="flex flex-col items-center justify-center py-8 px-8">
           {user?.avatar ? (
-            <>
-              <Image
-                src={user.avatar}
-                alt={"#"}
-                width={200}
-                height={200}
-                className=" rounded-full"
-              />
-            </>
+            <Image
+              src={user.avatar}
+              alt={"#"}
+              width={200}
+              height={200}
+              className="rounded-full"
+            />
           ) : (
-            <>
-              <div
-                className="rounded-full flex items-center justify-center text-[#A8353A] font-semibold text-6xl"
-                style={{
-                  width: 200,
-                  height: 200,
-                  backgroundColor: "#fff", // Ensures dark monotone color
-                }}
-              >
-                {`${user?.firstName?.[0] || ""}${
-                  user?.lastName?.[0] || ""
-                }`.toUpperCase()}
-              </div>
-            </>
+            <div
+              className="rounded-full flex items-center justify-center text-[#A8353A] font-semibold text-6xl"
+              style={{
+                width: 200,
+                height: 200,
+                backgroundColor: "#fff",
+              }}
+            >
+              {`${user?.firstName?.[0] || ""}${
+                user?.lastName?.[0] || ""
+              }`.toUpperCase()}
+            </div>
           )}
 
           <h2 className="text-xl font-bold text-white mt-2">
-            {user?.firstName} {"   "} {user?.lastName}
+            {user?.firstName} {user?.lastName}
           </h2>
           <p className="text-white text-base">{user?.email}</p>
 
-          {userRoles?.map((role) => {
-            return (
-              <div
-                key={role.name}
-                className="text-xs mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm"
-              >
-                <p key={role.name}> {role.name} </p>
-              </div>
-            );
-          })}
+          {userRoles?.map((role) => (
+            <div
+              key={role.name}
+              className="text-xs mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm"
+            >
+              <p>{role.name}</p>
+            </div>
+          ))}
           <ButtonComponent
             text="Go to Profile"
-            className="bg-white mt-6 "
+            className="bg-white mt-6"
             onClick={() => {
               router.push(`/user-profile`);
               setCentralState("");
@@ -106,31 +186,66 @@ export default function Navigation() {
           />
         </div>
       </ModalCompoenent>
-      <ul className="px-4 py-4 space-y-4 text-xs font-medium text-gray-500  w-full lg:w-1/5 bg-white">
-        <div className="flex items-center justify-between">
-          <Link href={`/dashboard`} className="w-full px-4 ml-4">
-            <Image src={Logo} alt="logo" width={100} height={70} />
-          </Link>
 
-          <button onClick={toggleMenu} className="md:hidden text-gray-500 ">
+      <ul
+        className={`px-4 py-4 space-y-4 text-xs font-medium text-gray-500 bg-white ${
+          isCollapsed ? "w-16" : "w-full lg:w-1/5"
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <Link href={`/dashboard`} className="px-4">
+            <Image
+              src={Logo}
+              alt="logo"
+              width={isCollapsed ? 50 : 100}
+              height={isCollapsed ? 35 : 70}
+            />
+          </Link>
+          {/* Desktop collapse toggle */}
+          <button onClick={toggleSidebar} className="hidden lg:block">
+            <svg
+              className="w-6 h-6 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              {isCollapsed ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              )}
+            </svg>
+          </button>
+          {/* Mobile hamburger toggle */}
+          <button onClick={toggleMenu} className="md:hidden text-gray-500">
             <svg
               className="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="2"
+                strokeWidth={2}
                 d="M4 6h16M4 12h16M4 18h16"
               />
             </svg>
           </button>
         </div>
 
-        <>
+        {/* Full profile card visible only when not collapsed */}
+        {!isCollapsed && (
           <div
             onClick={() => setCentralState("viewProfile")}
             className="flex cursor-pointer hover:animate-tilt flex-col items-center justify-center p-4 bg-[#A8353A] rounded-lg shadow-lg text-white max-w-sm mx-auto"
@@ -138,130 +253,51 @@ export default function Navigation() {
             <p className="text-base font-semibold">
               {user?.firstName} {user?.lastName}
             </p>
-
             <div className="text-xs mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm">
               {userRoles[0]?.name}
             </div>
           </div>
-        </>
+        )}
 
-        <div className={`md:block ${isMenuOpen ? "block" : "hidden"}`}>
-          {[
-            // Your routes here
-            {
-              href: "/dashboard",
-              label: "Dashboard",
-              permissions: [""],
-              iconPath: paths.path1,
-            },
-            {
-              href: "/facility-management",
-              label: "Facility Management",
-              permissions: ["units", "blocks", "facilities"],
-              iconPath: paths.path5,
-            },
-            {
-              href: "/work-requests",
-              label: "Work Request",
-              permissions: ["work-requests"],
-              iconPath: paths.path3,
-            },
-            {
-              href: "/work-orders",
-              label: "Work Order",
-              permissions: ["work-orders"],
-              iconPath: paths.path6,
-            },
-            {
-              href: "/power",
-              label: "Power",
-              permissions: ["power-charges"],
-              iconPath: paths.path6,
-            },
-            {
-              href: "/bills",
-              label: "Bills",
-              permissions: ["units"],
-              iconPath: paths.path6,
-            },
-            {
-              href: "/approvers",
-              label: "Approvers",
-              permissions: ["users"],
-              iconPath: paths.path9,
-            },
-            {
-              href: "/ppm",
-              label: "PPM",
-              permissions: ["ppms"],
-              iconPath: paths.path9,
-            },
-            {
-              href: "/audit",
-              label: "Audit Logs",
-              permissions: ["audit"],
-              iconPath: paths.path6,
-            },
-            {
-              href: "/vendor-management",
-              label: "Vendor & Tech Management",
-              permissions: ["vendors"],
-              iconPath: paths.path9,
-            },
-            {
-              href: "/user-management",
-              label: "User Management",
-              permissions: ["roles", "users", "permissions", "auth"],
-              iconPath: paths.path7,
-            },
-            {
-              href: "/transaction",
-              label: "Transactions",
-              permissions: ["transactions", "users"],
-              iconPath: paths.path3,
-            },
-          ].map(({ href, label, permissions, iconPath }) => {
-            // For the work request, check if the condition is true
-            if (href === "/work-orders" && hasTenantRole) {
-              return null; // Skip rendering this route if condition is not met
-            }
+        <div
+          className={`md:block ${isMenuOpen ? "block" : "hidden"} space-y-3`}
+        >
+          {navItems.map(({ href, label, permissions, icon }) => {
+            if (href === "/work-orders" && hasTenantRole) return null;
             return (
               hasPermissionForRoute(permissions) && (
-                <li key={href} className="w-full px-4">
+                <li
+                  key={href}
+                  className={`w-full ${isCollapsed ? "px-0" : "px-4"}`}
+                >
                   <Link
                     href={href}
-                    className={`inline-flex items-center w-full px-4 py-2 rounded-md font-thin  ${
-                      isActive(href) ? "bg-[#FBC2B61A] text-[#A8353A] " : ""
+                    className={`inline-flex items-center w-full ${
+                      isCollapsed ? "justify-center px-0" : "justify-start px-4"
+                    } py-2 rounded-md font-thin ${
+                      isActive(href) ? "bg-[#FBC2B61A] text-[#A8353A]" : ""
                     }`}
                     aria-current={isActive(href) ? "page" : undefined}
                   >
-                    <svg
-                      className={`w-10 h-10 me-2 ${
-                        isActive(href) ? "text-[#A8353A]" : "text-gray-500 "
-                      }`}
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="currentColor"
-                      viewBox="0 0 42 42"
-                    >
-                      <path d={iconPath} />
-                    </svg>
-                    {label}
+                    <span className="flex items-center justify-center w-6 h-6">
+                      {icon}
+                    </span>
+                    {!isCollapsed && <span className="ml-2">{label}</span>}
                   </Link>
                 </li>
               )
             );
           })}
 
-          <div className="flex items-center px-4 pt-32 "></div>
-          {/* Logout Button */}
-          <li className="w-full px-4 pt-4">
+          <li className={`w-full ${isCollapsed ? "px-0" : "px-4"} pt-4`}>
             <button
               onClick={logout}
-              className="inline-flex items-center justify-between w-full pl-4 py-3 pr-20 rounded-lg text-white bg-[#A8353A] "
+              className={`inline-flex items-center justify-between w-full ${
+                isCollapsed ? "justify-center" : "pl-4 pr-20"
+              } py-3 rounded-lg text-white bg-[#A8353A]`}
             >
               <LogoutIcon />
-              Logout
+              {!isCollapsed && <span>Logout</span>}
             </button>
           </li>
         </div>
