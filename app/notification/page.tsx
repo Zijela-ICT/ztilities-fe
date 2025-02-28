@@ -16,7 +16,6 @@ function NotificationPage() {
   const axiosInstance = createAxiosInstance();
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  // For demo purposes, we create 20 notifications with different dates.
   useEffect(() => {
     const dummyNotifications: Notification[] = [
       {
@@ -143,7 +142,7 @@ function NotificationPage() {
     setNotifications(dummyNotifications);
   }, []);
 
-  // Group notifications by day (using locale date string).
+  // Group notifications by day 
   const groupedNotifications = notifications.reduce(
     (acc: Record<string, Notification[]>, notification) => {
       const dateKey = new Date(notification.time).toLocaleDateString();
@@ -165,7 +164,7 @@ function NotificationPage() {
     );
   };
 
-  // Sort dates so that the latest day appears first.
+  // Sort dates,  so that eh, the latest day appears first.
   const sortedDates = Object.keys(groupedNotifications).sort(
     (a, b) => new Date(b).getTime() - new Date(a).getTime()
   );
