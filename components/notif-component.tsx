@@ -70,7 +70,7 @@ export default function NotificationCard({ onClose }: NotificationCardProps) {
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        onClose && onClose();
+        onClose();
       }
     };
 
