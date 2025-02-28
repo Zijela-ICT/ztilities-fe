@@ -266,6 +266,7 @@ export default function FacilityDetails({
                                                   "vendorName",
                                                   "technicianName",
                                                   "email",
+                                                  "unitNumber"
                                                   // "id"
                                                 ].includes(nestedKey)
                                               ) // Filter for only firstName and lastName
