@@ -76,7 +76,11 @@ export default function FacilityDetails({
                   value !== null &&
                   typeof value === "object" ? (
                   `${value?.unitNumber || "-"}`
-                ) : key === "facility" &&
+                ): key === "category" &&
+                value !== null &&
+                typeof value === "object" ? (
+                `${value?.categoryName || "-"}`
+              ) : key === "facility" &&
                   value !== null &&
                   typeof value === "object" ? (
                   `${value?.name || "-"}`

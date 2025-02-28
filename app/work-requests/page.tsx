@@ -92,11 +92,13 @@ function WorkRequests({ nowrap }: Props) {
 
   //workordershere
   const approveWorkOrder = async () => {
-    await axiosInstance.patch(`/work-orders/${activeRowId}/status/approve`);
+    await axiosInstance.patch(
+      `/work-requests/${activeRowId}/quotations/approve-quotation/tenant`
+    );
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully approved work order",
+      detail: "You have successfully approved quotation",
       status: true,
     });
   };
