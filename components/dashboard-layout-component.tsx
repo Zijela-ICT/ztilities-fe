@@ -1,3 +1,4 @@
+// components/DashboardLayout.tsx
 import {
   ArrowLeft,
   NotifIcon,
@@ -14,6 +15,7 @@ import Link from "next/link";
 import Image from "next/image";
 import formatCurrency from "@/utils/formatCurrency";
 import createAxiosInstance from "@/utils/api";
+import NotificationCard from "./notif-component";
 
 export default function DashboardLayout({
   children,
@@ -35,6 +37,7 @@ export default function DashboardLayout({
     useDataPermission();
   const [centralState, setCentralState] = useState<string>();
   const [selectedWallet, setSelectedWallet] = useState<any>();
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     setSelectedWallet(user?.wallets[0]);
@@ -57,7 +60,6 @@ export default function DashboardLayout({
     getMe();
   }, []);
 
-
   const handleWalletChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = user.wallets.find(
       (wallet) => wallet.id === parseInt(event.target.value)
@@ -70,7 +72,11 @@ export default function DashboardLayout({
     return <>{children}</>;
   }
 
- 
+  // Toggle notification box visibility
+  const handleNotificationClick = () => {
+    setShowNotifications((prev) => !prev);
+  };
+
   return (
     <>
       <ModalCompoenent
@@ -103,28 +109,8 @@ export default function DashboardLayout({
                   <h1 className="text-sm text-gray-500 font-light">{detail}</h1>
                 </div>
               </div>
-              {/* <div className="flex space-x-6 mr-14">
-                <Link href={`/user-profile`}>
-                  {user?.avatar ? (
-                    <Image
-                      src={user?.avatar && user?.avatar}
-                      alt="User Avatar"
-                      className="rounded-full"
-                      width={32}
-                      height={32}
-                    />
-                  ) : (
-                    <UserProfile />
-                  )}
-                </Link>
-                <Link href={`/settings`}>
-                  <SettingUserIcon />
-                </Link>
-                <Link href={`/`}>
-                  <NotifIcon />
-                </Link>
-              </div> */}
-              <div className="flex space-x-6 mr-14">
+
+              <div className="flex space-x-6 mr-14 relative">
                 {/* Wallet Dropdown */}
                 {selectedWallet && (
                   <div className="flex items-center space-x-2">
@@ -148,7 +134,7 @@ export default function DashboardLayout({
                 <Link href={`/user-profile`}>
                   {user?.avatar ? (
                     <Image
-                      src={user?.avatar && user?.avatar}
+                      src={user?.avatar}
                       alt="User Avatar"
                       className="rounded-full"
                       width={32}
@@ -161,9 +147,17 @@ export default function DashboardLayout({
                 <Link href={`/settings`}>
                   <SettingUserIcon />
                 </Link>
-                <Link href={`/`}>
+                <div
+                  onClick={handleNotificationClick}
+                  className="cursor-pointer"
+                >
                   <NotifIcon />
-                </Link>
+                </div>
+                {showNotifications && (
+                  <NotificationCard
+                    onClose={() => setShowNotifications(false)}
+                  />
+                )}
               </div>
             </div>
 
