@@ -302,7 +302,7 @@ function WorkOrders({ nowrap }: Props) {
       case "approveQuotation":
         return "You want to approve this quuotation";
       case "acceptWorkOrder":
-        return "Are you sure you want to approve this work order";
+        return "Are you sure you want to accept this work order";
       case "raisePaymentOrder":
         return "Are you sure you want to raise purchase order";
     }
