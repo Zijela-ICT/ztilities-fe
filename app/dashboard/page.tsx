@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import createAxiosInstance from "@/utils/api";
 import MyLoader from "@/components/loader-components";
 import formatCurrency from "@/utils/formatCurrency";
+import PermissionGuard from "@/components/auth/permission-protected-components";
 
 function Dashboard() {
   const axiosInstance = createAxiosInstance();
@@ -42,8 +43,6 @@ function Dashboard() {
     (role: Role) => role.name !== "TENANT_ROLE"
   );
 
-  const [myworkRequests, setMyWorkRequests] = useState<any[]>();
-  const [myworkOrders, setMyWorkOrders] = useState<any[]>();
   const [workRequests, setWorkRequests] = useState<any>();
   const [workOrders, setWorkOrders] = useState<any[]>();
   const [centralState, setCentralState] = useState<string>();
@@ -71,11 +70,6 @@ function Dashboard() {
     const response = await axiosInstance.get("/wallets/user-wallets");
   };
 
-  const getWorkRequestsDashboard = async () => {
-    const response = await axiosInstance.get("/work-orders/dashboard/all");
-    setWorkRequests(response.data.data);
-  };
-
   // useEffect to fetch getMe initially and every 5 minutes
   useEffect(() => {
     const interval = setInterval(() => {
@@ -87,9 +81,64 @@ function Dashboard() {
   }, []);
 
   const loading = !(user && userPermissions);
+
+  const [purchaseOrders, setPurchaseOrders] = useState<any>();
+  const [overdueWorkOrders, setOverdueWorkOrders] = useState<any>();
+  const [pendingWorkOrders, setPendingWorkOrders] = useState<any>();
+  const [overdueWorkRequests, setOverdueWorkRequests] = useState<any>();
+  const [pendingWorkRequests, setPendingWorkRequests] = useState<any>();
+  const [initiatedWorkRequests, setInitiatedWorkRequests] = useState<any>();
+
+  const getPurchaseOrders = async () => {
+    const response = await axiosInstance.get(
+      "/dashboards/purchase-orders-raised"
+    );
+    setPurchaseOrders(response.data.data);
+  };
+
+  const getOverdueWorkOrders = async () => {
+    const response = await axiosInstance.get("/dashboards/overdue-work-order");
+    setOverdueWorkOrders(response.data.data);
+  };
+
+  const getPendingWorkOrders = async () => {
+    const response = await axiosInstance.get("/dashboards/pending-work-order");
+    setPendingWorkOrders(response.data.data);
+  };
+
+  const getOverdueWorkRequests = async () => {
+    const response = await axiosInstance.get(
+      "/dashboards/overdue-work-request"
+    );
+    setOverdueWorkRequests(response.data.data);
+  };
+
+  const getPendingWorkRequests = async () => {
+    const response = await axiosInstance.get(
+      "/dashboards/pending-work-request"
+    );
+    setPendingWorkRequests(response.data.data);
+  };
+
+  const getInitiatedWorkRequests = async () => {
+    const response = await axiosInstance.get(
+      "/dashboards/initiated-work-request"
+    );
+    setInitiatedWorkRequests(response.data.data);
+  };
+
+  useEffect(() => {
+    getPurchaseOrders();
+    getOverdueWorkOrders();
+    getPendingWorkOrders();
+    getOverdueWorkRequests();
+    getPendingWorkRequests();
+    getInitiatedWorkRequests();
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([getMe(), getWallet(), getWorkRequestsDashboard()]);
+      await Promise.all([getMe(), getWallet()]);
     };
     fetchData();
   }, []);
@@ -97,41 +146,41 @@ function Dashboard() {
   const data = [
     {
       title: "Initiated Work Requests",
-      number: workRequests?.initiatedWorkRequest,
-      rate: "",
+      number: initiatedWorkRequests?.initiatedWorkRequest,
+      permisssion: ["read_dashboards:initiated-work-request"],
       path: "/dashboard",
     },
     {
       title: "Pending Work Requests",
-      number: workRequests?.pendingWorkRequest,
-      rate: "",
+      number: pendingWorkRequests?.pendingWorkRequest,
+      permisssion: ["read_dashboards:pending-work-request"],
       path: "/dashboard",
     },
     {
       title: "OverDue Work Requests",
-      number: workRequests?.overdueWorkRequest,
-      rate: "",
+      number: overdueWorkRequests?.overdueWorkRequest,
+      permisssion: ["read_dashboards:overdue-work-request"],
       path: "/dashboard",
     },
     {
       title: "Pending Work Orders",
-      number: workRequests?.pendingWorkOrder,
-      rate: "",
+      number: pendingWorkOrders?.pendingWorkOrder,
+      permisssion: ["read_dashboards:pending-work-order"],
       path: "/dashboard",
     },
     {
-      title: "Overdue Work Requests",
-      number: workRequests?.overdueWorkOrder,
-      rate: "",
+      title: "Overdue Work Orders",
+      number: overdueWorkOrders?.overdueWorkOrder,
+      permisssion: ["read_dashboards:overdue-work-order"],
       path: "/dashboard",
     },
     {
       title: "PurchaseOrdersRaised",
-      number: workRequests?.purchaseOrdersRaised,
-      rate: "",
+      number: purchaseOrders?.purchaseOrdersRaised,
+      permisssion: ["read_dashboards:purchase-orders-raised"],
       path: "/dashboard",
     },
-    { title: "Wallet Balance", number: 0, rate: "", path: null },
+    { title: "Wallet Balance", number: 0, permisssion: [], path: null },
   ];
 
   // Mapping centralState values to components
@@ -209,96 +258,100 @@ function Dashboard() {
                 (item.title === "Wallet Balance" &&
                   user?.wallets?.length > 0) ||
                 item.title !== "Wallet Balance" ? (
-                  <div
+                  <PermissionGuard
                     key={index}
-                    onClick={() => item?.path && router.push(item?.path)}
-                    className={`${
-                      item.title === "Wallet Balance"
-                        ? "bg-[#FBC2B6]"
-                        : "bg-white"
-                    } py-3 px-4 rounded-lg flex items-center justify-between cursor-pointer`}
+                    requiredPermissions={item.permisssion}
                   >
-                    {/* Left Content */}
-                    <div className="relative">
-                      {item.title !== "Wallet Balance" && (
-                        <h3 className="text-sm font-semibold text-gray-500 mb-1">
-                          {item.title}
-                        </h3>
-                      )}
+                    <div
+                      onClick={() => item?.path && router.push(item?.path)}
+                      className={`${
+                        item.title === "Wallet Balance"
+                          ? "bg-[#FBC2B6]"
+                          : "bg-white"
+                      } py-3 px-4 rounded-lg flex items-center justify-between cursor-pointer`}
+                    >
+                      {/* Left Content */}
+                      <div className="relative">
+                        {item.title !== "Wallet Balance" && (
+                          <h3 className="text-sm font-semibold text-gray-500 mb-1">
+                            {item.title}
+                          </h3>
+                        )}
 
-                      {item.title === "Wallet Balance" &&
-                      user?.wallets?.length > 0 ? (
-                        <div>
-                          {/* Dropdown for Wallet Balance */}
-                          <select
-                            value={selectedWallet}
-                            onChange={handleWalletChange}
-                            className="text-sm font-semibold text-gray-500 mb-1"
-                          >
-                            {user.wallets.map((wallet) => (
-                              <option key={wallet.id} value={wallet.id}>
-                                {wallet.walletType}
-                              </option>
-                            ))}
-                          </select>
-                          <p className="text-xl font-bold text-[#A8353A] mb-3">
-                            {showBalance ? (
-                              <>
-                                ₦
-                                {formatCurrency(
-                                  user.wallets.find(
-                                    (wallet) => wallet.id === selectedWallet
-                                  )?.balance || 0
-                                )}
-                              </>
-                            ) : (
-                              "****"
-                            )}
-                          </p>
-                          <div className="flex items-center gap-2 h-6"></div>
-                        </div>
-                      ) : item.title !== "Wallet Balance" ? (
-                        <div>
-                          <p className="text-3xl font-bold text-gray-800 mb-3">
-                            {item.number}
-                          </p>
-                          <div className="flex items-center gap-2">
-                            {/* <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
+                        {item.title === "Wallet Balance" &&
+                        user?.wallets?.length > 0 ? (
+                          <div>
+                            {/* Dropdown for Wallet Balance */}
+                            <select
+                              value={selectedWallet}
+                              onChange={handleWalletChange}
+                              className="text-sm font-semibold text-gray-500 mb-1"
+                            >
+                              {user.wallets.map((wallet) => (
+                                <option key={wallet.id} value={wallet.id}>
+                                  {wallet.walletType}
+                                </option>
+                              ))}
+                            </select>
+                            <p className="text-xl font-bold text-[#A8353A] mb-3">
+                              {showBalance ? (
+                                <>
+                                  ₦
+                                  {formatCurrency(
+                                    user.wallets.find(
+                                      (wallet) => wallet.id === selectedWallet
+                                    )?.balance || 0
+                                  )}
+                                </>
+                              ) : (
+                                "****"
+                              )}
+                            </p>
+                            <div className="flex items-center gap-2 h-6"></div>
+                          </div>
+                        ) : item.title !== "Wallet Balance" ? (
+                          <div>
+                            <p className="text-3xl font-bold text-gray-800 mb-3">
+                              {item.number}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              {/* <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
                               0%
                             </span> */}
-                            <span className="text-xs text-gray-500">
-                              {item.rate}
-                            </span>
+                              <span className="text-xs text-gray-500">
+                                {item.rate}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      ) : null}
+                        ) : null}
+                      </div>
+                      {item.title === "Wallet Balance" ? (
+                        <svg
+                          onClick={() => setShowBalance(!showBalance)}
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6 text-white cursor-pointer"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15 12c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                      ) : (
+                        <BarChartIcon />
+                      )}
+                      {/* Right Icon */}
                     </div>
-                    {item.title === "Wallet Balance" ? (
-                      <svg
-                        onClick={() => setShowBalance(!showBalance)}
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 text-white cursor-pointer"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15 12c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z"
-                        />
-                      </svg>
-                    ) : (
-                      <BarChartIcon />
-                    )}
-                    {/* Right Icon */}
-                  </div>
+                  </PermissionGuard>
                 ) : null
               )}
             </div>

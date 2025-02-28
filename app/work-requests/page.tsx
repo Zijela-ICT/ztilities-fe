@@ -93,12 +93,12 @@ function WorkRequests({ nowrap }: Props) {
   //workordershere
   const approveWorkOrder = async () => {
     await axiosInstance.patch(
-      `/work-requests/${activeRowId}/quotations/approve-quotation/tenant`
+      `/work-orders/${activeRowId}/quotations/approve-quotation/tenant`
     );
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully approved quotation",
+      detail: "You have successfully accepted quotation",
       status: true,
     });
   };
@@ -216,7 +216,7 @@ function WorkRequests({ nowrap }: Props) {
       case "activateWorkRequest":
         return "Re-activate Work Request";
       case "approveQuotation":
-        return "Approve Quotation";
+        return "Accept Quotation";
       case "apportionServiceCharge":
         return "Apportion Cost";
       case "assignProcurement":
@@ -265,7 +265,7 @@ function WorkRequests({ nowrap }: Props) {
       case "assignProcurement":
         return "You want to assign Procurement";
       case "approveQuotation":
-        return "You want to approve this quuotation";
+        return "You want to accept this quuotation";
     }
     return "Zijela";
   };

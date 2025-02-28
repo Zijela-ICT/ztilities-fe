@@ -749,7 +749,7 @@ const Actions: React.FC<UserActionsProps> = ({
 
                   <li>
                     <DropdownButtonComponent
-                      text="Approve Quotation"
+                      text="Accept Quotation"
                       onClick={() => setModalStateDelete("approveQuotation")}
                       permissions={[
                         "update_work-orders:id/quotations/approve-quotation/tenant",
