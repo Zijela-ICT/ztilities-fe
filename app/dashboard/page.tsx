@@ -318,9 +318,7 @@ function Dashboard() {
                               {/* <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">
                               0%
                             </span> */}
-                              <span className="text-xs text-gray-500">
-                                {item.rate}
-                              </span>
+                              <span className="text-xs text-gray-500"></span>
                             </div>
                           </div>
                         ) : null}
