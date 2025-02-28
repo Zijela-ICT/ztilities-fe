@@ -247,7 +247,11 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // Define the list of endpoints for which a success toast should appear
-const successToastEndpoints: string[] = [];
+const successToastEndpoints: string[] = [
+  "app-settings/auto-debit",
+  "/app-settings/auto-apportion",
+  "/users/2fa/enable",
+];
 
 // --- Refresh token helpers ---
 let isRefreshing = false;
@@ -350,7 +354,7 @@ const createAxiosInstance = (): AxiosInstance => {
                     "Authorization"
                   ] = `Bearer ${data.data.access_token}`;
                   originalRequest.headers.Authorization = `Bearer ${data.data.access_token}`;
-                  processQueue(null,data.data.access_token);
+                  processQueue(null, data.data.access_token);
                   resolve(axiosInstance(originalRequest));
                 })
                 .catch((err) => {

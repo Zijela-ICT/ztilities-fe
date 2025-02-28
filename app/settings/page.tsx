@@ -1,22 +1,19 @@
 "use client";
 
-import { FormEvent, JSX, useEffect, useRef, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
-import InputComponent from "@/components/input-container";
 import { ArrowRightIcon, CameraIcon } from "@/utils/svg";
-import ButtonComponent from "@/components/button-component";
 import { useDataPermission } from "@/context";
 import { toast } from "react-toastify";
-import axiosInstance from "@/utils/api";
 import ModalCompoenent, {
   SuccessModalCompoenent,
 } from "@/components/modal-component";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import AvatarEditor from "react-avatar-editor";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import createAxiosInstance from "@/utils/api";
 import DynamicCreateForm from "@/components/dynamic-create-form";
+import PermissionGuard from "@/components/auth/permission-protected-components";
 
 function Settings() {
   const axiosInstance = createAxiosInstance();
@@ -29,67 +26,57 @@ function Settings() {
   });
 
   const { user, setUser } = useDataPermission();
-  const [centralState, setCentralState] = useState<string>();
-  const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
-  // State for password inputs
-  const [password, setPassword] = useState({
-    newPassword: "",
-    confirmPassword: "",
-    oldPassword: "",
-  });
+  const [centralState, setCentralState] = useState<string>("");
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
 
-  const [modalState, setModalState] = useState(false);
-  const [qrCode, setQrCode] = useState("");
-  const [twoFactorMethod, setTwoFactorMethod] = useState(
-    user?.twoFAMethod || "email"
-  );
-
-  // State for various toggles
   const [settings, setSettings] = useState({
-    isTwoFactorEnabled: false,
-    isSoundNotificationEnabled: false,
     isPushNotificationEnabled: false,
     isBiometricLoginEnabled: false,
   });
 
+  const toggleMapping: Record<
+    keyof typeof settings,
+    { patchEndpoint: string; getEndpoint: string }
+  > = {
+    isPushNotificationEnabled: {
+      patchEndpoint: "/app-settings/auto-debit",
+      getEndpoint: "/app-settings/get-setting-by-key/autoDebit",
+    },
+    isBiometricLoginEnabled: {
+      patchEndpoint: "/app-settings/auto-apportion",
+      getEndpoint: "/app-settings/get-setting-by-key/autoApportion",
+    },
+  };
+
   useEffect(() => {
-    setSettings((prevSettings) => ({
-      ...prevSettings,
-      isTwoFactorEnabled: user?.isTwoFAEnabled,
-    }));
-  }, [user?.isTwoFAEnabled]);
+    const fetchToggleSettings = async () => {
+      try {
+        const responses = await Promise.all(
+          Object.keys(toggleMapping).map((key) =>
+            axiosInstance.get(
+              toggleMapping[key as keyof typeof settings].getEndpoint
+            )
+          )
+        );
+        const newSettings: Partial<typeof settings> = {};
+        Object.keys(toggleMapping).forEach((key, index) => {
+          newSettings[key as keyof typeof settings] =
+            responses[index].data.data.value;
+        });
+        setSettings((prev) => ({ ...prev, ...newSettings }));
+      } catch (error) {
+        console.error("Error fetching toggle settings", error);
+      }
+    };
+    fetchToggleSettings();
+  }, []);
 
-  const enable2FA = async () => {
-    const response = await axiosInstance.patch("/users/2fa/enable", {
-      method: twoFactorMethod,
-    });
-    setQrCode(response.data.data.qrCode);
-    if (twoFactorMethod === "app") {
-      setCentralState("2FA");
-    }
-  };
+  useEffect(() => {
+    getMe();
+    getWOLimit();
+    getWRLimit();
+  }, []);
 
-  const disable2FA = async () => {
-    const response = await axiosInstance.patch("/users/2fa/disable", {
-      isTwoFAEnabled: false,
-    });
-  };
-
-  // State for user avatar
-  const avatar = "/assets/avatar.png";
-  const [myuser, setMyUser] = useState({
-    avatar: "",
-  });
-
-  // State for form data and file handling
-  const [formData, setFormData] = useState<FormData>();
-  const [saveAvatar, setSaveAvatar] = useState<boolean>(false);
-  const [scale, setScale] = useState(1);
-  const [croppedImage, setCroppedImage] = useState(null);
-  const editorRef = useRef(null);
-
-  // Fetch user data on mount
   const getMe = async () => {
     const response = await axiosInstance.get("/auth/me");
     setUser(response.data.data.user);
@@ -97,59 +84,25 @@ function Settings() {
 
   const [wrlimit, setWrLimit] = useState();
   const getWRLimit = async () => {
-    const response = await axiosInstance.get(
-      `/app-settings/wr-overdue-limit`
-    );
+    const response = await axiosInstance.get(`/app-settings/wr-overdue-limit`);
     setWrLimit(response.data.data.value);
   };
 
-  const [wolimit, setWoLimit] = useState(); 
+  const [wolimit, setWoLimit] = useState();
   const getWOLimit = async () => {
-    const response = await axiosInstance.get(
-      `/app-settings/wo-overdue-limit`
-    );
+    const response = await axiosInstance.get(`/app-settings/wo-overdue-limit`);
     setWoLimit(response.data.data.value);
   };
-  useEffect(() => {
-    getMe();
-    getWOLimit();
-    getWRLimit();
-  }, []);
 
-  // Handle password change submission
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (password.newPassword !== password.confirmPassword) {
-      toast.error("Passwords do not match!");
-      return;
-    }
-    await axiosInstance.post("/auth/change-password", {
-      newPassword: password.newPassword,
-      oldPassword: password.oldPassword,
-    });
-    setCentralState("");
-    setModalState(true);
-    setPassword({
-      oldPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-  };
-
-  // Handle file change for avatar
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const reader = new FileReader();
-      reader.onload = () => {
-        setMyUser((prev) => ({ ...prev, avatar: reader.result as string }));
-      };
+      reader.onload = () => {};
       reader.readAsDataURL(file);
 
       const formData = new FormData();
       formData.append("file", file);
-      setFormData(formData);
-
       setCentralState("Uploaded");
     } else {
       toast.error("No file selected. Please select an image.");
@@ -166,7 +119,6 @@ function Settings() {
     return "Zijela";
   };
 
-
   // Mapping centralState values to components
   const componentMap: Record<string, JSX.Element> = {
     wooverduelimit: (
@@ -177,11 +129,11 @@ function Settings() {
         ]}
         selects={[]}
         title="Work order overdue limit"
-        apiEndpoint={`${"/app-settings/wo-overdue-limit"}`}
+        apiEndpoint="/app-settings/wo-overdue-limit"
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-        fetchResource={(id) =>
+        fetchResource={() =>
           axiosInstance
             .get(`/app-settings/wo-overdue-limit`)
             .then((res) => res.data.data)
@@ -196,11 +148,11 @@ function Settings() {
         ]}
         selects={[]}
         title="Work request overdue limit"
-        apiEndpoint={`${"/app-settings/wr-overdue-limit"}`}
+        apiEndpoint="/app-settings/wr-overdue-limit"
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-        fetchResource={(id) =>
+        fetchResource={() =>
           axiosInstance
             .get(`/app-settings/wr-overdue-limit`)
             .then((res) => res.data.data)
@@ -209,27 +161,31 @@ function Settings() {
     ),
   };
 
-  // Handle password input change
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPassword((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Toggle settings state
-  const handleToggle = (setting: keyof typeof settings) => {
+  const handleToggle = async (settingKey: keyof typeof settings) => {
+    const newValue = !settings[settingKey];
     setSettings((prev) => ({
       ...prev,
-      [setting]: !prev[setting],
+      [settingKey]: newValue,
     }));
+    try {
+      await axiosInstance.post(toggleMapping[settingKey].patchEndpoint, {
+        value: newValue,
+      });
+    } catch (error) {
+      toast.error("Failed to update setting");
+      // revert
+      setSettings((prev) => ({
+        ...prev,
+        [settingKey]: !newValue,
+      }));
+    }
   };
 
   // Handle logout
   const logout = async () => {
-    localStorage.removeItem("authToken"); // Remove the token
+    localStorage.removeItem("authToken");
     router.push("/");
   };
-
-  useEffect(() => {});
 
   return (
     <DashboardLayout title="Settings" detail="Manage setting">
@@ -240,7 +196,7 @@ function Settings() {
         setModalState={(state: boolean) =>
           setSuccessState((prevState) => ({ ...prevState, status: state }))
         }
-      ></SuccessModalCompoenent>
+      />
       <ModalCompoenent
         title={getTitle()}
         detail={""}
@@ -256,21 +212,19 @@ function Settings() {
       <h1 className="text-xl font-bold text-black ml-2 mt-4">Settings</h1>
 
       <div className="flex flex-col md:flex-row bg-gray-100 py-6 px-2">
-        <div className="hidden md:w-[38%] bg-white shadow-sm rounded-xl rounded-lg p-6 pt-16 flex flex-col items-center relative">
+        <div className="hidden md:w-[38%] bg-white shadow-sm rounded-xl p-6 pt-16 flex flex-col items-center relative">
           <div className="relative">
             <div className="w-44 h-44 bg-gray-500 rounded-full flex items-center justify-center mb-4 overflow-hidden">
               <Image
-                src={user?.avatar ? user?.avatar : avatar}
+                src={user?.avatar ? user?.avatar : "/assets/avatar.png"}
                 alt="User Avatar"
                 className="w-44 h-44 object-cover"
                 width={176}
                 height={176}
               />
             </div>
-
             <div className="absolute bottom-5 right-0 bg-gray-100 text-white p-3 rounded-full cursor-pointer hover:bg-gray-200">
               <CameraIcon />
-
               <input
                 type="file"
                 className="absolute inset-0 opacity-0 cursor-pointer"
@@ -279,93 +233,84 @@ function Settings() {
               />
             </div>
           </div>
-
           <h2 className="text-xl font-bold text-gray-800">
-            {user?.firstName} {"   "} {user?.lastName}{" "}
+            {user?.firstName} {user?.lastName}
           </h2>
           <p className="text-gray-600 text-base">{user?.email}</p>
         </div>
 
-        <div className="md:w-[62%] mt-6 md:mt-0 bg-white shadow-sm rounded-xl rounded-lg p-6 h-auto">
+        <div className="md:w-[62%] mt-6 md:mt-0 bg-white shadow-sm rounded-xl p-6">
           <h3 className="text-base text-gray-800 mb-4">Update settings</h3>
-          <div
-            onClick={() => setCentralState("wroverduelimit")}
-            className="flex items-center cursor-pointer justify-between mb-4 py-4 px-6 border rounded-xl border-gray-200"
+          <PermissionGuard
+            requiredPermissions={["create_app-settings:wr-overdue-limit"]}
           >
-            <div className="text-gray-800">Work request overdue limit</div>
-            <div className="flex items-center space-x-8">
-              <p>{wrlimit}</p>
-              <ArrowRightIcon />
+            <div
+              onClick={() => setCentralState("wroverduelimit")}
+              className="flex items-center cursor-pointer justify-between mb-4 py-4 px-6 border rounded-xl border-gray-200"
+            >
+              <div className="text-gray-800">Work request overdue limit</div>
+              <div className="flex items-center space-x-8">
+                <p>{wrlimit}</p>
+                <ArrowRightIcon />
+              </div>
             </div>
-          </div>
-          <div
-            onClick={() => setCentralState("wooverduelimit")}
-            className="flex items-center cursor-pointer justify-between mb-4 py-4 px-6 border rounded-xl border-gray-200"
+          </PermissionGuard>
+          <PermissionGuard
+            requiredPermissions={["create_app-settings:wo-overdue-limit"]}
           >
-            <div className="text-gray-800">Work order overdue limit</div>
-            <div className="flex items-center space-x-8">
-              <p>{wolimit}</p>
-              <ArrowRightIcon />
+            <div
+              onClick={() => setCentralState("wooverduelimit")}
+              className="flex items-center cursor-pointer justify-between mb-4 py-4 px-6 border rounded-xl border-gray-200"
+            >
+              <div className="text-gray-800">Work order overdue limit</div>
+              <div className="flex items-center space-x-8">
+                <p>{wolimit}</p>
+                <ArrowRightIcon />
+              </div>
             </div>
-          </div>
-
-          <h3 className="hidden text-base font-semibold text-gray-800 mb-4 mt-4">
-            Settings
-          </h3>
+          </PermissionGuard>
 
           {/* Settings Toggles */}
-          <div className=" w-full p-4 border border-gray-200 rounded-xl mb-4">
+          <div className="w-full p-4 border border-gray-200 rounded-xl mb-4">
             {[
-              // { label: "Two-Factor Authentication", key: "isTwoFactorEnabled" },
-              // {
-              //   label: "Sound Notification",
-              //   key: "isSoundNotificationEnabled",
-              // },
-              { label: "Auto Dept", key: "isPushNotificationEnabled" },
-              { label: "Auto Apportion", key: "isBiometricLoginEnabled" },
+              {
+                label: "Auto Debit",
+                key: "isPushNotificationEnabled",
+                permission: ["create_app-settings:auto-debit"],
+              },
+              {
+                label: "Auto Apportion",
+                key: "isBiometricLoginEnabled",
+                permission: ["create_app-settings:auto-apportion"],
+              },
             ].map((setting, index, array) => (
-              <div
+              <PermissionGuard
                 key={setting.key}
-                className={`flex items-center justify-between p-2 ${
-                  index < array.length - 1
-                    ? "border-b border-gray-200 mb-4"
-                    : ""
-                }`}
+                requiredPermissions={setting.permission}
               >
-                <div className="flex items-center space-x-4">
+                <div
+                  className={`flex items-center justify-between p-2 ${
+                    index < array.length - 1
+                      ? "border-b border-gray-200 mb-4"
+                      : ""
+                  }`}
+                >
                   <span className="text-gray-500 font-light text-sm">
                     {setting.label}
                   </span>
-                  {setting.key === "isTwoFactorEnabled" && (
-                    <select
-                      className="text-sm border border-gray-300 rounded-lg p-1"
-                      value={twoFactorMethod}
-                      onChange={(e) => setTwoFactorMethod(e.target.value)}
-                    >
-                      <option value="app">App</option>
-                      <option value="email">Email</option>
-                    </select>
-                  )}
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={settings[setting.key]}
-                    onChange={() => {
-                      handleToggle(setting.key as keyof typeof settings);
-                      if (setting.key === "isTwoFactorEnabled") {
-                        if (settings["isTwoFactorEnabled"]) {
-                          disable2FA();
-                        } else {
-                          enable2FA();
-                        }
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={settings[setting.key as keyof typeof settings]}
+                      onChange={() =>
+                        handleToggle(setting.key as keyof typeof settings)
                       }
-                    }}
-                  />
-                  <div className="w-8 h-4 bg-gray-900 rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-green-600"></div>
-                </label>
-              </div>
+                    />
+                    <div className="w-8 h-4 bg-gray-900 rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-green-600"></div>
+                  </label>
+                </div>
+              </PermissionGuard>
             ))}
           </div>
 
@@ -374,23 +319,21 @@ function Settings() {
             className="flex items-center cursor-pointer justify-between py-4 px-6 border rounded-xl border-gray-200"
           >
             <div className="text-red-500">Sign out</div>
-            <div>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5.3335 2.66675L10.6668 8.00008L5.3335 13.3334"
-                  stroke="#FF3B30"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5.3335 2.66675L10.6668 8.00008L5.3335 13.3334"
+                stroke="#FF3B30"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </div>
         </div>
       </div>
