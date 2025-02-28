@@ -721,6 +721,7 @@ export default function TableComponent({
       column !== "isApproved" &&
       column !== "isApportioned" &&
       column !== "isDeactivated" &&
+      column !== "purchaseOrderFileUrl" &&
       column !== "isWorkOrder"
   );
 

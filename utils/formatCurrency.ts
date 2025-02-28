@@ -1,7 +1,7 @@
 export default function formatCurrency(amount: any) {
   if (typeof amount === "string") {
     amount = amount.replace(/,/g, ""); // Remove commas if present
-    if (!/^\d+(\.\d+)?$/.test(amount)) return "Invalid number"; // Ensure it's a valid number string
+    if (!/^\d+(\.\d+)?$/.test(amount)) return "-----"; // Ensure it's a valid number string
     amount = parseFloat(amount); // Convert to a number
   }
 
