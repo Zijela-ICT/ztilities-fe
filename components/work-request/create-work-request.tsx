@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
 import { FileInputComponent, LabelInputComponent } from "../input-container";
-import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import createAxiosInstance from "@/utils/api";
@@ -28,11 +27,12 @@ export default function CreateWorkRequest({
   const [myFacilities, setMyFacilities] = useState<Facility[]>([]);
   const [myBlocks, setMyBlocks] = useState<Block[]>([]);
   const [myUnits, setMyUnits] = useState<Unit[]>([]);
+  const [allAssets, setAllAssets] = useState<Asset[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    entity: "",
+    entity: "unit", // auto-select "unit" as default
     unit: "",
     block: "",
     facility: "",
@@ -43,17 +43,17 @@ export default function CreateWorkRequest({
 
   const [assetCategories, setAssetCategories] = useState<any[]>([]);
   const [theAssetCategory, setTheAssetCategory] = useState<any>();
-
+  console.log(theAssetCategory);
   // Fetch work request if activeRowId exists
   const getWorkRequest = async () => {
     if (activeRowId) {
       const response = await axiosInstance.get(`/work-requests/${activeRowId}`);
       const data = response.data.data;
-      setFormData({
-        ...formData,
+      setFormData((prev) => ({
+        ...prev,
         title: data.title,
         description: data.description,
-      });
+      }));
     }
   };
 
@@ -94,21 +94,22 @@ export default function CreateWorkRequest({
       try {
         const response = await axiosInstance.get(`/assets/${formData.asset}`);
         const assetData = response.data.data;
-        if (assetData.category) {
-          setFormData({
-            ...formData,
+        if (assetData?.category) {
+          setFormData((prev) => ({
+            ...prev,
             category: assetData.id,
-            single: assetData.category.categoryName,
-          });
-          setTheAssetCategory(assetData.category.categoryName);
+            single: assetData.category?.categoryName,
+          }));
+          setTheAssetCategory(assetData.category?.categoryName);
         } else {
           const catResponse = await axiosInstance.get("/assets/category/all");
           setAssetCategories(catResponse.data.data);
-          setFormData({
-            ...formData,
+          setFormData((prev) => ({
+            ...prev,
             category: "",
-            single: ""
-          });
+            single: "",
+          }));
+          setTheAssetCategory("");
         }
       } catch (error) {
         console.error("Error fetching asset categories", error);
@@ -116,15 +117,35 @@ export default function CreateWorkRequest({
     }
   };
 
+  // Load all assets initially and auto-select asset "other"
+  const getAllAssets = async () => {
+    try {
+      const response = await axiosInstance.get("/assets");
+      const assets = response.data.data;
+      setAllAssets(assets);
+      // Auto-select the asset with assetName "other"
+      const otherAsset = assets?.find(
+        (asset: Asset) => asset?.assetName?.toLowerCase() === "others"
+      );
+      if (otherAsset) {
+        setFormData((prev) => ({
+          ...prev,
+          asset: otherAsset?.id?.toString() || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching all assets", error);
+    }
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-
   const [file, setFile] = useState<string | null>(null);
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -140,10 +161,10 @@ export default function CreateWorkRequest({
   };
 
   const handleSelectChange = (fieldName: string) => (selected: any) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [fieldName]: selected?.value || "",
-    });
+    }));
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -152,7 +173,7 @@ export default function CreateWorkRequest({
     const payload = {
       ...formData,
       file: file,
-      category : formData.category as string
+      category: formData.category as string,
     };
     if (activeRowId) {
       await axiosInstance.patch(`/work-requests/${activeRowId}`, payload);
@@ -162,7 +183,7 @@ export default function CreateWorkRequest({
     setFormData({
       title: "",
       description: "",
-      entity: "",
+      entity: "unit",
       unit: "",
       block: "",
       facility: "",
@@ -186,42 +207,48 @@ export default function CreateWorkRequest({
     { value: "facility", label: "Facility" },
   ];
 
-  const unitOptions = (user.units || myUnits)?.map((unit: Unit) => ({
-    value: unit.id.toString(),
-    label: unit.unitNumber,
+  const unitOptions = (user?.units || myUnits)?.map((unit: Unit) => ({
+    value: unit?.id?.toString(),
+    label: unit?.unitNumber,
   }));
 
-  const blockOptions = myBlocks?.map((unit: Block) => ({
-    value: unit.id.toString(),
-    label: unit.blockNumber,
+  const blockOptions = myBlocks?.map((block: Block) => ({
+    value: block?.id?.toString(),
+    label: block?.blockNumber,
   }));
 
-  const facilityOptions = myFacilities?.map((unit: Facility) => ({
-    value: unit.id.toString(),
-    label: unit.name,
+  const facilityOptions = myFacilities?.map((facility: Facility) => ({
+    value: facility?.id?.toString(),
+    label: facility?.name,
   }));
 
+  // Compute assetOptions:
+  // If an entity is selected and its details (unit, block, or facility) have assets, show those.
+  // Otherwise, fallback to the allAssets loaded initially.
   const assetOptions =
-    formData.entity === "unit"
-      ? unit?.assets?.map((unit: Asset) => ({
-          value: unit.id.toString(),
-          label: unit.assetName,
+    formData.entity === "unit" && unit?.assets?.length
+      ? unit.assets.map((asset: Asset) => ({
+          value: asset?.id?.toString(),
+          label: asset?.assetName,
         }))
-      : formData?.entity === "facility"
-      ? facility?.assets?.map((block: Asset) => ({
-          value: block.id.toString(),
-          label: block.assetName,
+      : formData.entity === "facility" && facility?.assets?.length
+      ? facility.assets.map((asset: Asset) => ({
+          value: asset?.id?.toString(),
+          label: asset?.assetName,
         }))
-      : formData?.entity === "block"
-      ? block?.assets?.map((otherBlock: Asset) => ({
-          value: otherBlock.id.toString(),
-          label: otherBlock.assetName,
+      : formData.entity === "block" && block?.assets?.length
+      ? block.assets.map((asset: Asset) => ({
+          value: asset?.id?.toString(),
+          label: asset?.assetName,
         }))
-      : [];
+      : allAssets?.map((asset: Asset) => ({
+          value: asset?.id?.toString(),
+          label: asset?.assetName,
+        }));
 
   const categoryOptions = assetCategories?.map((cat: any) => ({
-    value: cat.id.toString(),
-    label: cat.categoryName, // Adjust property name as needed
+    value: cat?.id?.toString(),
+    label: cat?.categoryName,
   }));
 
   useEffect(() => {
@@ -234,6 +261,7 @@ export default function CreateWorkRequest({
     getMyFacilities();
     getMyUnits();
     getMyBlocks();
+    getAllAssets(); // load all assets on mount
   }, []);
 
   useEffect(() => {
@@ -347,7 +375,7 @@ export default function CreateWorkRequest({
               />
             </div>
 
-            {theAssetCategory && (
+            {theAssetCategory !== "" && (
               <div className="relative w-full mt-6">
                 <LabelInputComponent
                   type="text"

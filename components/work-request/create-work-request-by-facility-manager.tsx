@@ -9,6 +9,14 @@ export default function CreateWorkRequestForUser({
   setModalState,
   activeRowId,
   setSuccessState,
+}: {
+  setModalState: (state: string) => void;
+  activeRowId?: string | null;
+  setSuccessState: (state: {
+    title: string;
+    detail: string;
+    status: boolean;
+  }) => void;
 }) {
   const axiosInstance = createAxiosInstance();
   const { user } = useDataPermission();
@@ -20,12 +28,13 @@ export default function CreateWorkRequestForUser({
   const [myFacilities, setMyFacilities] = useState<Facility[]>([]);
   const [myBlocks, setMyBlocks] = useState<Block[]>([]);
   const [myUnits, setMyUnits] = useState<Unit[]>([]);
+  const [allAssets, setAllAssets] = useState<Asset[]>([]);
 
   const [formData, setFormData] = useState({
     userId: "",
     title: "",
     description: "",
-    entity: "",
+    entity: "unit", // auto-select "unit" as default
     unit: "",
     block: "",
     facility: "",
@@ -92,25 +101,47 @@ export default function CreateWorkRequestForUser({
       try {
         const response = await axiosInstance.get(`/assets/${formData.asset}`);
         const assetData = response.data.data;
-        if (assetData.category) {
+        if (assetData?.category) {
           setFormData({
             ...formData,
             category: assetData.id,
-            single: assetData.category.categoryName,
+            single: assetData.category?.categoryName,
           });
-          setTheAssetCategory(assetData.category.categoryName);
+          setTheAssetCategory(assetData.category?.categoryName);
         } else {
           const catResponse = await axiosInstance.get("/assets/category/all");
           setAssetCategories(catResponse.data.data);
           setFormData({
             ...formData,
             category: "",
-            single: ""
+            single: "",
           });
+          setTheAssetCategory("");
         }
       } catch (error) {
         console.error("Error fetching asset categories", error);
       }
+    }
+  };
+
+  // Load all assets initially and auto-select asset "others"
+  const getAllAssets = async () => {
+    try {
+      const response = await axiosInstance.get("/assets");
+      const assets = response.data.data;
+      setAllAssets(assets);
+      // Auto-select the asset with assetName "others"
+      const otherAsset = assets?.find(
+        (asset: Asset) => asset?.assetName?.toLowerCase() === "others"
+      );
+      if (otherAsset) {
+        setFormData((prev) => ({
+          ...prev,
+          asset: otherAsset?.id?.toString() || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching all assets", error);
     }
   };
 
@@ -133,7 +164,7 @@ export default function CreateWorkRequestForUser({
 
     const payload = {
       ...formData,
-      category : formData.category as string
+      category: formData.category.toString(),
     };
     if (activeRowId) {
       await axiosInstance.patch(`/work-requests/${activeRowId}`, payload);
@@ -144,7 +175,7 @@ export default function CreateWorkRequestForUser({
       userId: "",
       title: "",
       description: "",
-      entity: "",
+      entity: "unit",
       unit: "",
       block: "",
       facility: "",
@@ -169,47 +200,53 @@ export default function CreateWorkRequestForUser({
     { value: "facility", label: "Facility" },
   ];
 
-  const userOptions = users?.map((unit: User) => ({
-    value: unit.id.toString(),
-    label: unit.firstName + unit.lastName,
+  const userOptions = users?.map((user: User) => ({
+    value: user.id.toString(),
+    label: user.firstName + " " + user.lastName,
   }));
 
-  const unitOptions = (user.units || myUnits)?.map((unit: Unit) => ({
+  const unitOptions = (user?.units || myUnits)?.map((unit: Unit) => ({
     value: unit.id.toString(),
     label: unit.unitNumber,
   }));
 
-  const blockOptions = myBlocks?.map((unit: Block) => ({
-    value: unit.id.toString(),
-    label: unit.blockNumber,
+  const blockOptions = myBlocks?.map((block: Block) => ({
+    value: block.id.toString(),
+    label: block.blockNumber,
   }));
 
-  const facilityOptions = myFacilities?.map((unit: Facility) => ({
-    value: unit.id.toString(),
-    label: unit.name,
+  const facilityOptions = myFacilities?.map((facility: Facility) => ({
+    value: facility.id.toString(),
+    label: facility.name,
   }));
 
+  // Compute assetOptions:
+  // If an entity is selected and its details (unit, block, or facility) have assets, show those.
+  // Otherwise, fallback to the allAssets loaded initially.
   const assetOptions =
-    formData.entity === "unit"
-      ? unit?.assets?.map((unit: Asset) => ({
-          value: unit.id.toString(),
-          label: unit.assetName,
+    formData.entity === "unit" && unit?.assets?.length
+      ? unit.assets.map((asset: Asset) => ({
+          value: asset.id.toString(),
+          label: asset.assetName,
         }))
-      : formData?.entity === "facility"
-      ? facility?.assets?.map((block: Asset) => ({
-          value: block.id.toString(),
-          label: block.assetName,
+      : formData.entity === "facility" && facility?.assets?.length
+      ? facility.assets.map((asset: Asset) => ({
+          value: asset.id.toString(),
+          label: asset.assetName,
         }))
-      : formData?.entity === "block"
-      ? block?.assets?.map((otherBlock: Asset) => ({
-          value: otherBlock.id.toString(),
-          label: otherBlock.assetName,
+      : formData.entity === "block" && block?.assets?.length
+      ? block.assets.map((asset: Asset) => ({
+          value: asset.id.toString(),
+          label: asset.assetName,
         }))
-      : [];
+      : allAssets?.map((asset: Asset) => ({
+          value: asset.id.toString(),
+          label: asset.assetName,
+        }));
 
   const categoryOptions = assetCategories?.map((cat: any) => ({
     value: cat.id.toString(),
-    label: cat.categoryName, // Adjust property name as needed
+    label: cat.categoryName,
   }));
 
   useEffect(() => {
@@ -223,6 +260,7 @@ export default function CreateWorkRequestForUser({
     getMyFacilities();
     getMyUnits();
     getMyBlocks();
+    getAllAssets(); // load all assets on mount
   }, []);
 
   useEffect(() => {

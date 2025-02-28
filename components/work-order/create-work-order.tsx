@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
 import { LabelInputComponent } from "../input-container";
-import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import createAxiosInstance from "@/utils/api";
@@ -28,24 +27,25 @@ export default function CreateWorkOrder({
   const [myFacilities, setMyFacilities] = useState<Facility[]>([]);
   const [myBlocks, setMyBlocks] = useState<Block[]>([]);
   const [myUnits, setMyUnits] = useState<Unit[]>([]);
+  const [allAssets, setAllAssets] = useState<Asset[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    entity: "",
+    entity: "unit", // auto-select "unit" as default
     unit: "",
     block: "",
     facility: "",
     asset: "",
     category: "",
-    single: "", // Added new property for category
+    single: "",
   });
 
   // New state to hold the asset's categories
   const [assetCategories, setAssetCategories] = useState<any[]>([]);
   const [theAssetCategory, setTheAssetCategory] = useState<any>();
 
-  // Fetch work request if activeRowId exists
+  // Fetch work order if activeRowId exists
   const getWorkRequest = async () => {
     if (activeRowId) {
       const response = await axiosInstance.get(`/work-orders/${activeRowId}`);
@@ -93,20 +93,18 @@ export default function CreateWorkOrder({
   };
 
   // New function to fetch categories for the selected asset.
-  // If the asset has its own categories, use those.
-  // Otherwise, call the "all categories" endpoint.
   const getAssetCategories = async () => {
     if (formData.asset) {
       try {
         const response = await axiosInstance.get(`/assets/${formData.asset}`);
         const assetData = response.data.data;
-        if (assetData.category) {
+        if (assetData?.category) {
           setFormData({
             ...formData,
             category: assetData.category.id,
-            single: assetData.category.categoryName,
+            single: assetData.category?.categoryName,
           });
-          setTheAssetCategory(assetData.category.categoryName);
+          setTheAssetCategory(assetData.category?.categoryName);
         } else {
           const catResponse = await axiosInstance.get("/assets/category/all");
           setAssetCategories(catResponse.data.data);
@@ -115,10 +113,32 @@ export default function CreateWorkOrder({
             category: "",
             single: "",
           });
+          setTheAssetCategory("");
         }
       } catch (error) {
         console.error("Error fetching asset categories", error);
       }
+    }
+  };
+
+  // Load all assets initially and auto-select asset "others"
+  const getAllAssets = async () => {
+    try {
+      const response = await axiosInstance.get("/assets");
+      const assets = response.data.data;
+      setAllAssets(assets);
+      // Auto-select the asset with assetName "others"
+      const otherAsset = assets?.find(
+        (asset: Asset) => asset?.assetName?.toLowerCase() === "others"
+      );
+      if (otherAsset) {
+        setFormData((prev) => ({
+          ...prev,
+          asset: otherAsset?.id?.toString() || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching all assets", error);
     }
   };
 
@@ -141,7 +161,7 @@ export default function CreateWorkOrder({
 
     const payload = {
       ...formData,
-      category: formData.category as string,
+      category: formData.category.toString(),
     };
 
     if (activeRowId) {
@@ -152,7 +172,7 @@ export default function CreateWorkOrder({
     setFormData({
       title: "",
       description: "",
-      entity: "",
+      entity: "unit",
       unit: "",
       block: "",
       facility: "",
@@ -176,7 +196,7 @@ export default function CreateWorkOrder({
     { value: "facility", label: "Facility" },
   ];
 
-  const unitOptions = (user.units || myUnits)?.map((unit: Unit) => ({
+  const unitOptions = (user?.units || myUnits)?.map((unit: Unit) => ({
     value: unit.id.toString(),
     label: unit.unitNumber,
   }));
@@ -191,28 +211,34 @@ export default function CreateWorkOrder({
     label: unit.name,
   }));
 
+  // Compute assetOptions:
+  // If an entity is selected and its details (unit, block, or facility) have assets, show those.
+  // Otherwise, fallback to the allAssets loaded initially.
   const assetOptions =
-    formData.entity === "unit"
-      ? unit?.assets?.map((unit: Asset) => ({
-          value: unit.id.toString(),
-          label: unit.assetName,
+    formData.entity === "unit" && unit?.assets?.length
+      ? unit.assets.map((asset: Asset) => ({
+          value: asset.id.toString(),
+          label: asset.assetName,
         }))
-      : formData?.entity === "facility"
-      ? facility?.assets?.map((block: Asset) => ({
-          value: block.id.toString(),
-          label: block.assetName,
+      : formData.entity === "facility" && facility?.assets?.length
+      ? facility.assets.map((asset: Asset) => ({
+          value: asset.id.toString(),
+          label: asset.assetName,
         }))
-      : formData?.entity === "block"
-      ? block?.assets?.map((otherBlock: Asset) => ({
-          value: otherBlock.id.toString(),
-          label: otherBlock.assetName,
+      : formData.entity === "block" && block?.assets?.length
+      ? block.assets.map((asset: Asset) => ({
+          value: asset.id.toString(),
+          label: asset.assetName,
         }))
-      : [];
+      : allAssets?.map((asset: Asset) => ({
+          value: asset.id.toString(),
+          label: asset.assetName,
+        }));
 
   // Compute category options from the assetCategories state
   const categoryOptions = assetCategories?.map((cat: any) => ({
     value: cat.id.toString(),
-    label: cat.categoryName, // Adjust property name as needed
+    label: cat.categoryName,
   }));
 
   useEffect(() => {
@@ -225,6 +251,7 @@ export default function CreateWorkOrder({
     getMyFacilities();
     getMyUnits();
     getMyBlocks();
+    getAllAssets(); // load all assets on mount
   }, []);
 
   useEffect(() => {
@@ -353,7 +380,6 @@ export default function CreateWorkOrder({
               </div>
             )}
 
-            {/* New: After selecting an asset, display its categories (or all categories if none exist) */}
             {formData.asset && !formData.single && (
               <div className="relative w-full mt-6">
                 <Select
