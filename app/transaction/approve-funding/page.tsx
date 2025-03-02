@@ -223,7 +223,7 @@ function Power() {
       <PermissionGuard requiredPermissions={["read_power-charges"]}>
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           <TableComponent
-            data={powerCharges}
+            data={[]}
             type="approvefunding"
             setModalState={setCentralState}
             setModalStateDelete={setCentralStateDelete}

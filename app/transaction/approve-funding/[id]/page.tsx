@@ -37,7 +37,7 @@ function Funding() {
       onclick={() => router.back()}
     >
       <div className="relative bg-white rounded-2xl p-8 ">
-        <FacilityDetails facility={transaction} title="Transactions" />
+        <FacilityDetails facility={{}} title="Transactions" />
       </div>
     </DashboardLayout>
   );
