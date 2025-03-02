@@ -16,6 +16,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import ModalCompoenent from "./modal-component";
 import ButtonComponent from "./button-component";
+import PermissionGuard from "./auth/permission-protected-components";
 
 const Logo = "/assets/logo.png";
 
@@ -25,8 +26,12 @@ export default function Navigation() {
 
   const { user, userRoles, userPermissions } = useDataPermission();
   const [centralState, setCentralState] = useState<string>("");
-  const [isCollapsed, setIsCollapsed] = useState(false); // state to toggle sidebar collapse
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // State to track which nav items (with children) are expanded
+  const [expandedItems, setExpandedItems] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const isActive = useCallback((path: string) => pathname === path, [pathname]);
 
@@ -40,6 +45,11 @@ export default function Navigation() {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+
+  // Toggle the accordion for a nav item with children
+  const toggleAccordion = (key: string) => {
+    setExpandedItems((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   // Check if the user has any of the permissions for a route
   const hasPermissionForRoute = (permissions: string[]) => {
@@ -126,6 +136,14 @@ export default function Navigation() {
       label: "Transactions",
       permissions: ["transactions", "users"],
       icon: <TransactionMIcon />,
+      children: [
+        {
+          href: "/transaction/approve-funding",
+          label: "Approve funding",
+          permissions: ["users"],
+          icon: <TransactionMIcon />,
+        },
+      ],
     },
   ];
 
@@ -188,7 +206,7 @@ export default function Navigation() {
       </ModalCompoenent>
 
       <ul
-        className={`px-4 py-4 space-y-4 text-xs font-medium text-gray-500 bg-white ${
+        className={`px-4 py-4 space-y-4 text-xs font-medium text-gray-500 bg-white transition-all duration-300 ${
           isCollapsed ? "w-16" : "w-full lg:w-1/5"
         }`}
       >
@@ -248,7 +266,7 @@ export default function Navigation() {
         {!isCollapsed && (
           <div
             onClick={() => setCentralState("viewProfile")}
-            className="flex cursor-pointer hover:animate-tilt flex-col items-center justify-center p-4 bg-[#A8353A] rounded-lg shadow-lg text-white max-w-sm mx-auto"
+            className="flex cursor-pointer hover:animate-tilt flex-col items-center justify-center p-4 bg-[#A8353A] rounded-lg shadow-lg text-white max-w-sm mx-auto "
           >
             <p className="text-base font-semibold">
               {user?.firstName} {user?.lastName}
@@ -262,28 +280,99 @@ export default function Navigation() {
         <div
           className={`md:block ${isMenuOpen ? "block" : "hidden"} space-y-3`}
         >
-          {navItems.map(({ href, label, permissions, icon }) => {
-            if (href === "/work-orders" && hasTenantRole) return null;
+          {navItems.map((item) => {
+            // Optionally skip work-orders for tenant roles
+            if (item.href === "/work-orders" && hasTenantRole) return null;
             return (
-              hasPermissionForRoute(permissions) && (
+              hasPermissionForRoute(item.permissions) && (
                 <li
-                  key={href}
+                  key={item.href}
                   className={`w-full ${isCollapsed ? "px-0" : "px-4"}`}
                 >
                   <Link
-                    href={href}
+                    href={item.href}
                     className={`inline-flex items-center w-full ${
                       isCollapsed ? "justify-center px-0" : "justify-start px-4"
                     } py-2 rounded-md font-thin ${
-                      isActive(href) ? "bg-[#FBC2B61A] text-[#A8353A]" : ""
+                      isActive(item.href) ? "bg-[#FBC2B61A] text-[#A8353A]" : ""
                     }`}
-                    aria-current={isActive(href) ? "page" : undefined}
+                    aria-current={isActive(item.href) ? "page" : undefined}
                   >
                     <span className="flex items-center justify-center w-6 h-6">
-                      {icon}
+                      {item.icon}
                     </span>
-                    {!isCollapsed && <span className="ml-2">{label}</span>}
+                    {!isCollapsed && (
+                      <>
+                        <span className="ml-2 flex-grow">{item.label}</span>
+                        {item.children && (
+                          <PermissionGuard requiredPermissions={["update_users:id"]}>
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                toggleAccordion(item.href);
+                              }}
+                              className="p-2"
+                            >
+                              <svg
+                                className="w-4 h-4 transition-transform duration-200"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                style={{
+                                  transform: expandedItems[item.href]
+                                    ? "rotate(90deg)"
+                                    : "rotate(0deg)",
+                                }}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </button>
+                          </PermissionGuard>
+                        )}
+                      </>
+                    )}
                   </Link>
+                  {item.children &&
+                    expandedItems[item.href] &&
+                    !isCollapsed && (
+                      <ul className="ml-4 space-y-2">
+                        {item.children.map(
+                          (child) =>
+                            hasPermissionForRoute(child.permissions) && (
+                              <li key={child.href}>
+                                <Link
+                                  href={child.href}
+                                  className={`inline-flex items-center w-full ${
+                                    isCollapsed
+                                      ? "justify-center px-0"
+                                      : "justify-start pl-8 pr-4"
+                                  } py-2 rounded-md font-thin ${
+                                    isActive(child.href)
+                                      ? "bg-[#FBC2B61A] text-[#A8353A]"
+                                      : ""
+                                  }`}
+                                  aria-current={
+                                    isActive(child.href) ? "page" : undefined
+                                  }
+                                >
+                                  <span className="flex items-center justify-center w-6 h-6">
+                                    {child.icon}
+                                  </span>
+                                  {!isCollapsed && (
+                                    <span className="ml-2">{child.label}</span>
+                                  )}
+                                </Link>
+                              </li>
+                            )
+                        )}
+                      </ul>
+                    )}
                 </li>
               )
             );

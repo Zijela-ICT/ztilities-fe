@@ -840,6 +840,8 @@ export default function TableComponent({
                   ? "w-full"
                   : type === "transactions"
                   ? "sm:w-full"
+                  : type === "approvefunding"
+                  ? "sm:w-full"
                   : "sm:w-[70%]"
               }`}
             >

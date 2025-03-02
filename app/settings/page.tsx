@@ -73,9 +73,12 @@ function Settings() {
 
   useEffect(() => {
     getMe();
+  }, []);
+
+  useEffect(() => {
     getWOLimit();
     getWRLimit();
-  }, []);
+  }, [centralState]);
 
   const getMe = async () => {
     const response = await axiosInstance.get("/auth/me");
@@ -130,7 +133,7 @@ function Settings() {
         selects={[]}
         title="Work order overdue limit"
         apiEndpoint="/app-settings/wo-overdue-limit"
-        activeRowId={activeRowId}
+        activeRowId={"5"}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={() =>
@@ -149,7 +152,7 @@ function Settings() {
         selects={[]}
         title="Work request overdue limit"
         apiEndpoint="/app-settings/wr-overdue-limit"
-        activeRowId={activeRowId}
+        activeRowId={"5"}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={() =>

@@ -22,7 +22,7 @@ export default function FacilityDetails({
     "facility",
     "block",
     "id",
-    "createdAt",
+    // "createdAt",
     "updatedAt",
     "workOrderNumber",
   ],
@@ -76,11 +76,11 @@ export default function FacilityDetails({
                   value !== null &&
                   typeof value === "object" ? (
                   `${value?.unitNumber || "-"}`
-                ): key === "category" &&
-                value !== null &&
-                typeof value === "object" ? (
-                `${value?.categoryName || "-"}`
-              ) : key === "facility" &&
+                ) : key === "category" &&
+                  value !== null &&
+                  typeof value === "object" ? (
+                  `${value?.categoryName || "-"}`
+                ) : key === "facility" &&
                   value !== null &&
                   typeof value === "object" ? (
                   `${value?.name || "-"}`
@@ -208,7 +208,9 @@ export default function FacilityDetails({
                               {item.action ??
                                 item.assetName ??
                                 item.walletType ??
+                                item.unit?.unitNumber ??
                                 item?.vendor?.vendorName ??
+                                item?.subCategoryName ??
                                 item?.technician?.technicianName ??
                                 (item.user?.firstName &&
                                   item.user?.lastName &&
@@ -250,6 +252,9 @@ export default function FacilityDetails({
                                         >
                                           View File
                                         </a>
+                                      ) : subKey === "createdAt" ||
+                                        subKey === "updatedAt" ? (
+                                        moment.utc(subValue).format("LL")
                                       ) : typeof subValue === "object" &&
                                         subValue !== null ? (
                                         Array.isArray(subValue) ? (
@@ -266,7 +271,8 @@ export default function FacilityDetails({
                                                   "vendorName",
                                                   "technicianName",
                                                   "email",
-                                                  "unitNumber"
+                                                  "unitNumber",
+                                                  "description",
                                                   // "id"
                                                 ].includes(nestedKey)
                                               ) // Filter for only firstName and lastName

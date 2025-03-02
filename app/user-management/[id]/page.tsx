@@ -14,9 +14,17 @@ import { useParams, useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import createAxiosInstance from "@/utils/api";
+import { useDataPermission } from "@/context";
 
 function UserManagement() {
   const axiosInstance = createAxiosInstance();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
   const params = useParams();
   const router = useRouter();
   const { id } = params;
@@ -53,6 +61,14 @@ function UserManagement() {
     setRole(response.data.data);
   };
 
+  const [users, setUsers] = useState<User[]>();
+  const getARoleUsers = async () => {
+    const response = await axiosInstance.get(
+      `/roles/${id}/users?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
+    );
+    setUsers(response.data.data);
+  };
+
   // Active row tracking
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const toggleActions = (rowId: string) => {
@@ -66,10 +82,16 @@ function UserManagement() {
   // Fetch roles and role data on centralState/centralStateDelete change
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([getRoles(), getARole()]);
+      await Promise.all([getRoles(), getARole(), getARoleUsers()]);
     };
     fetchData();
-  }, [centralState, centralStateDelete]);
+  }, [
+    centralState,
+    centralStateDelete,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+  ]);
 
   // Dynamic title logic
   const getTitle = () => {
@@ -200,7 +222,7 @@ function UserManagement() {
       </ModalCompoenent>
       <div className="relative bg-white rounded-2xl p-4 mt-4">
         <TableComponent
-          data={role?.users}
+          data={users}
           type="users"
           setModalState={setCentralState}
           setModalStateDelete={setCentralStateDelete}
@@ -208,6 +230,13 @@ function UserManagement() {
           activeRowId={activeRowId}
           setActiveRowId={setActiveRowId}
           deleteAction={setCentralStateDelete}
+          //new
+          currentPage={pagination.currentPage}
+          setCurrentPage={(page) =>
+            setPagination({ ...pagination, currentPage: page })
+          }
+          itemsPerPage={pagination.pageSize}
+          totalPages={pagination.totalPages}
         />
       </div>
     </DashboardLayout>

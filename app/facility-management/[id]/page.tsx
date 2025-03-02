@@ -12,9 +12,19 @@ import { useParams, useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import createAxiosInstance from "@/utils/api";
+import Payouts from "@/components/transaction/payout";
+import FundWallet from "@/components/transaction/fund-wallet";
+import { useDataPermission } from "@/context";
 
 function FacilityManagement() {
   const axiosInstance = createAxiosInstance();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
   const params = useParams();
   const router = useRouter();
   const { id } = params;
@@ -57,6 +67,14 @@ function FacilityManagement() {
     setAsset(response.data.data);
   };
 
+  const [facilities, setFacilities] = useState<Facility[]>();
+  const getAAssetFacilities = async () => {
+    const response = await axiosInstance.get(
+      `/assets/${id}/facilities?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
+    );
+    setFacilities(response.data.data);
+  };
+
   // Active row tracking
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const toggleActions = (rowId: string) => {
@@ -71,14 +89,25 @@ function FacilityManagement() {
   // Fetch roles and role data on centralState/centralStateDelete change
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([getAssets(), getAAsset(), getUsers()]);
+      await Promise.all([
+        getAssets(),
+        getAAsset(),
+        getAAssetFacilities(),
+        getUsers(),
+      ]);
     };
     fetchData();
   }, []);
 
   useEffect(() => {
     getAAsset();
-  }, [centralState, centralStateDelete]);
+  }, [
+    centralState,
+    centralStateDelete,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+  ]);
 
   // Dynamic title logic
   const getTitle = () => {
@@ -97,6 +126,10 @@ function FacilityManagement() {
         return "Facility Details";
       case "assignUserToFacility":
         return "Assign User";
+      case "fundWallet":
+        return "Fund Wallet";
+      case "payoutFacilities":
+        return "Transfer";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -135,6 +168,11 @@ function FacilityManagement() {
         return "";
       case "assignUserToFacility":
         return "Assign facility to users";
+      case "fundWallet":
+        return "";
+
+      case "payoutFacilities":
+        return "";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -244,13 +282,36 @@ function FacilityManagement() {
         }
       />
     ),
-    createBulkUser: <CreateBulkUser />,
+    createBulkFacility: (
+      <CreateBulkUser
+        type="Facilities"
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    fundWallet: (
+      <FundWallet
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        type={"Facilities"}
+      />
+    ),
+    payoutFacilities: (
+      <Payouts
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        type={"Facilities"}
+      />
+    ),
     assignUserToFacility: (
       <DynamicCreateForm
         inputs={[]}
         selects={[
           {
-            name: "userIds",
+            name: "facilityOfficers",
             label: "Facility Manager",
             placeholder: "Assign Facility to Users",
             options: users?.map((user: User) => ({
@@ -315,7 +376,7 @@ function FacilityManagement() {
       </ModalCompoenent>
       <div className="relative bg-white rounded-2xl p-4 mt-4">
         <TableComponent
-          data={asset?.facilities}
+          data={facilities}
           type="facilities"
           setModalState={setCentralState}
           setModalStateDelete={setCentralStateDelete}
@@ -323,6 +384,13 @@ function FacilityManagement() {
           activeRowId={activeRowId}
           setActiveRowId={setActiveRowId}
           deleteAction={setCentralStateDelete}
+          //new
+          currentPage={pagination.currentPage}
+          setCurrentPage={(page) =>
+            setPagination({ ...pagination, currentPage: page })
+          }
+          itemsPerPage={pagination.pageSize}
+          totalPages={pagination.totalPages}
         />
       </div>
     </DashboardLayout>

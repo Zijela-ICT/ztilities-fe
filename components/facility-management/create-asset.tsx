@@ -35,11 +35,15 @@ export default function CreateAsset({
       setFormData({
         assetName: data.assetName || "",
         description: data.description || "",
-        categoryId: data.category?.id || "",
-        subCategoryId: data.subCategoryId?.id || "",
+        categoryId: data.category?.id ? data.category.id.toString() : "",
+        subCategoryId: data.subCategory?.id
+          ? data.subCategory.id.toString()
+          : "",
       });
     }
   };
+
+  console.log(formData, categoryOptions);
 
   const fetchCategories = async () => {
     const response = await axiosInstance.get("/assets/category/all");
@@ -146,25 +150,23 @@ export default function CreateAsset({
           />
         </div>
 
-        {!activeRowId && (
-          <div className="relative w-full mt-6">
-            <Select
-              options={categoryOptions}
-              value={categoryOptions.find(
-                (option) => option.value === formData.categoryId
-              )}
-              onChange={handleSelectChange("categoryId")}
-              styles={multiSelectStyle}
-              placeholder="Select Category"
-            />
-          </div>
-        )}
+        <div className="relative w-full mt-6">
+          <Select
+            options={categoryOptions}
+            value={categoryOptions?.find(
+              (option) => option.value === formData.categoryId
+            )}
+            onChange={handleSelectChange("categoryId")}
+            styles={multiSelectStyle}
+            placeholder="Select Category"
+          />
+        </div>
 
         {formData.categoryId && (
           <div className="relative w-full mt-6">
             <Select
               options={subCategoryIdOptions}
-              value={subCategoryIdOptions.find(
+              value={subCategoryIdOptions?.find(
                 (option) => option.value === formData.subCategoryId
               )}
               onChange={handleSelectChange("subCategoryId")}

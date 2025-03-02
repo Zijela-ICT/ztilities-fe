@@ -1,199 +1,199 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import createAxiosInstance from "@/utils/api";
+import Pagination from "@/components/pagination-table";
+import moment from "moment";
+import { useDataPermission } from "@/context";
+import ModalCompoenent from "@/components/modal-component";
 
 interface Notification {
   id: number;
-  title: string;
-  time: string;
-  read: boolean;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  isRead: boolean;
 }
 
 function NotificationPage() {
   const axiosInstance = createAxiosInstance();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+  } = useDataPermission();
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notification, setANotification] = useState<Notification>();
+  const [activeRowId, setActiveRowId] = useState<number | null>(null);
+  const [centralState, setCentralState] = useState<string>();
+
+  const [notificationFilter, setNotificationFilter] = useState("all");
 
   useEffect(() => {
-    const dummyNotifications: Notification[] = [
-      {
-        id: 1,
-        title: "Your order has been shipped",
-        time: "Feb 27, 2025 10:00 AM",
-        read: false,
-      },
-      {
-        id: 2,
-        title: "Password successfully changed",
-        time: "Feb 27, 2025 11:00 AM",
-        read: false,
-      },
-      {
-        id: 3,
-        title: "New login from Chrome",
-        time: "Feb 27, 2025 02:00 PM",
-        read: false,
-      },
-      {
-        id: 4,
-        title: "Subscription expiring soon",
-        time: "Feb 26, 2025 06:00 PM",
-        read: false,
-      },
-      {
-        id: 5,
-        title: "Message from support",
-        time: "Feb 26, 2025 11:00 AM",
-        read: false,
-      },
-      {
-        id: 6,
-        title: "Weekly newsletter",
-        time: "Feb 25, 2025 09:00 AM",
-        read: false,
-      },
-      {
-        id: 7,
-        title: "Discount offer available",
-        time: "Feb 25, 2025 12:00 PM",
-        read: false,
-      },
-      {
-        id: 8,
-        title: "Update your profile",
-        time: "Feb 24, 2025 03:00 PM",
-        read: false,
-      },
-      {
-        id: 9,
-        title: "Security alert",
-        time: "Feb 24, 2025 05:00 PM",
-        read: false,
-      },
-      {
-        id: 10,
-        title: "New comment on your post",
-        time: "Feb 23, 2025 08:00 AM",
-        read: false,
-      },
-      {
-        id: 11,
-        title: "Your subscription renewed",
-        time: "Feb 23, 2025 10:00 AM",
-        read: false,
-      },
-      {
-        id: 12,
-        title: "Event reminder",
-        time: "Feb 22, 2025 02:00 PM",
-        read: false,
-      },
-      {
-        id: 13,
-        title: "Friend request accepted",
-        time: "Feb 22, 2025 04:00 PM",
-        read: false,
-      },
-      {
-        id: 14,
-        title: "Password reset request",
-        time: "Feb 21, 2025 09:30 AM",
-        read: false,
-      },
-      {
-        id: 15,
-        title: "New feature available",
-        time: "Feb 21, 2025 11:00 AM",
-        read: false,
-      },
-      {
-        id: 16,
-        title: "Account activity report",
-        time: "Feb 20, 2025 01:00 PM",
-        read: false,
-      },
-      {
-        id: 17,
-        title: "Feedback request",
-        time: "Feb 20, 2025 03:00 PM",
-        read: false,
-      },
-      {
-        id: 18,
-        title: "Security update",
-        time: "Feb 19, 2025 10:00 AM",
-        read: false,
-      },
-      {
-        id: 19,
-        title: "Maintenance notice",
-        time: "Feb 19, 2025 12:00 PM",
-        read: false,
-      },
-      {
-        id: 20,
-        title: "Survey invitation",
-        time: "Feb 18, 2025 04:00 PM",
-        read: false,
-      },
-    ];
-    setNotifications(dummyNotifications);
+    setPagination({
+      ...pagination,
+      currentPage: 1,
+      pageSize: 10,
+      total: 0,
+      totalPages: 0,
+    });
   }, []);
 
-  // Group notifications by day 
-  const groupedNotifications = notifications.reduce(
-    (acc: Record<string, Notification[]>, notification) => {
-      const dateKey = new Date(notification.time).toLocaleDateString();
-      if (!acc[dateKey]) {
-        acc[dateKey] = [];
-      }
-      acc[dateKey].push(notification);
-      return acc;
-    },
-    {}
-  );
-
-  // Mark a notification as read when hovered.
-  const markNotificationAsRead = (id: number) => {
-    setNotifications((prev) =>
-      prev.map((notification) =>
-        notification.id === id ? { ...notification, read: true } : notification
-      )
+  const getNotifications = async () => {
+    const endpoint = notificationFilter === "unread" ? "all/unread" : "all";
+    const response = await axiosInstance.get(
+      `/notifications/my-notifications/${endpoint}?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
+    setNotifications(response.data || []);
+    const extra = response.data.extra;
+    if (extra) {
+      setPagination({
+        currentPage: extra.page,
+        pageSize: extra.pageSize,
+        total: extra.total,
+        totalPages: extra.totalPages,
+      });
+    }
   };
 
-  // Sort dates,  so that eh, the latest day appears first.
-  const sortedDates = Object.keys(groupedNotifications).sort(
-    (a, b) => new Date(b).getTime() - new Date(a).getTime()
+  const getANotif = async () => {
+    const response = await axiosInstance.get(`/notifications/${activeRowId}`);
+    setANotification(response.data || {});
+  };
+
+  useEffect(() => {
+    getNotifications();
+  }, [
+    centralState,
+    pagination.currentPage,
+    searchQuery,
+    filterQuery,
+    notificationFilter,
+  ]);
+
+  useEffect(() => {
+    if (centralState === "viewNotif") {
+      getANotif();
+    }
+  }, [centralState]);
+
+  const handleNext = () => {
+    if (pagination.currentPage < pagination.totalPages) {
+      setPagination({ ...pagination, currentPage: pagination.currentPage + 1 });
+    }
+  };
+
+  const handlePrevious = () => {
+    if (pagination.currentPage > 1) {
+      setPagination({ ...pagination, currentPage: pagination.currentPage - 1 });
+    }
+  };
+
+  const handlePageClick = (page: number) => {
+    setPagination({ ...pagination, currentPage: page });
+  };
+
+  const groupedNotifications =
+    notifications.length > 0
+      ? notifications.reduce<Record<string, Notification[]>>(
+          (acc, notification) => {
+            const dateKey = moment(notification.createdAt).format(
+              "Do MMM YYYY"
+            );
+            if (!acc[dateKey]) {
+              acc[dateKey] = [];
+            }
+            acc[dateKey].push(notification);
+            return acc;
+          },
+          {}
+        )
+      : {};
+
+  const sortedDates = Object.keys(groupedNotifications || {}).sort(
+    (a, b) =>
+      moment(b, "Do MMM YYYY").valueOf() - moment(a, "Do MMM YYYY").valueOf()
   );
+
+  const componentMap: Record<string, JSX.Element> = {
+    viewNotif: (
+      <div className="bg-white rounded-lg p-2 pb-8 transition m-4">
+        <div className="flex justify-between items-center">
+          <div className="text-lg font-semibold text-gray-800">
+            {notification?.content}
+          </div>
+        </div>
+        <div className="mt-2 text-sm text-green-700">
+          <span className="font-medium">Read at: </span>
+          {notification
+            ? moment.utc(notification.updatedAt).format("llll")
+            : ""}
+        </div>
+      </div>
+    ),
+  };
 
   return (
     <DashboardLayout title="Notifications" detail="All Notifications">
+      <ModalCompoenent
+        title={"Notification"}
+        detail={"Read Notification"}
+        modalState={centralState}
+        setModalState={() => {
+          setCentralState("");
+          setActiveRowId(null);
+        }}
+      >
+        {componentMap[centralState]}
+      </ModalCompoenent>
       <div className="relative bg-white rounded-2xl p-8">
+        <div className="mb-4">
+          <label htmlFor="notificationFilter" className="mr-2">
+            Show:
+          </label>
+          <select
+            id="notificationFilter"
+            value={notificationFilter}
+            onChange={(e) => {
+              setNotificationFilter(e.target.value);
+              // Reset to page 1 when filter changes
+              setPagination({ ...pagination, currentPage: 1 });
+            }}
+            className="border rounded p-1"
+          >
+            <option value="all">All</option>
+            <option value="unread">Unread</option>
+          </select>
+        </div>
         {sortedDates.length > 0 ? (
           sortedDates.map((date) => (
-            <div key={date} className="mb-6">
+            <div key={date} className="mb-6 mt-8">
               <h3 className="text-md font-semibold mb-2">{date}</h3>
               <ul>
-                {groupedNotifications[date].map((notification) => (
+                {groupedNotifications[date]?.map((notification) => (
                   <li
                     key={notification.id}
-                    className="flex items-center border-b py-2"
-                    onMouseEnter={() => markNotificationAsRead(notification.id)}
+                    className="flex items-center border-b py-2 cursor-pointer"
+                    onClick={() => {
+                      setCentralState("viewNotif");
+                      setActiveRowId(notification.id);
+                    }}
                   >
                     <span
                       className={`w-2 h-2 rounded-full mr-2 transition-colors duration-300 ${
-                        notification.read ? "bg-green-500" : "bg-blue-500"
+                        notification.isRead ? "bg-green-500" : "bg-blue-500"
                       }`}
                     ></span>
                     <div>
                       <div className="text-sm font-medium">
-                        {notification.title}
+                        {notification.content}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {notification.time}
+                        {moment.utc(notification.createdAt).format("ll")}
                       </div>
                     </div>
                   </li>
@@ -202,8 +202,17 @@ function NotificationPage() {
             </div>
           ))
         ) : (
-          <p className="text-sm text-gray-500">No notifications</p>
+          <p className="text-sm text-gray-500 m-8">No notifications</p>
         )}
+
+        {/* Pagination Controls */}
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          handlePrevious={handlePrevious}
+          handleNext={handleNext}
+          handlePageClick={handlePageClick}
+        />
       </div>
     </DashboardLayout>
   );

@@ -128,12 +128,17 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    getPurchaseOrders();
-    getOverdueWorkOrders();
-    getPendingWorkOrders();
-    getOverdueWorkRequests();
-    getPendingWorkRequests();
-    getInitiatedWorkRequests();
+    const fetchData = async () => {
+      await Promise.all([
+        getPurchaseOrders(),
+        getOverdueWorkOrders(),
+        getPendingWorkOrders(),
+        getOverdueWorkRequests(),
+        getPendingWorkRequests(),
+        getInitiatedWorkRequests(),
+      ]);
+    };
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -293,7 +298,18 @@ function Dashboard() {
                                 </option>
                               ))}
                             </select>
-                            <p className="text-xl font-bold text-[#A8353A] mb-3">
+                            {/* <p
+                              title={
+                                showBalance
+                                  ? `₦${formatCurrency(
+                                      user.wallets.find(
+                                        (wallet) => wallet.id === selectedWallet
+                                      )?.balance || 0
+                                    )}`
+                                  : "****"
+                              }
+                              className="text-xl font-bold text-[#A8353A] mb-3 overflow-hidden text-ellipsis whitespace-nowrap max-w-[160px]"
+                            >
                               {showBalance ? (
                                 <>
                                   ₦
@@ -306,7 +322,36 @@ function Dashboard() {
                               ) : (
                                 "****"
                               )}
-                            </p>
+                            </p> */}
+                            <div className="relative group">
+                              <p className="text-xl font-bold text-[#A8353A] mb-3 overflow-hidden text-ellipsis whitespace-nowrap max-w-[160px]">
+                                {showBalance ? (
+                                  <>
+                                    ₦
+                                    {formatCurrency(
+                                      user.wallets.find(
+                                        (wallet) => wallet.id === selectedWallet
+                                      )?.balance || 0
+                                    )}
+                                  </>
+                                ) : (
+                                  "****"
+                                )}
+                              </p>
+
+                              {/* Tooltip */}
+                              {showBalance && (
+                                <span className="absolute left-1/2 -translate-x-1/2 -top-10 bg-[#A8353A] text-white text-lg font-semibold px-3 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                                  ₦
+                                  {formatCurrency(
+                                    user.wallets.find(
+                                      (wallet) => wallet.id === selectedWallet
+                                    )?.balance || 0
+                                  )}
+                                </span>
+                              )}
+                            </div>
+
                             <div className="flex items-center gap-2 h-6"></div>
                           </div>
                         ) : item.title !== "Wallet Balance" ? (

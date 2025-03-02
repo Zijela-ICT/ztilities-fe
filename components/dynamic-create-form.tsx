@@ -76,7 +76,9 @@ export default function DynamicCreateForm({
     };
 
   // const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File | null }>({});
+  const [uploadedFiles, setUploadedFiles] = useState<{
+    [key: string]: File | null;
+  }>({});
   // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   const { name, files } = e.target;
 
@@ -115,7 +117,6 @@ export default function DynamicCreateForm({
           //   preview: reader.result as string,
           // },
           [name]: reader.result as string,
-          
         }));
       };
       reader.readAsDataURL(file);
@@ -181,18 +182,24 @@ export default function DynamicCreateForm({
           "Block",
           "Work Request",
           "Work request overdue limit",
-          "Work order overdue limit"
+          "Work order overdue limit",
         ].includes(title)
       ) {
         if (activeRowId) {
-          await axiosInstance.patch(
-            `${apiEndpoint}/${activeRowId}`,
-            updatedFormData
-          );
+          if (
+            title === "Work request overdue limit" ||
+            "Work order overdue limit"
+          ) {
+            await axiosInstance.post(apiEndpoint, updatedFormData);
+          } else {
+            await axiosInstance.patch(
+              `${apiEndpoint}/${activeRowId}`,
+              updatedFormData
+            );
+          }
         } else {
           await axiosInstance.post(apiEndpoint, updatedFormData);
         }
-        
       } else {
         await axiosInstance.patch(apiEndpoint, updatedFormData);
       }
@@ -226,8 +233,7 @@ export default function DynamicCreateForm({
   };
 
   useEffect(() => {
-    //activeRowId &&
-    if (fetchResource) {
+    if (activeRowId && fetchResource) {
       fetchResource(activeRowId).then((data) => {
         // Dynamically process multi-select fields based on the 'selects' configuration
         const dynamicProcessedData = { ...data };

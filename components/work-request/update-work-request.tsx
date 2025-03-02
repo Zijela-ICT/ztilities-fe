@@ -55,53 +55,44 @@ export default function UpdateWorkRequest({
         ? `/work-requests/${activeRowId}/status/reject`
         : `/work-requests/${activeRowId}/status/accept`;
 
-    try {
-      if (formData.status === "closed") {
-        const formDataPayload = new FormData();
-        formDataPayload.append("comment", formData.comment);
-        if (uploadedFile) {
-          formDataPayload.append("file", uploadedFile);
-        }
-
-        await axiosInstance.patch(endpoint, formDataPayload, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-      } else if (formData.status === "rejected") {
-        await axiosInstance.patch(endpoint, {
-          reasonForRejection: formData.reasonForRejection,
-        });
-      } else {
-        await axiosInstance.patch(endpoint);
+    if (formData.status === "closed") {
+      const formDataPayload = new FormData();
+      formDataPayload.append("comment", formData.comment);
+      if (uploadedFile) {
+        formDataPayload.append("file", uploadedFile);
       }
 
-      setFormData({
-        status: "",
-        reasonForRejection: "",
-        comment: "",
+      await axiosInstance.patch(endpoint, formDataPayload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-
-      setModalState("");
-      setSuccessState({
-        title: "Successful",
-        detail: `You have successfully ${
-          formData.status === "closed"
-            ? "closed"
-            : formData.status === "rejected"
-            ? "rejected"
-            : "accepted"
-        } this Work Request`,
-        status: true,
+    } else if (formData.status === "rejected") {
+      await axiosInstance.patch(endpoint, {
+        reasonForRejection: formData.reasonForRejection,
       });
-    } catch (error) {
-      console.error("Error updating work request:", error);
-      setSuccessState({
-        title: "Error",
-        detail: "Failed to update the Work Request. Please try again.",
-        status: false,
-      });
+    } else {
+      await axiosInstance.patch(endpoint);
     }
+
+    setFormData({
+      status: "",
+      reasonForRejection: "",
+      comment: "",
+    });
+
+    setModalState("");
+    setSuccessState({
+      title: "Successful",
+      detail: `You have successfully ${
+        formData.status === "closed"
+          ? "closed"
+          : formData.status === "rejected"
+          ? "rejected"
+          : "accepted"
+      } this Work Request`,
+      status: true,
+    });
   };
 
   return (
@@ -164,7 +155,7 @@ export default function UpdateWorkRequest({
               ? "Close Work Request"
               : formData.status === "accepted"
               ? "Accept Work Request"
-              : "Reject Work Request"}
+              : "Update Work Request"}
           </button>
         </div>
       </form>

@@ -551,7 +551,7 @@ function Transactions() {
                         </div>
                       </div>
                       {/* Price or additional information */}
-                      <span className="text-gray-600 font-medium">
+                      <span className="text-gray-600 font-medium whitespace-nowrap">
                         ₦ {formatCurrency(log.amount)}
                       </span>
                     </li>

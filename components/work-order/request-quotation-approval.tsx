@@ -83,7 +83,7 @@ export default function RequestQuotationApproval({
     setModalState("");
     setSuccessState({
       title: "Successful",
-      detail: `You have successfully requested for quotation apprval`,
+      detail: `You have successfully requested for quotation approval`,
       status: true,
     });
   };

@@ -37,6 +37,8 @@ const Actions: React.FC<UserActionsProps> = ({
                 "delete_users:id",
                 "update_users:id",
                 "update_users:reset-password/admin",
+                "update_users:id/beneficiaries",
+                "delete_users:id/beneficiaries",
               ]}
             >
               <button
@@ -689,6 +691,56 @@ const Actions: React.FC<UserActionsProps> = ({
                       text="Delete"
                       onClick={() => setModalStateDelete("deletePowerCharge")}
                       permissions={["delete_power-charges:id"]}
+                    />
+                  </li>
+                </ul>
+              </ActionDropdownComponent>
+            )}
+          </div>
+        </>
+      ) : type === "approvefunding" ? (
+        <>
+          <div className="relative">
+            {/* Button */}
+            <PermissionGuard requiredPermissions={[]}>
+              <button
+                onClick={() => toggleActions(row.id)}
+                className="text-blue-500 hover:text-blue-700"
+              >
+                <TripleDotsIcon />
+              </button>
+            </PermissionGuard>
+
+            {/* Dropdown Menu */}
+            {activeRowId === row.id && (
+              <ActionDropdownComponent
+                toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
+              >
+                <ul className="py-2">
+                  <li>
+                    <DropdownButtonComponent
+                      text="View"
+                      onClick={() =>
+                        router.push(`/transaction/approve-funding/${row.id}`)
+                      }
+                      permissions={[]}
+                    />
+                  </li>
+
+                  <li>
+                    <DropdownButtonComponent
+                      text="Approve"
+                      onClick={() => setModalStateDelete("approveFunding")}
+                      permissions={[]}
+                    />
+                  </li>
+                  <li>
+                    <DropdownButtonComponent
+                      text="Reject"
+                      onClick={() => setModalStateDelete("rejectFunding")}
+                      permissions={[]}
                     />
                   </li>
                 </ul>

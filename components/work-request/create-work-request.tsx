@@ -173,7 +173,7 @@ export default function CreateWorkRequest({
     const payload = {
       ...formData,
       file: file,
-      category: formData.category as string,
+      category: formData.category.toString(),
     };
     if (activeRowId) {
       await axiosInstance.patch(`/work-requests/${activeRowId}`, payload);

@@ -44,7 +44,7 @@ function WorkOrders({ nowrap }: Props) {
     status: false,
   });
 
-  const [users, setUsers] = useState<User[]>();
+
   const [assignedworkOrders, setAssignedWorkOrders] = useState<any[]>();
   const [workOrders, setWorkOrders] = useState<any[]>();
   const [workOrder, setWorkOrder] = useState<any>();
@@ -55,11 +55,6 @@ function WorkOrders({ nowrap }: Props) {
   const [technician, setTechnicians] = useState<Technician[]>();
 
   // Fetch data functions
-  const getUsers = async () => {
-    const response = await axiosInstance.get("/users");
-    setUsers(response.data.data);
-  };
-
   const getWorkOrders = async () => {
     const response = await axiosInstance.get(
       `/work-orders/work-order/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -554,7 +549,6 @@ function WorkOrders({ nowrap }: Props) {
     } else {
       getAssignedWorkOrders();
     }
-    getUsers();
   }, [
     centralState,
     centralStateDelete,

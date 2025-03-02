@@ -316,7 +316,7 @@ function Transactions() {
         >
           <div className="relative bg-white rounded-2xl p-4 mb-4">
             <div className="flex justify-end items-center space-x-4 pb-2">
-              {user.wallets.length > 1 && (
+              {user.wallets.length > 0 && (
                 <PermissionGuard
                   requiredPermissions={[
                     "read_transactions:my-transactions/all",
