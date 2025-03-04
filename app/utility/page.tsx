@@ -48,7 +48,6 @@ function UtilityManagement() {
   const [utility, setAUtility] = useState<any>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
-
   const getElectricity = async () => {
     const response = await axiosInstance.get(`/electricity/providers`);
     setElectricity(response.data.data);
@@ -78,9 +77,8 @@ function UtilityManagement() {
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-
         setBeneficiaryState={setBeneficiaryState}
-        beneficiaryObj = {beneficiaryObj}
+        beneficiaryObj={beneficiaryObj}
       />
     ),
     tvFlow: (
@@ -90,9 +88,8 @@ function UtilityManagement() {
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-
         setBeneficiaryState={setBeneficiaryState}
-        beneficiaryObj = {beneficiaryObj}
+        beneficiaryObj={beneficiaryObj}
       />
     ),
     airtimeFlow: (
@@ -102,9 +99,8 @@ function UtilityManagement() {
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-
         setBeneficiaryState={setBeneficiaryState}
-        beneficiaryObj = {beneficiaryObj}
+        beneficiaryObj={beneficiaryObj}
       />
     ),
     internetFlow: (
@@ -114,9 +110,8 @@ function UtilityManagement() {
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-
         setBeneficiaryState={setBeneficiaryState}
-        beneficiaryObj = {beneficiaryObj}
+        beneficiaryObj={beneficiaryObj}
       />
     ),
     ben: (
@@ -126,15 +121,14 @@ function UtilityManagement() {
         tv={tvSubscription}
         internet={internet}
         utility={utility}
-
-        setABeneficiary={(obj)=> {
-          setABeneficiary(obj)
-          setBeneficiaryState("")
-        } }
-
+        setABeneficiary={(obj) => {
+          setABeneficiary(obj);
+          setBeneficiaryState("");
+        }}
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
+        setBeneficiaryState={setBeneficiaryState}
       />
     ),
   };
@@ -163,6 +157,19 @@ function UtilityManagement() {
   };
 
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([
+        getElectricity(),
+        getAirtime(),
+        getInternet(),
+        getTvSubscription(),
+      ]);
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -216,7 +223,7 @@ function UtilityManagement() {
         modalState={centralState}
         setModalState={() => {
           setCentralState("");
-          setABeneficiary("")
+          setABeneficiary("");
           setActiveRowId(null);
         }}
       >
@@ -226,6 +233,7 @@ function UtilityManagement() {
       <ModalCompoenent
         title={"Beneficiaries"}
         detail={""}
+        className="top-0 right-0"
         modalState={beneficiaryState}
         setModalState={() => {
           setBeneficiaryState("");

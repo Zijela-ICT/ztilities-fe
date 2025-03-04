@@ -17,6 +17,7 @@ export default function Beneficiaries({
   setModalState,
   activeRowId,
   setSuccessState,
+  setBeneficiaryState,
 }) {
   const axiosInstance = createAxiosInstance();
   const { user } = useDataPermission();
@@ -48,7 +49,7 @@ export default function Beneficiaries({
     const { utility, ...payload } = data;
     console.log(payload);
     await axiosInstance.post(
-      `/users/${user.id}/beneficiaries?type=airtime`,
+      `/users/${user.id}/beneficiaries?type=${activeTab}`,
       payload
     );
     setSuccessState({
@@ -57,6 +58,7 @@ export default function Beneficiaries({
       status: true,
     });
     setModalState("");
+    setBeneficiaryState("");
   };
 
   const utilityOptions = [
@@ -109,18 +111,19 @@ export default function Beneficiaries({
     const response = await axiosInstance.get(
       `/users/${user.id}/beneficiaries?type=${tab}`
     );
-    setBeneficiaries([
-      {
-        telco: "MTN",
-        number: "08012345678",
-      },
-    ]);
-    // setBeneficiaries(response.data.data);
+    // setBeneficiaries([
+    //   {
+    //     telco: "MTN",
+    //     number: "08012345678",
+    //   },
+    // ]);
+    setBeneficiaries(response.data.data);
   };
   useEffect(() => {
     getUtilityBeneficiaries(activeTab);
   }, [activeTab]);
 
+  console.log(utility, beneficiaries);
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       {!showForm ? (
@@ -139,7 +142,7 @@ export default function Beneficiaries({
                   onClick={() => setActiveTab(tab.key)}
                   className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-none ${
                     activeTab === tab.key
-                      ? "border-blue-500 text-blue-600"
+                      ? "border-[#A8353A] text-[#A8353A]"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                   }`}
                 >
@@ -152,23 +155,27 @@ export default function Beneficiaries({
           {/* Beneficiaries List */}
           <div className="space-y-4">
             {beneficiaries.length > 0 ? (
-              beneficiaries.map((beneficiary, index) => (
-                <div
-                  key={index}
-                  onClick={() => setABeneficiary(beneficiary)}
-                  className="bg-white cursor-pointer shadow rounded-lg p-4 flex justify-between items-center border border-gray-200"
-                >
-                  <div>
-                    <p className="text-lg font-semibold text-gray-800">
-                      {beneficiary.telco}
-                    </p>
-                    <p className="text-gray-600">{beneficiary.number}</p>
+              beneficiaries.map((beneficiary, index) => {
+                const isClickable = true
+
+                return (
+                  <div
+                    key={index}
+                    onClick={() => isClickable && setABeneficiary(beneficiary)}
+                    className={`bg-white shadow rounded-lg p-4 flex justify-between items-center border border-gray-200 
+            ${isClickable ? "cursor-pointer" : "cursor-not-allowed"}`}
+                  >
+                    <div>
+                      <p className="text-sm text-gray-800">
+                        {beneficiary.telco}
+                      </p>
+                      <p className="text-gray-600 text-xs">
+                        {beneficiary.number}
+                      </p>
+                    </div>
                   </div>
-                  {/* <div onClick={()=> deleteBeneficiary(beneficiary.telco) } >
-                    <TrashIcon />
-                  </div> */}
-                </div>
-              ))
+                );
+              })
             ) : (
               <p className="text-gray-500">No beneficiaries found.</p>
             )}

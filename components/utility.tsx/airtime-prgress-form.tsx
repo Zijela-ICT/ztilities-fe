@@ -131,7 +131,7 @@ export default function AirtimeFlow({
             className="text-[#A8353A] my-3 cursor-pointer"
             onClick={() => setBeneficiaryState("ben")}
           >
-            Choose Beneficiaries
+            Choose Beneficiaries for airtime
           </p>
         </div>
 
