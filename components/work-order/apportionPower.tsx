@@ -256,7 +256,7 @@ export default function ApportionPower({
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
-        <div className="relative w-full mt-6">
+
           <LabelInputComponent
             type="number"
             name="amount"
@@ -265,7 +265,7 @@ export default function ApportionPower({
             label="Amount"
             required
           />
-        </div>
+       
         <div className="relative w-full mt-6">
           <Select
             options={entityOptions}

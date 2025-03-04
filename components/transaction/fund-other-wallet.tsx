@@ -130,48 +130,43 @@ export default function FundOtherWallet({
           className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
         >
           {/* Wallet Account Number Input */}
-          <div className="relative w-full mt-6">
-            <LabelInputComponent
-              type="text"
-              name="walletId"
-              value={formData.walletId}
-              onChange={handleAccountNumberChange}
-              label="Wallet Account Number"
-              required
-            />
-          </div>
+
+          <LabelInputComponent
+            type="text"
+            name="walletId"
+            value={formData.walletId}
+            onChange={handleAccountNumberChange}
+            label="Wallet Account Number"
+            required
+          />
 
           {/* Display Wallet Details (if found) */}
           {walletDetails && (
-            <div className="relative w-full mt-6">
-              <LabelInputComponent
-                type="text"
-                name="walletInfo"
-                value={`${
-                  walletDetails?.user
-                    ? walletDetails.user.firstName + walletDetails.user.lastName
-                    : walletDetails?.unit
-                    ? walletDetails.unit.unitNumber
-                    : walletDetails?.facility
-                    ? walletDetails.facility.facilityName
-                    : ""
-                } (${walletDetails?.walletType || ""})`}
-                label="Wallet Info"
-                readOnly
-              />
-            </div>
-          )}
-
-          <div className="relative w-full mt-6">
             <LabelInputComponent
               type="text"
-              name="amount"
-              value={formData.amount}
-              onChange={handleChange}
-              label="Amount"
-              required
+              name="walletInfo"
+              value={`${
+                walletDetails?.user
+                  ? walletDetails.user.firstName + walletDetails.user.lastName
+                  : walletDetails?.unit
+                  ? walletDetails.unit.unitNumber
+                  : walletDetails?.facility
+                  ? walletDetails.facility.facilityName
+                  : ""
+              } (${walletDetails?.walletType || ""})`}
+              label="Wallet Info"
+              readOnly
             />
-          </div>
+          )}
+
+          <LabelInputComponent
+            type="text"
+            name="amount"
+            value={formData.amount}
+            onChange={handleChange}
+            label="Amount"
+            required
+          />
 
           <div className="relative w-full mt-6">
             <Select

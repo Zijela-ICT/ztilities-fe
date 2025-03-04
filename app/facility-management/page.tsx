@@ -285,6 +285,8 @@ function FacilityManagement() {
         return "Assign User";
       case "assignUserToBlock":
         return "Assign User";
+        case "assignUserToUnit":
+          return "Assign User";
       case "fundWallet":
         return "Fund Wallet";
       case "payoutUnits":
@@ -353,6 +355,8 @@ function FacilityManagement() {
         return "Assign facility to users";
       case "assignUserToBlock":
         return "Assign User to a block";
+        case "assignUserToUnit":
+          return "Assign User to a unit";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -788,6 +792,31 @@ function FacilityManagement() {
         setSuccessState={setSuccessState}
         fetchResource={(id) =>
           axiosInstance.get(`/blocks/${id}`).then((res) => res.data.data)
+        }
+      />
+    ),
+    assignUserToUnit: (
+      <DynamicCreateForm
+        inputs={[]}
+        selects={[
+          {
+            name: "unitOfficers",
+            label: "Unit Manager",
+            placeholder: "Assign Unit to a User",
+            options: users?.map((user: User) => ({
+              value: user.id,
+              label: `${user.firstName} ${user.lastName}`,
+            })),
+            isMulti: true,
+          },
+        ]}
+        title="Assign Unit"
+        apiEndpoint={`/units/${activeRowId}/assign/officers`}
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/units/${id}`).then((res) => res.data.data)
         }
       />
     ),

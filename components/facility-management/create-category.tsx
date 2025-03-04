@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
 import { LabelInputComponent } from "../input-container";
-import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import createAxiosInstance from "@/utils/api";
 
@@ -111,42 +110,37 @@ export default function CreateCategory({
       >
         {!activeRowId && (
           <>
-            <div className="relative w-full mt-6">
-              <LabelInputComponent
-                type="text"
-                name="categoryName"
-                value={formData.categoryName}
-                onChange={handleChange}
-                label="Category Name"
-                readOnly={!!activeRowId} // Read-only when activeRowId exists
-              />
-            </div>
+            <LabelInputComponent
+              type="text"
+              name="categoryName"
+              value={formData.categoryName}
+              onChange={handleChange}
+              label="Category Name"
+              readOnly={!!activeRowId} // Read-only when activeRowId exists
+            />
 
-            <div className="relative w-full mt-6">
-              <LabelInputComponent
-                type="text"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                label="Description (Optional)"
-                readOnly={!!activeRowId} // Read-only when activeRowId exists
-              />
-            </div>
+            <LabelInputComponent
+              type="text"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              label="Description (Optional)"
+              readOnly={!!activeRowId} // Read-only when activeRowId exists
+            />
           </>
         )}
 
         {activeRowId && (
           <>
             <h1 className="text-base text-black mt-4"> Add Sub Category </h1>
-            <div className="relative w-full mt-2">
-              <LabelInputComponent
-                type="text"
-                name="subcategoryName"
-                value={formData.subcategoryName}
-                onChange={handleChange}
-                label="Subcategory Name"
-              />
-            </div>
+
+            <LabelInputComponent
+              type="text"
+              name="subcategoryName"
+              value={formData.subcategoryName}
+              onChange={handleChange}
+              label="Subcategory Name"
+            />
 
             {/* <div className="relative w-full mt-6">
               <LabelInputComponent

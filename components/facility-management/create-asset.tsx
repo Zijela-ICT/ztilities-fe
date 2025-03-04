@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
 import { LabelInputComponent } from "../input-container";
-import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import createAxiosInstance from "@/utils/api";
 
@@ -42,8 +41,6 @@ export default function CreateAsset({
       });
     }
   };
-
-  console.log(formData, categoryOptions);
 
   const fetchCategories = async () => {
     const response = await axiosInstance.get("/assets/category/all");
@@ -130,37 +127,31 @@ export default function CreateAsset({
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="assetName"
-            value={formData.assetName}
-            onChange={handleChange}
-            label="Asset Name"
-          />
-        </div>
+        <LabelInputComponent
+          type="text"
+          name="assetName"
+          value={formData.assetName}
+          onChange={handleChange}
+          label="Asset Name"
+        />
 
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            label="Description"
-          />
-        </div>
+        <LabelInputComponent
+          type="text"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          label="Description"
+        />
 
-        <div className="relative w-full mt-6">
-          <Select
-            options={categoryOptions}
-            value={categoryOptions?.find(
-              (option) => option.value === formData.categoryId
-            )}
-            onChange={handleSelectChange("categoryId")}
-            styles={multiSelectStyle}
-            placeholder="Select Category"
-          />
-        </div>
+        <Select
+          options={categoryOptions}
+          value={categoryOptions?.find(
+            (option) => option.value === formData.categoryId
+          )}
+          onChange={handleSelectChange("categoryId")}
+          styles={multiSelectStyle}
+          placeholder="Select Category"
+        />
 
         {formData.categoryId && (
           <div className="relative w-full mt-6">

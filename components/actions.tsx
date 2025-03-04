@@ -277,6 +277,7 @@ const Actions: React.FC<UserActionsProps> = ({
                 "delete_blocks:id",
                 "update_blocks:id",
                 "read_blocks:id",
+                "update_blocks:id/assign"
               ]}
             >
               <button
@@ -318,7 +319,7 @@ const Actions: React.FC<UserActionsProps> = ({
                     <DropdownButtonComponent
                       text="Assign Users"
                       onClick={() => setModalState("assignUserToBlock")}
-                      permissions={["update_blocks:id"]}
+                      permissions={["update_blocks:id/assign"]}
                     />
                   </li>
                   <li>
@@ -350,6 +351,7 @@ const Actions: React.FC<UserActionsProps> = ({
                 "delete_units:id",
                 "update_units:id",
                 "read_units:id",
+                "update_units:id/assign/officers"
               ]}
             >
               <button
@@ -385,6 +387,13 @@ const Actions: React.FC<UserActionsProps> = ({
                       text="Edit"
                       onClick={() => setModalState("createUnit")}
                       permissions={["update_units:id"]}
+                    />
+                  </li>
+                  <li>
+                    <DropdownButtonComponent
+                      text="Assign Users"
+                      onClick={() => setModalState("assignUserToUnit")}
+                      permissions={["update_units:id/assign/officers"]}
                     />
                   </li>
                   <li>

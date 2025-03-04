@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
 import { LabelInputComponent } from "../input-container";
-import axiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import createAxiosInstance from "@/utils/api";
@@ -220,25 +219,22 @@ export default function CreateWorkRequestForUser({
             placeholder="Select a user"
           />
         </div>
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            label="Title"
-          />
-        </div>
 
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            label="Description"
-          />
-        </div>
+        <LabelInputComponent
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          label="Title"
+        />
+
+        <LabelInputComponent
+          type="text"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          label="Description"
+        />
 
         {/* Only show the rest of the form if there is no activeRowId */}
         {!activeRowId && (

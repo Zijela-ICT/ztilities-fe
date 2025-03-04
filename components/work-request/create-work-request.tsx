@@ -286,25 +286,21 @@ export default function CreateWorkRequest({
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            label="Title"
-          />
-        </div>
+        <LabelInputComponent
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          label="Title"
+        />
 
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            label="Description"
-          />
-        </div>
+        <LabelInputComponent
+          type="text"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          label="Description"
+        />
 
         {/* Only show the rest of the form if there is no activeRowId */}
         {!activeRowId && (
@@ -376,16 +372,14 @@ export default function CreateWorkRequest({
             </div>
 
             {theAssetCategory !== "" && (
-              <div className="relative w-full mt-6">
-                <LabelInputComponent
-                  type="text"
-                  name="category"
-                  value={formData.single}
-                  onChange={handleChange}
-                  label="Category"
-                  readOnly
-                />
-              </div>
+              <LabelInputComponent
+                type="text"
+                name="category"
+                value={formData.single}
+                onChange={handleChange}
+                label="Category"
+                readOnly
+              />
             )}
 
             {formData.asset && !formData.single && (

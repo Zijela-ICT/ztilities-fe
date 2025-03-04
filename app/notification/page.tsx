@@ -48,7 +48,7 @@ function NotificationPage() {
     const response = await axiosInstance.get(
       `/notifications/my-notifications/${endpoint}?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
-    setNotifications(response.data || []);
+    setNotifications(response.data.data || []);
     const extra = response.data.extra;
     if (extra) {
       setPagination({
@@ -62,7 +62,7 @@ function NotificationPage() {
 
   const getANotif = async () => {
     const response = await axiosInstance.get(`/notifications/${activeRowId}`);
-    setANotification(response.data || {});
+    setANotification(response.data.data || {});
   };
 
   useEffect(() => {
@@ -98,7 +98,7 @@ function NotificationPage() {
   };
 
   const groupedNotifications =
-    notifications.length > 0
+    notifications?.length > 0
       ? notifications.reduce<Record<string, Notification[]>>(
           (acc, notification) => {
             const dateKey = moment(notification.createdAt).format(

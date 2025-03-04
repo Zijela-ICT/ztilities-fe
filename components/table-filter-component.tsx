@@ -217,11 +217,6 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
           </div>
         );
       })}
-      {/* {filterKeys.length === 0 ? (
-        <div onClick={() => clearSearchAndPagination()}>Clear Filter</div>
-      ) : (
-        <div onClick={() => sendQueryString()}>Filter</div>
-      )} */}
     </div>
   );
 };

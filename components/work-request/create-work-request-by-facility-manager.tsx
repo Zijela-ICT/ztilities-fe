@@ -296,25 +296,22 @@ export default function CreateWorkRequestForUser({
             placeholder="Select a user"
           />
         </div>
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            label="Title"
-          />
-        </div>
 
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            label="Description"
-          />
-        </div>
+        <LabelInputComponent
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          label="Title"
+        />
+
+        <LabelInputComponent
+          type="text"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          label="Description"
+        />
 
         {/* Only show the rest of the form if there is no activeRowId */}
         {!activeRowId && (
@@ -386,16 +383,14 @@ export default function CreateWorkRequestForUser({
             </div>
 
             {theAssetCategory && formData.single && (
-              <div className="relative w-full mt-6">
-                <LabelInputComponent
-                  type="text"
-                  name="category"
-                  value={formData.single}
-                  onChange={handleChange}
-                  label="Category"
-                  readOnly
-                />
-              </div>
+              <LabelInputComponent
+                type="text"
+                name="category"
+                value={formData.single}
+                onChange={handleChange}
+                label="Category"
+                readOnly
+              />
             )}
 
             {formData.asset && !formData.single && (

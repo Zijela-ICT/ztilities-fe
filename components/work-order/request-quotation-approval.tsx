@@ -116,7 +116,7 @@ export default function RequestQuotationApproval({
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
-        <div className="relative w-full mt-6">
+
           <LabelInputComponent
             type="text"
             name="title"
@@ -124,8 +124,7 @@ export default function RequestQuotationApproval({
             onChange={handleChange}
             label="Title"
           />
-        </div>
-
+     
         <div className="relative w-full mt-6">
           <LabelTextareaComponent
             name="description"

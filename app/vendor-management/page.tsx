@@ -300,7 +300,7 @@ function VendorManagement() {
 
   const tabPermissions: { [key: string]: string[] } = {
     Vendors: ["read_vendors"],
-    Technicians: ["read_vendors"],
+    Technicians: ["read_technicians"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -388,7 +388,7 @@ function VendorManagement() {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      <PermissionGuard requiredPermissions={["read_vendors"]}>
+      <PermissionGuard requiredPermissions={["read_vendors","read_technicians"]}>
         <div className="relative bg-white rounded-2xl p-4">
           <div className="flex space-x-4 pb-2">
             {tabs.map((tab) => (
@@ -416,7 +416,7 @@ function VendorManagement() {
         </div>
       </PermissionGuard>
 
-      <PermissionGuard requiredPermissions={["read_vendors"]}>
+      <PermissionGuard requiredPermissions={["read_vendors", "read_technicians"]}>
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           {selectedTab === "Vendors" && (
             <TableComponent

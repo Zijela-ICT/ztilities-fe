@@ -2,10 +2,14 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { LabelInputComponent } from "../input-container";
-import axiosInstance from "@/utils/api";
 import createAxiosInstance from "@/utils/api";
 
-export default function ResetPassword({ roles, setModalState, activeRowId,setSuccessState }) {
+export default function ResetPassword({
+  roles,
+  setModalState,
+  activeRowId,
+  setSuccessState,
+}) {
   const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({
     user: "",
@@ -30,7 +34,7 @@ export default function ResetPassword({ roles, setModalState, activeRowId,setSuc
     setSuccessState({
       title: "Successful",
       detail: "You have successfully reset the password for this user",
-      status :true
+      status: true,
     });
   };
 
@@ -61,16 +65,14 @@ export default function ResetPassword({ roles, setModalState, activeRowId,setSuc
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="user"
-            value={formData.user}
-            onChange={handleChange}
-            label="Name of user"
-            readOnly={true}
-          />
-        </div>
+        <LabelInputComponent
+          type="text"
+          name="user"
+          value={formData.user}
+          onChange={handleChange}
+          label="Name of user"
+          readOnly={true}
+        />
         {/* <div className="relative w-full mt-6">
           <LabelInputComponent
             type="password"

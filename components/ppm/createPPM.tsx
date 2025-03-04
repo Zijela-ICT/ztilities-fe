@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import Select from "react-select";
 import { FileInputComponent, LabelInputComponent } from "../input-container";
-import axiosInstance from "@/utils/api";
+
 import { multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import createAxiosInstance from "@/utils/api";
@@ -280,37 +280,34 @@ export default function CreatePPM({
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
         {/* Title */}
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            label="Title"
-          />
-        </div>
+
+        <LabelInputComponent
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          label="Title"
+        />
 
         {/* Description */}
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="text"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            label="Description"
-          />
-        </div>
+
+        <LabelInputComponent
+          type="text"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          label="Description"
+        />
 
         {/* Start Date */}
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="datetime-local"
-            name="startDate"
-            value={formData.startDate}
-            onChange={handleChange}
-            label="Start Date"
-          />
-        </div>
+
+        <LabelInputComponent
+          type="datetime-local"
+          name="startDate"
+          value={formData.startDate}
+          onChange={handleChange}
+          label="Start Date"
+        />
 
         {/* Frequency */}
         <div className="flex space-x-3">
@@ -328,15 +325,14 @@ export default function CreatePPM({
         </div>
 
         {/* End Date */}
-        <div className="relative w-full mt-6">
-          <LabelInputComponent
-            type="datetime-local"
-            name="endDate"
-            value={formData.endDate}
-            onChange={handleChange}
-            label="End Date"
-          />
-        </div>
+
+        <LabelInputComponent
+          type="datetime-local"
+          name="endDate"
+          value={formData.endDate}
+          onChange={handleChange}
+          label="End Date"
+        />
 
         {/* Only show the additional selections if not editing an existing PPM */}
         {!activeRowId && (
@@ -521,16 +517,14 @@ export default function CreatePPM({
                   </div>
                 )}
 
-                <div className="relative w-full mt-6">
-                  <LabelInputComponent
-                    type="number"
-                    name="amount"
-                    value={formData.amount}
-                    onChange={handleChange}
-                    label="Amount"
-                    required
-                  />
-                </div>
+                <LabelInputComponent
+                  type="number"
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleChange}
+                  label="Amount"
+                  required
+                />
 
                 <div className="relative w-full mt-6">
                   <FileInputComponent

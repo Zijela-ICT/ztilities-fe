@@ -188,7 +188,7 @@ export default function DynamicCreateForm({
         if (activeRowId) {
           if (
             title === "Work request overdue limit" ||
-            "Work order overdue limit"
+            title === "Work order overdue limit"
           ) {
             await axiosInstance.post(apiEndpoint, updatedFormData);
           } else {
@@ -312,7 +312,7 @@ export default function DynamicCreateForm({
           }
 
           return (
-            <div key={index} className="relative w-full mt-6">
+            <div key={index}>
               <LabelInputComponent
                 type={input.type}
                 name={input.name}

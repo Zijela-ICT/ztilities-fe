@@ -27,14 +27,14 @@ export default function NotificationCard({ onClose }: NotificationCardProps) {
     const response = await axiosInstance.get(
       `/notifications/my-notifications/all`
     );
-    setNotifications(response.data);
+    setNotifications(response.data.data);
   };
 
   useEffect(() => {
     getNotifications();
   }, [centralState]);
 
-  const latestNotifications = notifications.slice(0, 5);
+  const latestNotifications = notifications?.slice(0, 5);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

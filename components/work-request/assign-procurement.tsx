@@ -73,7 +73,7 @@ export default function CommentWorkRequestOrder({
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
-        <div className="relative w-full mt-6">
+       
           <LabelInputComponent
             type="textarea"
             name="description"
@@ -81,7 +81,7 @@ export default function CommentWorkRequestOrder({
             onChange={handleChange}
             label="Description"
           />
-        </div>
+       
 
         <div className="relative w-full mt-6">
           <FileInputComponent

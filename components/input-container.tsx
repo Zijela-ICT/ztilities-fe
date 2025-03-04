@@ -107,6 +107,7 @@ export function LabelInputComponent({
 }: LabelInputProps) {
   return (
     <>
+      <div className="relative w-full mt-6"> 
       <input
         type={type}
         name={name}
@@ -120,6 +121,7 @@ export function LabelInputComponent({
       <label className="absolute left-4 top-2 text-gray-600 text-sm transition-all duration-200 ease-in-out peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-focus:top-2  ">
         {label}
       </label>
+      </div>
     </>
   );
 }

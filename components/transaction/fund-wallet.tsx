@@ -165,16 +165,14 @@ export default function FundWallet({
             onSubmit={handleSubmit}
             className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
           >
-            <div className="relative w-full mt-6">
-              <LabelInputComponent
-                type="text"
-                name="amount"
-                value={formData.amount}
-                onChange={handleChange}
-                label="Amount"
-                required
-              />
-            </div>
+            <LabelInputComponent
+              type="text"
+              name="amount"
+              value={formData.amount}
+              onChange={handleChange}
+              label="Amount"
+              required
+            />
 
             <div className="relative w-full mt-6">
               <Select

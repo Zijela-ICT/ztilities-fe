@@ -119,15 +119,13 @@ export default function UpdateWorkRequest({
         </div>
 
         {formData.status === "rejected" && (
-          <div className="relative w-full mt-6">
-            <LabelInputComponent
-              type="text"
-              name="reasonForRejection"
-              value={formData.reasonForRejection}
-              onChange={handleChange}
-              label="Reason For Rejection"
-            />
-          </div>
+          <LabelInputComponent
+            type="text"
+            name="reasonForRejection"
+            value={formData.reasonForRejection}
+            onChange={handleChange}
+            label="Reason For Rejection"
+          />
         )}
 
         {formData.status === "closed" && (

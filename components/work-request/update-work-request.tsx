@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import Select from "react-select";
-import axiosInstance from "@/utils/api";
+
 import { multiSelectStyle } from "@/utils/ojects";
 import { FileInputComponent, LabelInputComponent } from "../input-container";
 import createAxiosInstance from "@/utils/api";
@@ -114,7 +114,7 @@ export default function UpdateWorkRequest({
         </div>
 
         {formData.status === "rejected" && (
-          <div className="relative w-full mt-6">
+   
             <LabelInputComponent
               type="text"
               name="reasonForRejection"
@@ -122,7 +122,7 @@ export default function UpdateWorkRequest({
               onChange={handleChange}
               label="Reason For Rejection"
             />
-          </div>
+      
         )}
 
         {formData.status === "closed" && (

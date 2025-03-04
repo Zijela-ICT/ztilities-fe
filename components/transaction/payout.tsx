@@ -194,40 +194,35 @@ export default function Payouts({
           </div>
 
           {/* Wallet Account Number Input */}
-          <div className="relative w-full mt-6">
-            <LabelInputComponent
-              type="text"
-              name="account_number"
-              value={formData.account_number}
-              onChange={handleAccountNumberChange}
-              label="Bank Account Number"
-              required
-            />
-          </div>
+
+          <LabelInputComponent
+            type="text"
+            name="account_number"
+            value={formData.account_number}
+            onChange={handleAccountNumberChange}
+            label="Bank Account Number"
+            required
+          />
 
           {/* Display Wallet Details (if found) */}
           {acountDetails && (
-            <div className="relative w-full mt-6">
-              <LabelInputComponent
-                type="text"
-                name="accountName"
-                value={acountDetails.account_name}
-                label="Account name"
-                readOnly
-              />
-            </div>
-          )}
-
-          <div className="relative w-full mt-6">
             <LabelInputComponent
               type="text"
-              name="amount"
-              value={formData.amount}
-              onChange={handleChange}
-              label="Amount"
-              required
+              name="accountName"
+              value={acountDetails.account_name}
+              label="Account name"
+              readOnly
             />
-          </div>
+          )}
+
+          <LabelInputComponent
+            type="text"
+            name="amount"
+            value={formData.amount}
+            onChange={handleChange}
+            label="Amount"
+            required
+          />
 
           <div className="relative w-full mt-6">
             <LabelTextareaComponent

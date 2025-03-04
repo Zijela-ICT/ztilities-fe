@@ -120,6 +120,12 @@ export default function Navigation() {
       icon: <WorkRequestIcon />,
     },
     {
+      href: "/utility",
+      label: "Utilities",
+      permissions: ["tv", "internet", "airtime", "electricity"],
+      icon: <WorkRequestIcon />,
+    },
+    {
       href: "/vendor-management",
       label: "Vendor & Tech Management",
       permissions: ["vendors"],
@@ -305,7 +311,9 @@ export default function Navigation() {
                       <>
                         <span className="ml-2 flex-grow">{item.label}</span>
                         {item.children && (
-                          <PermissionGuard requiredPermissions={["update_users:id"]}>
+                          <PermissionGuard
+                            requiredPermissions={["update_users:id"]}
+                          >
                             <button
                               onClick={(e) => {
                                 e.preventDefault();
