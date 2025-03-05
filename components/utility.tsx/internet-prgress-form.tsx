@@ -8,11 +8,8 @@ import { multiSelectStyle } from "@/utils/ojects";
 export default function InternetFlow({
   internet,
   utility,
-  sub,
   setModalState,
-
   setSuccessState,
-
   setBeneficiaryState,
   beneficiaryObj,
 }) {
@@ -28,13 +25,12 @@ export default function InternetFlow({
 
   const [purchaseData, setPurchaseData] = useState(initialPurchaseData);
 
-  console.log(utility);
   useEffect(() => {
     setPurchaseData((prev) => ({
       ...prev,
-      telco: utility.provider,
-      name: utility.name,
-      plan_id: utility.id,
+      telco: utility.provider || "",
+      name: utility.name || "",
+      plan_id: utility.id || "",
     }));
   }, []);
 
@@ -42,9 +38,9 @@ export default function InternetFlow({
     if (beneficiaryObj) {
       setPurchaseData((prev) => ({
         ...prev,
-        telco: beneficiaryObj?.telco,
-        number: beneficiaryObj?.number,
-        plan_id:  Number(beneficiaryObj?.plan_id), 
+        telco: beneficiaryObj?.telco  || "",
+        number: beneficiaryObj?.number || "" ,
+        plan_id: Number(beneficiaryObj?.plan_id)|| 0 ,
       }));
     }
   }, [beneficiaryObj]);
@@ -61,7 +57,6 @@ export default function InternetFlow({
     e.preventDefault();
 
     const { name, ...payload } = purchaseData;
-    console.log(payload)
     await axiosInstance.post(`/internet/purchase`, payload);
     setSuccessState({
       title: "Successful",
@@ -76,7 +71,22 @@ export default function InternetFlow({
     label: internet.provider,
   }));
 
-  const planOptions = sub?.map((sub: any) => ({
+  const [plans, setPlans] = useState<any>();
+  const getInternetPlans = async () => {
+    const response = await axiosInstance.get(
+      `/internet/plans/${purchaseData.telco}`
+    );
+    setPlans(response.data.data);
+  };
+
+  useEffect(() => {
+    if(purchaseData.telco){
+      getInternetPlans();
+    }
+
+  }, [purchaseData.telco]);
+
+  const planOptions = plans?.map((sub: any) => ({
     value: sub.id,
     label: sub.name,
   }));

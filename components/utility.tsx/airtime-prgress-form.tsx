@@ -10,10 +10,7 @@ export default function AirtimeFlow({
   airtime,
   utility,
   setModalState,
-
-  activeRowId,
   setSuccessState,
-
   setBeneficiaryState,
   beneficiaryObj,
 }) {
@@ -29,18 +26,16 @@ export default function AirtimeFlow({
   // const [centralState, setCentralState] = useState<string>();
   const [topupData, setTopupData] = useState(initialTopupData);
 
-
   useEffect(() => {
-    setTopupData({ ...topupData, telco: utility.provider });
+    setTopupData({ ...topupData, telco: utility.provider || "" });
   }, []);
-
 
   useEffect(() => {
     if (beneficiaryObj) {
       setTopupData((prev) => ({
         ...prev,
-        telco: beneficiaryObj?.telco,
-        number: beneficiaryObj?.number,
+        telco: beneficiaryObj?.telco || "",
+        number: beneficiaryObj?.number || "",
       }));
     }
   }, [beneficiaryObj]);

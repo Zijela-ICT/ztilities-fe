@@ -28,7 +28,7 @@ const UtilityCardContainer = ({ type, data, onClick }: CardProps) => {
               <Image
                 width={150}
                 height={150}
-                src={"https://cdn.worldvectorlogo.com/logos/mtn-new-logo.svg"}
+                src={`https://api.budpay.com/${providerLogoUrl}`}
                 alt={`${provider} Logo`}
                 className=" rounded-full "
               />

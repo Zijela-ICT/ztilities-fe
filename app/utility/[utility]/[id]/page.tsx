@@ -16,6 +16,7 @@ import ModalCompoenent, {
 } from "@/components/modal-component";
 import InternetFlow from "@/components/utility.tsx/internet-prgress-form";
 import TVFlow from "@/components/utility.tsx/tv-prgress-form";
+import Benfeciaries from "@/components/utility.tsx/benficiaries";
 
 function WorkRequests() {
   const axiosInstance = createAxiosInstance();
@@ -23,7 +24,7 @@ function WorkRequests() {
   const router = useRouter();
   const { utility, id } = useParams();
 
-  console.log(utility);
+
   const [successState, setSuccessState] = useState({
     title: "",
     detail: "",
@@ -35,14 +36,28 @@ function WorkRequests() {
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
+  const [activeBeneficiary, setActiveBeneficiary] = useState<any>(null);
   const [beneficiaryState, setBeneficiaryState] = useState<string>();
 
   const [beneficiaryObj, setABeneficiary] = useState<any>(null);
 
   const [sub, setSub] = useState<any>();
 
+  const [electricity, setElectricity] = useState<any[]>([]);
+  const [airtime, setAirtime] = useState<any[]>([]);
   const [internet, setInternet] = useState<any[]>([]);
   const [tvSubscription, setTvSubscription] = useState<any[]>([]);
+
+  const getElectricity = async () => {
+    const response = await axiosInstance.get(`/electricity/providers`);
+    setElectricity(response.data.data);
+  };
+
+  const getAirtime = async () => {
+    const response = await axiosInstance.get(`/airtime/telcos`);
+    setAirtime(response.data.data);
+  };
+
   const getInternet = async () => {
     const response = await axiosInstance.get(`/internet/telcos`);
     setInternet(response.data.data);
@@ -63,9 +78,25 @@ function WorkRequests() {
     setSub(response.data.data);
   };
 
+  const deleteABeneficiary = async () => {
+    await axiosInstance.delete(
+      `/users/${user.id}/beneficiaries?type=${
+        activeBeneficiary.activeTab
+      }&number=${activeBeneficiary.number || activeBeneficiary.meterNumber}`
+    );
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully deleted this beneficiary",
+      status: true,
+    });
+  };
+
   useEffect(() => {
     getInternet();
     getTvSubscription();
+    getAirtime();
+    getElectricity();
   }, []);
   useEffect(() => {
     if (utility === "internet") {
@@ -80,7 +111,6 @@ function WorkRequests() {
       <TVFlow
         tv={tvSubscription}
         utility={activeUtility}
-        sub={sub}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         setBeneficiaryState={setBeneficiaryState}
@@ -92,39 +122,37 @@ function WorkRequests() {
       <InternetFlow
         internet={internet}
         utility={activeUtility}
-        sub={sub}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         setBeneficiaryState={setBeneficiaryState}
         beneficiaryObj={beneficiaryObj}
       />
     ),
-    // ben: (
-    //   <Benfeciaries
-    //     airtime={airtime}
-    //     electricity={electricity}
-    //     tv={tvSubscription}
-    //     internet={internet}
-    //     utility={utility}
-    //     setABeneficiary={(obj) => {
-    //       setABeneficiary(obj);
-    //       setBeneficiaryState("");
-    //     }}
-    //     setActiveBeneficiary={(obj) => setActiveBeneficiary(obj)}
-    //     activeRowId={activeRowId}
-    //     setModalState={setCentralState}
-    //     setSuccessState={setSuccessState}
-    //     setModalStateDelete={setCentralStateDelete}
-    //     modalStateDelete={centralStateDelete}
-    //     setBeneficiaryState={setBeneficiaryState}
-    //   />
-    // ),
+    ben: (
+      <Benfeciaries
+        airtime={airtime}
+        electricity={electricity}
+        tv={tvSubscription}
+        internet={internet}
+        utility={utility}
+        setABeneficiary={(obj) => {
+          setABeneficiary(obj);
+          setBeneficiaryState("");
+        }}
+        setActiveBeneficiary={(obj) => setActiveBeneficiary(obj)}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        setModalStateDelete={setCentralStateDelete}
+        modalStateDelete={centralStateDelete}
+        setBeneficiaryState={setBeneficiaryState}
+      />
+    ),
   };
 
   return (
     <DashboardLayout
-      title={`${id} Package`}
-      detail={`Select a ${id} package`}
+      title={`${id} ${utility === "internet" ? "plans" : "packages"}`}
+      detail={`Select a ${id} ${utility === "internet" ? "plans" : "packages"}`}
       dynamic
       onclick={() => router.back()}
     >
@@ -137,7 +165,7 @@ function WorkRequests() {
         }
       ></SuccessModalCompoenent>
 
-      {/* <ActionModalCompoenent
+      <ActionModalCompoenent
         title={"Delete beneficiary"}
         detail={"Do you want to delete this beneficiary?"}
         modalState={centralStateDelete}
@@ -145,7 +173,7 @@ function WorkRequests() {
         takeAction={
           centralStateDelete === "deleteBeneficiary" ? deleteABeneficiary : null
         }
-      ></ActionModalCompoenent> */}
+      ></ActionModalCompoenent>
 
       <ModalCompoenent
         title={`${id} `}
@@ -155,8 +183,7 @@ function WorkRequests() {
         modalState={centralState}
         setModalState={() => {
           setCentralState("");
-          // setABeneficiary("");
-          // setActiveRowId(null);
+          setABeneficiary("");
         }}
       >
         {componentMap[centralState]}
@@ -166,9 +193,9 @@ function WorkRequests() {
         title={"Beneficiaries"}
         detail={""}
         modalState={beneficiaryState}
+        className="absolute z-40 top-5 right-5 w-full max-w-lg h-[60vh] overflow-y-auto p-0 "
         setModalState={() => {
           setBeneficiaryState("");
-          // setActiveRowId(null);
         }}
       >
         {componentMap[beneficiaryState]}
@@ -182,7 +209,6 @@ function WorkRequests() {
               <div
                 key={index}
                 onClick={() => {
-                  console.log({ ...sub, provider: id });
                   if (utility === "internet") {
                     setCentralState("internetFlow");
                     setActiveUtility({ ...sub, provider: id });

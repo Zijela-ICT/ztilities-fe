@@ -18,7 +18,6 @@ export default function Beneficiaries({
   setModalState,
   setModalStateDelete,
   modalStateDelete,
-  activeRowId,
   setSuccessState,
   setBeneficiaryState,
 }) {
@@ -124,7 +123,7 @@ export default function Beneficiaries({
     );
     setSuccessState({
       title: "Successful",
-      detail: "Beneficiary added",
+      detail: `Beneficiary for ${activeTab} added`,
       status: true,
     });
     setModalState("");
@@ -143,7 +142,32 @@ export default function Beneficiaries({
     getUtilityBeneficiaries(activeTab);
   }, [activeTab, showForm, modalStateDelete]);
 
-  const planOptions = utility.dataSub?.map((sub: any) => ({
+  const [packages, setPackages] = useState<any>();
+  const getTvPackages = async () => {
+    const response = await axiosInstance.get(
+      `/tv/packages/${data[providerField]}`
+    );
+    setPackages(response.data.data);
+  };
+
+  const getInternetPlans = async () => {
+    const response = await axiosInstance.get(
+      `/internet/plans/${data[providerField]}`
+    );
+    setPackages(response.data.data);
+  };
+
+  useEffect(() => {
+    if (data[providerField]) {
+      if (activeTab === "tv") {
+        getTvPackages();
+      } else if (activeTab === "internet") {
+        getInternetPlans();
+      }
+    }
+  }, [data[providerField]]);
+
+  const packageOptions = packages?.map((sub: any) => ({
     value: sub.id,
     label: sub.name,
   }));
@@ -188,11 +212,7 @@ export default function Beneficiaries({
                       isClickable ? "cursor-pointer" : "cursor-not-allowed"
                     }`}
                   >
-                    <div
-                      onClick={() =>
-                        isClickable && setABeneficiary(beneficiary)
-                      }
-                    >
+                    <div onClick={() => setABeneficiary(beneficiary)}>
                       <p className="text-sm text-gray-800">
                         {beneficiary.alias}
                       </p>
@@ -263,7 +283,8 @@ export default function Beneficiaries({
             {/* Display the beneficiary type */}
             <div className="mb-4">
               <span className="text-gray-700 font-medium">
-                Beneficiary Type: {activeTab}
+                Add Beneficiary for{" "}
+                {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
               </span>
             </div>
             {/* Provider select */}
@@ -326,16 +347,6 @@ export default function Beneficiaries({
                       { value: "prepaid", label: "Prepaid" },
                       { value: "postpaid", label: "Postpaid" },
                     ].find((option) => option.value === data.type)}
-                    // value={
-                    //   data.type
-                    //     ? {
-                    //         value: data.type,
-                    //         label:
-                    //           data.type.charAt(0).toUpperCase() +
-                    //           data.type.slice(1),
-                    //       }
-                    //     : null
-                    // }
                     onChange={handleSelectChange("type")}
                     styles={multiSelectStyle}
                     placeholder="Select Prepaid/Postpaid"
@@ -355,27 +366,10 @@ export default function Beneficiaries({
             )}
             {activeTab === "internet" && (
               <>
-                <LabelInputComponent
-                  type="text"
-                  name="number"
-                  value={data.number}
-                  onChange={handleChange}
-                  label="Phone Number"
-                  required
-                />
-                <LabelInputComponent
-                  type="text"
-                  name="plan_id"
-                  value={data.plan_id}
-                  onChange={handleChange}
-                  label="Plan ID"
-                  required
-                />
-
                 <div className="relative w-full mt-6">
                   <Select
-                    options={planOptions}
-                    value={planOptions.find(
+                    options={packageOptions}
+                    value={packageOptions?.find(
                       (option) => option.value === data.plan_id
                     )}
                     onChange={handleSelectChange("plan_id")}
@@ -384,6 +378,15 @@ export default function Beneficiaries({
                     required
                   />
                 </div>
+                <LabelInputComponent
+                  type="text"
+                  name="number"
+                  value={data.number}
+                  onChange={handleChange}
+                  label="Phone Number"
+                  required
+                />
+
                 <LabelInputComponent
                   type="text"
                   name="alias"
@@ -396,6 +399,18 @@ export default function Beneficiaries({
             )}
             {activeTab === "tv" && (
               <>
+                <div className="relative w-full mt-6">
+                  <Select
+                    options={packageOptions}
+                    value={packageOptions?.find(
+                      (option) => option.value === data.plan_id
+                    )}
+                    onChange={handleSelectChange("plan_id")}
+                    styles={multiSelectStyle}
+                    placeholder="Select Package"
+                    required
+                  />
+                </div>
                 <LabelInputComponent
                   type="text"
                   name="number"
@@ -404,14 +419,7 @@ export default function Beneficiaries({
                   label="Phone Number"
                   required
                 />
-                <LabelInputComponent
-                  type="text"
-                  name="plan_id"
-                  value={data.plan_id}
-                  onChange={handleChange}
-                  label="Plan ID"
-                  required
-                />
+
                 <LabelInputComponent
                   type="text"
                   name="alias"

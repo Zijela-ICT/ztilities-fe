@@ -8,10 +8,8 @@ import { toast } from "react-toastify";
 export default function TVFlow({
   tv,
   utility,
-  sub,
   setModalState,
   setSuccessState,
-
   setBeneficiaryState,
   beneficiaryObj,
 }) {
@@ -36,9 +34,9 @@ export default function TVFlow({
   useEffect(() => {
     setCustomerData((prev) => ({
       ...prev,
-      tv: utility.provider,
-      number: utility.number,
-      name: utility.name,
+      tv: utility.provider || "",
+      number: utility.number || "",
+      name: utility.name || "",
     }));
   }, []);
 
@@ -46,8 +44,8 @@ export default function TVFlow({
     if (beneficiaryObj) {
       setCustomerData((prev) => ({
         ...prev,
-        tv: beneficiaryObj?.tv,
-        number: beneficiaryObj?.number,
+        tv: beneficiaryObj.tv || "",
+        number: beneficiaryObj.number || "",
       }));
     }
   }, [beneficiaryObj]);
@@ -55,22 +53,24 @@ export default function TVFlow({
   useEffect(() => {
     setSubscribeData((prev) => ({
       ...prev,
-      plan_id: utility.id,
+      plan_id: utility.id || "",
     }));
   }, []);
 
-  console.log(beneficiaryObj);
   useEffect(() => {
     if (beneficiaryObj) {
       setSubscribeData((prev) => ({
         ...prev,
-        plan_id: Number(beneficiaryObj?.plan_id),
+        plan_id: Number(beneficiaryObj?.plan_id) || 0,
       }));
     }
   }, [beneficiaryObj]);
 
   const handleSelectChange = (field: string) => (selected: any) =>
     setCustomerData((prev) => ({ ...prev, [field]: selected?.value || "" }));
+
+  const handleSelectSubscribeChange = (field: string) => (selected: any) =>
+    setSubscribeData((prev) => ({ ...prev, [field]: selected?.value || "" }));
 
   const handleCustomerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -107,7 +107,24 @@ export default function TVFlow({
     setModalState("");
   };
 
-  const packageOptions = sub?.map((sub: any) => ({
+  const tvOptions = tv?.map((internet: any) => ({
+    value: internet.provider,
+    label: internet.provider,
+  }));
+
+  const [packages, setPackages] = useState<any>();
+  const getTvPackages = async () => {
+    const response = await axiosInstance.get(`/tv/packages/${customerData.tv}`);
+    setPackages(response.data.data);
+  };
+
+  useEffect(() => {
+    if (customerData.tv) {
+      getTvPackages();
+    }
+  }, [customerData.tv]);
+
+  const packageOptions = packages?.map((sub: any) => ({
     value: sub.id,
     label: sub.name,
   }));
@@ -142,15 +159,17 @@ export default function TVFlow({
           onSubmit={handleCustomerSubmit}
           className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
         >
-          <LabelInputComponent
-            type="text"
-            name="tv"
-            value={customerData.tv}
-            onChange={handleCustomerChange}
-            label="TV"
+          <Select
+            options={tvOptions}
+            value={tvOptions?.find(
+              (option) => option.value === customerData.tv
+            )}
+            onChange={handleSelectChange("tv")}
+            styles={multiSelectStyle}
+            placeholder="Select Provider"
             required
-            readOnly
           />
+
           <LabelInputComponent
             type="number"
             name="number"
@@ -186,22 +205,13 @@ export default function TVFlow({
           onSubmit={handleRechargeSubmit}
           className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
         >
-          <LabelInputComponent
-            type="text"
-            name="tv"
-            value={subscribeData.tv}
-            onChange={handleRechargeChange}
-            label="TV"
-            readOnly
-          />
-
           <div className="relative w-full mt-6">
             <Select
               options={packageOptions}
               value={packageOptions.find(
                 (option) => option.value === subscribeData.plan_id
               )}
-              onChange={handleSelectChange("plan_id")}
+              onChange={handleSelectSubscribeChange("plan_id")}
               styles={multiSelectStyle}
               placeholder="Select Package"
               required
@@ -215,14 +225,6 @@ export default function TVFlow({
             label="Number"
           />
 
-          {/* <LabelInputComponent
-            type="number"
-            name="amount"
-            value={subscribeData.amount}
-            onChange={handleRechargeChange}
-            label="Amount"
-            required
-          /> */}
           <LabelInputComponent
             type="text"
             name="reference"

@@ -120,7 +120,7 @@ export default function Navigation() {
       icon: <WorkRequestIcon />,
     },
     // {
-    //   href: "/utility-2",
+    //   href: "/utility",
     //   label: "Utilities",
     //   permissions: ["tv", "internet", "airtime", "electricity"],
     //   icon: <WorkRequestIcon />,

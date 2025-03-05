@@ -10,7 +10,6 @@ export default function ElectricityFlow({
   utility,
   setModalState,
   setSuccessState,
-
   setBeneficiaryState,
   beneficiaryObj,
 }) {
@@ -35,17 +34,16 @@ export default function ElectricityFlow({
   const [rechargeData, setRechargeData] = useState(initialRechargeData);
 
   useEffect(() => {
-    setCustomerData({ ...customerData, provider: utility.provider });
+    setCustomerData({ ...customerData, provider: utility.provider || "" });
   }, []);
 
-  console.log(beneficiaryObj);
   useEffect(() => {
     if (beneficiaryObj) {
       setCustomerData((prev) => ({
         ...prev,
-        provider: beneficiaryObj?.disco,
-        meterNumber: beneficiaryObj?.meterNumber,
-        type: beneficiaryObj?.type,
+        provider: beneficiaryObj?.disco || "" ,
+        meterNumber: beneficiaryObj?.meterNumber || "",
+        type: beneficiaryObj?.type || "",
       }));
     }
   }, [beneficiaryObj]);
@@ -139,22 +137,6 @@ export default function ElectricityFlow({
           onSubmit={handleCustomerSubmit}
           className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
         >
-          <LabelInputComponent
-            type="text"
-            name="Customer_Name"
-            value={customerData.Customer_Name}
-            onChange={handleCustomerChange}
-            label="Customer Name"
-            required
-          />
-          <LabelInputComponent
-            type="text"
-            name="meterNumber"
-            value={customerData.meterNumber}
-            onChange={handleCustomerChange}
-            label="Meter Number"
-            required
-          />
           <div className="relative w-full mt-6">
             <Select
               options={electricityOptions}
@@ -179,6 +161,23 @@ export default function ElectricityFlow({
               required
             />
           </div>
+          <LabelInputComponent
+            type="text"
+            name="Customer_Name"
+            value={customerData.Customer_Name}
+            onChange={handleCustomerChange}
+            label="Customer Name"
+            required
+          />
+          <LabelInputComponent
+            type="text"
+            name="meterNumber"
+            value={customerData.meterNumber}
+            onChange={handleCustomerChange}
+            label="Meter Number"
+            required
+          />
+          
 
           <div className="flex justify-end">
             <p

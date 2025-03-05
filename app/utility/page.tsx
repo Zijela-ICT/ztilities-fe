@@ -103,7 +103,6 @@ function UtilityManagement() {
       <AirtimeFlow
         airtime={airtime}
         utility={utility}
-        activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         setBeneficiaryState={setBeneficiaryState}
@@ -123,7 +122,6 @@ function UtilityManagement() {
           setBeneficiaryState("");
         }}
         setActiveBeneficiary={(obj) => setActiveBeneficiary(obj)}
-        activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         setModalStateDelete={setCentralStateDelete}
@@ -237,6 +235,7 @@ function UtilityManagement() {
         title={"Beneficiaries"}
         detail={""}
         modalState={beneficiaryState}
+        className="absolute z-40 top-5 right-5 w-full max-w-lg h-[60vh] overflow-y-auto p-0 "
         setModalState={() => {
           setBeneficiaryState("");
           setActiveRowId(null);
@@ -306,7 +305,7 @@ function UtilityManagement() {
                 data={tvSubscription}
                 type="tv"
                 onClick={(utility) =>
-                  router.push(`/utility-2/tv/${utility.provider}`)
+                  router.push(`/utility/tv/${utility.provider}`)
                 }
               />
             </>
@@ -328,7 +327,7 @@ function UtilityManagement() {
                 data={internet}
                 type="internet"
                 onClick={(utility) =>
-                  router.push(`/utility-2/internet/${utility.provider}`)
+                  router.push(`/utility/internet/${utility.provider}`)
                 }
               />
             </>

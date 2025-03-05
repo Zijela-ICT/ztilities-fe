@@ -15,7 +15,71 @@ interface ModalProps {
   systemColor?: boolean;
 }
 
-export default function ModalCompoenent({
+// export default function ModalCompoenent({
+//   children,
+//   title,
+//   detail,
+//   modalState,
+//   setModalState,
+//   bulk,
+//   width,
+//   systemColor,
+// }: ModalProps) {
+//   return (
+//     <>
+//       <div
+//         id="crud-modal"
+//         tabIndex={-1}
+//         aria-hidden="true"
+//         className={`${
+//           modalState ? "block" : "hidden"
+//         } fixed inset-0 z-40 flex justify-center items-center overflow-y-auto `}
+//       >
+//         <div
+//           className={`relative p-4 w-full ${
+//             width ? width : "max-w-2xl"
+//           } max-h-full mx-auto`}
+//         >
+//           {/* Modal content */}
+//           <div
+//             className={`relative ${
+//               bulk ? "bg-[#FBFBFC]" : systemColor ? "bg-[#A8353A]" : "bg-white"
+//             } rounded-xl shadow`}
+//           >
+//             {/* Modal header */}
+//             <div className="flex items-center justify-between pt-10 pb-2 px-4 md:px-5 rounded-t">
+//               <h3
+//                 className={`text-2xl font-semibold ${
+//                   systemColor ? "text-white" : "text-gray-900 "
+//                 } `}
+//               >
+//                 {title}
+//               </h3>
+//               <button
+//                 onClick={setModalState}
+//                 type="button"
+//                 className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+//                 data-modal-toggle="crud-modal"
+//               >
+//                 <div className="w-3 h-3">
+//                   <CancelIcon />
+//                 </div>
+//                 <span className="sr-only">Close modal</span>
+//               </button>
+//             </div>
+
+//             <p className="text-gray-700 text-base px-5 font-thin">{detail}</p>
+
+//             {/* Modal body */}
+//             {children}
+//           </div>
+//         </div>
+//       </div>
+//     </>
+//   );
+// }
+
+export default function ModalComponent({
   children,
   title,
   detail,
@@ -24,21 +88,25 @@ export default function ModalCompoenent({
   bulk,
   width,
   systemColor,
+  className, // new optional prop for custom classes
 }: ModalProps) {
+  // Determine the visibility class based on modalState.
+  const visibilityClass = modalState ? "block" : "hidden";
+  // Use the provided className if available, otherwise fallback to the default.
+  const containerClasses = className
+    ? className
+    : "fixed inset-0 z-40 flex justify-center items-center overflow-y-auto";
+
   return (
     <>
       <div
         id="crud-modal"
         tabIndex={-1}
         aria-hidden="true"
-        className={`${
-          modalState ? "block" : "hidden"
-        } fixed inset-0 z-40 flex justify-center items-center overflow-y-auto `}
+        className={`${visibilityClass} ${containerClasses}`}
       >
         <div
-          className={`relative p-4 w-full ${
-            width ? width : "max-w-2xl"
-          } max-h-full mx-auto`}
+          className={`relative p-4 w-full ${width ? width : "max-w-2xl"} max-h-full mx-auto`}
         >
           {/* Modal content */}
           <div
@@ -50,8 +118,8 @@ export default function ModalCompoenent({
             <div className="flex items-center justify-between pt-10 pb-2 px-4 md:px-5 rounded-t">
               <h3
                 className={`text-2xl font-semibold ${
-                  systemColor ? "text-white" : "text-gray-900 "
-                } `}
+                  systemColor ? "text-white" : "text-gray-900"
+                }`}
               >
                 {title}
               </h3>
@@ -78,6 +146,8 @@ export default function ModalCompoenent({
     </>
   );
 }
+
+
 
 interface ActionModalProps {
   setModalState?: any;
