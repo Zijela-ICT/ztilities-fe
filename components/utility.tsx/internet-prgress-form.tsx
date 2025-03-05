@@ -8,8 +8,9 @@ import { multiSelectStyle } from "@/utils/ojects";
 export default function InternetFlow({
   internet,
   utility,
+  sub,
   setModalState,
-  activeRowId,
+
   setSuccessState,
 
   setBeneficiaryState,
@@ -21,12 +22,13 @@ export default function InternetFlow({
     telco: "",
     name: "",
     number: "",
-    plan_id: "",
+    plan_id: 0,
     reference: "",
   };
 
   const [purchaseData, setPurchaseData] = useState(initialPurchaseData);
 
+  console.log(utility);
   useEffect(() => {
     setPurchaseData((prev) => ({
       ...prev,
@@ -42,6 +44,7 @@ export default function InternetFlow({
         ...prev,
         telco: beneficiaryObj?.telco,
         number: beneficiaryObj?.number,
+        plan_id:  Number(beneficiaryObj?.plan_id), 
       }));
     }
   }, [beneficiaryObj]);
@@ -58,6 +61,7 @@ export default function InternetFlow({
     e.preventDefault();
 
     const { name, ...payload } = purchaseData;
+    console.log(payload)
     await axiosInstance.post(`/internet/purchase`, payload);
     setSuccessState({
       title: "Successful",
@@ -72,16 +76,20 @@ export default function InternetFlow({
     label: internet.provider,
   }));
 
+  const planOptions = sub?.map((sub: any) => ({
+    value: sub.id,
+    label: sub.name,
+  }));
   return (
     <div>
       <form
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
-        {/* <div className="relative w-full mt-6">
+        <div className="relative w-full mt-6">
           <Select
             options={internetOptions}
-            value={internetOptions.find(
+            value={internetOptions?.find(
               (option) => option.value === purchaseData.telco
             )}
             onChange={handleSelectChange("telco")}
@@ -89,25 +97,21 @@ export default function InternetFlow({
             placeholder="Select Provider"
             required
           />
-        </div> */}
-        <LabelInputComponent
-          type="text"
-          name="name"
-          value={purchaseData.name}
-          onChange={handleChange}
-          label="Plan"
-          required
-          readOnly
-        />
-        {/* <LabelInputComponent
-          type="text"
-          name="telco"
-          value={purchaseData.telco}
-          onChange={handleChange}
-          label="Telco"
-          required
-          readOnly
-        /> */}
+        </div>
+
+        <div className="relative w-full mt-6">
+          <Select
+            options={planOptions}
+            value={planOptions?.find(
+              (option) => option.value === purchaseData.plan_id
+            )}
+            onChange={handleSelectChange("plan_id")}
+            styles={multiSelectStyle}
+            placeholder="Select Plan"
+            required
+          />
+        </div>
+
         <LabelInputComponent
           type="text"
           name="number"
@@ -116,14 +120,6 @@ export default function InternetFlow({
           label="Phone Number"
           required
         />
-        {/* <LabelInputComponent
-          type="number"
-          name="plan_id"
-          value={purchaseData.plan_id}
-          onChange={handleChange}
-          label="Plan ID"
-          required
-        /> */}
         <LabelInputComponent
           type="text"
           name="reference"

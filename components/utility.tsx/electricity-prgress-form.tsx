@@ -9,7 +9,6 @@ export default function ElectricityFlow({
   electricity,
   utility,
   setModalState,
-  activeRowId,
   setSuccessState,
 
   setBeneficiaryState,
@@ -39,13 +38,14 @@ export default function ElectricityFlow({
     setCustomerData({ ...customerData, provider: utility.provider });
   }, []);
 
-
+  console.log(beneficiaryObj);
   useEffect(() => {
     if (beneficiaryObj) {
       setCustomerData((prev) => ({
         ...prev,
-        provider: beneficiaryObj?.telco,
-        meterNumber: beneficiaryObj?.number,
+        provider: beneficiaryObj?.disco,
+        meterNumber: beneficiaryObj?.meterNumber,
+        type: beneficiaryObj?.type,
       }));
     }
   }, [beneficiaryObj]);
@@ -155,15 +155,6 @@ export default function ElectricityFlow({
             label="Meter Number"
             required
           />
-          {/* <LabelInputComponent
-            type="text"
-            name="provider"
-            value={customerData.provider}
-            onChange={handleCustomerChange}
-            label="Provider"
-            required
-            readOnly
-          /> */}
           <div className="relative w-full mt-6">
             <Select
               options={electricityOptions}
@@ -190,13 +181,13 @@ export default function ElectricityFlow({
           </div>
 
           <div className="flex justify-end">
-          <p
-            className="text-[#A8353A] my-3 cursor-pointer"
-            onClick={() => setBeneficiaryState("ben")}
-          >
-            Choose Beneficiaries for electricity
-          </p>
-        </div>
+            <p
+              className="text-[#A8353A] my-3 cursor-pointer"
+              onClick={() => setBeneficiaryState("ben")}
+            >
+              Choose Beneficiaries for electricity
+            </p>
+          </div>
           <div className="mt-10 flex w-full justify-end">
             <button
               type="submit"

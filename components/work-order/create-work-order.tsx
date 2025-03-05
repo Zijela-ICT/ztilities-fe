@@ -165,7 +165,7 @@ export default function CreateWorkOrder({
     };
 
     if (activeRowId) {
-      await axiosInstance.patch(`/work-orders/${activeRowId}`, formData);
+      await axiosInstance.patch(`/work-orders/${activeRowId}`, payload);
     } else {
       await axiosInstance.post("/work-orders/work-order/", formData);
     }

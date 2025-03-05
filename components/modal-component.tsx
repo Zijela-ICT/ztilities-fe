@@ -33,7 +33,7 @@ export default function ModalCompoenent({
         aria-hidden="true"
         className={`${
           modalState ? "block" : "hidden"
-        } fixed inset-0 z-50 flex justify-center items-center overflow-y-auto `}
+        } fixed inset-0 z-40 flex justify-center items-center overflow-y-auto `}
       >
         <div
           className={`relative p-4 w-full ${

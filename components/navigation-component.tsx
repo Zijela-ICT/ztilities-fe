@@ -119,12 +119,12 @@ export default function Navigation() {
       permissions: ["audit"],
       icon: <WorkRequestIcon />,
     },
-    {
-      href: "/utility",
-      label: "Utilities",
-      permissions: ["tv", "internet", "airtime", "electricity"],
-      icon: <WorkRequestIcon />,
-    },
+    // {
+    //   href: "/utility-2",
+    //   label: "Utilities",
+    //   permissions: ["tv", "internet", "airtime", "electricity"],
+    //   icon: <WorkRequestIcon />,
+    // },
     {
       href: "/vendor-management",
       label: "Vendor & Tech Management",

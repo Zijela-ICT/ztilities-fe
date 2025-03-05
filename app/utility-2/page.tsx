@@ -16,6 +16,7 @@ import AirtimeFlow from "@/components/utility.tsx/airtime-prgress-form";
 import InternetFlow from "@/components/utility.tsx/internet-prgress-form";
 import TVFlow from "@/components/utility.tsx/tv-prgress-form";
 import Benfeciaries from "@/components/utility.tsx/benficiaries";
+import { useRouter } from "next/navigation";
 
 function UtilityManagement() {
   const axiosInstance = createAxiosInstance();
@@ -27,6 +28,7 @@ function UtilityManagement() {
     filterQuery,
     clearSearchAndPagination,
   } = useDataPermission();
+  const router = useRouter();
   const tabs = ["Electricity", "Airtime", "Internet", "TV Subscription"];
 
   const [successState, setSuccessState] = useState({
@@ -48,7 +50,7 @@ function UtilityManagement() {
   const [activeBeneficiary, setActiveBeneficiary] = useState<any>(null);
   const [beneficiaryState, setBeneficiaryState] = useState<string>();
 
-  const [utility, setAUtility] = useState<any>();
+  const [utility, setUtility] = useState<any>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   const getElectricity = async () => {
@@ -91,18 +93,6 @@ function UtilityManagement() {
       <ElectricityFlow
         electricity={electricity}
         utility={utility}
-        activeRowId={activeRowId}
-        setModalState={setCentralState}
-        setSuccessState={setSuccessState}
-        setBeneficiaryState={setBeneficiaryState}
-        beneficiaryObj={beneficiaryObj}
-      />
-    ),
-    tvFlow: (
-      <TVFlow
-        tv={tvSubscription}
-        utility={utility}
-        activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         setBeneficiaryState={setBeneficiaryState}
@@ -120,17 +110,7 @@ function UtilityManagement() {
         beneficiaryObj={beneficiaryObj}
       />
     ),
-    internetFlow: (
-      <InternetFlow
-        internet={internet}
-        utility={utility}
-        activeRowId={activeRowId}
-        setModalState={setCentralState}
-        setSuccessState={setSuccessState}
-        setBeneficiaryState={setBeneficiaryState}
-        beneficiaryObj={beneficiaryObj}
-      />
-    ),
+
     ben: (
       <Benfeciaries
         airtime={airtime}
@@ -313,11 +293,9 @@ function UtilityManagement() {
             <>
               <UtilityCardContainer
                 data={electricity}
-                onClick={(data, dataSub) => {
-                  console.log(data);
+                onClick={(utility) => {
                   setCentralState("electricityFlow");
-                  // setAUtility(data);
-                  setAUtility({...data, dataSub : dataSub})
+                  setUtility(utility);
                 }}
               />
             </>
@@ -327,12 +305,9 @@ function UtilityManagement() {
               <UtilityCardContainer
                 data={tvSubscription}
                 type="tv"
-                onClick={(data, dataSub) => {
-                  console.log(data);
-                  setCentralState("tvFlow");
-                  // setAUtility(data);
-                  setAUtility({...data, dataSub : dataSub})
-                }}
+                onClick={(utility) =>
+                  router.push(`/utility-2/tv/${utility.provider}`)
+                }
               />
             </>
           )}
@@ -340,10 +315,9 @@ function UtilityManagement() {
             <>
               <UtilityCardContainer
                 data={airtime}
-                onClick={(data, dataSub) => {
+                onClick={(utility) => {
                   setCentralState("airtimeFlow");
-                  // setAUtility(data);
-                  setAUtility({...data, dataSub : dataSub})
+                  setUtility(utility);
                 }}
               />
             </>
@@ -353,12 +327,9 @@ function UtilityManagement() {
               <UtilityCardContainer
                 data={internet}
                 type="internet"
-                onClick={(data, dataSub) => {
-                  console.log(data, dataSub);
-                  setCentralState("internetFlow");
-                  // setAUtility(data, dataSub);
-                  setAUtility({...data, dataSub : dataSub})
-                }}
+                onClick={(utility) =>
+                  router.push(`/utility-2/internet/${utility.provider}`)
+                }
               />
             </>
           )}

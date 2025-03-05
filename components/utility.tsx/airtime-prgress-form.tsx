@@ -29,9 +29,11 @@ export default function AirtimeFlow({
   // const [centralState, setCentralState] = useState<string>();
   const [topupData, setTopupData] = useState(initialTopupData);
 
+
   useEffect(() => {
     setTopupData({ ...topupData, telco: utility.provider });
   }, []);
+
 
   useEffect(() => {
     if (beneficiaryObj) {

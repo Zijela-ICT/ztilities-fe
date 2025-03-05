@@ -8,8 +8,8 @@ import { toast } from "react-toastify";
 export default function TVFlow({
   tv,
   utility,
+  sub,
   setModalState,
-  activeRowId,
   setSuccessState,
 
   setBeneficiaryState,
@@ -25,7 +25,7 @@ export default function TVFlow({
   const initialSubsribeData = {
     tv: "",
     number: "",
-    plan_id: "",
+    plan_id: 0,
     reference: "",
   };
   // Stepper and form state
@@ -37,6 +37,7 @@ export default function TVFlow({
     setCustomerData((prev) => ({
       ...prev,
       tv: utility.provider,
+      number: utility.number,
       name: utility.name,
     }));
   }, []);
@@ -45,7 +46,7 @@ export default function TVFlow({
     if (beneficiaryObj) {
       setCustomerData((prev) => ({
         ...prev,
-        tv: beneficiaryObj?.telco,
+        tv: beneficiaryObj?.tv,
         number: beneficiaryObj?.number,
       }));
     }
@@ -57,6 +58,16 @@ export default function TVFlow({
       plan_id: utility.id,
     }));
   }, []);
+
+  console.log(beneficiaryObj);
+  useEffect(() => {
+    if (beneficiaryObj) {
+      setSubscribeData((prev) => ({
+        ...prev,
+        plan_id: Number(beneficiaryObj?.plan_id),
+      }));
+    }
+  }, [beneficiaryObj]);
 
   const handleSelectChange = (field: string) => (selected: any) =>
     setCustomerData((prev) => ({ ...prev, [field]: selected?.value || "" }));
@@ -96,9 +107,9 @@ export default function TVFlow({
     setModalState("");
   };
 
-  const tvOptions = tv?.map((tv: any) => ({
-    value: tv.provider,
-    label: tv.provider,
+  const packageOptions = sub?.map((sub: any) => ({
+    value: sub.id,
+    label: sub.name,
   }));
 
   return (
@@ -133,22 +144,13 @@ export default function TVFlow({
         >
           <LabelInputComponent
             type="text"
-            name="name"
-            value={customerData.name}
-            onChange={handleCustomerChange}
-            label="Package"
-            required
-            readOnly
-          />
-          {/* <LabelInputComponent
-            type="text"
             name="tv"
             value={customerData.tv}
             onChange={handleCustomerChange}
             label="TV"
             required
             readOnly
-          /> */}
+          />
           <LabelInputComponent
             type="number"
             name="number"
@@ -158,14 +160,14 @@ export default function TVFlow({
             required
           />
 
-<div className="flex justify-end">
-          <p
-            className="text-[#A8353A] my-3 cursor-pointer"
-            onClick={() => setBeneficiaryState("ben")}
-          >
-            Choose Beneficiaries for tv
-          </p>
-        </div>
+          <div className="flex justify-end">
+            <p
+              className="text-[#A8353A] my-3 cursor-pointer"
+              onClick={() => setBeneficiaryState("ben")}
+            >
+              Choose Beneficiaries for tv
+            </p>
+          </div>
 
           <div className="mt-10 flex w-full justify-end">
             <button
@@ -192,6 +194,19 @@ export default function TVFlow({
             label="TV"
             readOnly
           />
+
+          <div className="relative w-full mt-6">
+            <Select
+              options={packageOptions}
+              value={packageOptions.find(
+                (option) => option.value === subscribeData.plan_id
+              )}
+              onChange={handleSelectChange("plan_id")}
+              styles={multiSelectStyle}
+              placeholder="Select Package"
+              required
+            />
+          </div>
           <LabelInputComponent
             type="text"
             name="number"
@@ -199,20 +214,13 @@ export default function TVFlow({
             readOnly
             label="Number"
           />
-          {/* <LabelInputComponent
-            type="text"
-            name="plan_id"
-            value={subscribeData.plan_id}
-            readOnly
-            label="PLan ID"
-          /> */}
+
           {/* <LabelInputComponent
             type="number"
             name="amount"
             value={subscribeData.amount}
             onChange={handleRechargeChange}
             label="Amount"
-            placeholder="5000"
             required
           /> */}
           <LabelInputComponent
@@ -221,7 +229,6 @@ export default function TVFlow({
             value={subscribeData.reference}
             onChange={handleRechargeChange}
             label="Reference (Optional)"
-            placeholder="TXN_87654321"
           />
           <div className="mt-10 flex w-full justify-between">
             <button

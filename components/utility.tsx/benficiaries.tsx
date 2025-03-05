@@ -13,63 +13,62 @@ export default function Beneficiaries({
   tv,
   internet,
   setABeneficiary,
+  setActiveBeneficiary,
   utility,
   setModalState,
+  setModalStateDelete,
+  modalStateDelete,
   activeRowId,
   setSuccessState,
   setBeneficiaryState,
 }) {
   const axiosInstance = createAxiosInstance();
   const { user } = useDataPermission();
-  const initialTopupData = {
-    telco: "",
-    number: "",
-    utility: "",
+
+  const getInitialData = (tab: string) => {
+    switch (tab) {
+      case "airtime":
+        return { telco: "", number: "", alias: "", utility: tab };
+      case "electricity":
+        return {
+          disco: "",
+          meterNumber: "",
+          type: "prepaid",
+          alias: "",
+          utility: tab,
+        };
+      case "internet":
+        return { telco: "", number: "", plan_id: "", alias: "", utility: tab };
+      case "tv":
+        return { tv: "", number: "", plan_id: "", alias: "", utility: tab };
+      default:
+        return {};
+    }
   };
 
+  // State for beneficiaries list and active tab
   const [beneficiaries, setBeneficiaries] = useState<any[]>([]);
-  const [data, setTopupData] = useState(initialTopupData);
+  const [activeTab, setActiveTab] = useState("airtime");
 
-  // When the utility changes, reset the telco (provider) selection
+  // State for the form data; initialize based on activeTab
+  const [data, setTopupData] = useState(getInitialData(activeTab));
+
   useEffect(() => {
-    setTopupData((prev) => ({ ...prev, telco: "" }));
-  }, [data.utility]);
+    setTopupData(getInitialData(activeTab));
+  }, [activeTab]);
 
-  const handleSelectChange = (field: string) => (selected: any) =>
-    setTopupData((prev) => ({ ...prev, [field]: selected?.value || "" }));
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setTopupData((prev) => ({ ...prev, [name]: value }));
+  const providerFieldMapping: { [key: string]: string } = {
+    airtime: "telco",
+    electricity: "disco",
+    internet: "telco",
+    tv: "tv",
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const providerField = providerFieldMapping[activeTab];
 
-    const { utility, ...payload } = data;
-    console.log(payload);
-    await axiosInstance.post(
-      `/users/${user.id}/beneficiaries?type=${activeTab}`,
-      payload
-    );
-    setSuccessState({
-      title: "Successful",
-      detail: "Beneficiary added",
-      status: true,
-    });
-    setModalState("");
-    setBeneficiaryState("");
-  };
-
-  const utilityOptions = [
-    { value: "electricity", label: "Electricity" },
-    { value: "airtime", label: "Airtime" },
-    { value: "internet", label: "Internet" },
-    { value: "tv", label: "TV Subscription" },
-  ];
-
+  // Compute provider options based on the active tab
   const providerOptions = (() => {
-    switch (data.utility) {
+    switch (activeTab) {
       case "airtime":
         return (
           airtime?.map((item: any) => ({
@@ -103,27 +102,52 @@ export default function Beneficiaries({
     }
   })();
 
-  const [activeTab, setActiveTab] = useState("airtime");
-  // State to toggle between list view and add beneficiary form view
+  const handleSelectChange = (field: string) => (selected: any) =>
+    setTopupData((prev) => ({ ...prev, [field]: selected?.value || "" }));
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setTopupData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  //toggle
   const [showForm, setShowForm] = useState(false);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const payload = { ...data };
+    await axiosInstance.post(
+      `/users/${user.id}/beneficiaries?type=${activeTab}`,
+      payload
+    );
+    setSuccessState({
+      title: "Successful",
+      detail: "Beneficiary added",
+      status: true,
+    });
+    setModalState("");
+    setShowForm(false);
+    // setBeneficiaryState("");
+  };
 
   const getUtilityBeneficiaries = async (tab: string) => {
     const response = await axiosInstance.get(
       `/users/${user.id}/beneficiaries?type=${tab}`
     );
-    // setBeneficiaries([
-    //   {
-    //     telco: "MTN",
-    //     number: "08012345678",
-    //   },
-    // ]);
     setBeneficiaries(response.data.data);
   };
+
   useEffect(() => {
     getUtilityBeneficiaries(activeTab);
-  }, [activeTab]);
+  }, [activeTab, showForm, modalStateDelete]);
 
-  console.log(utility, beneficiaries);
+  const planOptions = utility.dataSub?.map((sub: any) => ({
+    value: sub.id,
+    label: sub.name,
+  }));
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       {!showForm ? (
@@ -156,22 +180,39 @@ export default function Beneficiaries({
           <div className="space-y-4">
             {beneficiaries.length > 0 ? (
               beneficiaries.map((beneficiary, index) => {
-                const isClickable = true
-
+                const isClickable = true;
                 return (
                   <div
                     key={index}
-                    onClick={() => isClickable && setABeneficiary(beneficiary)}
-                    className={`bg-white shadow rounded-lg p-4 flex justify-between items-center border border-gray-200 
-            ${isClickable ? "cursor-pointer" : "cursor-not-allowed"}`}
+                    className={`bg-white shadow rounded-lg p-4 flex justify-between items-center border border-gray-200 ${
+                      isClickable ? "cursor-pointer" : "cursor-not-allowed"
+                    }`}
                   >
-                    <div>
+                    <div
+                      onClick={() =>
+                        isClickable && setABeneficiary(beneficiary)
+                      }
+                    >
                       <p className="text-sm text-gray-800">
-                        {beneficiary.telco}
+                        {beneficiary.alias}
                       </p>
                       <p className="text-gray-600 text-xs">
-                        {beneficiary.number}
+                        {beneficiary[providerField] || beneficiary.telco}
                       </p>
+                      <p className="text-gray-600 text-xs">
+                        {beneficiary.number || beneficiary.meterNumber}
+                      </p>
+                    </div>
+                    <div
+                      onClick={() => {
+                        setModalStateDelete("deleteBeneficiary");
+                        setActiveBeneficiary({
+                          ...beneficiary,
+                          activeTab: activeTab,
+                        });
+                      }}
+                    >
+                      <TrashIcon />
                     </div>
                   </div>
                 );
@@ -187,7 +228,7 @@ export default function Beneficiaries({
               onClick={() => setShowForm(true)}
               className="block rounded-md bg-[#A8353A] px-4 py-3.5 text-center text-xs font-semibold text-white"
             >
-              Add Beneficiary
+              Add {activeTab} beneficiary
             </button>
           </div>
         </>
@@ -219,39 +260,168 @@ export default function Beneficiaries({
             onSubmit={handleSubmit}
             className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
           >
-            <div className="relative w-full mt-6">
-              <Select
-                options={utilityOptions}
-                value={utilityOptions.find(
-                  (option) => option.value === data.utility
-                )}
-                onChange={handleSelectChange("utility")}
-                styles={multiSelectStyle}
-                placeholder="Select Utility"
-                required
-              />
+            {/* Display the beneficiary type */}
+            <div className="mb-4">
+              <span className="text-gray-700 font-medium">
+                Beneficiary Type: {activeTab}
+              </span>
             </div>
+            {/* Provider select */}
             <div className="relative w-full mt-6">
               <Select
                 options={providerOptions}
                 value={providerOptions.find(
-                  (option) => option.value === data.telco
+                  (option) => option.value === data[providerField]
                 )}
-                onChange={handleSelectChange("telco")}
+                onChange={handleSelectChange(providerField)}
                 styles={multiSelectStyle}
-                placeholder="Select Provider"
+                placeholder={
+                  activeTab === "electricity"
+                    ? "Select Disco"
+                    : activeTab === "tv"
+                    ? "Select TV Provider"
+                    : "Select Provider"
+                }
                 required
               />
             </div>
-            <LabelInputComponent
-              type="text"
-              name="number"
-              value={data.number}
-              onChange={handleChange}
-              label="Phone Number"
-              required
-            />
+            {/* Conditional inputs based on activeTab */}
+            {activeTab === "airtime" && (
+              <>
+                <LabelInputComponent
+                  type="text"
+                  name="number"
+                  value={data.number}
+                  onChange={handleChange}
+                  label="Phone Number"
+                  required
+                />
+                <LabelInputComponent
+                  type="text"
+                  name="alias"
+                  value={data.alias}
+                  onChange={handleChange}
+                  label="Alias"
+                  required
+                />
+              </>
+            )}
+            {activeTab === "electricity" && (
+              <>
+                <LabelInputComponent
+                  type="text"
+                  name="meterNumber"
+                  value={data.meterNumber}
+                  onChange={handleChange}
+                  label="Meter Number"
+                  required
+                />
+                <div className="mt-6">
+                  <Select
+                    options={[
+                      { value: "prepaid", label: "Prepaid" },
+                      { value: "postpaid", label: "Postpaid" },
+                    ]}
+                    value={[
+                      { value: "prepaid", label: "Prepaid" },
+                      { value: "postpaid", label: "Postpaid" },
+                    ].find((option) => option.value === data.type)}
+                    // value={
+                    //   data.type
+                    //     ? {
+                    //         value: data.type,
+                    //         label:
+                    //           data.type.charAt(0).toUpperCase() +
+                    //           data.type.slice(1),
+                    //       }
+                    //     : null
+                    // }
+                    onChange={handleSelectChange("type")}
+                    styles={multiSelectStyle}
+                    placeholder="Select Prepaid/Postpaid"
+                    required
+                  />
+                </div>
 
+                <LabelInputComponent
+                  type="text"
+                  name="alias"
+                  value={data.alias}
+                  onChange={handleChange}
+                  label="Alias"
+                  required
+                />
+              </>
+            )}
+            {activeTab === "internet" && (
+              <>
+                <LabelInputComponent
+                  type="text"
+                  name="number"
+                  value={data.number}
+                  onChange={handleChange}
+                  label="Phone Number"
+                  required
+                />
+                <LabelInputComponent
+                  type="text"
+                  name="plan_id"
+                  value={data.plan_id}
+                  onChange={handleChange}
+                  label="Plan ID"
+                  required
+                />
+
+                <div className="relative w-full mt-6">
+                  <Select
+                    options={planOptions}
+                    value={planOptions.find(
+                      (option) => option.value === data.plan_id
+                    )}
+                    onChange={handleSelectChange("plan_id")}
+                    styles={multiSelectStyle}
+                    placeholder="Select Plan"
+                    required
+                  />
+                </div>
+                <LabelInputComponent
+                  type="text"
+                  name="alias"
+                  value={data.alias}
+                  onChange={handleChange}
+                  label="Alias"
+                  required
+                />
+              </>
+            )}
+            {activeTab === "tv" && (
+              <>
+                <LabelInputComponent
+                  type="text"
+                  name="number"
+                  value={data.number}
+                  onChange={handleChange}
+                  label="Phone Number"
+                  required
+                />
+                <LabelInputComponent
+                  type="text"
+                  name="plan_id"
+                  value={data.plan_id}
+                  onChange={handleChange}
+                  label="Plan ID"
+                  required
+                />
+                <LabelInputComponent
+                  type="text"
+                  name="alias"
+                  value={data.alias}
+                  onChange={handleChange}
+                  label="Alias"
+                  required
+                />
+              </>
+            )}
             <div className="mt-10 flex w-full justify-end">
               <button
                 type="submit"
