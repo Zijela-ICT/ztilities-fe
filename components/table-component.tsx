@@ -85,6 +85,7 @@ export default function TableComponent({
     "type",
     "nonProcurementLimit",
     "apportionmentMetric",
+    
   ];
 
   const [input, setInput] = useState("");
@@ -185,7 +186,11 @@ export default function TableComponent({
       column !== "isApportioned" &&
       column !== "isDeactivated" &&
       column !== "purchaseOrderFileUrl" &&
-      column !== "isWorkOrder"
+      column !== "isWorkOrder"&&
+      // column !=="evidenceURLs"&&
+      column !== "paymentURL" &&
+      column !== "redirect" &&
+      column !=="wallet"
   );
 
   // Only show filters for columns that are in filterColumns and displayedColumns
@@ -426,6 +431,7 @@ export default function TableComponent({
                         type === "bills" ||
                         type === "units" ||
                         type === "categories" ||
+                        type === "approvefunding"||
                         type === "powers" ? (
                           row[column]?.length
                         ) : (
@@ -478,6 +484,9 @@ export default function TableComponent({
                         <StatusBadge status={row[column]} />
                       ) : column === "amount" ? (
                         row[column] && formatCurrency(row[column])
+                      ): column === "description" || column === "reference" || column === "title" ? (
+                        <span title={row[column]} className="truncate w-32 block">{row[column]} oo</span>
+
                       ) : column === "paidAt" || column === "createdAt" ? (
                         row[column] && moment.utc(row[column]).format("ll")
                       ) : column === "avatar" ? (

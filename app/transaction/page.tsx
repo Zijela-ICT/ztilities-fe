@@ -35,6 +35,9 @@ import formatCurrency from "@/utils/formatCurrency";
 import FundOtherWallet from "@/components/transaction/fund-other-wallet";
 import Payouts from "@/components/transaction/payout";
 import moment from "moment";
+import DynamicCreateForm from "@/components/dynamic-create-form";
+import CreatePin from "@/components/transaction/create-pin";
+import ManagePin from "@/components/transaction/create-pin";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -293,6 +296,15 @@ function Transactions() {
         type={"User"}
       />
     ),
+    managePin: (
+      <>
+        <ManagePin
+          activeRowId={user.wallets[selectedWalletIndex]?.id}
+          setModalState={setCentralState}
+          setSuccessState={setSuccessState}
+        />
+      </>
+    ),
   };
 
   return (
@@ -309,7 +321,13 @@ function Transactions() {
         }
       ></SuccessModalCompoenent>
       <ModalCompoenent
-        title={centralState === "fundWallet" ? "Fund Wallet" : "Transfer"}
+        title={
+          centralState === "fundWallet"
+            ? "Fund Wallet"
+            : centralState === "managePin"
+            ? "Manage Pin"
+            : "Transfer"
+        }
         detail={""}
         modalState={centralState}
         setModalState={() => {
@@ -433,6 +451,12 @@ function Transactions() {
                   className="px-3 py-1 rounded bg-white text-black"
                 >
                   Payout
+                </button>
+                <button
+                  onClick={() => setCentralState("managePin")}
+                  className="px-3 py-1 rounded bg-white text-black"
+                >
+                  Manage PIN
                 </button>
               </div>
             )}

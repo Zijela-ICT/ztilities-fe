@@ -10,10 +10,8 @@ import ModalCompoenent, {
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
-import ApportionPower from "@/components/work-request/apportionPower";
-import FacilityDetails from "@/components/facility-management/view-facility";
 import createAxiosInstance from "@/utils/api";
-import CreateBulk from "@/components/user-management/create-bulk";
+import DynamicCreateForm from "@/components/dynamic-create-form";
 
 function Power() {
   const axiosInstance = createAxiosInstance();
@@ -32,18 +30,17 @@ function Power() {
     status: false,
   });
 
-  const [powerCharges, setPowerCharges] = useState<any[]>();
-  const [powerCharge, setAPowerCharge] = useState<any[]>();
+  const [payments, setPayments] = useState<any[]>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   // Fetch data functions
-  const getPowerCharges = async () => {
+  const getPayments = async () => {
     const response = await axiosInstance.get(
-      `/power-charges?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
+      `/payments/?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
-    setPowerCharges(response.data.data);
+    setPayments(response.data.data);
     const extra = response.data.extra;
     setPagination({
       currentPage: extra.page,
@@ -53,38 +50,12 @@ function Power() {
     });
   };
 
-  const getAPowerCharge = async () => {
-    const response = await axiosInstance.get(`/power-charges/${activeRowId}`);
-    setAPowerCharge(response.data.data);
-  };
-
-  // Delete functions
-  const deletePowerCharge = async () => {
-    await axiosInstance.delete(`/power-charges/${activeRowId}`);
-    setCentralStateDelete("");
-    setSuccessState({
-      title: "Successful",
-      detail: "You have successfully deleted this vendor",
-      status: true,
-    });
-  };
-
-  const approvePowerCharge = async () => {
-    await axiosInstance.patch(`/power-charges/${activeRowId}/status/approve`);
+  const approveFunding = async () => {
+    await axiosInstance.patch(`/payments/manual-fund/${activeRowId}/verify`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
       detail: "You have successfully approved this power charge",
-      status: true,
-    });
-  };
-
-  const apportionPowerCharge = async () => {
-    await axiosInstance.patch(`/power-charges/${activeRowId}/apportion`);
-    setCentralStateDelete("");
-    setSuccessState({
-      title: "Successful",
-      detail: "You have successfully apportioned power charge",
       status: true,
     });
   };
@@ -97,77 +68,55 @@ function Power() {
   // Dynamic title and detail logic
   const getTitle = () => {
     switch (centralState) {
-      case "createPowerCharge":
-        return "Create Power Charge";
-      case "viewPowerCharge":
-        return "View Power Charge";
-      case "createBulkPowerCharge":
-        return "Upload Bulk Power Charge";
+      case "rejectFunding":
+        return "Reject";
     }
     switch (centralStateDelete) {
-      case "approvePowerCharge":
-        return "Approve Power Charge";
-      case "apportionPowerCharge":
-        return "Apportion Power Charge";
-      case "deletePowerCharge":
-        return "Delete Power Charge";
+      case "approveFunding":
+        return "Verify Funding";
     }
     return "Zijela";
   };
 
   const getDetail = () => {
     switch (centralState) {
-      case "createPowerCharge":
-        return "";
-      case "viewPowerCharge":
-        return "";
-      case "createBulkPowerCharge":
-        return "Import CSV/Excel file";
+      case "rejectFunding":
+        return "Give reason for rejection";
     }
     switch (centralStateDelete) {
-      case "approvePowerCharge":
-        return "Are you sure you want to approve the power charge";
-      case "apportionPowerCharge":
-        return "Are you sure you want to apportion the power charge";
-      case "deletePowerCharge":
-        return "Are you sure you want to delete the power charge";
+      case "approveFunding":
+        return "Are you sure you want to verify this payment";
     }
     return "Zijela";
   };
 
   // Mapping centralState values to components
   const componentMap: Record<string, JSX.Element> = {
-    createPowerCharge: (
-      <ApportionPower
+    rejectFunding: (
+      <DynamicCreateForm
+        inputs={[
+          {
+            name: "reasonForRejection",
+            label: "Reason for rejection",
+            type: "textarea",
+          },
+        ]}
+        selects={[]}
+        title="Reject fund"
+        apiEndpoint={`/payments/manual-fund/${activeRowId}/reject`}
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/payments/${id}`).then((res) => res.data.data)
+        }
       />
-    ),
-    createBulkPowerCharge: (
-      <CreateBulk
-        type="Power Charges"
-        activeRowId={activeRowId}
-        setModalState={setCentralState}
-        setSuccessState={setSuccessState}
-      />
-    ),
-    viewPowerCharge: (
-      <div className="p-4">
-        <FacilityDetails facility={powerCharge} title="Power Charge" />
-      </div>
     ),
   };
 
   useEffect(() => {
-    if (centralState === "viewPowerCharge") {
-      getAPowerCharge();
-    }
-  }, [centralState]);
-
-  useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([getPowerCharges()]);
+      await Promise.all([getPayments()]);
     };
     fetchData();
   }, [
@@ -180,7 +129,7 @@ function Power() {
 
   return (
     <DashboardLayout
-      title="Aprove Funding"
+      title="Mange Funding"
       detail="Manage and approve all pending fundings"
     >
       <SuccessModalCompoenent
@@ -198,13 +147,7 @@ function Power() {
         modalState={centralStateDelete}
         setModalState={setCentralStateDelete}
         takeAction={
-          centralStateDelete === "approvePowerCharge"
-            ? approvePowerCharge
-            : centralStateDelete === "apportionPowerCharge"
-            ? apportionPowerCharge
-            : centralStateDelete === "deletePowerCharge"
-            ? deletePowerCharge
-            : null
+          centralStateDelete === "approveFunding" ? approveFunding : null
         }
       ></ActionModalCompoenent>
 
@@ -220,10 +163,10 @@ function Power() {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      <PermissionGuard requiredPermissions={["read_power-charges"]}>
+      <PermissionGuard requiredPermissions={["read_payments"]}>
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           <TableComponent
-            data={[]}
+            data={payments}
             type="approvefunding"
             setModalState={setCentralState}
             setModalStateDelete={setCentralStateDelete}
@@ -244,4 +187,4 @@ function Power() {
   );
 }
 
-export default withPermissions(Power, ["users"]);
+export default withPermissions(Power, ["payments"]);

@@ -146,7 +146,7 @@ export default function Navigation() {
         {
           href: "/transaction/approve-funding",
           label: "Approve funding",
-          permissions: ["users"],
+          permissions: ["payments", "users"],
           icon: <TransactionMIcon />,
         },
       ],

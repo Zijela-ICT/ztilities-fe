@@ -58,7 +58,7 @@ export default function FundOtherWallet({
   }, [type]);
 
   const options = unit?.wallets?.map((wallet: any) => ({
-    value: wallet.id,
+    value: wallet.walletID,
     label: wallet.walletType + " ₦ " + wallet.balance,
   }));
 

@@ -293,12 +293,12 @@ export default function DynamicCreateForm({
           }
 
           if (input.type === "textarea") {
-            if (
-              formData.status !== "rejected" &&
-              input.name === "reasonForRejection"
-            ) {
-              return null; // Skip rendering this select if typeSelected does not match
-            }
+            // if (
+            //   formData.status !== "rejected" &&
+            //   input.name === "reasonForRejection"
+            // ) {
+            //   return null; // Skip rendering this select if typeSelected does not match
+            // }
             return (
               <div key={index} className="relative w-full mt-6">
                 <LabelTextareaComponent

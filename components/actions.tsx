@@ -711,7 +711,7 @@ const Actions: React.FC<UserActionsProps> = ({
         <>
           <div className="relative">
             {/* Button */}
-            <PermissionGuard requiredPermissions={[]}>
+            <PermissionGuard requiredPermissions={["read_payments:id"]}>
               <button
                 onClick={() => toggleActions(row.id)}
                 className="text-blue-500 hover:text-blue-700"
@@ -734,24 +734,28 @@ const Actions: React.FC<UserActionsProps> = ({
                       onClick={() =>
                         router.push(`/transaction/approve-funding/${row.id}`)
                       }
-                      permissions={[]}
+                      permissions={["read_payments:id"]}
                     />
                   </li>
 
-                  <li>
-                    <DropdownButtonComponent
-                      text="Approve"
-                      onClick={() => setModalStateDelete("approveFunding")}
-                      permissions={[]}
-                    />
-                  </li>
-                  <li>
-                    <DropdownButtonComponent
-                      text="Reject"
-                      onClick={() => setModalStateDelete("rejectFunding")}
-                      permissions={[]}
-                    />
-                  </li>
+                  {row.type === "MANUAL_FUNDING" && (
+                    <>
+                      <li>
+                        <DropdownButtonComponent
+                          text="Verify"
+                          onClick={() => setModalStateDelete("approveFunding")}
+                          permissions={["update_payments:manual-fund/id/verify"]}
+                        />
+                      </li>
+                      <li>
+                        <DropdownButtonComponent
+                          text="Reject"
+                          onClick={() => setModalState("rejectFunding")}
+                          permissions={["update_payments:manual-fund/id/reject"]}
+                        />
+                      </li>
+                    </>
+                  )}
                 </ul>
               </ActionDropdownComponent>
             )}
