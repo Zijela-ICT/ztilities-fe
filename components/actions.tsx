@@ -879,6 +879,7 @@ const Actions: React.FC<UserActionsProps> = ({
                         router.push(`/work-orders/${row.id}`)
                       }
                       permissions={[
+                        "read_work-orders:id",
                         "read_work-orders:id/users-with-work-request-approval-limit/all",
                       ]}
                     />
