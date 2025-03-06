@@ -277,7 +277,7 @@ const Actions: React.FC<UserActionsProps> = ({
                 "delete_blocks:id",
                 "update_blocks:id",
                 "read_blocks:id",
-                "update_blocks:id/assign"
+                "update_blocks:id/assign",
               ]}
             >
               <button
@@ -351,7 +351,7 @@ const Actions: React.FC<UserActionsProps> = ({
                 "delete_units:id",
                 "update_units:id",
                 "read_units:id",
-                "update_units:id/assign/officers"
+                "update_units:id/assign/officers",
               ]}
             >
               <button
@@ -840,6 +840,13 @@ const Actions: React.FC<UserActionsProps> = ({
                       />
                     </li>
                   )}
+                  <li>
+                    <DropdownButtonComponent
+                      text="Attach File"
+                      onClick={() => setModalState("attachFile")}
+                      permissions={["create_files:upload"]}
+                    />
+                  </li>
                 </ul>
               </ActionDropdownComponent>
             )}

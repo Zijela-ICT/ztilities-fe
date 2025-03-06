@@ -202,6 +202,8 @@ function WorkRequests({ nowrap }: Props) {
         return "Assign Technician";
       case "acceptQuotation":
         return "Accept Quotation";
+      case "attachFile":
+        return "Upload File";
     }
     switch (centralStateDelete) {
       case "deactivateWorkRequest":
@@ -247,6 +249,8 @@ function WorkRequests({ nowrap }: Props) {
         return "";
       case "acceptQuotation":
         return "";
+        case "attachFile":
+          return "Upload a file here";
     }
     switch (centralStateDelete) {
       case "activateWorkRequest":
@@ -318,6 +322,19 @@ function WorkRequests({ nowrap }: Props) {
         selects={[]}
         title="Add Attachment"
         apiEndpoint={`/work-requests/${activeRowId}/upload-attachment`}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
+    ),
+    attachFile: (
+      <DynamicCreateForm
+        inputs={[
+          { name: "title", label: "Title", type: "text" },
+          { name: "file", label: "File", type: "file" },
+        ]}
+        selects={[]}
+        title="Attach File"
+        apiEndpoint={`/work-orders/${activeRowId}/upload-attachment`}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
       />
