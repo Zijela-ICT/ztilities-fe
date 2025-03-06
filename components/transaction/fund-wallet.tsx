@@ -474,7 +474,7 @@ export default function FundWallet({
                   <button
                     type="button"
                     onClick={handleAddAdditionalFile}
-                    className="text-blue-500 mt-2"
+                    className="text-[#A8353A] mt-2"
                   >
                     + Add
                   </button>
