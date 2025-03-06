@@ -5,6 +5,7 @@ interface DropdownProps {
   contextMenuedActions?: (value: any) => void;
   contextMenued?: string | null;
   children: any;
+  className?: string;
 }
 
 export default function ActionDropdownComponent({
@@ -12,6 +13,7 @@ export default function ActionDropdownComponent({
   contextMenuedActions,
   toggleActions,
   children,
+  className,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -37,7 +39,7 @@ export default function ActionDropdownComponent({
   if (!isOpen) return null;
 
   return (
-    <>
+    <div className={className}>
       {contextMenued ? (
         <div
           ref={dropdownRef}
@@ -53,6 +55,6 @@ export default function ActionDropdownComponent({
           {children}
         </div>
       )}
-    </>
+    </div>
   );
 }

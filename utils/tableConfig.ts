@@ -10,7 +10,7 @@ export const tableMainButtonConfigs = {
       text: "Bulk User",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-      permissions: ["create_users", "create_users:pre-register"],
+      permissions: ["create_users:pre-register/bulk"],
       action: "createBulkUser",
     },
   ],
@@ -40,7 +40,7 @@ export const tableMainButtonConfigs = {
       text: "Bulk Facility",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-      permissions: ["create_facilities"],
+      permissions: ["create_facilities:bulk"],
       action: "createBulkFacility",
     },
   ],
@@ -55,7 +55,7 @@ export const tableMainButtonConfigs = {
       text: "Bulk Blocks",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-      permissions: ["create_blocks"],
+      permissions: ["create_blocks:bulk"],
       action: "createBulkBlock",
     },
   ],
@@ -70,7 +70,7 @@ export const tableMainButtonConfigs = {
       text: "Bulk Units",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-      permissions: ["create_units"],
+      permissions: ["create_units:bulk"],
       action: "createBulkUnit",
     },
   ],
@@ -85,7 +85,7 @@ export const tableMainButtonConfigs = {
       text: "Bulk Assets",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-      permissions: ["create_assets"],
+      permissions: ["create_assets:bulk"],
       action: "createBulkAsset",
     },
   ],
@@ -100,7 +100,7 @@ export const tableMainButtonConfigs = {
       text: "Bulk Category",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-      permissions: ["create_assets:/category"],
+      permissions: ["create_assets:/category/bulk"],
       action: "createBulkAssetCategory",
     },
   ],
@@ -115,7 +115,7 @@ export const tableMainButtonConfigs = {
       text: "Bulk Vendor",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-      permissions: ["create_vendors"],
+      permissions: ["create_vendors:bulk"],
       action: "createBulkVendor",
     },
   ],
@@ -130,7 +130,7 @@ export const tableMainButtonConfigs = {
       text: "Bulk Technician",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-      permissions: ["create_technicians"],
+      permissions: ["create_technicians:bulk"],
       action: "createBulkTechnician",
     },
   ],

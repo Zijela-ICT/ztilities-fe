@@ -781,10 +781,7 @@ const Actions: React.FC<UserActionsProps> = ({
                   <li>
                     <DropdownButtonComponent
                       text="View"
-                      onClick={() =>
-                        // setModalState("viewWorkRequest")
-                        router.push(`/work-requests/${row.id}`)
-                      }
+                      onClick={() => router.push(`/work-requests/${row.id}`)}
                       permissions={["read_work-requests:id"]}
                     />
                   </li>

@@ -388,7 +388,7 @@ function WorkOrders({ nowrap }: Props) {
         ]}
         inputs={[
           { name: "title", label: "Title", type: "text" },
-          { name: "file", label: "FIle", type: "file" },
+          { name: "file", label: "Quotation", type: "file" },
           { name: "invoice", label: "Invoice", type: "file" },
           { name: "amount", label: "Amount", type: "number" },
           { name: "dueDate", label: "Due Date", type: "date" },

@@ -249,8 +249,8 @@ function WorkRequests({ nowrap }: Props) {
         return "";
       case "acceptQuotation":
         return "";
-        case "attachFile":
-          return "Upload a file here";
+      case "attachFile":
+        return "Upload a file here";
     }
     switch (centralStateDelete) {
       case "activateWorkRequest":
