@@ -70,16 +70,6 @@ function Dashboard() {
     const response = await axiosInstance.get("/wallets/user-wallets");
   };
 
-  // useEffect to fetch getMe initially and every 5 minutes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      getMe();
-      getWallet();
-    }, 5 * 60 * 1000); // 5 minutes in milliseconds
-
-    return () => clearInterval(interval); // Cleanup interval on unmount
-  }, []);
-
   const loading = !(user && userPermissions);
 
   const [purchaseOrders, setPurchaseOrders] = useState<any>();
@@ -126,27 +116,6 @@ function Dashboard() {
     );
     setInitiatedWorkRequests(response.data.data);
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([
-        getPurchaseOrders(),
-        getOverdueWorkOrders(),
-        getPendingWorkOrders(),
-        getOverdueWorkRequests(),
-        getPendingWorkRequests(),
-        getInitiatedWorkRequests(),
-      ]);
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([getMe(), getWallet()]);
-    };
-    fetchData();
-  }, []);
 
   const data = [
     {
@@ -225,6 +194,31 @@ function Dashboard() {
     return "Zijela";
   };
   const [showBalance, setShowBalance] = useState(true);
+
+  useEffect(() => {
+    const fetchAllData = async () => {
+      await Promise.all([
+        getPurchaseOrders(),
+        getOverdueWorkOrders(),
+        getPendingWorkOrders(),
+        getOverdueWorkRequests(),
+        getPendingWorkRequests(),
+        getInitiatedWorkRequests(),
+        getMe(),
+        getWallet(),
+      ]);
+    };
+
+    fetchAllData();
+
+    const interval = setInterval(() => {
+      getMe();
+      getWallet();
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       {!loading ? (

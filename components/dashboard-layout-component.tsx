@@ -16,6 +16,7 @@ import Image from "next/image";
 import formatCurrency from "@/utils/formatCurrency";
 import createAxiosInstance from "@/utils/api";
 import NotificationCard from "./notif-component";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function DashboardLayout({
   children,
@@ -35,9 +36,13 @@ export default function DashboardLayout({
   const axiosInstance = createAxiosInstance();
   const { user, setUser, setUserPermissions, setUserRoles } =
     useDataPermission();
+  const pathname = usePathname();
+  const router = useRouter();
   const [centralState, setCentralState] = useState<string>();
   const [selectedWallet, setSelectedWallet] = useState<any>();
   const [showNotifications, setShowNotifications] = useState(false);
+
+  console.log(pathname);
 
   useEffect(() => {
     setSelectedWallet(user?.wallets[0]);
@@ -57,8 +62,10 @@ export default function DashboardLayout({
   };
 
   useEffect(() => {
-    getMe();
-  }, []);
+    if (pathname !== "/dashboard") {
+      getMe();
+    }
+  }, [pathname]);
 
   const handleWalletChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = user.wallets.find(
