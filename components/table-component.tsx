@@ -485,7 +485,7 @@ export default function TableComponent({
                       ) : column === "amount" ? (
                         row[column] && formatCurrency(row[column])
                       ): column === "description" || column === "reference" || column === "title" ? (
-                        <span title={row[column]} className="truncate w-32 block">{row[column]} oo</span>
+                        <span title={row[column]} className="truncate w-32 block">{row[column]}</span>
 
                       ) : column === "paidAt" || column === "createdAt" ? (
                         row[column] && moment.utc(row[column]).format("ll")
