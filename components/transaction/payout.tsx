@@ -11,16 +11,22 @@ import { toast } from "react-toastify";
 
 interface FundWalletProps {
   setModalState: (state: any) => void;
+  setPINState?: (state: any) => void;
   activeRowId: number | string;
   setSuccessState?: (state: any) => void;
   type?: string;
+  code?: any[];
+  setCode?:any
 }
 
 export default function Payouts({
   setModalState,
+  setPINState,
   activeRowId,
   setSuccessState,
   type,
+  code,
+  setCode
 }: FundWalletProps) {
   const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({
@@ -130,41 +136,57 @@ export default function Payouts({
     }
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const { myWalletId, ...rest } = formData;
-    const payload = {
-      ...rest,
-      //   amount: Number(formData.amount) || 0,
-    };
-    console.log(payload);
-    await axiosInstance.post(
-      `/payments/payout/bank-transfer/${formData.myWalletId}`,
-      payload
-    );
-    setFormData({
-      account_number: "",
-      bank_code: "",
-      bank_name: "",
-      myWalletId: "",
-      amount: "",
-      narration: "",
-    });
-    setModalState("");
-    setSuccessState({
-      title: "Successful",
-      detail: `Your payout was successful`,
-      status: true,
-    });
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      const { myWalletId, ...rest } = formData;
+      const joinCode = code.join("");
+      const payload = {
+        ...rest,
+        pin: joinCode,
+        //   amount: Number(formData.amount) || 0,
+      };
+      console.log(payload);
+      await axiosInstance.post(
+        `/payments/payout/bank-transfer/${formData.myWalletId}`,
+        payload
+      );
+      setFormData({
+        account_number: "",
+        bank_code: "",
+        bank_name: "",
+        myWalletId: "",
+        amount: "",
+        narration: "",
+      });
+      setModalState("");
+      setSuccessState({
+        title: "Successful",
+        detail: `Your payout was successful`,
+        status: true,
+      });
+    } catch (error) {
+      setLoading(false);
+      setCode(Array(4).fill(""))
+    }
   };
-
+  useEffect(() => {
+    const allNonEmpty = code.every((str) => str !== "");
+    if (allNonEmpty) {
+      handleSubmit();
+      setPINState("");
+    }
+  }, [code]);
   return (
     <div>
       {loading ? (
         <MyLoaderFinite height="h-[50vh]" />
       ) : (
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e: FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            setPINState("enterPIN");
+          }}
           className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
         >
           <div className="relative w-full mt-6">

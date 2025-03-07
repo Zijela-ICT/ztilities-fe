@@ -34,6 +34,7 @@ interface AuthUser {
   facilities: Facility[];
   blocks: Block[];
   wallets: any[];
+  hasPin : boolean
 }
 
 interface Permission {

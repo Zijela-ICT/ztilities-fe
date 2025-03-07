@@ -35,8 +35,6 @@ import formatCurrency from "@/utils/formatCurrency";
 import FundOtherWallet from "@/components/transaction/fund-other-wallet";
 import Payouts from "@/components/transaction/payout";
 import moment from "moment";
-import DynamicCreateForm from "@/components/dynamic-create-form";
-import CreatePin from "@/components/transaction/create-pin";
 import ManagePin from "@/components/transaction/create-pin";
 
 // Register required components in Chart.js
@@ -66,6 +64,7 @@ function Transactions() {
     status: false,
   });
 
+  const [code, setCode] = useState(Array(4).fill("")); // Array to hold each digit
   const [loading, setLoading] = useState<boolean>();
   const [transactionId, setTransactionId] = useState<any>();
   const [entity, setEntity] = useState<any>();
@@ -101,6 +100,35 @@ function Transactions() {
 
   const handleApplyFilters = () => {
     console.log("Filters Applied:", filters);
+  };
+
+  // Handle changes for each input box
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const value = e.target.value.replace(/[^0-9]/g, ""); // Only allow numbers
+    if (value.length <= 1) {
+      const newCode = [...code];
+      newCode[index] = value;
+      setCode(newCode);
+
+      // Automatically focus the next input
+      if (value && index < 5) {
+        const nextInput = document.getElementById(`code-input-${index + 1}`);
+        nextInput?.focus();
+      }
+    }
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    if (e.key === "Backspace" && !code[index] && index > 0) {
+      const prevInput = document.getElementById(`code-input-${index - 1}`);
+      prevInput?.focus();
+    }
   };
 
   const getUsers = async () => {
@@ -269,6 +297,7 @@ function Transactions() {
   };
 
   const [centralState, setCentralState] = useState<string>();
+  const [PINState, setPINState] = useState<string>();
   const [selectedWalletIndex, setSelectedWalletIndex] = useState(0);
   const [showBalance, setShowBalance] = useState(true);
   // Component mapping
@@ -284,6 +313,9 @@ function Transactions() {
       <FundOtherWallet
         activeRowId={user.wallets[selectedWalletIndex]?.id}
         setModalState={setCentralState}
+        setPINState={setPINState}
+        code={code}
+        setCode={setCode}
         setSuccessState={setSuccessState}
         type={"User"}
       />
@@ -292,6 +324,9 @@ function Transactions() {
       <Payouts
         activeRowId={user.wallets[selectedWalletIndex]?.id}
         setModalState={setCentralState}
+        setPINState={setPINState}
+        code={code}
+        setCode={setCode}
         setSuccessState={setSuccessState}
         type={"User"}
       />
@@ -304,6 +339,22 @@ function Transactions() {
           setSuccessState={setSuccessState}
         />
       </>
+    ),
+    enterPIN: (
+      <div className="flex gap-1 justify-between pt-6 pb-8 px-10 ">
+        {code.map((digit, index) => (
+          <input
+            key={index}
+            id={`code-input-${index}`}
+            type="text"
+            value={digit}
+            onChange={(e) => handleChange(e, index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            maxLength={1}
+            className="w-12 h-12 text-center bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        ))}
+      </div>
     ),
   };
 
@@ -335,6 +386,19 @@ function Transactions() {
         }}
       >
         {componentMap[centralState]}
+      </ModalCompoenent>
+
+      <ModalCompoenent
+        width="max-w-sm"
+        title={"Enter your PIN"}
+        detail={""}
+        modalState={PINState}
+        setModalState={() => {
+          setPINState("");
+          setCode(Array(4).fill(""));
+        }}
+      >
+        {componentMap[PINState]}
       </ModalCompoenent>
       {loading && (
         <div className="flex items-center justify-center space-x-4">

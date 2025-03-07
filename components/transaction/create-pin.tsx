@@ -3,6 +3,7 @@ import { LabelInputComponent } from "../input-container";
 import createAxiosInstance from "@/utils/api";
 import { MyLoaderFinite } from "../loader-components";
 import { toast } from "react-toastify"; // Make sure react-toastify is installed
+import { useDataPermission } from "@/context";
 
 interface ManagePinProps {
   setModalState: (state: any) => void;
@@ -20,7 +21,11 @@ export default function ManagePin({
   type,
 }: ManagePinProps) {
   const axiosInstance = createAxiosInstance();
-  const [selectedMethod, setSelectedMethod] = useState<Method>("create");
+  const { user } = useDataPermission();
+  const [selectedMethod, setSelectedMethod] = useState<Method>(
+    user.hasPin === false ? "create" : "change"
+  );
+
   const [loading, setLoading] = useState<boolean>(false);
 
   // Common form state for all PIN methods.
@@ -112,28 +117,33 @@ export default function ManagePin({
         <>
           {/* Navigation Tabs */}
           <div className="flex my-4 px-6 space-x-4">
-            <button
-              type="button"
-              onClick={() => setSelectedMethod("create")}
-              className={`px-4 py-2 rounded-md ${
-                selectedMethod === "create"
-                  ? "bg-gray-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              Create PIN
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedMethod("change")}
-              className={`px-4 py-2 rounded-md ${
-                selectedMethod === "change"
-                  ? "bg-gray-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              Change PIN
-            </button>
+            {user.hasPin === false && (
+              <button
+                type="button"
+                onClick={() => setSelectedMethod("create")}
+                className={`px-4 py-2 rounded-md ${
+                  selectedMethod === "create"
+                    ? "bg-gray-500 text-white"
+                    : "bg-gray-200 text-gray-700"
+                }`}
+              >
+                Create PIN
+              </button>
+            )}
+
+            {user.hasPin === true && (
+              <button
+                type="button"
+                onClick={() => setSelectedMethod("change")}
+                className={`px-4 py-2 rounded-md ${
+                  selectedMethod === "change"
+                    ? "bg-gray-500 text-white"
+                    : "bg-gray-200 text-gray-700"
+                }`}
+              >
+                Change PIN
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setSelectedMethod("forgot")}
@@ -148,7 +158,7 @@ export default function ManagePin({
           </div>
 
           <form onSubmit={handleSubmit} className="mt-12 px-6 max-w-full pb-12">
-            {selectedMethod === "create" && (
+            {selectedMethod === "create" && user.hasPin === false && (
               <>
                 <LabelInputComponent
                   type="password"
@@ -156,6 +166,7 @@ export default function ManagePin({
                   value={formData.pin}
                   onChange={handleChange}
                   label="Enter New PIN"
+                  maxLength={4}
                   required
                 />
                 <LabelInputComponent
@@ -164,12 +175,13 @@ export default function ManagePin({
                   value={formData.confirmPin}
                   onChange={handleChange}
                   label="Confirm New PIN"
+                  maxLength={4}
                   required
                 />
               </>
             )}
 
-            {selectedMethod === "change" && (
+            {selectedMethod === "change" && user.hasPin === true && (
               <>
                 <LabelInputComponent
                   type="password"
@@ -177,6 +189,7 @@ export default function ManagePin({
                   value={formData.oldPin}
                   onChange={handleChange}
                   label="Old PIN"
+                  maxLength={4}
                   required
                 />
                 <LabelInputComponent
@@ -185,6 +198,7 @@ export default function ManagePin({
                   value={formData.newPin}
                   onChange={handleChange}
                   label="New PIN"
+                  maxLength={4}
                   required
                 />
                 <LabelInputComponent
@@ -193,6 +207,7 @@ export default function ManagePin({
                   value={formData.confirmNewPin}
                   onChange={handleChange}
                   label="Confirm New PIN"
+                  maxLength={4}
                   required
                 />
               </>

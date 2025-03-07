@@ -8,16 +8,22 @@ import { toast } from "react-toastify";
 
 interface FundWalletProps {
   setModalState: (state: any) => void;
+  setPINState?: (state: any) => void;
   activeRowId: number | string;
   setSuccessState?: (state: any) => void;
   type?: string;
+  code?: any[];
+  setCode?: any
 }
 
 export default function FundOtherWallet({
   setModalState,
+  setPINState,
   activeRowId,
   setSuccessState,
   type,
+  code,
+  setCode
 }: FundWalletProps) {
   const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({
@@ -99,26 +105,43 @@ export default function FundOtherWallet({
     }
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const { myWalletId, ...rest } = formData;
-    const payload = {
-      ...rest,
-      amount: Number(formData.amount) || 0,
-    };
-    await axiosInstance.post(`/wallets/wallet-wallet/transfer`, payload);
-    setFormData({
-      myWalletId: "",
-      walletId: "",
-      amount: "",
-    });
-    setModalState("");
-    setSuccessState({
-      title: "Successful",
-      detail: `Your transaction is successful`,
-      status: true,
-    });
+  const handleSubmit = async () => {
+    setLoading(true)
+    try {
+      const { myWalletId, ...rest } = formData;
+      const joinCode = code.join("");
+      const payload = {
+        ...rest,
+        amount: Number(formData.amount) || 0,
+        pin: joinCode,
+      };
+      await axiosInstance.post(`/wallets/wallet-wallet/transfer`, payload);
+      setFormData({
+        myWalletId: "",
+        walletId: "",
+        amount: "",
+      });
+      setModalState("");
+      setPINState("");
+      setSuccessState({
+        title: "Successful",
+        detail: `Your transaction is successful`,
+        status: true,
+      });  
+    } catch (error) {
+      setLoading(false);
+      setCode(Array(4).fill(""))
+    }
+    
   };
+
+  useEffect(() => {
+    const allNonEmpty = code.every((str) => str !== "");
+    if (allNonEmpty) {
+      handleSubmit();
+      setPINState("");
+    }
+  }, [code]);
 
   return (
     <div>
@@ -126,7 +149,10 @@ export default function FundOtherWallet({
         <MyLoaderFinite height="h-[50vh]" />
       ) : (
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e: FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            setPINState("enterPIN");
+          }}
           className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
         >
           {/* Wallet Account Number Input */}
@@ -160,7 +186,7 @@ export default function FundOtherWallet({
           )}
 
           <LabelInputComponent
-            type="text"
+            type="number"
             name="amount"
             value={formData.amount}
             onChange={handleChange}
