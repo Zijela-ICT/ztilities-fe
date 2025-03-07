@@ -16,7 +16,7 @@ interface FundWalletProps {
   setSuccessState?: (state: any) => void;
   type?: string;
   code?: any[];
-  setCode?:any
+  setCode?: any;
 }
 
 export default function Payouts({
@@ -26,7 +26,7 @@ export default function Payouts({
   setSuccessState,
   type,
   code,
-  setCode
+  setCode,
 }: FundWalletProps) {
   const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({
@@ -167,7 +167,7 @@ export default function Payouts({
       });
     } catch (error) {
       setLoading(false);
-      setCode(Array(4).fill(""))
+      setCode(Array(4).fill(""));
     }
   };
   useEffect(() => {

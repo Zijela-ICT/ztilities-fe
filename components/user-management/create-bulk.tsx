@@ -155,8 +155,7 @@ export default function CreateBulk({ type }: BulkProps) {
       endpoint = "/vendors/bulk";
     } else if (type === "Technicians") {
       endpoint = "/technicians/bulk";
-    } 
-    
+    }
 
     // if (type === " Users") {
     //   await axiosInstance.post("/users/pre-register/bulk", csvData);

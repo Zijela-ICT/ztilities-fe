@@ -18,6 +18,8 @@ import Pagination from "./pagination-table";
 import { useDataPermission } from "@/context";
 import FilterComponent from "./table-filter-component";
 import { MyLoaderFinite } from "./loader-components";
+import exportToCSV from "@/utils/exportCSV";
+import { ActionModalCompoenent } from "./modal-component";
 
 interface TableProps {
   data: Record<string, any>[];
@@ -85,7 +87,6 @@ export default function TableComponent({
     "type",
     "nonProcurementLimit",
     "apportionmentMetric",
-    
   ];
 
   const [input, setInput] = useState("");
@@ -186,11 +187,11 @@ export default function TableComponent({
       column !== "isApportioned" &&
       column !== "isDeactivated" &&
       column !== "purchaseOrderFileUrl" &&
-      column !== "isWorkOrder"&&
+      column !== "isWorkOrder" &&
       // column !=="evidenceURLs"&&
       column !== "paymentURL" &&
       column !== "redirect" &&
-      column !=="wallet"
+      column !== "wallet"
   );
 
   // Only show filters for columns that are in filterColumns and displayedColumns
@@ -245,6 +246,7 @@ export default function TableComponent({
 
     return queryParts.join("&");
   }
+
   const queryString = convertFiltersToQueryString(filters);
 
   const sendQueryString = () => {
@@ -291,8 +293,20 @@ export default function TableComponent({
     return () => clearTimeout(timer);
   }, []);
 
+  const [csvState, setCSVState] = useState<string>();
+
   return (
     <div className="p-4">
+      <ActionModalCompoenent
+        title={"Export "}
+        detail={"Export your data as a CSV file "}
+        modalState={csvState}
+        setModalState={setCSVState}
+        takeAction={() => {
+          exportToCSV(data, type);
+          setCSVState("");
+        }}
+      ></ActionModalCompoenent>
       {noSearch ? null : (
         <>
           <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0 font-semibold text-md mb-4">
@@ -331,6 +345,26 @@ export default function TableComponent({
               className="flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-gray-200 cursor-pointer"
             >
               <FilterIcon />
+            </div>
+            <div
+              onClick={() => setCSVState("export")}
+              className="flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-gray-200 cursor-pointer"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6 text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <rect x="4" y="8" width="16" height="12" rx="2" ry="2" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 4v8m0 0l-4-4m4 4l4-4"
+                />
+              </svg>
             </div>
             {tableMainButtonConfigs[type]?.map((button, index) => (
               <ButtonComponent
@@ -431,7 +465,7 @@ export default function TableComponent({
                         type === "bills" ||
                         type === "units" ||
                         type === "categories" ||
-                        type === "approvefunding"||
+                        type === "approvefunding" ||
                         type === "powers" ? (
                           row[column]?.length
                         ) : (
@@ -484,9 +518,15 @@ export default function TableComponent({
                         <StatusBadge status={row[column]} />
                       ) : column === "amount" ? (
                         row[column] && formatCurrency(row[column])
-                      ): column === "description" || column === "reference" || column === "title" ? (
-                        <span title={row[column]} className="truncate w-32 block">{row[column]}</span>
-
+                      ) : column === "description" ||
+                        column === "reference" ||
+                        column === "title" ? (
+                        <span
+                          title={row[column]}
+                          className="truncate w-32 block"
+                        >
+                          {row[column]}
+                        </span>
                       ) : column === "paidAt" || column === "createdAt" ? (
                         row[column] && moment.utc(row[column]).format("ll")
                       ) : column === "avatar" ? (

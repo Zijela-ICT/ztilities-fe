@@ -5,8 +5,6 @@ import FooterComponent from "@/components/footer-component";
 import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
-import axiosInstance from "@/utils/api";
 import UnprotectedRoute from "@/components/auth/unprotected-routes";
 import createAxiosInstance from "@/utils/api";
 
