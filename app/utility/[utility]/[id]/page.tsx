@@ -24,7 +24,6 @@ function WorkRequests() {
   const router = useRouter();
   const { utility, id } = useParams();
 
-
   const [successState, setSuccessState] = useState({
     title: "",
     detail: "",
@@ -236,4 +235,9 @@ function WorkRequests() {
   );
 }
 
-export default withPermissions(WorkRequests, ["power-charges"]);
+export default withPermissions(WorkRequests, [
+  "electricity",
+  "airtime",
+  "internet",
+  "tv",
+]);
