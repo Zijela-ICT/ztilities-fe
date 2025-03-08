@@ -160,7 +160,7 @@ export const tableMainButtonConfigs = {
       text: "Bulk Requests",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-      permissions: ["create_work-requests"],
+      permissions: ["create_work-requests:bulk"],
       action: "createBulkWorkRequest",
     },
     {
@@ -173,7 +173,7 @@ export const tableMainButtonConfigs = {
       text: "Bulk Requests for a user",
       className:
         "flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]",
-      permissions: ["create_work-requests:for-a-user"],
+      permissions: ["create_work-requests:bulk"],
       action: "createBulkWorkRequestforUser",
     },
   ],

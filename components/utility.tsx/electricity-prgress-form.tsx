@@ -184,7 +184,7 @@ export default function ElectricityFlow({
               className="text-[#A8353A] my-3 cursor-pointer"
               onClick={() => setBeneficiaryState("ben")}
             >
-              Choose Beneficiaries for electricity
+              Beneficiaries for electricity
             </p>
           </div>
           <div className="mt-10 flex w-full justify-end">

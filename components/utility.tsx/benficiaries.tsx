@@ -24,6 +24,7 @@ export default function Beneficiaries({
   const axiosInstance = createAxiosInstance();
   const { user } = useDataPermission();
 
+  console.log(utility,"okok")
   const getInitialData = (tab: string) => {
     switch (tab) {
       case "airtime":

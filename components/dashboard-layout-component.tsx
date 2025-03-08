@@ -2,6 +2,7 @@
 import {
   ArrowLeft,
   NotifIcon,
+  RefreshIcon,
   SettingUserIcon,
   UserProfile,
 } from "@/utils/svg";
@@ -17,6 +18,7 @@ import formatCurrency from "@/utils/formatCurrency";
 import createAxiosInstance from "@/utils/api";
 import NotificationCard from "./notif-component";
 import { useRouter, usePathname } from "next/navigation";
+import PermissionGuard from "./auth/permission-protected-components";
 
 export default function DashboardLayout({
   children,
@@ -120,22 +122,32 @@ export default function DashboardLayout({
               <div className="flex space-x-6 mr-14 relative">
                 {/* Wallet Dropdown */}
                 {selectedWallet && (
-                  <div className="flex items-center space-x-2">
-                    <span className="text-lg text-black font-medium">
-                      ₦ {formatCurrency(selectedWallet?.balance || 0)}
-                    </span>
-                    <select
-                      value={selectedWallet?.id}
-                      onChange={handleWalletChange}
-                      className="border p-2 rounded w-48"
+                  <>
+                    <div
+                      onClick={() => getMe()}
+                      className="text-black flex items-center space-x-1 cursor-pointer"
                     >
-                      {user?.wallets.map((wallet) => (
-                        <option key={wallet.id} value={wallet.id}>
-                          {wallet.walletType}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                      <p>Refresh : </p>
+                      <RefreshIcon stroke="black" />
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg text-black font-medium">
+                        ₦ {formatCurrency(selectedWallet?.balance || 0)}
+                      </span>
+                      <select
+                        value={selectedWallet?.id}
+                        onChange={handleWalletChange}
+                        className="border p-2 rounded w-48"
+                      >
+                        {user?.wallets.map((wallet) => (
+                          <option key={wallet.id} value={wallet.id}>
+                            {wallet.walletType}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </>
                 )}
 
                 <Link href={`/user-profile`}>

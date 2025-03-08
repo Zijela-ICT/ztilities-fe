@@ -79,14 +79,6 @@ export default function AirtimeFlow({
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
-        {/* <LabelInputComponent
-          type="text"
-          name="telco"
-          value={topupData.telco}
-          onChange={handleChange}
-          label="Telco"
-          required
-        /> */}
         <div className="relative w-full mt-6">
           <Select
             options={airtimeOptions}
@@ -128,7 +120,7 @@ export default function AirtimeFlow({
             className="text-[#A8353A] my-3 cursor-pointer"
             onClick={() => setBeneficiaryState("ben")}
           >
-            Choose Beneficiaries for airtime
+            Beneficiaries for airtime
           </p>
         </div>
 
