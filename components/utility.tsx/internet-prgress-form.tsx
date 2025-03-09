@@ -12,6 +12,9 @@ export default function InternetFlow({
   setSuccessState,
   setBeneficiaryState,
   beneficiaryObj,
+  code,
+  setCode,
+  setPINState,
 }) {
   const axiosInstance = createAxiosInstance();
 
@@ -38,9 +41,9 @@ export default function InternetFlow({
     if (beneficiaryObj) {
       setPurchaseData((prev) => ({
         ...prev,
-        telco: beneficiaryObj?.telco  || "",
-        number: beneficiaryObj?.number || "" ,
-        plan_id: Number(beneficiaryObj?.plan_id)|| 0 ,
+        telco: beneficiaryObj?.telco || "",
+        number: beneficiaryObj?.number || "",
+        plan_id: Number(beneficiaryObj?.plan_id) || 0,
       }));
     }
   }, [beneficiaryObj]);
@@ -53,17 +56,26 @@ export default function InternetFlow({
     setPurchaseData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    try {
+      const joinCode = code.join("");
+      const { name, ...rest } = purchaseData; // Exclude 'name'
 
-    const { name, ...payload } = purchaseData;
-    await axiosInstance.post(`/internet/purchase`, payload);
-    setSuccessState({
-      title: "Successful",
-      detail: "Purchase successful.",
-      status: true,
-    });
-    setModalState("");
+      const payload = {
+        ...rest, // Use the remaining properties of purchaseData
+        pin: joinCode, // Add 'pin'
+      };
+      await axiosInstance.post(`/internet/purchase`, payload);
+      setSuccessState({
+        title: "Successful",
+        detail: "Purchase successful.",
+        status: true,
+      });
+      setModalState("");
+      setCode(Array(4).fill(""));
+    } catch (error) {
+      setCode(Array(4).fill(""));
+    }
   };
 
   const internetOptions = internet?.map((internet: any) => ({
@@ -80,20 +92,30 @@ export default function InternetFlow({
   };
 
   useEffect(() => {
-    if(purchaseData.telco){
+    if (purchaseData.telco) {
       getInternetPlans();
     }
-
   }, [purchaseData.telco]);
 
   const planOptions = plans?.map((sub: any) => ({
     value: sub.id,
     label: sub.name,
   }));
+
+  useEffect(() => {
+    const allNonEmpty = code.every((str) => str !== "");
+    if (allNonEmpty) {
+      handleSubmit();
+      setPINState("");
+    }
+  }, [code]);
   return (
     <div>
       <form
-        onSubmit={handleSubmit}
+        onSubmit={(e: FormEvent<HTMLFormElement>) => {
+          e.preventDefault();
+          setPINState("enterPIN");
+        }}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
         <div className="relative w-full mt-6">

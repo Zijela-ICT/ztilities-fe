@@ -13,6 +13,9 @@ export default function AirtimeFlow({
   setSuccessState,
   setBeneficiaryState,
   beneficiaryObj,
+  code,
+  setCode,
+  setPINState,
 }) {
   const axiosInstance = createAxiosInstance();
 
@@ -48,24 +51,29 @@ export default function AirtimeFlow({
     setTopupData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (Number(topupData.amount) < Number(utility.minAmount)) {
-      toast.warning("Amount cannot be below minimun amount");
-      return;
+  const handleSubmit = async () => {
+    try {
+      if (Number(topupData.amount) < Number(utility.minAmount)) {
+        toast.warning("Amount cannot be below minimun amount");
+        return;
+      }
+      const joinCode = code.join("");
+      const payload = {
+        ...topupData,
+        amount: Number(topupData.amount) || 0,
+        pin: joinCode,
+      };
+      await axiosInstance.post(`/airtime/topup`, payload);
+      setSuccessState({
+        title: "Successful",
+        detail: "Topup successful.",
+        status: true,
+      });
+      setModalState("");
+      setCode(Array(4).fill(""));
+    } catch (error) {
+      setCode(Array(4).fill(""));
     }
-
-    const payload = {
-      ...topupData,
-      amount: Number(topupData.amount) || 0,
-    };
-    await axiosInstance.post(`/airtime/topup`, payload);
-    setSuccessState({
-      title: "Successful",
-      detail: "Topup successful.",
-      status: true,
-    });
-    setModalState("");
   };
 
   const airtimeOptions = airtime?.map((airtime: any) => ({
@@ -73,10 +81,21 @@ export default function AirtimeFlow({
     label: airtime.provider,
   }));
 
+  useEffect(() => {
+    const allNonEmpty = code.every((str) => str !== "");
+    if (allNonEmpty) {
+      handleSubmit();
+      setPINState("");
+    }
+  }, [code]);
+
   return (
     <div>
       <form
-        onSubmit={handleSubmit}
+        onSubmit={(e: FormEvent<HTMLFormElement>) => {
+          e.preventDefault();
+          setPINState("enterPIN");
+        }}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
         <div className="relative w-full mt-6">

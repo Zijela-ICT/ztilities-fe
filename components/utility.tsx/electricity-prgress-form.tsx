@@ -12,6 +12,9 @@ export default function ElectricityFlow({
   setSuccessState,
   setBeneficiaryState,
   beneficiaryObj,
+  code,
+  setCode,
+  setPINState,
 }) {
   const axiosInstance = createAxiosInstance();
 
@@ -41,7 +44,7 @@ export default function ElectricityFlow({
     if (beneficiaryObj) {
       setCustomerData((prev) => ({
         ...prev,
-        provider: beneficiaryObj?.disco || "" ,
+        provider: beneficiaryObj?.disco || "",
         meterNumber: beneficiaryObj?.meterNumber || "",
         type: beneficiaryObj?.type || "",
       }));
@@ -76,25 +79,29 @@ export default function ElectricityFlow({
     setActiveStep(1);
   };
 
-  const handleRechargeSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (Number(rechargeData.amount) < Number(utility.minAmount)) {
-      toast.warning("Amount cannot be below minimun amount");
-      return;
+  const handleRechargeSubmit = async () => {
+    try {
+      if (Number(rechargeData.amount) < Number(utility.minAmount)) {
+        toast.warning("Amount cannot be below minimun amount");
+        return;
+      }
+      const joinCode = code.join("");
+      const payload = {
+        ...rechargeData,
+        amount: Number(rechargeData.amount) || 0,
+        pin: joinCode,
+      };
+      await axiosInstance.post(`/electricity/recharge`, payload);
+      setSuccessState({
+        title: "Successful",
+        detail: "Recharge successful.",
+        status: true,
+      });
+
+      setModalState("");
+    } catch (error) {
+      setCode(Array(4).fill(""));
     }
-
-    const payload = {
-      ...rechargeData,
-      amount: Number(rechargeData.amount) || 0,
-    };
-    await axiosInstance.post(`/electricity/recharge`, payload);
-    setSuccessState({
-      title: "Successful",
-      detail: "Recharge successful.",
-      status: true,
-    });
-
-    setModalState("");
   };
 
   const typeOptions = [
@@ -106,6 +113,14 @@ export default function ElectricityFlow({
     value: electricity.provider,
     label: electricity.provider,
   }));
+
+  useEffect(() => {
+    const allNonEmpty = code.every((str) => str !== "");
+    if (allNonEmpty) {
+      handleRechargeSubmit();
+      setPINState("");
+    }
+  }, [code]);
 
   return (
     <div>
@@ -177,7 +192,6 @@ export default function ElectricityFlow({
             label="Meter Number"
             required
           />
-          
 
           <div className="flex justify-end">
             <p
@@ -201,7 +215,10 @@ export default function ElectricityFlow({
       {/* Step 2: Recharge */}
       {activeStep === 1 && (
         <form
-          onSubmit={handleRechargeSubmit}
+          onSubmit={(e: FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            setPINState("enterPIN");
+          }}
           className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
         >
           <LabelInputComponent

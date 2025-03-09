@@ -37,6 +37,9 @@ interface ContextType {
   filterQuery: string;
   setFilterQuery: React.Dispatch<React.SetStateAction<string>>;
   clearSearchAndPagination: () => void;
+
+  showFilter: string;
+  setShowFilter: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // Create context
@@ -66,6 +69,7 @@ export const DataPermissionProvider = ({
   const [pagination, setPagination] = useState(initialPagination);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterQuery, setFilterQuery] = useState("");
+  const [showFilter, setShowFilter] = useState("");
 
   // Load persisted data on client mount
   useEffect(() => {
@@ -128,6 +132,10 @@ export const DataPermissionProvider = ({
         filterQuery,
         setFilterQuery,
         clearSearchAndPagination,
+
+
+        showFilter,
+        setShowFilter
       }}
     >
       {children}

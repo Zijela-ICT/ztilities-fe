@@ -21,12 +21,12 @@ interface FundWalletProps {
 
 export default function Payouts({
   setModalState,
-  setPINState,
   activeRowId,
   setSuccessState,
   type,
   code,
   setCode,
+  setPINState,
 }: FundWalletProps) {
   const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({

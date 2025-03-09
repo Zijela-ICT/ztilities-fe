@@ -53,9 +53,14 @@ export default function TableComponent({
   itemsPerPage,
   totalPages,
 }: TableProps) {
-  const { setSearchQuery, setFilterQuery, clearSearchAndPagination } =
-    useDataPermission();
-  const [showFilter, setShowFilter] = useState<boolean>(false);
+  const {
+    setSearchQuery,
+    setFilterQuery,
+    showFilter,
+    setShowFilter,
+    clearSearchAndPagination,
+  } = useDataPermission();
+
   // filters state now may hold a string (for normal filters)
   // or an object with min/max (for range filters) or from/to (for date filters)
   const [filters, setFilters] = useState<
@@ -64,6 +69,11 @@ export default function TableComponent({
       string | { min?: string; max?: string } | { from?: string; to?: string }
     >
   >({});
+
+  const [show, setShow] = useState<{ visible: boolean; name: string }>({
+    visible: false,
+    name: "",
+  });
 
   // Define which columns should use special inputs
   const rangeFilterKeys = [
@@ -199,8 +209,6 @@ export default function TableComponent({
     displayedColumns.includes(key)
   );
 
-  //console.log({ filters });
-
   function convertFiltersToQueryString(
     filterObj: Record<string, unknown>,
     prefix: string = "filters"
@@ -252,10 +260,12 @@ export default function TableComponent({
   const sendQueryString = () => {
     setFilterQuery(queryString);
   };
-  useEffect(() => {
-    console.log(queryString);
-    // setFilterQuery(queryString);
-  }, [filters]);
+
+  // useEffect(() => {
+  //   if (queryString && showFilter === "export") {
+  //     exportToCSV(data, type);
+  //   }
+  // }, [queryString, showFilter]);
 
   // Pagination logic remains the same…
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -341,13 +351,23 @@ export default function TableComponent({
               />
             </div>
             <div
-              onClick={() => setShowFilter(!showFilter)}
+              onClick={() =>
+                setShow((prev) => ({
+                  visible: !prev.visible,
+                  name: "Filter",
+                }))
+              }
               className="flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-gray-200 cursor-pointer"
             >
               <FilterIcon />
             </div>
             <div
-              onClick={() => setCSVState("export")}
+              onClick={() =>
+                setShow((prev) => ({
+                  visible: !prev.visible,
+                  name: "Export",
+                }))
+              }
               className="flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-gray-200 cursor-pointer"
             >
               <svg
@@ -383,7 +403,7 @@ export default function TableComponent({
       )}
 
       {/* Render filters with conditional input types */}
-      {showFilter && (
+      {show.visible && (
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm mb-5">
           <FilterComponent
             filterKeys={filterKeys}
@@ -395,8 +415,11 @@ export default function TableComponent({
             handleRangeFilterChange={handleRangeFilterChange}
             handleDateRangeFilterChange={handleDateRangeFilterChange}
             sendQueryString={sendQueryString}
+            showFilter={showFilter}
+            show={show}
+            type={type}
           />
-          <div
+          {/* <div
             className={
               filterKeys.length === 0
                 ? "flex justify-center mt-4"
@@ -413,12 +436,18 @@ export default function TableComponent({
             ) : (
               <button
                 className="px-4 py-2 bg-[#A8353A] text-white rounded transition-colors hover:bg-[#962d31]"
-                onClick={() => sendQueryString()}
+                onClick={() => {
+                  if (showFilter === "filter") {
+                    sendQueryString();
+                  } else {
+    
+                  }
+                }}
               >
-                Filter
+                {showFilter === "filter" ? "Filter" : "Export CSV"}
               </button>
             )}
-          </div>
+          </div> */}
         </div>
       )}
 
@@ -443,142 +472,144 @@ export default function TableComponent({
               </tr>
             </thead>
             <tbody>
-              {data?.map((row: any, index) => (
-                <tr
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    toggleActions(row.id);
-                    contextMenuedActions(row.id);
-                  }}
-                  key={index}
-                  className="border-b border-gray-200 h-20"
-                >
-                  {displayedColumns.map((column) => (
-                    <td key={column} className="py-3 px-4">
-                      {/* Render cells based on type */}
-                      {Array.isArray(row[column]) ? (
-                        type === "assets" ||
-                        type === "workrequests" ||
-                        type === "workorders" ||
-                        type === "facilities" ||
-                        type === "blocks" ||
-                        type === "bills" ||
-                        type === "units" ||
-                        type === "categories" ||
-                        type === "approvefunding" ||
-                        type === "powers" ? (
-                          row[column]?.length
-                        ) : (
-                          row[column]
-                            ?.map((item: any) =>
-                              [
-                                "name",
-                                "blockNumber",
-                                "unitNumber",
-                                "assetName",
-                                "firstName",
-                                "lastName",
-                                "subCategoryName",
-                                "categoryName",
-                              ]
-                                .map((prop) => item?.[prop])
-                                .filter(Boolean)
-                                .join(", ")
-                            )
+              {data?.map((row: any, index) => {
+                return (
+                  <tr
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      toggleActions(row.id);
+                      contextMenuedActions(row.id);
+                    }}
+                    key={index}
+                    className="border-b border-gray-200 h-20"
+                  >
+                    {displayedColumns.map((column) => (
+                      <td key={column} className="py-3 px-4">
+                        {/* Render cells based on type */}
+                        {Array.isArray(row[column]) ? (
+                          type === "assets" ||
+                          type === "workrequests" ||
+                          type === "workorders" ||
+                          type === "facilities" ||
+                          type === "blocks" ||
+                          type === "bills" ||
+                          type === "units" ||
+                          type === "categories" ||
+                          type === "approvefunding" ||
+                          type === "powers" ? (
+                            row[column]?.length
+                          ) : (
+                            row[column]
+                              ?.map((item: any) =>
+                                [
+                                  "name",
+                                  "blockNumber",
+                                  "unitNumber",
+                                  "assetName",
+                                  "firstName",
+                                  "lastName",
+                                  "subCategoryName",
+                                  "categoryName",
+                                ]
+                                  .map((prop) => item?.[prop])
+                                  .filter(Boolean)
+                                  .join(", ")
+                              )
+                              .join(", ")
+                          )
+                        ) : typeof row[column] === "object" &&
+                          row[column] !== null ? (
+                          [
+                            "name",
+                            "blockNumber",
+                            "unitNumber",
+                            "assetName",
+                            "firstName",
+                            "lastName",
+                            "subCategoryName",
+                            "vendorName",
+                            "techniacianName",
+                            "categoryName",
+                          ]
+                            .map((prop) => row[column]?.[prop])
+                            .filter(Boolean)
                             .join(", ")
-                        )
-                      ) : typeof row[column] === "object" &&
-                        row[column] !== null ? (
-                        [
-                          "name",
-                          "blockNumber",
-                          "unitNumber",
-                          "assetName",
-                          "firstName",
-                          "lastName",
-                          "subCategoryName",
-                          "vendorName",
-                          "techniacianName",
-                          "categoryName",
-                        ]
-                          .map((prop) => row[column]?.[prop])
-                          .filter(Boolean)
-                          .join(", ")
-                      ) : column === "isDeactivated" ? (
-                        <span
-                          className={`px-2.5 py-1 ${
-                            row[column] === false
-                              ? "text-[#036B26] bg-[#E7F6EC]"
-                              : "text-[#B76E00] bg-[#FFAB0014]"
-                          } rounded-full`}
-                        >
-                          {row[column] === true ? "Inactive" : "Active"}
-                        </span>
-                      ) : column === "status" || column === "subStatus" ? (
-                        <StatusBadge status={row[column]} />
-                      ) : column === "amount" ? (
-                        row[column] && formatCurrency(row[column])
-                      ) : column === "description" ||
-                        column === "reference" ||
-                        column === "title" ? (
-                        <span
-                          title={row[column]}
-                          className="truncate w-32 block"
-                        >
-                          {row[column]}
-                        </span>
-                      ) : column === "paidAt" || column === "createdAt" ? (
-                        row[column] && moment.utc(row[column]).format("ll")
-                      ) : column === "avatar" ? (
-                        row?.avatar ? (
-                          <Image
-                            src={row.avatar}
-                            alt={`${row?.firstName} ${row?.lastName}`}
-                            className="rounded-full object-cover"
-                            width={30}
-                            height={30}
-                          />
-                        ) : (
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold`}
-                            style={{
-                              backgroundColor: `#${Math.floor(
-                                Math.random() * 16777215
-                              ).toString(16)}`,
-                            }}
+                        ) : column === "isDeactivated" ? (
+                          <span
+                            className={`px-2.5 py-1 ${
+                              row[column] === false
+                                ? "text-[#036B26] bg-[#E7F6EC]"
+                                : "text-[#B76E00] bg-[#FFAB0014]"
+                            } rounded-full`}
                           >
-                            {`${row?.firstName?.[0] || ""}${
-                              row?.lastName?.[0] || ""
-                            }`.toUpperCase()}
-                          </div>
-                        )
-                      ) : type === "transactions" && column === "category" ? (
-                        row[column] === "INFLOW" ? (
-                          <IncomingIcon />
+                            {row[column] === true ? "Inactive" : "Active"}
+                          </span>
+                        ) : column === "status" || column === "subStatus" ? (
+                          <StatusBadge status={row[column]} />
+                        ) : column === "amount" ? (
+                          row[column] && formatCurrency(row[column])
+                        ) : column === "description" ||
+                          column === "reference" ||
+                          column === "title" ? (
+                          <span
+                            title={row[column]}
+                            className="truncate w-32 block"
+                          >
+                            {row[column]}
+                          </span>
+                        ) : column === "paidAt" || column === "createdAt" ? (
+                          row[column] && moment.utc(row[column]).format("ll")
+                        ) : column === "avatar" ? (
+                          row?.avatar ? (
+                            <Image
+                              src={row.avatar}
+                              alt={`${row?.firstName} ${row?.lastName}`}
+                              className="rounded-full object-cover"
+                              width={30}
+                              height={30}
+                            />
+                          ) : (
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold`}
+                              style={{
+                                backgroundColor: `#${Math.floor(
+                                  Math.random() * 16777215
+                                ).toString(16)}`,
+                              }}
+                            >
+                              {`${row?.firstName?.[0] || ""}${
+                                row?.lastName?.[0] || ""
+                              }`.toUpperCase()}
+                            </div>
+                          )
+                        ) : type === "transactions" && column === "category" ? (
+                          row[column] === "INFLOW" ? (
+                            <IncomingIcon />
+                          ) : (
+                            <OutgoingIcon />
+                          )
                         ) : (
-                          <OutgoingIcon />
-                        )
-                      ) : (
-                        row[column]?.toString()
-                      )}
-                    </td>
-                  ))}
-                  {noSearch ? null : (
-                    <td className="py-3 px-4">
-                      <Actions
-                        type={type}
-                        row={row}
-                        setModalState={setModalState}
-                        setModalStateDelete={setModalStateDelete}
-                        activeRowId={activeRowId}
-                        toggleActions={toggleActions}
-                        contextMenued={contextMenued}
-                        contextMenuedActions={contextMenuedActions}
-                      />
-                    </td>
-                  )}
-                </tr>
-              ))}
+                          row[column]?.toString()
+                        )}
+                      </td>
+                    ))}
+                    {noSearch ? null : (
+                      <td className="py-3 px-4">
+                        <Actions
+                          type={type}
+                          row={row}
+                          setModalState={setModalState}
+                          setModalStateDelete={setModalStateDelete}
+                          activeRowId={activeRowId}
+                          toggleActions={toggleActions}
+                          contextMenued={contextMenued}
+                          contextMenuedActions={contextMenuedActions}
+                        />
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (

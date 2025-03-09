@@ -17,6 +17,7 @@ import DynamicCreateForm from "@/components/dynamic-create-form";
 import createAxiosInstance from "@/utils/api";
 import CreateBulk from "@/components/user-management/create-bulk";
 import { SearchIcon } from "@/utils/svg";
+import exportToCSV from "@/utils/exportCSV";
 
 function UserManagement() {
   const axiosInstance = createAxiosInstance();
@@ -26,6 +27,8 @@ function UserManagement() {
     searchQuery,
     filterQuery,
     clearSearchAndPagination,
+    showFilter,
+    setShowFilter,
   } = useDataPermission();
   const tabs = ["All Users", "Roles", "Permissions"];
 
@@ -43,6 +46,12 @@ function UserManagement() {
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
+  const getUsersUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/users?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "users");
+  };
   const getUsers = async () => {
     const response = await axiosInstance.get(
       `/users?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -57,6 +66,12 @@ function UserManagement() {
     });
   };
 
+  const getRolesUnpaginated = async () => {
+    const response = await axiosInstance.get(
+      `/roles?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "roles");
+  };
   const getRoles = async () => {
     const response = await axiosInstance.get(
       `/roles?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -304,8 +319,19 @@ function UserManagement() {
     filterQuery,
   ]);
 
+  useEffect(() => {
+    if (showFilter === "export") {
+      if (selectedTab === "All Users") {
+        getUsersUnPaginated();
+      } else {
+        getRolesUnpaginated();
+      }
+    }
+  }, [setShowFilter, filterQuery]);
+
   //new clear
   useEffect(() => {
+    setShowFilter("");
     clearSearchAndPagination();
   }, [selectedTab]);
 

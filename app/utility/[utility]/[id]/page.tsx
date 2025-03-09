@@ -105,6 +105,37 @@ function WorkRequests() {
     }
   }, [utility]);
 
+  const [PINState, setPINState] = useState<string>();
+  const [code, setCode] = useState(Array(4).fill("")); // Array to hold each digit
+  // Handle changes for each input box
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const value = e.target.value.replace(/[^0-9]/g, ""); // Only allow numbers
+    if (value.length <= 1) {
+      const newCode = [...code];
+      newCode[index] = value;
+      setCode(newCode);
+
+      // Automatically focus the next input
+      if (value && index < 5) {
+        const nextInput = document.getElementById(`code-input-${index + 1}`);
+        nextInput?.focus();
+      }
+    }
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    if (e.key === "Backspace" && !code[index] && index > 0) {
+      const prevInput = document.getElementById(`code-input-${index - 1}`);
+      prevInput?.focus();
+    }
+  };
+
   const componentMap: Record<string, JSX.Element> = {
     tvFlow: (
       <TVFlow
@@ -114,6 +145,9 @@ function WorkRequests() {
         setSuccessState={setSuccessState}
         setBeneficiaryState={setBeneficiaryState}
         beneficiaryObj={beneficiaryObj}
+        setPINState={setPINState}
+        code={code}
+        setCode={setCode}
       />
     ),
 
@@ -125,7 +159,26 @@ function WorkRequests() {
         setSuccessState={setSuccessState}
         setBeneficiaryState={setBeneficiaryState}
         beneficiaryObj={beneficiaryObj}
+        setPINState={setPINState}
+        code={code}
+        setCode={setCode}
       />
+    ),
+    enterPIN: (
+      <div className="flex gap-1 justify-between pt-6 pb-8 px-10 ">
+        {code.map((digit, index) => (
+          <input
+            key={index}
+            id={`code-input-${index}`}
+            type="text"
+            value={digit}
+            onChange={(e) => handleChange(e, index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            maxLength={1}
+            className="w-12 h-12 text-center bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        ))}
+      </div>
     ),
     ben: (
       <Benfeciaries
@@ -186,6 +239,19 @@ function WorkRequests() {
         }}
       >
         {componentMap[centralState]}
+      </ModalCompoenent>
+
+      <ModalCompoenent
+        width="max-w-sm"
+        title={"Enter your PIN"}
+        detail={""}
+        modalState={PINState}
+        setModalState={() => {
+          setPINState("");
+          setCode(Array(4).fill(""));
+        }}
+      >
+        {componentMap[PINState]}
       </ModalCompoenent>
 
       <ModalCompoenent

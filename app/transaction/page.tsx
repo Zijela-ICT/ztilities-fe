@@ -98,10 +98,6 @@ function Transactions() {
     }));
   };
 
-  const handleApplyFilters = () => {
-    console.log("Filters Applied:", filters);
-  };
-
   // Handle changes for each input box
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -129,6 +125,10 @@ function Transactions() {
       const prevInput = document.getElementById(`code-input-${index - 1}`);
       prevInput?.focus();
     }
+  };
+
+  const handleApplyFilters = () => {
+    console.log("Filters Applied:", filters);
   };
 
   const getUsers = async () => {

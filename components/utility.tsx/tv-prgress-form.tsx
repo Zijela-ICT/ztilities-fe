@@ -12,6 +12,9 @@ export default function TVFlow({
   setSuccessState,
   setBeneficiaryState,
   beneficiaryObj,
+  code,
+  setCode,
+  setPINState,
 }) {
   const axiosInstance = createAxiosInstance();
 
@@ -95,16 +98,25 @@ export default function TVFlow({
     setActiveStep(1);
   };
 
-  const handleRechargeSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    await axiosInstance.post(`/tv/subscribe`, subscribeData);
-    setSuccessState({
-      title: "Successful",
-      detail: "Recharge successful.",
-      status: true,
-    });
+  const handleRechargeSubmit = async () => {
+    try {
+      const joinCode = code.join("");
+      const payload = {
+        ...subscribeData,
+        pin: joinCode,
+      };
+      await axiosInstance.post(`/tv/subscribe`, payload);
+      setSuccessState({
+        title: "Successful",
+        detail: "Recharge successful.",
+        status: true,
+      });
 
-    setModalState("");
+      setModalState("");
+      setCode(Array(4).fill(""));
+    } catch (error) {
+      setCode(Array(4).fill(""));
+    }
   };
 
   const tvOptions = tv?.map((internet: any) => ({
@@ -128,6 +140,14 @@ export default function TVFlow({
     value: sub.id,
     label: sub.name,
   }));
+
+  useEffect(() => {
+    const allNonEmpty = code.every((str) => str !== "");
+    if (allNonEmpty) {
+      handleRechargeSubmit();
+      setPINState("");
+    }
+  }, [code]);
 
   return (
     <div>
@@ -202,7 +222,10 @@ export default function TVFlow({
       {/* Step 2: Recharge */}
       {activeStep === 1 && (
         <form
-          onSubmit={handleRechargeSubmit}
+          onSubmit={(e: FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            setPINState("enterPIN");
+          }}
           className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
         >
           <div className="relative w-full mt-6">
