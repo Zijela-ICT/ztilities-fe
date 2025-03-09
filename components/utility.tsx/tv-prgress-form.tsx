@@ -27,7 +27,7 @@ export default function TVFlow({
     tv: "",
     number: "",
     plan_id: 0,
-    reference: "",
+    description: "",
   };
   // Stepper and form state
   const [activeStep, setActiveStep] = useState(0);
@@ -250,10 +250,10 @@ export default function TVFlow({
 
           <LabelInputComponent
             type="text"
-            name="reference"
-            value={subscribeData.reference}
+            name="description"
+            value={subscribeData.description}
             onChange={handleRechargeChange}
-            label="Reference (Optional)"
+            label="Description"
           />
           <div className="mt-10 flex w-full justify-between">
             <button

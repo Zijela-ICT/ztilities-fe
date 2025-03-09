@@ -13,6 +13,7 @@ import { useDataPermission } from "@/context";
 import createAxiosInstance from "@/utils/api";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import PermissionList from "@/components/user-management/view-permissions";
+import exportToCSV from "@/utils/exportCSV";
 
 function Approvers() {
   const axiosInstance = createAxiosInstance();
@@ -22,6 +23,8 @@ function Approvers() {
     searchQuery,
     filterQuery,
     clearSearchAndPagination,
+    setShowFilter,
+    showFilter,
   } = useDataPermission();
   const tabs = ["Power Apportion"];
 
@@ -44,6 +47,18 @@ function Approvers() {
   const getRoles = async () => {
     const response = await axiosInstance.get("/roles");
     setRoles(response.data.data);
+  };
+
+  const getApproversUnPaginated = async () => {
+    const APPROVAL_ROLE = roles.find(
+      (role: Role) => role.name === "APPROVAL_ROLE"
+    );
+    if (APPROVAL_ROLE) {
+      const response = await axiosInstance.get(
+        `/roles/${APPROVAL_ROLE.id}?search=${searchQuery}&&${filterQuery}`
+      );
+      exportToCSV(response.data.data?.users, "approvers");
+    }
   };
 
   const getApprovers = async () => {
@@ -178,6 +193,13 @@ function Approvers() {
     searchQuery,
     filterQuery,
   ]);
+
+  useEffect(() => {
+    if (showFilter === "export") {
+      getApproversUnPaginated()
+      setShowFilter("");
+    }
+  }, [showFilter, filterQuery]);
 
   //new clear
   useEffect(() => {

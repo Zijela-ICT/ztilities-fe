@@ -29,7 +29,7 @@ export default function ElectricityFlow({
     meterNumber: "",
     type: "prepaid",
     amount: "",
-    reference: "",
+    description: "",
   };
   // Stepper and form state
   const [activeStep, setActiveStep] = useState(0);
@@ -254,11 +254,10 @@ export default function ElectricityFlow({
           />
           <LabelInputComponent
             type="text"
-            name="reference"
-            value={rechargeData.reference}
+            name="description"
+            value={rechargeData.description}
             onChange={handleRechargeChange}
-            label="Reference (Optional)"
-            placeholder="TXN_87654321"
+            label="Description"
           />
           <div className="mt-10 flex w-full justify-between">
             <button

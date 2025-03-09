@@ -13,6 +13,7 @@ import { useDataPermission } from "@/context";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import createAxiosInstance from "@/utils/api";
 import CreateBulk from "@/components/user-management/create-bulk";
+import exportToCSV from "@/utils/exportCSV";
 
 function VendorManagement() {
   const axiosInstance = createAxiosInstance();
@@ -22,6 +23,8 @@ function VendorManagement() {
     searchQuery,
     filterQuery,
     clearSearchAndPagination,
+    showFilter,
+    setShowFilter,
   } = useDataPermission();
   const tabs = ["Vendors", "Technicians"];
 
@@ -40,6 +43,14 @@ function VendorManagement() {
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   // Fetch data functions
+
+  const getVendorsUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/vendors?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "vendors");
+  };
+
   const getVendors = async () => {
     const response = await axiosInstance.get(
       `/vendors?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -52,6 +63,13 @@ function VendorManagement() {
       total: extra.total,
       totalPages: extra.totalPages,
     });
+  };
+
+  const getTechniciansUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/technicians?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "technicians");
   };
 
   const getTechnicians = async () => {
@@ -283,7 +301,6 @@ function VendorManagement() {
     ),
   };
 
-  
   useEffect(() => {
     if (
       centralStateDelete === "deactivateVendor" ||
@@ -337,6 +354,17 @@ function VendorManagement() {
     filterQuery,
   ]);
 
+  useEffect(() => {
+    if (showFilter === "export") {
+      if (selectedTab === "Technicians") {
+        getTechniciansUnPaginated();
+      } else {
+        getVendorsUnPaginated();
+      }
+      setShowFilter("");
+    }
+  }, [showFilter, filterQuery]);
+
   //new clear
   useEffect(() => {
     clearSearchAndPagination();
@@ -388,7 +416,9 @@ function VendorManagement() {
         {componentMap[centralState]}
       </ModalCompoenent>
 
-      <PermissionGuard requiredPermissions={["read_vendors","read_technicians"]}>
+      <PermissionGuard
+        requiredPermissions={["read_vendors", "read_technicians"]}
+      >
         <div className="relative bg-white rounded-2xl p-4">
           <div className="flex space-x-4 pb-2">
             {tabs.map((tab) => (
@@ -416,7 +446,9 @@ function VendorManagement() {
         </div>
       </PermissionGuard>
 
-      <PermissionGuard requiredPermissions={["read_vendors", "read_technicians"]}>
+      <PermissionGuard
+        requiredPermissions={["read_vendors", "read_technicians"]}
+      >
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           {selectedTab === "Vendors" && (
             <TableComponent

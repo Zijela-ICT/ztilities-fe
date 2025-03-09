@@ -23,7 +23,7 @@ export default function InternetFlow({
     name: "",
     number: "",
     plan_id: 0,
-    reference: "",
+    description: "",
   };
 
   const [purchaseData, setPurchaseData] = useState(initialPurchaseData);
@@ -154,10 +154,10 @@ export default function InternetFlow({
         />
         <LabelInputComponent
           type="text"
-          name="reference"
-          value={purchaseData.reference}
+          name="description"
+          value={purchaseData.description}
           onChange={handleChange}
-          label="Reference (Optional)"
+          label="Description"
         />
 
         <div className="flex justify-end">

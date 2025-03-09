@@ -29,6 +29,7 @@ import TableComponent from "@/components/table-component";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useParams } from "next/navigation";
 import { MyLoaderFinite } from "@/components/loader-components";
+import exportToCSV from "@/utils/exportCSV";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -49,6 +50,8 @@ function Transactions() {
     setPagination,
     searchQuery,
     filterQuery,
+    showFilter,
+    setShowFilter,
     clearSearchAndPagination,
   } = useDataPermission();
   const { id, entity } = useParams();
@@ -114,6 +117,13 @@ function Transactions() {
     setFacilities(response.data.data);
   };
 
+  const getMyTransactionsUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/transactions/my-transactions/all?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "my_transactions");
+  };
+
   const getMyTransactions = async () => {
     const response = await axiosInstance.get(
       `/transactions/my-transactions/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -126,6 +136,15 @@ function Transactions() {
       total: extra.total,
       totalPages: extra.totalPages,
     });
+  };
+
+  const getAUserTransactionsUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/transactions/user-transactions/all/${
+        filters.User || id
+      }?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "user_transactions");
   };
 
   const getAUserTransactions = async () => {
@@ -143,6 +162,16 @@ function Transactions() {
       totalPages: extra.totalPages,
     });
   };
+
+  const getAVendorTransactionsUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/transactions/user-transactions/all/${
+        filters.Vendor || id
+      }?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "vendor_transactions");
+  };
+
   const getAVendorTransactions = async () => {
     const response = await axiosInstance.get(
       `/transactions/user-transactions/all/${filters.Vendor || id}?page=${
@@ -158,6 +187,16 @@ function Transactions() {
       totalPages: extra.totalPages,
     });
   };
+
+  const getATechnicianTransactionsUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/transactions/user-transactions/all/${
+        filters.Technician || id
+      }?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "technician_transactions");
+  };
+
   const getATechnicianTransactions = async () => {
     const response = await axiosInstance.get(
       `/transactions/user-transactions/all/${filters.Technician || id}?page=${
@@ -173,6 +212,16 @@ function Transactions() {
       totalPages: extra.totalPages,
     });
   };
+
+  const getAFacilityTransactionsUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/transactions/facility-transactions/all/${
+        filters.Facility || id
+      }?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "facility_transactions");
+  };
+
   const getAFacilityTransactions = async () => {
     const response = await axiosInstance.get(
       `/transactions/facility-transactions/all/${filters.Facility || id}?page=${
@@ -239,6 +288,34 @@ function Transactions() {
   ]);
 
   useEffect(() => {
+    setShowFilter("");
+  }, []);
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (showFilter === "export") {
+        if (user.wallets.length > 0) {
+          await getMyTransactionsUnPaginated();
+        } else {
+          if (id && entity) {
+            if (entity === "User") {
+              await getAUserTransactionsUnPaginated();
+            } else if (entity === "Vendor") {
+              await getAVendorTransactionsUnPaginated();
+            } else if (entity === "Technician") {
+              await getATechnicianTransactionsUnPaginated();
+            } else if (entity === "Facility") {
+              await getAFacilityTransactionsUnPaginated();
+            }
+          }
+        }
+      }
+    };
+
+    fetchTransactions();
+    setShowFilter("");
+  }, [id, entity, user.wallets, showFilter, filterQuery]);
+
+  useEffect(() => {
     const fetchFilteredTransactions = async () => {
       if (filters.User) {
         await getAUserTransactions();
@@ -298,14 +375,14 @@ function Transactions() {
       title="Transactions"
       detail="See balance and all transactions here"
     >
-      {loading && (
+      {/* {loading && (
         <div className="flex items-center justify-center space-x-4">
           <div>
             <MyLoaderFinite />
           </div>
           <div>Hold on, getting transactions</div>
         </div>
-      )}
+      )} */}
       <>
         <PermissionGuard
           requiredPermissions={[

@@ -326,12 +326,12 @@ function UserManagement() {
       } else {
         getRolesUnpaginated();
       }
+      setShowFilter("");
     }
-  }, [setShowFilter, filterQuery]);
+  }, [showFilter, filterQuery]);
 
   //new clear
   useEffect(() => {
-    setShowFilter("");
     clearSearchAndPagination();
   }, [selectedTab]);
 

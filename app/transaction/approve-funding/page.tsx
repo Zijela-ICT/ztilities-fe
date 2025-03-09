@@ -12,6 +12,7 @@ import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
 import createAxiosInstance from "@/utils/api";
 import DynamicCreateForm from "@/components/dynamic-create-form";
+import exportToCSV from "@/utils/exportCSV";
 
 function Power() {
   const axiosInstance = createAxiosInstance();
@@ -20,6 +21,8 @@ function Power() {
     setPagination,
     searchQuery,
     filterQuery,
+    showFilter,
+    setShowFilter,
     clearSearchAndPagination,
   } = useDataPermission();
   const tabs = ["Power Apportion"];
@@ -36,6 +39,14 @@ function Power() {
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   // Fetch data functions
+
+  const getPaymentsUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/payments/?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "payments");
+  };
+
   const getPayments = async () => {
     const response = await axiosInstance.get(
       `/payments/?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -126,6 +137,13 @@ function Power() {
     searchQuery,
     filterQuery,
   ]);
+
+  useEffect(() => {
+    if (showFilter === "export") {
+      getPaymentsUnPaginated();
+      setShowFilter("");
+    }
+  }, [showFilter, filterQuery]);
 
   return (
     <DashboardLayout

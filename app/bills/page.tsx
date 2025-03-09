@@ -12,6 +12,7 @@ import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
 import FacilityDetails from "@/components/facility-management/view-facility";
 import createAxiosInstance from "@/utils/api";
+import exportToCSV from "@/utils/exportCSV";
 
 function VendorManagement() {
   const axiosInstance = createAxiosInstance();
@@ -21,6 +22,8 @@ function VendorManagement() {
     searchQuery,
     filterQuery,
     clearSearchAndPagination,
+    showFilter,
+    setShowFilter,
   } = useDataPermission();
 
   const tabs = ["My Bills", "All Bills"];
@@ -39,6 +42,13 @@ function VendorManagement() {
   const [centralState, setCentralState] = useState<string>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
+  const getBillsUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/bills?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "bills");
+  };
+
   const getBills = async () => {
     const response = await axiosInstance.get(
       `/bills?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -51,6 +61,13 @@ function VendorManagement() {
       total: extra.total,
       totalPages: extra.totalPages,
     });
+  };
+
+  const getMyBillsUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/bills/my-bills/all?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "my_bills");
   };
 
   const getMyBills = async () => {
@@ -169,6 +186,17 @@ function VendorManagement() {
     searchQuery,
     filterQuery,
   ]);
+
+  useEffect(() => {
+    if (showFilter === "export") {
+      if (selectedTab === "All Bills") {
+        getBillsUnPaginated();
+      } else {
+        getMyBillsUnPaginated();
+      }
+      setShowFilter("");
+    }
+  }, [showFilter, filterQuery]);
 
   //new clear
   useEffect(() => {

@@ -22,6 +22,7 @@ import createAxiosInstance from "@/utils/api";
 import CommentWorkRequestOrder from "@/components/work-request/comment-request-order";
 import RequestQuotationApproval from "@/components/work-order/request-quotation-approval";
 import CreateBulk from "@/components/user-management/create-bulk";
+import exportToCSV from "@/utils/exportCSV";
 
 interface Props {
   nowrap: boolean;
@@ -35,6 +36,8 @@ function WorkOrders({ nowrap }: Props) {
     searchQuery,
     filterQuery,
     clearSearchAndPagination,
+    showFilter,
+    setShowFilter
   } = useDataPermission();
   const tabs = ["All Work Order", "My Work Order"];
 
@@ -55,6 +58,13 @@ function WorkOrders({ nowrap }: Props) {
   const [technician, setTechnicians] = useState<Technician[]>();
 
   // Fetch data functions
+  const getWorkOrdersUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/work-orders/work-order/all?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "work_orders");
+  };
+  
   const getWorkOrders = async () => {
     const response = await axiosInstance.get(
       `/work-orders/work-order/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -69,6 +79,13 @@ function WorkOrders({ nowrap }: Props) {
     });
   };
 
+  const getAssignedWorkOrdersUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/work-orders/my-work-orders/all?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "my_work_orders");
+  };
+  
   const getAssignedWorkOrders = async () => {
     const response = await axiosInstance.get(
       `/work-orders/my-work-orders/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -557,6 +574,17 @@ function WorkOrders({ nowrap }: Props) {
     searchQuery,
     filterQuery,
   ]);
+
+  useEffect(() => {
+    if (showFilter === "export") {
+      if (selectedTab === "All Work Order") {
+        getWorkOrdersUnPaginated();
+      } else {
+        getAssignedWorkOrdersUnPaginated();
+      }
+      setShowFilter("");
+    }
+  }, [showFilter, filterQuery]);
 
   //new clear
   useEffect(() => {

@@ -15,6 +15,7 @@ import withPermissions from "@/components/auth/permission-protected-routes";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import createAxiosInstance from "@/utils/api";
 import { useDataPermission } from "@/context";
+import exportToCSV from "@/utils/exportCSV";
 
 function UserManagement() {
   const axiosInstance = createAxiosInstance();
@@ -24,6 +25,8 @@ function UserManagement() {
     searchQuery,
     filterQuery,
     clearSearchAndPagination,
+    setShowFilter,
+    showFilter,
   } = useDataPermission();
   const params = useParams();
   const router = useRouter();
@@ -62,11 +65,28 @@ function UserManagement() {
   };
 
   const [users, setUsers] = useState<User[]>();
+
+  const getARoleUsersUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/roles/${id}/users?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "role_users");
+  };
+
   const getARoleUsers = async () => {
     const response = await axiosInstance.get(
       `/roles/${id}/users?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
     setUsers(response.data.data);
+    const extra = response.data.extra;
+    if (extra) {
+      setPagination({
+        currentPage: extra.page,
+        pageSize: extra.pageSize,
+        total: extra.total,
+        totalPages: extra.totalPages,
+      });
+    }
   };
 
   // Active row tracking
@@ -92,6 +112,12 @@ function UserManagement() {
     searchQuery,
     filterQuery,
   ]);
+
+  useEffect(() => {
+    if (showFilter === "export") {
+      getARoleUsersUnPaginated();
+    }
+  }, [setShowFilter, filterQuery]);
 
   // Dynamic title logic
   const getTitle = () => {

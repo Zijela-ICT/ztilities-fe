@@ -19,6 +19,7 @@ import createAxiosInstance from "@/utils/api";
 import FundWallet from "@/components/transaction/fund-wallet";
 import CreateBulk from "@/components/user-management/create-bulk";
 import Payouts from "@/components/transaction/payout";
+import exportToCSV from "@/utils/exportCSV";
 
 function FacilityManagement() {
   const axiosInstance = createAxiosInstance();
@@ -27,6 +28,8 @@ function FacilityManagement() {
     setPagination,
     searchQuery,
     filterQuery,
+    setShowFilter,
+    showFilter,
     clearSearchAndPagination,
   } = useDataPermission();
   const tabs = [
@@ -70,6 +73,13 @@ function FacilityManagement() {
     setUsers(response.data.data);
   };
 
+  const getFacilitiesForExport = async () => {
+    const response = await axiosInstance.get(
+      `/facilities?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "facilities");
+  };
+
   const getFacilities = async () => {
     const response = await axiosInstance.get(
       `/facilities?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -87,6 +97,13 @@ function FacilityManagement() {
   const getFacilitiesUnpaginated = async () => {
     const response = await axiosInstance.get(`/facilities`);
     setFacilities(response.data.data);
+  };
+
+  const getMyFacilitiesForExport = async () => {
+    const response = await axiosInstance.get(
+      `/facilities/my-facilities/all?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "my_facilities");
   };
 
   const getMyFacilities = async () => {
@@ -108,6 +125,13 @@ function FacilityManagement() {
     setFacilities(response.data.data);
   };
 
+  const getBlocksForExport = async () => {
+    const response = await axiosInstance.get(
+      `/blocks?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "blocks");
+  };
+
   const getBlocks = async () => {
     const response = await axiosInstance.get(
       `/blocks?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -125,6 +149,13 @@ function FacilityManagement() {
   const getBlocksUnpaginated = async () => {
     const response = await axiosInstance.get(`/blocks`);
     setBlocks(response.data.data);
+  };
+
+  const getMyBlocksForExport = async () => {
+    const response = await axiosInstance.get(
+      `/blocks/my-blocks/all?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "my_blocks");
   };
 
   const getMyBlocks = async () => {
@@ -146,6 +177,13 @@ function FacilityManagement() {
     setMyBlocks(response.data.data);
   };
 
+  const getUnitsForExport = async () => {
+    const response = await axiosInstance.get(
+      `/units?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "units");
+  };
+
   const getUnits = async () => {
     const response = await axiosInstance.get(
       `/units?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -158,6 +196,13 @@ function FacilityManagement() {
       total: extra.total,
       totalPages: extra.totalPages,
     });
+  };
+
+  const getMyUnitsForExport = async () => {
+    const response = await axiosInstance.get(
+      `/units/my-units/all?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "my_units");
   };
 
   const getMyUnits = async () => {
@@ -174,9 +219,19 @@ function FacilityManagement() {
     });
   };
 
+  const getAssetsForExport = async () => {
+    const response = await axiosInstance.get("/assets");
+    exportToCSV(response.data.data, "assets");
+  };
+
   const getAssets = async () => {
     const response = await axiosInstance.get("/assets");
     setAssets(response.data.data);
+  };
+
+  const getCategoriesForExport = async () => {
+    const response = await axiosInstance.get("/assets/category/all");
+    exportToCSV(response.data.data, "categories");
   };
 
   const getCategories = async () => {
@@ -285,8 +340,8 @@ function FacilityManagement() {
         return "Assign User";
       case "assignUserToBlock":
         return "Assign User";
-        case "assignUserToUnit":
-          return "Assign User";
+      case "assignUserToUnit":
+        return "Assign User";
       case "fundWallet":
         return "Fund Wallet";
       case "payoutUnits":
@@ -355,8 +410,8 @@ function FacilityManagement() {
         return "Assign facility to users";
       case "assignUserToBlock":
         return "Assign User to a block";
-        case "assignUserToUnit":
-          return "Assign User to a unit";
+      case "assignUserToUnit":
+        return "Assign User to a unit";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -489,9 +544,7 @@ function FacilityManagement() {
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={(id) =>
-          axiosInstance
-            .get(`/facilities/${id}`)
-            .then((res) => res.data.data)
+          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
         }
       />
     ),
@@ -576,9 +629,7 @@ function FacilityManagement() {
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={(id) =>
-          axiosInstance
-            .get(`/blocks/${id}`)
-            .then((res) => res.data.data)
+          axiosInstance.get(`/blocks/${id}`).then((res) => res.data.data)
         }
       />
     ),
@@ -700,9 +751,7 @@ function FacilityManagement() {
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={(id) =>
-          axiosInstance
-            .get(`/units/${id}`)
-            .then((res) => res.data.data)
+          axiosInstance.get(`/units/${id}`).then((res) => res.data.data)
         }
       />
     ),
@@ -907,6 +956,29 @@ function FacilityManagement() {
       getACategory();
     }
   }, [centralState]);
+
+  useEffect(() => {
+    if (showFilter === "export") {
+      if (selectedTab === "Blocks") {
+        getBlocksForExport();
+      } else if (selectedTab === "My Blocks") {
+        getMyBlocksForExport();
+      } else if (selectedTab === "Units") {
+        getUnitsForExport();
+      } else if (selectedTab === "My Units") {
+        getMyUnitsForExport();
+      } else if (selectedTab === "Assets") {
+        getAssetsForExport();
+      } else if (selectedTab === "Categories") {
+        getCategoriesForExport();
+      } else if (selectedTab === "My Facilities") {
+        getMyFacilitiesForExport();
+      } else {
+        getFacilitiesForExport();
+      }
+      setShowFilter("");
+    }
+  }, [showFilter, filterQuery]);
 
   //new clear
   useEffect(() => {

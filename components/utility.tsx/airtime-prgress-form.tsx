@@ -18,12 +18,12 @@ export default function AirtimeFlow({
   setPINState,
 }) {
   const axiosInstance = createAxiosInstance();
-
+console.log(utility)
   const initialTopupData = {
     telco: "",
     number: "",
     amount: "",
-    reference: "",
+    description: "",
   };
 
   // const [centralState, setCentralState] = useState<string>();
@@ -128,10 +128,10 @@ export default function AirtimeFlow({
         />
         <LabelInputComponent
           type="text"
-          name="reference"
-          value={topupData.reference}
+          name="description"
+          value={topupData.description}
           onChange={handleChange}
-          label="Reference (Optional)"
+          label="Description"
         />
 
         <div className="flex justify-end">

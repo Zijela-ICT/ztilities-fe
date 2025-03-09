@@ -15,6 +15,7 @@ import createAxiosInstance from "@/utils/api";
 import Payouts from "@/components/transaction/payout";
 import FundWallet from "@/components/transaction/fund-wallet";
 import { useDataPermission } from "@/context";
+import exportToCSV from "@/utils/exportCSV";
 
 function FacilityManagement() {
   const axiosInstance = createAxiosInstance();
@@ -24,6 +25,8 @@ function FacilityManagement() {
     searchQuery,
     filterQuery,
     clearSearchAndPagination,
+    showFilter,
+    setShowFilter,
   } = useDataPermission();
   const params = useParams();
   const router = useRouter();
@@ -68,6 +71,14 @@ function FacilityManagement() {
   };
 
   const [facilities, setFacilities] = useState<Facility[]>();
+
+  const getAAssetFacilitiesUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/assets/${id}/facilities?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "asset_facilities");
+  };
+
   const getAAssetFacilities = async () => {
     const response = await axiosInstance.get(
       `/assets/${id}/facilities?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -108,6 +119,13 @@ function FacilityManagement() {
     searchQuery,
     filterQuery,
   ]);
+
+  useEffect(() => {
+    if (showFilter === "export") {
+      getAAssetFacilitiesUnPaginated();
+      setShowFilter("");
+    }
+  }, [showFilter, filterQuery]);
 
   // Dynamic title logic
   const getTitle = () => {

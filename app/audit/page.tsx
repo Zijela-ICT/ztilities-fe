@@ -13,6 +13,7 @@ import { useDataPermission } from "@/context";
 import ApportionPower from "@/components/work-request/apportionPower";
 import FacilityDetails from "@/components/facility-management/view-facility";
 import createAxiosInstance from "@/utils/api";
+import exportToCSV from "@/utils/exportCSV";
 
 function Power() {
   const axiosInstance = createAxiosInstance();
@@ -22,6 +23,8 @@ function Power() {
     searchQuery,
     filterQuery,
     clearSearchAndPagination,
+    showFilter,
+    setShowFilter,
   } = useDataPermission();
   const tabs = ["Power Apportion"];
 
@@ -40,6 +43,14 @@ function Power() {
   // const formAudit = auditLogs?.slice(0,10)
 
   // Fetch data functions
+
+  const getPowerChargesUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/audit-logs?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "audit_logs");
+  };
+
   const getPowerCharges = async () => {
     const response = await axiosInstance.get(
       `/audit-logs?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -210,6 +221,13 @@ function Power() {
     searchQuery,
     filterQuery,
   ]);
+
+  useEffect(() => {
+    if (showFilter === "export") {
+      getPowerChargesUnPaginated();
+      setShowFilter("");
+    }
+  }, [showFilter, filterQuery]);
 
   //new clear
   useEffect(() => {

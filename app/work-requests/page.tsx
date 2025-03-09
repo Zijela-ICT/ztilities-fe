@@ -21,6 +21,7 @@ import AcceptQuotation from "@/components/work-request/acceptQuotation";
 import createAxiosInstance from "@/utils/api";
 import CommentWorkRequestOrder from "@/components/work-request/comment-request-order";
 import CreateBulk from "@/components/user-management/create-bulk";
+import exportToCSV from "@/utils/exportCSV";
 
 interface Props {
   nowrap: boolean;
@@ -35,6 +36,8 @@ function WorkRequests({ nowrap }: Props) {
     searchQuery,
     filterQuery,
     clearSearchAndPagination,
+    setShowFilter,
+    showFilter
   } = useDataPermission();
 
   const hasTenantRole = userRoles.some(
@@ -59,6 +62,13 @@ function WorkRequests({ nowrap }: Props) {
   const [technician, setTechnicians] = useState<Technician[]>();
 
   // Fetch data functions
+  const getAssignedWorkRequestsUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/work-requests/my-work-requests/all?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "assigned_work_requests");
+  };
+
   const getAssignedWorkRequests = async () => {
     const response = await axiosInstance.get(
       `/work-requests/my-work-requests/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -73,6 +83,13 @@ function WorkRequests({ nowrap }: Props) {
     });
   };
 
+  const getAssignedWorkRequestsOrderUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/work-requests/my-requests/all?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "assigned_work_requests_and_order");
+  };
+  
   const getAssignedWorkRequestsOrder = async () => {
     const response = await axiosInstance.get(
       `/work-requests/my-requests/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -100,6 +117,13 @@ function WorkRequests({ nowrap }: Props) {
     });
   };
 
+  const getOtherWorkRequestsUnPaginated = async () => {
+    const response = await axiosInstance.get(
+      `/work-requests?search=${searchQuery}&&${filterQuery}`
+    );
+    exportToCSV(response.data.data, "work_requests");
+  };
+  
   const getOtherWorkRequests = async () => {
     const response = await axiosInstance.get(
       `/work-requests?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -495,6 +519,19 @@ function WorkRequests({ nowrap }: Props) {
     searchQuery,
     filterQuery,
   ]);
+
+  useEffect(() => {
+    if (showFilter === "export") {
+      if (selectedTab === "All Work Request") {
+        getOtherWorkRequestsUnPaginated();
+      } else if (selectedTab === "My Work Request" && hasTenantRole) {
+        getAssignedWorkRequestsOrderUnPaginated();
+      } else if (selectedTab === "My Work Request") {
+        getAssignedWorkRequestsUnPaginated();
+      }
+      setShowFilter("");
+    }
+  }, [showFilter, filterQuery]);
 
   //new clear
   useEffect(() => {
