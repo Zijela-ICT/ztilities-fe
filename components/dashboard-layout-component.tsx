@@ -44,7 +44,6 @@ export default function DashboardLayout({
   const [selectedWallet, setSelectedWallet] = useState<any>();
   const [showNotifications, setShowNotifications] = useState(false);
 
-  console.log(pathname);
 
   useEffect(() => {
     setSelectedWallet(user?.wallets[0]);

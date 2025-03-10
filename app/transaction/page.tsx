@@ -23,7 +23,7 @@ import {
 import Link from "next/link";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import createAxiosInstance from "@/utils/api";
-import { chartOptions } from "@/utils/ojects";
+import { chartOptions, multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { MyLoaderFinite } from "@/components/loader-components";
@@ -36,6 +36,7 @@ import FundOtherWallet from "@/components/transaction/fund-other-wallet";
 import Payouts from "@/components/transaction/payout";
 import moment from "moment";
 import ManagePin from "@/components/transaction/create-pin";
+import Select from "react-select";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -91,11 +92,21 @@ function Transactions() {
     },
   ];
 
+  // const handleFilterChange = (label, value) => {
+  //   setFilters((prevFilters) => ({
+  //     ...prevFilters,
+  //     [label]: value,
+  //   }));
+  // };
+
   const handleFilterChange = (label, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
+    setFilters({
+      User: "",
+      Facility: "",
+      Vendor: "",
+      Technician: "",
       [label]: value,
-    }));
+    });
   };
 
   // Handle changes for each input box
@@ -220,22 +231,6 @@ function Transactions() {
     };
 
     fetchFilteredTransactions();
-  }, [filters]);
-
-  useEffect(() => {
-    if (
-      filters.User ||
-      filters.Vendor ||
-      filters.Technician ||
-      filters.Facility
-    ) {
-      setFilters({
-        User: "",
-        Facility: "",
-        Vendor: "",
-        Technician: "",
-      });
-    }
   }, [filters]);
 
   const monthlyData = {
@@ -452,7 +447,8 @@ function Transactions() {
                     >
                       <select
                         className="border border-gray-300 rounded-md p-2"
-                        value={filters[filter.label]?.id}
+                        // value={filters[filter.label]?.id}
+                        value={filters[filter.label]}
                         onChange={(e) => {
                           handleFilterChange(filter.label, e.target.value);
                           setTransactionId(e.target.value);
