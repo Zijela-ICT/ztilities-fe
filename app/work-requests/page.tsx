@@ -30,6 +30,7 @@ interface Props {
 function WorkRequests({ nowrap }: Props) {
   const axiosInstance = createAxiosInstance();
   const {
+    user,
     pagination,
     setPagination,
     userRoles,
@@ -66,7 +67,7 @@ function WorkRequests({ nowrap }: Props) {
     const response = await axiosInstance.get(
       `/work-requests/my-work-requests/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, "assigned_work_requests");
+    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_work_requests`);
   };
 
   const getAssignedWorkRequests = async () => {
@@ -87,7 +88,7 @@ function WorkRequests({ nowrap }: Props) {
     const response = await axiosInstance.get(
       `/work-requests/my-requests/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, "assigned_work_requests_and_order");
+    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_work_requests_order`);
   };
   
   const getAssignedWorkRequestsOrder = async () => {

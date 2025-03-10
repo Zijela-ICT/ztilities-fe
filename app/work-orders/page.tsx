@@ -31,6 +31,7 @@ interface Props {
 function WorkOrders({ nowrap }: Props) {
   const axiosInstance = createAxiosInstance();
   const {
+    user,
     pagination,
     setPagination,
     searchQuery,
@@ -83,7 +84,7 @@ function WorkOrders({ nowrap }: Props) {
     const response = await axiosInstance.get(
       `/work-orders/my-work-orders/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, "my_work_orders");
+    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_work_orders`);
   };
   
   const getAssignedWorkOrders = async () => {

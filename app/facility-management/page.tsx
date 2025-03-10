@@ -24,6 +24,7 @@ import exportToCSV from "@/utils/exportCSV";
 function FacilityManagement() {
   const axiosInstance = createAxiosInstance();
   const {
+    user,
     pagination,
     setPagination,
     searchQuery,
@@ -103,7 +104,7 @@ function FacilityManagement() {
     const response = await axiosInstance.get(
       `/facilities/my-facilities/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, "my_facilities");
+    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_facilities`);
   };
 
   const getMyFacilities = async () => {
@@ -155,7 +156,7 @@ function FacilityManagement() {
     const response = await axiosInstance.get(
       `/blocks/my-blocks/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, "my_blocks");
+    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_blocks`);
   };
 
   const getMyBlocks = async () => {
@@ -202,7 +203,7 @@ function FacilityManagement() {
     const response = await axiosInstance.get(
       `/units/my-units/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, "my_units");
+    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_units`);
   };
 
   const getMyUnits = async () => {

@@ -121,7 +121,7 @@ function Transactions() {
     const response = await axiosInstance.get(
       `/transactions/my-transactions/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, "my_transactions");
+    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_transactions`);
   };
 
   const getMyTransactions = async () => {

@@ -17,6 +17,7 @@ import exportToCSV from "@/utils/exportCSV";
 function VendorManagement() {
   const axiosInstance = createAxiosInstance();
   const {
+    user,
     pagination,
     setPagination,
     searchQuery,
@@ -67,7 +68,7 @@ function VendorManagement() {
     const response = await axiosInstance.get(
       `/bills/my-bills/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, "my_bills");
+    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_bills`);
   };
 
   const getMyBills = async () => {
