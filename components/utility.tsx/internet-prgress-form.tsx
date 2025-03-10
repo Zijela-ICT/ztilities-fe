@@ -165,7 +165,7 @@ export default function InternetFlow({
             className="text-[#A8353A] my-3 cursor-pointer"
             onClick={() => setBeneficiaryState("ben")}
           >
-            Beneficiaries for internet
+            Choose Beneficiary
           </p>
         </div>
         <div className="mt-10 flex w-full justify-end">

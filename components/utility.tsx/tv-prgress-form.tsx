@@ -204,7 +204,7 @@ export default function TVFlow({
               className="text-[#A8353A] my-3 cursor-pointer"
               onClick={() => setBeneficiaryState("ben")}
             >
-              Beneficiaries for tv
+             Choose Beneficiary
             </p>
           </div>
 
