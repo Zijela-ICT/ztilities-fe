@@ -4,6 +4,7 @@ import createAxiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import { LabelInputComponent } from "../input-container";
 import { toast } from "react-toastify";
+import { useDataPermission } from "@/context";
 
 export default function ElectricityFlow({
   electricity,
@@ -17,7 +18,13 @@ export default function ElectricityFlow({
   setPINState,
 }) {
   const axiosInstance = createAxiosInstance();
-
+  const { user } = useDataPermission();
+  const initialBeneficiaryData = {
+    disco: "",
+    meterNumber: "",
+    type: "",
+    alias: "",
+  };
   const initialCustomerData = {
     Customer_Name: "",
     meterNumber: "",
@@ -30,9 +37,14 @@ export default function ElectricityFlow({
     type: "prepaid",
     amount: "",
     description: "",
+    alias: "",
   };
   // Stepper and form state
   const [activeStep, setActiveStep] = useState(0);
+  const [checked, setChecked] = useState(false);
+  const [beneficiaryData, setBeneficiaryData] = useState(
+    initialBeneficiaryData
+  );
   const [customerData, setCustomerData] = useState(initialCustomerData);
   const [rechargeData, setRechargeData] = useState(initialRechargeData);
 
@@ -64,12 +76,24 @@ export default function ElectricityFlow({
     setRechargeData((prev) => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    setBeneficiaryData((prev) => ({
+      ...prev,
+      disco: customerData.provider,
+      meterNumber: customerData.meterNumber,
+      type: customerData.type,
+      alias: rechargeData.alias,
+    }));
+  }, [customerData, rechargeData]);
+
+  const handleCheck = () => {
+    setChecked((prev) => !prev);
+  };
+
   const handleCustomerSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     await axiosInstance.post(`/electricity/validate/`, customerData);
     // Pre-fill recharge data with validated customer details
-    console.log(customerData);
     setRechargeData((prev) => ({
       ...prev,
       disco: customerData.provider,
@@ -83,6 +107,7 @@ export default function ElectricityFlow({
     try {
       if (Number(rechargeData.amount) < Number(utility.minAmount)) {
         toast.warning("Amount cannot be below minimun amount");
+        setCode(Array(4).fill(""));
         return;
       }
       const joinCode = code.join("");
@@ -92,6 +117,12 @@ export default function ElectricityFlow({
         pin: joinCode,
       };
       await axiosInstance.post(`/electricity/recharge`, payload);
+      if (checked) {
+        await axiosInstance.post(
+          `/users/${user.id}/beneficiaries?type=electricity`,
+          beneficiaryData
+        );
+      }
       setSuccessState({
         title: "Successful",
         detail: "Recharge successful.",
@@ -99,6 +130,7 @@ export default function ElectricityFlow({
       });
 
       setModalState("");
+      setCode(Array(4).fill(""));
     } catch (error) {
       setCode(Array(4).fill(""));
     }
@@ -198,7 +230,7 @@ export default function ElectricityFlow({
               className="text-[#A8353A] my-3 cursor-pointer"
               onClick={() => setBeneficiaryState("ben")}
             >
-            Choose Beneficiary
+              Choose Beneficiary
             </p>
           </div>
           <div className="mt-10 flex w-full justify-end">
@@ -259,6 +291,34 @@ export default function ElectricityFlow({
             onChange={handleRechargeChange}
             label="Description"
           />
+          {activeStep === 1 && checked && (
+            <LabelInputComponent
+              type="text"
+              name="alias"
+              value={beneficiaryData.alias}
+              onChange={handleRechargeChange}
+              label="Alias for your beneficiary"
+            />
+          )}
+
+          <div className="flex justify-between">
+            <label className="flex items-center text-[#A8353A] my-3">
+              <input
+                className="mr-2"
+                type="checkbox"
+                checked={checked}
+                onChange={handleCheck}
+              />
+              Save as beneficiary
+            </label>
+            <p
+              className="text-[#A8353A] my-3 cursor-pointer"
+              onClick={() => setBeneficiaryState("ben")}
+            >
+              Choose Beneficiary
+            </p>
+          </div>
+
           <div className="mt-10 flex w-full justify-between">
             <button
               type="button"

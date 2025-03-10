@@ -256,9 +256,9 @@ function WorkRequests() {
 
       <ModalCompoenent
         title={"Beneficiaries"}
-        detail={""}
+        detail={`Beneficiaries for ${utility} `}
         modalState={beneficiaryState}
-        className="fixed z-40 top-5 right-5 w-full max-w-lg h-[60vh] overflow-y-auto p-0 "
+        className="fixed z-40 top-5 right-5 w-full max-w-lg h-[70vh] overflow-y-auto p-0 "
         setModalState={() => {
           setBeneficiaryState("");
         }}

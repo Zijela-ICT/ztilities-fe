@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import Select from "react-select";
 import { multiSelectStyle } from "@/utils/ojects";
 import Benfeciaries from "./benficiaries";
+import { useDataPermission } from "@/context";
 
 export default function AirtimeFlow({
   airtime,
@@ -18,15 +19,25 @@ export default function AirtimeFlow({
   setPINState,
 }) {
   const axiosInstance = createAxiosInstance();
-  console.log({});
+  const { user } = useDataPermission();
+  const initialBeneficiaryData = {
+    telco: "",
+    number: "",
+    alias: "",
+  };
   const initialTopupData = {
     telco: "",
     number: "",
     amount: "",
     description: "",
+    alias: "",
   };
 
   // const [centralState, setCentralState] = useState<string>();
+  const [checked, setChecked] = useState(false);
+  const [beneficiaryData, setBeneficiaryData] = useState(
+    initialBeneficiaryData
+  );
   const [topupData, setTopupData] = useState(initialTopupData);
 
   useEffect(() => {
@@ -51,10 +62,24 @@ export default function AirtimeFlow({
     setTopupData((prev) => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    setBeneficiaryData((prev) => ({
+      ...prev,
+      telco: topupData.telco,
+      number: topupData.number,
+      alias: topupData.alias,
+    }));
+  }, [topupData]);
+
+  const handleCheck = () => {
+    setChecked((prev) => !prev);
+  };
+
   const handleSubmit = async () => {
     try {
       if (Number(topupData.amount) < Number(utility.minAmount)) {
         toast.warning("Amount cannot be below minimun amount");
+        setCode(Array(4).fill(""));
         return;
       }
       const joinCode = code.join("");
@@ -64,6 +89,12 @@ export default function AirtimeFlow({
         pin: joinCode,
       };
       await axiosInstance.post(`/airtime/topup`, payload);
+      if (checked) {
+        await axiosInstance.post(
+          `/users/${user.id}/beneficiaries?type=airtime`,
+          beneficiaryData
+        );
+      }
       setSuccessState({
         title: "Successful",
         detail: "Topup successful.",
@@ -134,7 +165,26 @@ export default function AirtimeFlow({
           label="Description"
         />
 
-        <div className="flex justify-end">
+        {checked && (
+          <LabelInputComponent
+            type="text"
+            name="alias"
+            value={beneficiaryData.alias}
+            onChange={handleChange}
+            label="Alias for your beneficiary"
+          />
+        )}
+
+        <div className="flex justify-between">
+          <label className="flex items-center text-[#A8353A] my-3">
+            <input
+              className="mr-2"
+              type="checkbox"
+              checked={checked}
+              onChange={handleCheck}
+            />
+            Save as beneficiary
+          </label>
           <p
             className="text-[#A8353A] my-3 cursor-pointer"
             onClick={() => setBeneficiaryState("ben")}

@@ -4,6 +4,7 @@ import createAxiosInstance from "@/utils/api";
 import { multiSelectStyle } from "@/utils/ojects";
 import { LabelInputComponent } from "../input-container";
 import { toast } from "react-toastify";
+import { useDataPermission } from "@/context";
 
 export default function TVFlow({
   tv,
@@ -17,7 +18,14 @@ export default function TVFlow({
   setPINState,
 }) {
   const axiosInstance = createAxiosInstance();
+  const { user } = useDataPermission();
 
+  const initialBeneficiaryData = {
+    tv: "",
+    number: "",
+    plan_id: 0,
+    alias: "",
+  };
   const initialCustomerData = {
     tv: "",
     number: "",
@@ -28,9 +36,14 @@ export default function TVFlow({
     number: "",
     plan_id: 0,
     description: "",
+    alias: "",
   };
   // Stepper and form state
   const [activeStep, setActiveStep] = useState(0);
+  const [checked, setChecked] = useState(false);
+  const [beneficiaryData, setBeneficiaryData] = useState(
+    initialBeneficiaryData
+  );
   const [customerData, setCustomerData] = useState(initialCustomerData);
   const [subscribeData, setSubscribeData] = useState(initialSubsribeData);
 
@@ -85,6 +98,20 @@ export default function TVFlow({
     setSubscribeData((prev) => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    setBeneficiaryData((prev) => ({
+      ...prev,
+      tv: customerData.tv,
+      number: customerData.number,
+      plan_id: subscribeData.plan_id,
+      alias: subscribeData.alias,
+    }));
+  }, [customerData, subscribeData]);
+
+  const handleCheck = () => {
+    setChecked((prev) => !prev);
+  };
+
   const handleCustomerSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -106,6 +133,12 @@ export default function TVFlow({
         pin: joinCode,
       };
       await axiosInstance.post(`/tv/subscribe`, payload);
+      if (checked) {
+        await axiosInstance.post(
+          `/users/${user.id}/beneficiaries?type=tv`,
+          beneficiaryData
+        );
+      }
       setSuccessState({
         title: "Successful",
         detail: "Recharge successful.",
@@ -204,7 +237,7 @@ export default function TVFlow({
               className="text-[#A8353A] my-3 cursor-pointer"
               onClick={() => setBeneficiaryState("ben")}
             >
-             Choose Beneficiary
+              Choose Beneficiary
             </p>
           </div>
 
@@ -255,6 +288,34 @@ export default function TVFlow({
             onChange={handleRechargeChange}
             label="Description"
           />
+
+          {activeStep === 1 && checked && (
+            <LabelInputComponent
+              type="text"
+              name="alias"
+              value={beneficiaryData.alias}
+              onChange={handleRechargeChange}
+              label="Alias for your beneficiary"
+            />
+          )}
+
+          <div className="flex justify-between">
+            <label className="flex items-center text-[#A8353A] my-3">
+              <input
+                className="mr-2"
+                type="checkbox"
+                checked={checked}
+                onChange={handleCheck}
+              />
+              Save as beneficiary
+            </label>
+            <p
+              className="text-[#A8353A] my-3 cursor-pointer"
+              onClick={() => setBeneficiaryState("ben")}
+            >
+              Choose Beneficiary
+            </p>
+          </div>
           <div className="mt-10 flex w-full justify-between">
             <button
               type="button"

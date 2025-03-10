@@ -4,6 +4,7 @@ import { LabelInputComponent } from "../input-container";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import { multiSelectStyle } from "@/utils/ojects";
+import { useDataPermission } from "@/context";
 
 export default function InternetFlow({
   internet,
@@ -17,15 +18,27 @@ export default function InternetFlow({
   setPINState,
 }) {
   const axiosInstance = createAxiosInstance();
+  const { user } = useDataPermission();
 
+  const initialBeneficiaryData = {
+    telco: "",
+    number: "",
+    plan_id: 0,
+    alias: "",
+  };
   const initialPurchaseData = {
     telco: "",
     name: "",
     number: "",
     plan_id: 0,
     description: "",
+    alias: "",
   };
 
+  const [checked, setChecked] = useState(false);
+  const [beneficiaryData, setBeneficiaryData] = useState(
+    initialBeneficiaryData
+  );
   const [purchaseData, setPurchaseData] = useState(initialPurchaseData);
 
   useEffect(() => {
@@ -56,6 +69,20 @@ export default function InternetFlow({
     setPurchaseData((prev) => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    setBeneficiaryData((prev) => ({
+      ...prev,
+      telco: purchaseData.telco,
+      number: purchaseData.number,
+      plan_id: purchaseData.plan_id,
+      alias: purchaseData.alias,
+    }));
+  }, [purchaseData]);
+
+  const handleCheck = () => {
+    setChecked((prev) => !prev);
+  };
+
   const handleSubmit = async () => {
     try {
       const joinCode = code.join("");
@@ -66,6 +93,12 @@ export default function InternetFlow({
         pin: joinCode, // Add 'pin'
       };
       await axiosInstance.post(`/internet/purchase`, payload);
+      if (checked) {
+        await axiosInstance.post(
+          `/users/${user.id}/beneficiaries?type=internet`,
+          beneficiaryData
+        );
+      }
       setSuccessState({
         title: "Successful",
         detail: "Purchase successful.",
@@ -160,7 +193,26 @@ export default function InternetFlow({
           label="Description"
         />
 
-        <div className="flex justify-end">
+        {checked && (
+          <LabelInputComponent
+            type="text"
+            name="alias"
+            value={purchaseData.alias}
+            onChange={handleChange}
+            label="Alias for your beneficiary"
+          />
+        )}
+
+        <div className="flex justify-between">
+          <label className="flex items-center text-[#A8353A] my-3">
+            <input
+              className="mr-2"
+              type="checkbox"
+              checked={checked}
+              onChange={handleCheck}
+            />
+            Save as beneficiary
+          </label>
           <p
             className="text-[#A8353A] my-3 cursor-pointer"
             onClick={() => setBeneficiaryState("ben")}

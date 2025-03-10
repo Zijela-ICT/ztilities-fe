@@ -133,7 +133,7 @@ export default function Beneficiaries({
       detail: `Beneficiary for ${activeTab} added`,
       status: true,
     });
-    setModalState("");
+    // setModalState("");
     setShowForm(false);
   };
 
