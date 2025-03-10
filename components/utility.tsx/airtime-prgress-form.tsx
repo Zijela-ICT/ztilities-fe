@@ -18,7 +18,7 @@ export default function AirtimeFlow({
   setPINState,
 }) {
   const axiosInstance = createAxiosInstance();
-console.log(utility)
+  console.log({});
   const initialTopupData = {
     telco: "",
     number: "",

@@ -50,6 +50,7 @@ function UtilityManagement() {
   const [activeBeneficiary, setActiveBeneficiary] = useState<any>(null);
   const [beneficiaryState, setBeneficiaryState] = useState<string>();
 
+  const [activeUtility, setActiveUtility] = useState<string>();
   const [utility, setUtility] = useState<any>();
   const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
@@ -122,7 +123,7 @@ function UtilityManagement() {
     electricityFlow: (
       <ElectricityFlow
         electricity={electricity}
-        utility={utility}
+        utility={activeUtility}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         setBeneficiaryState={setBeneficiaryState}
@@ -135,7 +136,7 @@ function UtilityManagement() {
     airtimeFlow: (
       <AirtimeFlow
         airtime={airtime}
-        utility={utility}
+        utility={activeUtility}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         setBeneficiaryState={setBeneficiaryState}
@@ -362,6 +363,7 @@ function UtilityManagement() {
                 onClick={(utility) => {
                   setCentralState("electricityFlow");
                   setUtility("electricity");
+                  setActiveUtility(utility);
                 }}
               />
             </>
@@ -384,6 +386,7 @@ function UtilityManagement() {
                 onClick={(utility) => {
                   setCentralState("airtimeFlow");
                   setUtility("airtime");
+                  setActiveUtility(utility);
                 }}
               />
             </>

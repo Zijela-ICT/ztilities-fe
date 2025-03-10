@@ -14,7 +14,7 @@ export default function Beneficiaries({
   internet,
   setABeneficiary,
   setActiveBeneficiary,
-  utility,
+  utility, // if provided, restricts to a specific utility
   setModalState,
   setModalStateDelete,
   modalStateDelete,
@@ -24,7 +24,17 @@ export default function Beneficiaries({
   const axiosInstance = createAxiosInstance();
   const { user } = useDataPermission();
 
-  console.log(utility,"okok")
+  // Initialize activeTab using the passed in utility (if any) or default to "airtime"
+  const [activeTab, setActiveTab] = useState(utility || "airtime");
+
+  console.log(utility,"here boy")
+  // If the utility prop ever changes, update the activeTab accordingly.
+  useEffect(() => {
+    if (utility && utility !== activeTab) {
+      setActiveTab(utility);
+    }
+  }, [utility]);
+
   const getInitialData = (tab: string) => {
     switch (tab) {
       case "airtime":
@@ -46,11 +56,8 @@ export default function Beneficiaries({
     }
   };
 
-  // State for beneficiaries list and active tab
+  // State for beneficiaries list and form data
   const [beneficiaries, setBeneficiaries] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState("airtime");
-
-  // State for the form data; initialize based on activeTab
   const [data, setTopupData] = useState(getInitialData(activeTab));
 
   useEffect(() => {
@@ -63,7 +70,6 @@ export default function Beneficiaries({
     internet: "telco",
     tv: "tv",
   };
-
   const providerField = providerFieldMapping[activeTab];
 
   // Compute provider options based on the active tab
@@ -112,7 +118,7 @@ export default function Beneficiaries({
     setTopupData((prev) => ({ ...prev, [name]: value }));
   };
 
-  //toggle
+  // Toggle for showing add beneficiary form
   const [showForm, setShowForm] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -129,7 +135,6 @@ export default function Beneficiaries({
     });
     setModalState("");
     setShowForm(false);
-    // setBeneficiaryState("");
   };
 
   const getUtilityBeneficiaries = async (tab: string) => {
@@ -177,41 +182,40 @@ export default function Beneficiaries({
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       {!showForm ? (
         <>
-          {/* Tabs Navigation */}
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-              {[
-                { key: "airtime", label: "Airtime" },
-                { key: "electricity", label: "Electricity" },
-                { key: "tv", label: "TV Subscription" },
-                { key: "internet", label: "Internet" },
-              ].map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-none ${
-                    activeTab === tab.key
-                      ? "border-[#A8353A] text-[#A8353A]"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </div>
+          {/* Conditionally show the Tabs Navigation only if no utility prop is passed */}
+          {!utility && (
+            <div className="border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                {[
+                  { key: "airtime", label: "Airtime" },
+                  { key: "electricity", label: "Electricity" },
+                  { key: "tv", label: "TV Subscription" },
+                  { key: "internet", label: "Internet" },
+                ].map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-none ${
+                      activeTab === tab.key
+                        ? "border-[#A8353A] text-[#A8353A]"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </nav>
+            </div>
+          )}
 
           {/* Beneficiaries List */}
           <div className="space-y-4">
             {beneficiaries.length > 0 ? (
               beneficiaries.map((beneficiary, index) => {
-                const isClickable = true;
                 return (
                   <div
                     key={index}
-                    className={`bg-white shadow rounded-lg p-4 flex justify-between items-center border border-gray-200 ${
-                      isClickable ? "cursor-pointer" : "cursor-not-allowed"
-                    }`}
+                    className="bg-white shadow rounded-lg p-4 flex justify-between items-center border border-gray-200 cursor-pointer"
                   >
                     <div onClick={() => setABeneficiary(beneficiary)}>
                       <p className="text-sm text-gray-800">
@@ -281,7 +285,6 @@ export default function Beneficiaries({
             onSubmit={handleSubmit}
             className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
           >
-            {/* Display the beneficiary type */}
             <div className="mb-4">
               <span className="text-gray-700 font-medium">
                 Add Beneficiary for{" "}
@@ -354,7 +357,6 @@ export default function Beneficiaries({
                     required
                   />
                 </div>
-
                 <LabelInputComponent
                   type="text"
                   name="alias"
@@ -387,7 +389,6 @@ export default function Beneficiaries({
                   label="Phone Number"
                   required
                 />
-
                 <LabelInputComponent
                   type="text"
                   name="alias"
@@ -420,7 +421,6 @@ export default function Beneficiaries({
                   label="Phone Number"
                   required
                 />
-
                 <LabelInputComponent
                   type="text"
                   name="alias"
