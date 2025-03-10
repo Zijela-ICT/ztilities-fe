@@ -67,11 +67,28 @@ function UserManagement() {
   };
 
   const getRolesUnpaginated = async () => {
-    const response = await axiosInstance.get(
-      `/roles?search=${searchQuery}&&${filterQuery}`
-    );
-    exportToCSV(response.data.data, "roles");
+    try {
+      // Fetch roles
+      const response = await axiosInstance.get(
+        `/roles?search=${searchQuery}&&${filterQuery}`
+      );
+      const roles = response.data.data;
+
+      // Fetch additional details for each role
+      const rolesWithPermissions = await Promise.all(
+        roles.map(async (role) => {
+          const roleDetails = await axiosInstance.get(`/roles/${role.id}`);
+          return { ...role, permissions: roleDetails.data.data.permissions };
+        })
+      );
+
+      // Export roles with permissions to CSV
+      exportToCSV(rolesWithPermissions, "roles");
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
   };
+
   const getRoles = async () => {
     const response = await axiosInstance.get(
       `/roles?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
