@@ -301,7 +301,7 @@ function UtilityManagement() {
         title={"Beneficiaries"}
         detail={""}
         modalState={beneficiaryState}
-        className="absolute z-40 top-5 right-5 w-full max-w-lg h-[60vh] overflow-y-auto p-0 "
+        className="fixed z-40 top-5 right-5 w-full max-w-lg h-[60vh] overflow-y-auto p-0 "
         setModalState={() => {
           setBeneficiaryState("");
           setActiveRowId(null);
