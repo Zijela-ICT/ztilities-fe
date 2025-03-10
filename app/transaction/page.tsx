@@ -423,7 +423,7 @@ function Transactions() {
                   >
                     <div
                       onClick={() => getMyTransactions()}
-                      className="text-black f lex items-center space-x-1 cursor-pointer"
+                      className="text-black flex items-center space-x-1 cursor-pointer"
                     >
                       <p>Refresh my transactions : </p>
                       <RefreshIcon stroke="black" />

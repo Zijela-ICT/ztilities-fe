@@ -121,7 +121,10 @@ function Transactions() {
     const response = await axiosInstance.get(
       `/transactions/my-transactions/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_transactions`);
+    exportToCSV(
+      response.data.data,
+      `${user.firstName}_${user.lastName}_transactions`
+    );
   };
 
   const getMyTransactions = async () => {
@@ -375,14 +378,14 @@ function Transactions() {
       title="Transactions"
       detail="See balance and all transactions here"
     >
-      {/* {loading && (
+      {loading && (
         <div className="flex items-center justify-center space-x-4">
           <div>
             <MyLoaderFinite />
           </div>
           <div>Hold on, getting transactions</div>
         </div>
-      )} */}
+      )}
       <>
         <PermissionGuard
           requiredPermissions={[
