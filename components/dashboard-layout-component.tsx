@@ -9,7 +9,10 @@ import {
 import Navigation from "./navigation-component";
 import ProtectedRoute from "./auth/protected-routes";
 import { useDataPermission } from "@/context";
-import ModalCompoenent from "./modal-component";
+import ModalCompoenent, {
+  ActionModalCompoenent,
+  SuccessModalCompoenent,
+} from "./modal-component";
 import { useEffect, useState } from "react";
 import ChangeMyPassword from "./change-my-password";
 import Link from "next/link";
@@ -27,6 +30,12 @@ export default function DashboardLayout({
   dynamic,
   onclick,
   nowrap, // New 'nowrap' prop
+
+  getTitle,
+  getDetail,
+  componentMap,
+  takeAction,
+  setActiveRowId,
 }: {
   children: any;
   title: string;
@@ -34,16 +43,39 @@ export default function DashboardLayout({
   dynamic?: boolean;
   onclick?: () => void;
   nowrap?: boolean; // Optional 'nowrap' prop
+
+  getTitle?: any;
+  getDetail?: any;
+  componentMap?: any;
+  takeAction?: any;
+  setActiveRowId?: (id: any) => void;
 }) {
   const axiosInstance = createAxiosInstance();
-  const { user, setUser, setUserPermissions, setUserRoles } =
-    useDataPermission();
+  const {
+    user,
+    setUser,
+    setUserPermissions,
+    setUserRoles,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    successState,
+    setSuccessState,
+  } = useDataPermission();
   const pathname = usePathname();
   const router = useRouter();
-  const [centralState, setCentralState] = useState<string>();
+  //const [centralState, setCentralState] = useState<string>();
   const [selectedWallet, setSelectedWallet] = useState<any>();
   const [showNotifications, setShowNotifications] = useState(false);
 
+  // const [successState, setSuccessState] = useState({
+  //   title: "",
+  //   detail: "",
+  //   status: false,
+  // });
+  // const [centralState, setCentralState] = useState<string>();
+  // const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   useEffect(() => {
     setSelectedWallet(user?.wallets[0]);
@@ -94,6 +126,35 @@ export default function DashboardLayout({
         setModalState={() => setCentralState("")}
       >
         <ChangeMyPassword />
+      </ModalCompoenent>
+
+      <SuccessModalCompoenent
+        title={successState.title}
+        detail={successState.detail}
+        modalState={successState.status}
+        setModalState={(state: boolean) =>
+          setSuccessState((prevState) => ({ ...prevState, status: state }))
+        }
+      ></SuccessModalCompoenent>
+
+      <ActionModalCompoenent
+        title={getTitle && getTitle()}
+        detail={getDetail && getDetail()}
+        modalState={centralStateDelete}
+        setModalState={setCentralStateDelete}
+        takeAction={takeAction && takeAction}
+      ></ActionModalCompoenent>
+
+      <ModalCompoenent
+        title={getTitle && getTitle()}
+        detail={getDetail && getDetail()}
+        modalState={centralState}
+        setModalState={() => {
+          setCentralState("");
+          setActiveRowId(null);
+        }}
+      >
+        {componentMap && componentMap[centralState]}
       </ModalCompoenent>
 
       <ProtectedRoute>
@@ -173,7 +234,10 @@ export default function DashboardLayout({
                 </div>
                 {showNotifications && (
                   <NotificationCard
-                    onClose={() => setShowNotifications(false)}
+                    onClose={() => {
+                      setShowNotifications(false);
+                      setCentralState("");
+                    }}
                   />
                 )}
               </div>

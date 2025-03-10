@@ -27,17 +27,15 @@ function FacilityManagement() {
     clearSearchAndPagination,
     showFilter,
     setShowFilter,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
   } = useDataPermission();
   const params = useParams();
   const router = useRouter();
   const { id } = params;
-
-  // Success state
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
 
   // Delete user function
   const deleteFacility = async () => {
@@ -91,11 +89,6 @@ function FacilityManagement() {
   const toggleActions = (rowId: string) => {
     setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
   };
-
-  // Central states for managing actions
-
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   // Fetch roles and role data on centralState/centralStateDelete change
   useEffect(() => {
@@ -366,32 +359,12 @@ function FacilityManagement() {
       detail="Facility Management"
       dynamic
       onclick={() => router.back()}
+      getTitle={getTitle}
+      getDetail={getDetail}
+      componentMap={componentMap}
+      takeAction={deleteFacility}
+      setActiveRowId={setActiveRowId}
     >
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-
-      <ActionModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={deleteFacility}
-      ></ActionModalCompoenent>
-
-      <ModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralState}
-        setModalState={() => setCentralState("")}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
       <div className="relative bg-white rounded-2xl p-4 mt-4">
         <TableComponent
           data={facilities}

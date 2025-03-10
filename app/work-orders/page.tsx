@@ -38,23 +38,19 @@ function WorkOrders({ nowrap }: Props) {
     filterQuery,
     clearSearchAndPagination,
     showFilter,
-    setShowFilter
+    setShowFilter,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
   } = useDataPermission();
   const tabs = ["All Work Order", "My Work Order"];
-
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
-
 
   const [assignedworkOrders, setAssignedWorkOrders] = useState<any[]>();
   const [workOrders, setWorkOrders] = useState<any[]>();
   const [workOrder, setWorkOrder] = useState<any>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
   const [vendors, setVendors] = useState<Vendor[]>();
   const [technician, setTechnicians] = useState<Technician[]>();
 
@@ -65,7 +61,7 @@ function WorkOrders({ nowrap }: Props) {
     );
     exportToCSV(response.data.data, "work_orders");
   };
-  
+
   const getWorkOrders = async () => {
     const response = await axiosInstance.get(
       `/work-orders/work-order/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -84,9 +80,12 @@ function WorkOrders({ nowrap }: Props) {
     const response = await axiosInstance.get(
       `/work-orders/my-work-orders/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_work_orders`);
+    exportToCSV(
+      response.data.data,
+      `${user.firstName}_${user.lastName}_work_orders`
+    );
   };
-  
+
   const getAssignedWorkOrders = async () => {
     const response = await axiosInstance.get(
       `/work-orders/my-work-orders/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -597,53 +596,29 @@ function WorkOrders({ nowrap }: Props) {
       title="Work Order"
       detail="Submit work order here and view created work orders"
       nowrap={nowrap}
+      getTitle={getTitle}
+      getDetail={getDetail}
+      componentMap={componentMap}
+      takeAction={
+        centralStateDelete === "deactivateWorkOrder" ||
+        centralStateDelete === "activateWorkOrder"
+          ? deleteWorkOrders
+          : centralStateDelete === "apportionServiceCharge"
+          ? apportionServiceCharge
+          : centralStateDelete === "closeWorkOrder"
+          ? closeWorkOrder
+          : centralStateDelete === "requestquotationsselection"
+          ? requestQuotationSelection
+          : centralStateDelete === "approveQuotation"
+          ? approveWorkOrder
+          : centralStateDelete === "acceptWorkOrder"
+          ? acceptWorkOrder
+          : centralStateDelete === "raisePaymentOrder"
+          ? raisePaymentOrder
+          : deleteWorkOrders
+      }
+      setActiveRowId={setActiveRowId}
     >
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-
-      <ActionModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={
-          centralStateDelete === "deactivateWorkOrder" ||
-          centralStateDelete === "activateWorkOrder"
-            ? deleteWorkOrders
-            : centralStateDelete === "apportionServiceCharge"
-            ? apportionServiceCharge
-            : centralStateDelete === "closeWorkOrder"
-            ? closeWorkOrder
-            : centralStateDelete === "requestquotationsselection"
-            ? requestQuotationSelection
-            : centralStateDelete === "approveQuotation"
-            ? approveWorkOrder
-            : centralStateDelete === "acceptWorkOrder"
-            ? acceptWorkOrder
-            : centralStateDelete === "raisePaymentOrder"
-            ? raisePaymentOrder
-            : deleteWorkOrders
-        }
-      ></ActionModalCompoenent>
-
-      <ModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setActiveRowId(null);
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
       <PermissionGuard
         requiredPermissions={[
           "read_work-orders:my-work-orders/all",

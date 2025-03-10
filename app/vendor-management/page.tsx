@@ -3,10 +3,6 @@
 import { JSX, useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
-import ModalCompoenent, {
-  ActionModalCompoenent,
-  SuccessModalCompoenent,
-} from "@/components/modal-component";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
@@ -25,22 +21,20 @@ function VendorManagement() {
     clearSearchAndPagination,
     showFilter,
     setShowFilter,
+
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
   } = useDataPermission();
   const tabs = ["Vendors", "Technicians"];
-
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
 
   const [vendors, setVendors] = useState<Vendor[]>();
   const [technicians, setTechnicians] = useState<Technician[]>();
   const [vendor, setVendor] = useState<Vendor>();
   const [technician, setTechnician] = useState<Technician>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   // Fetch data functions
 
@@ -374,48 +368,24 @@ function VendorManagement() {
     <DashboardLayout
       title="Vendor Management"
       detail="Manage all vendors and technicians here"
+      getTitle={getTitle}
+      getDetail={getDetail}
+      componentMap={componentMap}
+      takeAction={
+        centralStateDelete === "deactivateTechnician" ||
+        centralStateDelete === "activateTechnician"
+          ? deactivateTechnician
+          : centralStateDelete === "deleteTechnician"
+          ? deleteTechnician
+          : centralStateDelete === "deactivateVendor" ||
+            centralStateDelete === "activateVendor"
+          ? deactivateVendor
+          : centralStateDelete === "deleteVendor"
+          ? deleteVendor
+          : undefined
+      }
+      setActiveRowId={setActiveRowId}
     >
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-
-      <ActionModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={
-          centralStateDelete === "deactivateTechnician" ||
-          centralStateDelete === "activateTechnician"
-            ? deactivateTechnician
-            : centralStateDelete === "deleteTechnician"
-            ? deleteTechnician
-            : centralStateDelete === "deactivateVendor" ||
-              centralStateDelete === "activateVendor"
-            ? deactivateVendor
-            : centralStateDelete === "deleteVendor"
-            ? deleteVendor
-            : undefined
-        }
-      ></ActionModalCompoenent>
-
-      <ModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setActiveRowId(null);
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
       <PermissionGuard
         requiredPermissions={["read_vendors", "read_technicians"]}
       >

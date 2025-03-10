@@ -5,9 +5,6 @@ import DashboardLayout from "@/components/dashboard-layout-component";
 import { ArrowRightIcon, CameraIcon } from "@/utils/svg";
 import { useDataPermission } from "@/context";
 import { toast } from "react-toastify";
-import ModalCompoenent, {
-  SuccessModalCompoenent,
-} from "@/components/modal-component";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import withPermissions from "@/components/auth/permission-protected-routes";
@@ -19,14 +16,16 @@ function Settings() {
   const axiosInstance = createAxiosInstance();
   const router = useRouter();
 
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
+  const {
+    user,
+    setUser,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
+  } = useDataPermission();
 
-  const { user, setUser } = useDataPermission();
-  const [centralState, setCentralState] = useState<string>("");
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
 
   const [settings, setSettings] = useState({
@@ -191,27 +190,14 @@ function Settings() {
   };
 
   return (
-    <DashboardLayout title="Settings" detail="Manage setting">
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      />
-      <ModalCompoenent
-        title={getTitle()}
-        detail={""}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setActiveRowId(null);
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
+    <DashboardLayout
+      title="Settings"
+      detail="Manage setting"
+      getTitle={getTitle}
+      componentMap={componentMap}
+      takeAction={null}
+      setActiveRowId={setActiveRowId}
+    >
       <h1 className="text-xl font-bold text-black ml-2 mt-4">Settings</h1>
 
       <div className="flex flex-col md:flex-row bg-gray-100 py-6 px-2">

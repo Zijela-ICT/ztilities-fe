@@ -44,7 +44,6 @@ export default function TableComponent({
   setModalState,
   setModalStateDelete,
   toggleActions,
-  extraActions,
   activeRowId,
   setActiveRowId,
   noSearch,
@@ -330,6 +329,8 @@ export default function TableComponent({
                   ? "w-full"
                   : type === "apportionmentDetails"
                   ? "w-full"
+                  : type === "auditlogs"
+                  ? "w-full"
                   : type === "transactions"
                   ? "sm:w-full"
                   : type === "approvefunding"
@@ -419,35 +420,6 @@ export default function TableComponent({
             show={show}
             type={type}
           />
-          {/* <div
-            className={
-              filterKeys.length === 0
-                ? "flex justify-center mt-4"
-                : "flex justify-end mt-4 mr-9"
-            }
-          >
-            {filterKeys.length === 0 ? (
-              <button
-                className="px-4 py-2 border border-[#A8353A] text-[#A8353A] rounded hover:bg-[#A8353A] hover:text-white transition-colors"
-                onClick={() => clearSearchAndPagination()}
-              >
-                Clear Filter
-              </button>
-            ) : (
-              <button
-                className="px-4 py-2 bg-[#A8353A] text-white rounded transition-colors hover:bg-[#962d31]"
-                onClick={() => {
-                  if (showFilter === "filter") {
-                    sendQueryString();
-                  } else {
-    
-                  }
-                }}
-              >
-                {showFilter === "filter" ? "Filter" : "Export CSV"}
-              </button>
-            )}
-          </div> */}
         </div>
       )}
 
@@ -468,7 +440,9 @@ export default function TableComponent({
                       : column.charAt(0).toUpperCase() + column.slice(1)}
                   </th>
                 ))}
-                {noSearch ? null : <th className="py-3 px-4">Actions</th>}
+                {noSearch || type === "auditlogs" ? null : (
+                  <th className="py-3 px-4">Actions</th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -593,7 +567,7 @@ export default function TableComponent({
                         )}
                       </td>
                     ))}
-                    {noSearch ? null : (
+                    {noSearch || type === "auditlogs" ? null : (
                       <td className="py-3 px-4">
                         <Actions
                           type={type}

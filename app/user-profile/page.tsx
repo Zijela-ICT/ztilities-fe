@@ -17,11 +17,19 @@ import AvatarEditor from "react-avatar-editor";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import createAxiosInstance from "@/utils/api";
 
- function UserProfile() {
+function UserProfile() {
   const axiosInstance = createAxiosInstance();
   const router = useRouter();
-  const { user, setUser } = useDataPermission();
-  const [centralState, setCentralState] = useState<string>();
+  const {
+    user,
+    setUser,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
+  } = useDataPermission();
+
   // State for password inputs
   const [password, setPassword] = useState({
     newPassword: "",
@@ -29,7 +37,6 @@ import createAxiosInstance from "@/utils/api";
     oldPassword: "",
   });
 
-  const [modalState, setModalState] = useState(false);
   const [qrCode, setQrCode] = useState("");
   const [twoFactorMethod, setTwoFactorMethod] = useState(
     user?.twoFAMethod || "email"
@@ -100,7 +107,11 @@ import createAxiosInstance from "@/utils/api";
       oldPassword: password.oldPassword,
     });
     setCentralState("");
-    setModalState(true);
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully changed your password",
+      status: true,
+    });
     setPassword({
       oldPassword: "",
       newPassword: "",
@@ -196,13 +207,7 @@ import createAxiosInstance from "@/utils/api";
 
   return (
     <DashboardLayout title="Profile" detail="Manage your account details here">
-      <SuccessModalCompoenent
-        title={"Sussessful"}
-        detail={"Changed password successful"}
-        modalState={modalState}
-        setModalState={setModalState}
-      ></SuccessModalCompoenent>
-
+      {/* special modal and state  */}
       <ModalCompoenent
         title={"Scan QR Code"}
         detail={
@@ -406,12 +411,12 @@ import createAxiosInstance from "@/utils/api";
           <div className="w-full p-4 border border-gray-200 rounded-xl mb-4">
             {[
               { label: "Two-Factor Authentication", key: "isTwoFactorEnabled" },
-              {
-                label: "Sound Notification",
-                key: "isSoundNotificationEnabled",
-              },
-              { label: "Push Notification", key: "isPushNotificationEnabled" },
-              { label: "Login with Biometric", key: "isBiometricLoginEnabled" },
+              // {
+              //   label: "Sound Notification",
+              //   key: "isSoundNotificationEnabled",
+              // },
+              // { label: "Push Notification", key: "isPushNotificationEnabled" },
+              // { label: "Login with Biometric", key: "isBiometricLoginEnabled" },
             ].map((setting, index, array) => (
               <div
                 key={setting.key}
@@ -486,6 +491,5 @@ import createAxiosInstance from "@/utils/api";
     </DashboardLayout>
   );
 }
-
 
 export default withPermissions(UserProfile, [""]);

@@ -1,14 +1,10 @@
-
-
 "use client";
 
 import ButtonComponent from "@/components/button-component";
 import DashboardLayout from "@/components/dashboard-layout-component";
-import ModalCompoenent, {
-  SuccessModalCompoenent,
-} from "@/components/modal-component";
 import CreatePPM from "@/components/ppm/createPPM";
 import CreateBulk from "@/components/user-management/create-bulk";
+import { useDataPermission } from "@/context";
 import createAxiosInstance from "@/utils/api";
 import moment from "moment";
 import Link from "next/link";
@@ -17,14 +13,14 @@ import "react-datepicker/dist/react-datepicker.css";
 
 export default function Ppm() {
   const axiosInstance = createAxiosInstance();
+  const {
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
+  } = useDataPermission();
 
-  // Modal and notification state
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
-  const [centralState, setCentralState] = useState<string>("");
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
 
   // API & calendar data state
@@ -159,6 +155,7 @@ export default function Ppm() {
             <Link
               href={`/ppm/${work.id}`}
               key={index}
+              onClick={() => setCentralState("")}
               className="flex items-center gap-2 p-2 rounded-md transition-all duration-200 hover:bg-gray-100"
             >
               <span
@@ -177,27 +174,18 @@ export default function Ppm() {
   };
 
   return (
-    <DashboardLayout title="PPM" detail="View Work Calendar">
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      />
-      <ModalCompoenent
-        title={centralState === "showAll" ? "Show PPMs" : "Create PPMs"}
-        detail={centralState === "createBulkPPM" &&  "Import CSV/Excel file"}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setActiveRowId(null);
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
+    <DashboardLayout
+      title="PPM"
+      detail="View Work Calendar"
+      getTitle={() =>
+        centralState === "showAll" ? "Show PPMs" : "Create PPMs"
+      }
+      getDetail={() =>
+        centralState === "createBulkPPM" ? "Import CSV/Excel file" : ""
+      }
+      componentMap={componentMap}
+      setActiveRowId={setActiveRowId}
+    >
       <div className="relative bg-white rounded-2xl p-4 mb-4">
         <div className="flex sm:flex-row flex-col items-center md:space-x-2 space-x-0 space-y-2 md:space-y-0 font-semibold text-md">
           <div className="flex items-center border rounded-md w-full sm:w-[70%]">

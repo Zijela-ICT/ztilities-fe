@@ -3,10 +3,6 @@
 import { JSX, useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
-import ModalCompoenent, {
-  ActionModalCompoenent,
-  SuccessModalCompoenent,
-} from "@/components/modal-component";
 import CreateRole from "@/components/user-management/create-role";
 import ResetPassword from "@/components/user-management/reset-password";
 import PermissionList from "@/components/user-management/view-permissions";
@@ -29,22 +25,20 @@ function UserManagement() {
     clearSearchAndPagination,
     showFilter,
     setShowFilter,
+
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
   } = useDataPermission();
   const tabs = ["All Users", "Roles", "Permissions"];
-
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
 
   const [users, setUsers] = useState<User[]>();
   const [roles, setRoles] = useState<Role[]>();
   const [role, setRole] = useState<RoleData>();
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   const getUsersUnPaginated = async () => {
     const response = await axiosInstance.get(
@@ -372,38 +366,12 @@ function UserManagement() {
     <DashboardLayout
       title="User Management"
       detail="Manage all users and their roles."
+      getTitle={getTitle}
+      getDetail={getDetail}
+      componentMap={componentMap}
+      takeAction={centralStateDelete === "deleteRole" ? deleteRole : deleteUser}
+      setActiveRowId={setActiveRowId}
     >
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-
-      <ActionModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={
-          centralStateDelete === "deleteRole" ? deleteRole : deleteUser
-        }
-      ></ActionModalCompoenent>
-
-      <ModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setActiveRowId(null);
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
       <PermissionGuard
         requiredPermissions={["read_users", "read_permission", "read_roles"]}
       >

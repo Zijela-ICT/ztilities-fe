@@ -53,6 +53,11 @@ function Transactions() {
     showFilter,
     setShowFilter,
     clearSearchAndPagination,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
   } = useDataPermission();
   const { id, entity } = useParams();
   const [filters, setFilters] = useState({
@@ -70,8 +75,6 @@ function Transactions() {
 
   //for table
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   const [filteredTransactions, setFilteredTransactions] =
     useState<Transaction[]>();

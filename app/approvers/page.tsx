@@ -3,10 +3,6 @@
 import { JSX, useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
-import ModalCompoenent, {
-  ActionModalCompoenent,
-  SuccessModalCompoenent,
-} from "@/components/modal-component";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
@@ -25,22 +21,19 @@ function Approvers() {
     clearSearchAndPagination,
     setShowFilter,
     showFilter,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
   } = useDataPermission();
   const tabs = ["Power Apportion"];
-
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
 
   const [roles, setRoles] = useState<Role[]>();
   const [approvers, setApprovers] = useState<any[]>();
 
   const [approver, setApprover] = useState<any[]>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   // Fetch data functions
 
@@ -196,7 +189,7 @@ function Approvers() {
 
   useEffect(() => {
     if (showFilter === "export") {
-      getApproversUnPaginated()
+      getApproversUnPaginated();
       setShowFilter("");
     }
   }, [showFilter, filterQuery]);
@@ -210,36 +203,12 @@ function Approvers() {
     <DashboardLayout
       title="Approvers"
       detail="Manage and track all appprovers here"
+      getTitle={getTitle}
+      getDetail={getDetail}
+      componentMap={componentMap}
+      takeAction={null}
+      setActiveRowId={setActiveRowId}
     >
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-
-      <ActionModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={null}
-      ></ActionModalCompoenent>
-
-      <ModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setActiveRowId(null);
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
       <PermissionGuard requiredPermissions={["read_users"]}>
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           <TableComponent

@@ -3,10 +3,7 @@
 import { JSX, useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
-import ModalCompoenent, {
-  ActionModalCompoenent,
-  SuccessModalCompoenent,
-} from "@/components/modal-component";
+import ModalCompoenent from "@/components/modal-component";
 import CreateBulkUser from "@/components/user-management/create-bulk";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
@@ -32,6 +29,11 @@ function FacilityManagement() {
     setShowFilter,
     showFilter,
     clearSearchAndPagination,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
   } = useDataPermission();
   const tabs = [
     "Facilities",
@@ -43,12 +45,6 @@ function FacilityManagement() {
     "Assets",
     "Categories",
   ];
-
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
 
   const [users, setUsers] = useState<User[]>();
 
@@ -64,9 +60,10 @@ function FacilityManagement() {
   const [categories, setCategories] = useState<any[]>();
   const [category, setACategory] = useState<any>();
 
+  const [PINState, setPINState] = useState<string>();
+  const [code, setCode] = useState(Array(4).fill("")); // Array to hold each digit
+
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   // Fetch data functions
   const getUsers = async () => {
@@ -104,7 +101,10 @@ function FacilityManagement() {
     const response = await axiosInstance.get(
       `/facilities/my-facilities/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_facilities`);
+    exportToCSV(
+      response.data.data,
+      `${user.firstName}_${user.lastName}_facilities`
+    );
   };
 
   const getMyFacilities = async () => {
@@ -156,7 +156,10 @@ function FacilityManagement() {
     const response = await axiosInstance.get(
       `/blocks/my-blocks/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_blocks`);
+    exportToCSV(
+      response.data.data,
+      `${user.firstName}_${user.lastName}_blocks`
+    );
   };
 
   const getMyBlocks = async () => {
@@ -454,6 +457,35 @@ function FacilityManagement() {
   };
 
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
+
+  // Handle changes for each input box
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const value = e.target.value.replace(/[^0-9]/g, ""); // Only allow numbers
+    if (value.length <= 1) {
+      const newCode = [...code];
+      newCode[index] = value;
+      setCode(newCode);
+
+      // Automatically focus the next input
+      if (value && index < 5) {
+        const nextInput = document.getElementById(`code-input-${index + 1}`);
+        nextInput?.focus();
+      }
+    }
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    if (e.key === "Backspace" && !code[index] && index > 0) {
+      const prevInput = document.getElementById(`code-input-${index - 1}`);
+      prevInput?.focus();
+    }
+  };
 
   // Component mapping
   const componentMap: Record<string, JSX.Element> = {
@@ -764,10 +796,29 @@ function FacilityManagement() {
         type={selectedTab}
       />
     ),
+    enterPIN: (
+      <div className="flex gap-1 justify-between pt-6 pb-8 px-10 ">
+        {code.map((digit, index) => (
+          <input
+            key={index}
+            id={`code-input-${index}`}
+            type="text"
+            value={digit}
+            onChange={(e) => handleChange(e, index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            maxLength={1}
+            className="w-12 h-12 text-center bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        ))}
+      </div>
+    ),
     payoutFacilities: (
       <Payouts
         activeRowId={activeRowId}
         setModalState={setCentralState}
+        setPINState={setPINState}
+        code={code}
+        setCode={setCode}
         setSuccessState={setSuccessState}
         type={"Facilities"}
       />
@@ -776,6 +827,9 @@ function FacilityManagement() {
       <Payouts
         activeRowId={activeRowId}
         setModalState={setCentralState}
+        setPINState={setPINState}
+        code={code}
+        setCode={setCode}
         setSuccessState={setSuccessState}
         type={"Units"}
       />
@@ -990,46 +1044,35 @@ function FacilityManagement() {
     <DashboardLayout
       title="Facility Management"
       detail="Manage creation and assignment of facility"
+      getTitle={getTitle}
+      getDetail={getDetail}
+      componentMap={componentMap}
+      takeAction={
+        centralStateDelete === "deleteFacility"
+          ? deleteFacility
+          : centralStateDelete === "deleteBlock"
+          ? deleteBlock
+          : centralStateDelete === "deleteUnit"
+          ? deleteUnit
+          : centralStateDelete === "deleteAsset"
+          ? deleteAsset
+          : null
+      }
+      setActiveRowId={setActiveRowId}
     >
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-
-      <ActionModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={
-          centralStateDelete === "deleteFacility"
-            ? deleteFacility
-            : centralStateDelete === "deleteBlock"
-            ? deleteBlock
-            : centralStateDelete === "deleteUnit"
-            ? deleteUnit
-            : centralStateDelete === "deleteAsset"
-            ? deleteAsset
-            : null
-        }
-      ></ActionModalCompoenent>
-
+      {/* special modal and states */}
       <ModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralState}
+        width="max-w-sm"
+        title={"Enter your PIN"}
+        detail={""}
+        modalState={PINState}
         setModalState={() => {
-          setCentralState("");
-          setActiveRowId(null);
+          setPINState("");
+          setCode(Array(4).fill(""));
         }}
       >
-        {componentMap[centralState]}
+        {componentMap[PINState]}
       </ModalCompoenent>
-
       <PermissionGuard
         requiredPermissions={[
           "read_facilities",

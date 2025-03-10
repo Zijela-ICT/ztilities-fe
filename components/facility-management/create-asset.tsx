@@ -143,16 +143,17 @@ export default function CreateAsset({
           label="Description"
         />
 
-        <Select
-          options={categoryOptions}
-          value={categoryOptions?.find(
-            (option) => option.value === formData.categoryId
-          )}
-          onChange={handleSelectChange("categoryId")}
-          styles={multiSelectStyle}
-          placeholder="Select Category"
-        />
-
+        <div className="relative w-full mt-6">
+          <Select
+            options={categoryOptions}
+            value={categoryOptions?.find(
+              (option) => option.value === formData.categoryId
+            )}
+            onChange={handleSelectChange("categoryId")}
+            styles={multiSelectStyle}
+            placeholder="Select Category"
+          />
+        </div>
         {formData.categoryId && (
           <div className="relative w-full mt-6">
             <Select

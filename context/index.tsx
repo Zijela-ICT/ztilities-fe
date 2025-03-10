@@ -40,6 +40,25 @@ interface ContextType {
 
   showFilter: string;
   setShowFilter: React.Dispatch<React.SetStateAction<string>>;
+
+  centralState: string;
+  setCentralState: React.Dispatch<React.SetStateAction<string>>;
+
+  centralStateDelete: string;
+  setCentralStateDelete: React.Dispatch<React.SetStateAction<string>>;
+
+  successState: {
+    title: string;
+    detail: string;
+    status: boolean;
+  };
+  setSuccessState: React.Dispatch<
+    React.SetStateAction<{
+      title: string;
+      detail: string;
+      status: boolean;
+    }>
+  >;
 }
 
 // Create context
@@ -70,6 +89,15 @@ export const DataPermissionProvider = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [filterQuery, setFilterQuery] = useState("");
   const [showFilter, setShowFilter] = useState("");
+
+  //modal
+  const [successState, setSuccessState] = useState({
+    title: "",
+    detail: "",
+    status: false,
+  });
+  const [centralState, setCentralState] = useState<string>();
+  const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   // Load persisted data on client mount
   useEffect(() => {
@@ -133,9 +161,17 @@ export const DataPermissionProvider = ({
         setFilterQuery,
         clearSearchAndPagination,
 
-
         showFilter,
-        setShowFilter
+        setShowFilter,
+
+        successState,
+        setSuccessState,
+
+        centralState,
+        setCentralState,
+
+        centralStateDelete,
+        setCentralStateDelete,
       }}
     >
       {children}

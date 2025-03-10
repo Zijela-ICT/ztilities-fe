@@ -38,7 +38,12 @@ function WorkRequests({ nowrap }: Props) {
     filterQuery,
     clearSearchAndPagination,
     setShowFilter,
-    showFilter
+    showFilter,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
   } = useDataPermission();
 
   const hasTenantRole = userRoles.some(
@@ -47,18 +52,12 @@ function WorkRequests({ nowrap }: Props) {
 
   const tabs = ["All Work Request", "My Work Request"];
 
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
 
   const [assignedworkRequests, setAssignedWorkRequests] = useState<any[]>();
   const [otherWorkRequests, setOtherWorkRequests] = useState<any[]>();
   const [workRequest, setWorkRequest] = useState<any>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
+
   const [vendors, setVendors] = useState<Vendor[]>();
   const [technician, setTechnicians] = useState<Technician[]>();
 
@@ -67,7 +66,10 @@ function WorkRequests({ nowrap }: Props) {
     const response = await axiosInstance.get(
       `/work-requests/my-work-requests/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_work_requests`);
+    exportToCSV(
+      response.data.data,
+      `${user.firstName}_${user.lastName}_work_requests`
+    );
   };
 
   const getAssignedWorkRequests = async () => {
@@ -88,9 +90,12 @@ function WorkRequests({ nowrap }: Props) {
     const response = await axiosInstance.get(
       `/work-requests/my-requests/all?search=${searchQuery}&&${filterQuery}`
     );
-    exportToCSV(response.data.data, `${user.firstName}_${user.lastName}_work_requests_order`);
+    exportToCSV(
+      response.data.data,
+      `${user.firstName}_${user.lastName}_work_requests_order`
+    );
   };
-  
+
   const getAssignedWorkRequestsOrder = async () => {
     const response = await axiosInstance.get(
       `/work-requests/my-requests/all?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -124,7 +129,7 @@ function WorkRequests({ nowrap }: Props) {
     );
     exportToCSV(response.data.data, "work_requests");
   };
-  
+
   const getOtherWorkRequests = async () => {
     const response = await axiosInstance.get(
       `/work-requests?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
@@ -544,47 +549,23 @@ function WorkRequests({ nowrap }: Props) {
       title="Work Request"
       detail="Submit work request here and view created work requests"
       nowrap={nowrap}
+      getTitle={getTitle}
+      getDetail={getDetail}
+      componentMap={componentMap}
+      takeAction={
+        centralStateDelete === "deactivateWorkRequest" ||
+        centralStateDelete === "activateWorkRequest"
+          ? deleteWorkRequests
+          : centralStateDelete === "apportionServiceCharge"
+          ? apportionServiceCharge
+          : centralStateDelete === "approveQuotation"
+          ? approveWorkOrder
+          : centralStateDelete === "assignProcurement"
+          ? assignProcurement
+          : deleteWorkRequests
+      }
+      setActiveRowId={setActiveRowId}
     >
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-
-      <ActionModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={
-          centralStateDelete === "deactivateWorkRequest" ||
-          centralStateDelete === "activateWorkRequest"
-            ? deleteWorkRequests
-            : centralStateDelete === "apportionServiceCharge"
-            ? apportionServiceCharge
-            : centralStateDelete === "approveQuotation"
-            ? approveWorkOrder
-            : centralStateDelete === "assignProcurement"
-            ? assignProcurement
-            : deleteWorkRequests
-        }
-      ></ActionModalCompoenent>
-
-      <ModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setActiveRowId(null);
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
       <PermissionGuard
         requiredPermissions={[
           "read_work-requests",

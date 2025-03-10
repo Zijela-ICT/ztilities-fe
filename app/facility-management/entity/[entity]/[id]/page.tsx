@@ -85,6 +85,8 @@ function FacilityManagementEntity() {
       detail={detailText}
       dynamic
       onclick={() => router.back()}
+
+      
     >
       <div className="relative bg-white rounded-2xl p-8 ">
         <FacilityDetails facility={newData} />

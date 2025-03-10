@@ -25,7 +25,7 @@ export default function NotificationCard({ onClose }: NotificationCardProps) {
 
   const getNotifications = async () => {
     const response = await axiosInstance.get(
-      `/notifications/my-notifications/all`
+      `/notifications/my-notifications/all/unread`
     );
     setNotifications(response.data.data);
   };
@@ -55,7 +55,7 @@ export default function NotificationCard({ onClose }: NotificationCardProps) {
   const [notification, setANotification] = useState<Notification>();
   const getANotif = async () => {
     const response = await axiosInstance.get(`/notifications/${activeRowId}`);
-    setANotification(response.data || {});
+    setANotification(response.data.data || {});
   };
 
   useEffect(() => {
@@ -107,10 +107,10 @@ export default function NotificationCard({ onClose }: NotificationCardProps) {
               <li
                 key={notification.id}
                 className="flex items-center border-b py-2 cursor-pointer"
-                onClick={() => {
-                  setCentralState("viewNotif");
-                  setActiveRowId(notification.id);
-                }}
+                // onClick={() => {
+                //   setCentralState("viewNotif");
+                //   setActiveRowId(notification.id);
+                // }}
               >
                 <span
                   className={`w-2 h-2 rounded-full mr-2 transition-colors duration-300 ${

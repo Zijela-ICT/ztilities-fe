@@ -23,7 +23,7 @@ import {
 import Link from "next/link";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import createAxiosInstance from "@/utils/api";
-import { chartOptions, multiSelectStyle } from "@/utils/ojects";
+import { chartOptions } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { MyLoaderFinite } from "@/components/loader-components";
@@ -36,7 +36,6 @@ import FundOtherWallet from "@/components/transaction/fund-other-wallet";
 import Payouts from "@/components/transaction/payout";
 import moment from "moment";
 import ManagePin from "@/components/transaction/create-pin";
-import Select from "react-select";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -51,18 +50,19 @@ ChartJS.register(
 
 function Transactions() {
   const axiosInstance = createAxiosInstance();
-  const { user } = useDataPermission();
+  const {
+    user,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
+  } = useDataPermission();
   const [filters, setFilters] = useState({
     User: "",
     Facility: "",
     Vendor: "",
     Technician: "",
-  });
-
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
   });
 
   const [code, setCode] = useState(Array(4).fill("")); // Array to hold each digit
@@ -91,13 +91,6 @@ function Transactions() {
       options: technicians,
     },
   ];
-
-  // const handleFilterChange = (label, value) => {
-  //   setFilters((prevFilters) => ({
-  //     ...prevFilters,
-  //     [label]: value,
-  //   }));
-  // };
 
   const handleFilterChange = (label, value) => {
     setFilters({
@@ -136,10 +129,6 @@ function Transactions() {
       const prevInput = document.getElementById(`code-input-${index - 1}`);
       prevInput?.focus();
     }
-  };
-
-  const handleApplyFilters = () => {
-    console.log("Filters Applied:", filters);
   };
 
   const getUsers = async () => {
@@ -291,7 +280,6 @@ function Transactions() {
     ],
   };
 
-  const [centralState, setCentralState] = useState<string>();
   const [PINState, setPINState] = useState<string>();
   const [selectedWalletIndex, setSelectedWalletIndex] = useState(0);
   const [showBalance, setShowBalance] = useState(true);
@@ -357,32 +345,18 @@ function Transactions() {
     <DashboardLayout
       title="Transactions"
       detail="See balance and all transactions here"
+      getTitle={() =>
+        centralState === "fundWallet"
+          ? "Fund Wallet"
+          : centralState === "managePin"
+          ? "Manage Pin"
+          : "Transfer"
+      }
+      getDetail={() => ""}
+      componentMap={componentMap}
+      takeAction={null}
     >
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-      <ModalCompoenent
-        title={
-          centralState === "fundWallet"
-            ? "Fund Wallet"
-            : centralState === "managePin"
-            ? "Manage Pin"
-            : "Transfer"
-        }
-        detail={""}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
+      {/* special modal and states */}
       <ModalCompoenent
         width="max-w-sm"
         title={"Enter your PIN"}

@@ -25,11 +25,12 @@ function NotificationPage() {
     searchQuery,
     filterQuery,
     clearSearchAndPagination,
+    centralState,
+    setCentralState,
   } = useDataPermission();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notification, setANotification] = useState<Notification>();
   const [activeRowId, setActiveRowId] = useState<number | null>(null);
-  const [centralState, setCentralState] = useState<string>();
 
   const [notificationFilter, setNotificationFilter] = useState("all");
 
@@ -138,18 +139,14 @@ function NotificationPage() {
   };
 
   return (
-    <DashboardLayout title="Notifications" detail="All Notifications">
-      <ModalCompoenent
-        title={"Notification"}
-        detail={"Read Notification"}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setActiveRowId(null);
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
+    <DashboardLayout
+      title="Notifications"
+      detail="All Notifications"
+      getTitle={() => "Notification"}
+      getDetail={() => "Read notiication"}
+      componentMap={componentMap}
+      setActiveRowId={setActiveRowId}
+    >
       <div className="relative bg-white rounded-2xl p-8">
         <div className="mb-4">
           <label htmlFor="notificationFilter" className="mr-2">

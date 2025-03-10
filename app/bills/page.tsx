@@ -3,10 +3,6 @@
 import { JSX, useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout-component";
 import TableComponent from "@/components/table-component";
-import ModalCompoenent, {
-  ActionModalCompoenent,
-  SuccessModalCompoenent,
-} from "@/components/modal-component";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useDataPermission } from "@/context";
@@ -25,23 +21,19 @@ function VendorManagement() {
     clearSearchAndPagination,
     showFilter,
     setShowFilter,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
   } = useDataPermission();
 
   const tabs = ["My Bills", "All Bills"];
-
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
 
   const [bills, setBills] = useState<any[]>([]);
   const [mybills, setMyBills] = useState<any[]>([]);
   const [bill, setABill] = useState<any>();
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
-  const [extraRowId, setExtraROwId] = useState<string | null>(null);
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   const getBillsUnPaginated = async () => {
     const response = await axiosInstance.get(
@@ -104,9 +96,6 @@ function VendorManagement() {
   // Toggle actions
   const toggleActions = (rowId: string) => {
     setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
-  };
-  const extraActions = (id: string) => {
-    setExtraROwId((prevId) => (prevId === id ? null : id));
   };
 
   // Dynamic title and detail logic
@@ -205,36 +194,15 @@ function VendorManagement() {
   }, [selectedTab]);
 
   return (
-    <DashboardLayout title="Bills" detail="Manage all bills here">
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-
-      <ActionModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={centralStateDelete === "payBills" ? payBills : undefined}
-      ></ActionModalCompoenent>
-
-      <ModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setActiveRowId(null);
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
+    <DashboardLayout
+      title="Bills"
+      detail="Manage all bills here"
+      getTitle={getTitle}
+      getDetail={getDetail}
+      componentMap={componentMap}
+      takeAction={centralStateDelete === "payBills" ? payBills : undefined}
+      setActiveRowId={setActiveRowId}
+    >
       <PermissionGuard requiredPermissions={["read_bills"]}>
         <div className="relative bg-white rounded-2xl p-4">
           <div className="flex space-x-4 pb-2">
@@ -274,7 +242,6 @@ function VendorManagement() {
               setModalState={setCentralState}
               setModalStateDelete={setCentralStateDelete}
               toggleActions={toggleActions}
-              extraActions={extraActions}
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}
@@ -293,7 +260,6 @@ function VendorManagement() {
               setModalState={setCentralState}
               setModalStateDelete={setCentralStateDelete}
               toggleActions={toggleActions}
-              extraActions={extraActions}
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               deleteAction={setCentralStateDelete}

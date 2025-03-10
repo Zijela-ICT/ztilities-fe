@@ -9,27 +9,25 @@ import { useDataPermission } from "@/context";
 import { useParams, useRouter } from "next/navigation";
 import createAxiosInstance from "@/utils/api";
 import FacilityDetails from "@/components/facility-management/view-facility";
-import {
-  ActionModalCompoenent,
-  SuccessModalCompoenent,
-} from "@/components/modal-component";
 
 function WorkRequests() {
   const axiosInstance = createAxiosInstance();
-  const { user, setUser, setUserPermissions } = useDataPermission();
+  const {
+    user,
+    setUser,
+    setUserPermissions,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
+  } = useDataPermission();
   const router = useRouter();
   const { id } = useParams();
 
   const [workRequest, setWorkRequest] = useState<any>();
 
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   const toggleActions = (rowId: string) => {
     setActiveRowId(rowId);
@@ -65,24 +63,11 @@ function WorkRequests() {
       detail="Work Request Details"
       dynamic
       onclick={() => router.back()}
+      getTitle={() => "Delete Comment"}
+      getDetail={() => "Do you want to delete this comment"}
+      takeAction={centralStateDelete === "deleteComment" ? deleteComment : null}
+      setActiveRowId={setActiveRowId}
     >
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-      <ActionModalCompoenent
-        title={"Delete comment"}
-        detail={"Do you want to delete this comment ?"}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={
-          centralStateDelete === "deleteComment" ? deleteComment : null
-        }
-      ></ActionModalCompoenent>
       <div className="relative bg-white rounded-2xl p-8 ">
         <FacilityDetails
           facility={workRequest}
