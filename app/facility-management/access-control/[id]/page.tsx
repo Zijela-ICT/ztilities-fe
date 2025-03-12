@@ -823,7 +823,7 @@ function AccessControl() {
             <div className="flex w-full space-x-4">
               <div className="flex-1 bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow">
                 <h2 className="text-2xl font-bold mb-4">Guests Still Inside</h2>
-                <div className="flex ">
+                <div className="w-48 mt-4">
                   <ButtonComponent
                     text="Fetch Guests Inside"
                     onClick={fetchGuestsInside}
@@ -835,7 +835,7 @@ function AccessControl() {
                 <h2 className="text-2xl font-bold mb-4">
                   Expired Guests Still Inside
                 </h2>
-                <div className="flex justify-end">
+                <div className="w-48 mt-4">
                   <ButtonComponent
                     text="Fetch Expired Guests"
                     onClick={fetchExpiredGuests}
