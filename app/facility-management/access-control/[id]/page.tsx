@@ -498,7 +498,8 @@ function AccessControl() {
     const response = await axiosInstance.get(
       `/access-control/verify/${accessCodeVerify || activeRowId}`
     );
-    setVerifyResult(response.data.data);
+    const { userId, unitId, ...filteredData } = response.data.data;
+    setVerifyResult(filteredData);
     setCentralState("viewAccessCodeDetails");
     setAccessCodeVerify("");
   };
@@ -626,24 +627,6 @@ function AccessControl() {
     ),
   };
 
-  useEffect(() => {
-    getAUnit();
-  }, []);
-
-  useEffect(() => {
-    if (centralState === "viewAccess") {
-      verifyAccessDetails();
-    }
-  }, [centralState]);
-
-  useEffect(() => {
-    fetchAccess();
-    if (showFilter === "export") {
-      fetchAccessUnpaginated();
-    }
-    setShowFilter("");
-  }, [pagination.currentPage, showFilter, filterQuery, searchQuery]);
-
   const tabs = [
     "Reports",
     "Access Codes",
@@ -679,6 +662,33 @@ function AccessControl() {
     );
   };
   const [selectedTab, setSelectedTab] = useState<string>(getDefaultTab() || "");
+
+  useEffect(() => {
+    getAUnit();
+  }, []);
+
+  useEffect(() => {
+    if (centralState === "viewAccess") {
+      verifyAccessDetails();
+    }
+  }, [centralState]);
+
+  useEffect(() => {
+    if (selectedTab === "Access Codes") {
+      fetchAccess();
+    }
+
+    if (showFilter === "export") {
+      fetchAccessUnpaginated();
+    }
+    setShowFilter("");
+  }, [
+    selectedTab,
+    pagination.currentPage,
+    showFilter,
+    filterQuery,
+    searchQuery,
+  ]);
 
   const renderTabContent = () => {
     switch (selectedTab) {
