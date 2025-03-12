@@ -172,7 +172,7 @@ export default function CreateWorkRequest({
 
     const payload = {
       ...formData,
-      file: file,
+      files: [file],
       category: formData.category.toString(),
     };
     if (activeRowId) {

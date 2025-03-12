@@ -80,8 +80,10 @@ export default function TableComponent({
     "approvalLimit",
     "approvalCount",
     "nonProcurementLimit",
+    "apportionmentMetric",
+    "noOfSQM",
   ];
-  const dateFilterKeys = ["paidAt", "createdAt"];
+  const dateFilterKeys = ["paidAt", "createdAt", "expiresAt"];
 
   const filterColumns = [
     // "isDeactivated",
@@ -91,11 +93,13 @@ export default function TableComponent({
     "amount",
     "paidAt",
     "createdAt",
+    "expiresAt",
     "status",
     "consideredEntity",
     "type",
     "nonProcurementLimit",
     "apportionmentMetric",
+    "noOfSQM",
   ];
 
   const [input, setInput] = useState("");
@@ -331,6 +335,8 @@ export default function TableComponent({
                   ? "w-full"
                   : type === "auditlogs"
                   ? "w-full"
+                  : type === "accesscontrol"
+                  ? "w-full"
                   : type === "transactions"
                   ? "sm:w-full"
                   : type === "approvefunding"
@@ -469,6 +475,7 @@ export default function TableComponent({
                           type === "bills" ||
                           type === "units" ||
                           type === "categories" ||
+                          type === "accesscontrol" ||
                           type === "approvefunding" ||
                           type === "powers" ? (
                             row[column]?.length
@@ -508,6 +515,7 @@ export default function TableComponent({
                             .map((prop) => row[column]?.[prop])
                             .filter(Boolean)
                             .join(", ")
+                            .slice(0, 40)
                         ) : column === "isDeactivated" ? (
                           <span
                             className={`px-2.5 py-1 ${
@@ -523,6 +531,11 @@ export default function TableComponent({
                         ) : column === "amount" ? (
                           row[column] && formatCurrency(row[column])
                         ) : column === "description" ||
+                          column === "requestedBy" ||
+                          column === "code" ||
+                          column === "name" ||
+                          column === "contactName" ||
+                          column === "address" ||
                           column === "reference" ||
                           column === "title" ? (
                           <span
@@ -531,7 +544,9 @@ export default function TableComponent({
                           >
                             {row[column]}
                           </span>
-                        ) : column === "paidAt" || column === "createdAt" ? (
+                        ) : column === "paidAt" ||
+                          column === "createdAt" ||
+                          column === "expiresAt" ? (
                           row[column] && moment.utc(row[column]).format("ll")
                         ) : column === "avatar" ? (
                           row?.avatar ? (

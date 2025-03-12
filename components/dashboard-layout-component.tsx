@@ -151,7 +151,9 @@ export default function DashboardLayout({
         modalState={centralState}
         setModalState={() => {
           setCentralState("");
-          setActiveRowId(null);
+          if (setActiveRowId) {
+            setActiveRowId(null);
+          }
         }}
       >
         {componentMap && componentMap[centralState]}

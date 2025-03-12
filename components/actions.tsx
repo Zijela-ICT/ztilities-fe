@@ -227,7 +227,7 @@ const Actions: React.FC<UserActionsProps> = ({
                   </li>
                   <li>
                     <DropdownButtonComponent
-                      text="Assign Users"
+                      text="Assign Facility Officers"
                       onClick={() => setModalState("assignUserToFacility")}
                       permissions={["update_facilities:id/assign"]}
                     />
@@ -317,7 +317,7 @@ const Actions: React.FC<UserActionsProps> = ({
                   </li>
                   <li>
                     <DropdownButtonComponent
-                      text="Assign Users"
+                      text="Assign Block Officers"
                       onClick={() => setModalState("assignUserToBlock")}
                       permissions={["update_blocks:id/assign"]}
                     />
@@ -374,7 +374,6 @@ const Actions: React.FC<UserActionsProps> = ({
                     <DropdownButtonComponent
                       text="View"
                       onClick={() =>
-                        // setModalState("viewUnit")
                         router.push(
                           `/facility-management/entity/unit/${row.id}`
                         )
@@ -391,7 +390,7 @@ const Actions: React.FC<UserActionsProps> = ({
                   </li>
                   <li>
                     <DropdownButtonComponent
-                      text="Assign Users"
+                      text="Assign Unit Officers"
                       onClick={() => setModalState("assignUserToUnit")}
                       permissions={["update_units:id/assign/officers"]}
                     />
@@ -426,6 +425,91 @@ const Actions: React.FC<UserActionsProps> = ({
                         permissions={["delete_units:id"]}
                       />
                     )}
+                    {/* for access-control */}
+                    {/* <li>
+                      <DropdownButtonComponent
+                        text="Generate access code"
+                        onClick={() => setModalState("generateAccessCode")}
+                        permissions={[]}
+                      />
+                    </li> */}
+                    {/* <li>
+                      <DropdownButtonComponent
+                        text="Verify access code"
+                        onClick={() => setModalState("verifyAccessCode")}
+                        permissions={[]}
+                      />
+                    </li> */}
+                    {/* <li>
+                      <DropdownButtonComponent
+                        text="Log guest in"
+                        onClick={() => setModalState("logGuestEntry")}
+                        permissions={[]}
+                      />
+                    </li> */}
+                    {/* <li>
+                      <DropdownButtonComponent
+                        text="Exit guest"
+                        onClick={() => setModalState("logGuestExit")}
+                        permissions={[]}
+                      />
+                    </li> */}
+                    <li>
+                      <DropdownButtonComponent
+                        text="Manage access control"
+                        onClick={() =>
+                          router.push(
+                            `/facility-management/access-control/${row.id}`
+                          )
+                        }
+                        permissions={[
+                          "create_access-control:generate",
+                          "read_access-control:verify/accessCode",
+                          "update_access-control:entry/accessCode",
+                          "update_access-control:exit/accessCode",
+                          "read_access-control:guests/still-inside",
+                          "read_access-control:guests/expired-still-inside",
+                          "read_access-control:guests-inside",
+                          "read_access-control:history/accessCode",
+                          "read_access-control",
+                        ]}
+                      />
+                    </li>
+                  </li>
+                </ul>
+              </ActionDropdownComponent>
+            )}
+          </div>
+        </>
+      ) : type === "accesscontrol" ? (
+        <>
+          <div className="relative">
+            {/* Button */}
+            <PermissionGuard
+              requiredPermissions={["read_access-control:verify/accessCode"]}
+            >
+              <button
+                onClick={() => toggleActions(row.accessCode)}
+                className="text-blue-500 hover:text-blue-700"
+              >
+                <TripleDotsIcon />
+              </button>
+            </PermissionGuard>
+
+            {/* Dropdown Menu */}
+            {activeRowId === row.accessCode && (
+              <ActionDropdownComponent
+                toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
+              >
+                <ul className="py-2">
+                  <li>
+                    <DropdownButtonComponent
+                      text="Verify Access Control"
+                      onClick={() => setModalState("viewAccess")}
+                      permissions={["read_access-control:verify/accessCode"]}
+                    />
                   </li>
                 </ul>
               </ActionDropdownComponent>
@@ -744,14 +828,18 @@ const Actions: React.FC<UserActionsProps> = ({
                         <DropdownButtonComponent
                           text="Verify"
                           onClick={() => setModalStateDelete("approveFunding")}
-                          permissions={["update_payments:manual-fund/id/verify"]}
+                          permissions={[
+                            "update_payments:manual-fund/id/verify",
+                          ]}
                         />
                       </li>
                       <li>
                         <DropdownButtonComponent
                           text="Reject"
                           onClick={() => setModalState("rejectFunding")}
-                          permissions={["update_payments:manual-fund/id/reject"]}
+                          permissions={[
+                            "update_payments:manual-fund/id/reject",
+                          ]}
                         />
                       </li>
                     </>
