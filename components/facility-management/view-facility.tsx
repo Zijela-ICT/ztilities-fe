@@ -231,6 +231,7 @@ export default function FacilityDetails({
                                     {item.action ??
                                       item.assetName ??
                                       item.walletType ??
+                                      item.guestName ??
                                       item.unit?.unitNumber ??
                                       item?.vendor?.vendorName ??
                                       item?.subCategoryName ??
@@ -287,16 +288,16 @@ export default function FacilityDetails({
                                                 <p className="text-gray-900">
                                                   Array: {subValue.length} items
                                                 </p>
-                                              //   <ul className="list-disc ml-5">
-                                              //   {subValue.map((arrItem, i) => (
-                                              //     <li key={i}>
-                                              //       {typeof arrItem === "object" && arrItem !== null
-                                              //         ? JSON.stringify(arrItem)
-                                              //         : String(arrItem)}
-                                              //     </li>
-                                              //   ))}
-                                              // </ul>
                                               ) : (
+                                                //   <ul className="list-disc ml-5">
+                                                //   {subValue.map((arrItem, i) => (
+                                                //     <li key={i}>
+                                                //       {typeof arrItem === "object" && arrItem !== null
+                                                //         ? JSON.stringify(arrItem)
+                                                //         : String(arrItem)}
+                                                //     </li>
+                                                //   ))}
+                                                // </ul>
                                                 <div className="pl-4 mt-2 border-l-2 border-gray-300">
                                                   {Object.entries(subValue)
                                                     .filter(([nestedKey]) =>
