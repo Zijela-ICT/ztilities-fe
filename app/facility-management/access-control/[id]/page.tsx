@@ -523,7 +523,7 @@ function AccessControl() {
 
   const fetchGuestsInside = async () => {
     const response = await axiosInstance.get(
-      "/access-control/guests/still-inside"
+      `/access-control/guests/still-inside?unitId=${unit?.id}`
     );
     if (response.data.data && response.data.data.length > 0) {
       setVerifyResult({ guests: response.data.data });
@@ -535,7 +535,7 @@ function AccessControl() {
 
   const fetchExpiredGuests = async () => {
     const response = await axiosInstance.get(
-      "/access-control/guests/expired-still-inside"
+      `/access-control/guests/expired-still-inside?unitId=${unit?.id}`
     );
     if (response.data.data && response.data.data.length > 0) {
       setVerifyResult({ guests: response.data.data });
@@ -546,12 +546,15 @@ function AccessControl() {
   };
 
   const fetchGuestsByDateRange = async () => {
-    const response = await axiosInstance.get("/access-control/guests-inside", {
-      params: {
-        startDate: new Date(startDate).toISOString(),
-        endDate: new Date(endDate).toISOString(),
-      },
-    });
+    const response = await axiosInstance.get(
+      `/access-control/guests-inside?unitId=${unit?.id}`,
+      {
+        params: {
+          startDate: new Date(startDate).toISOString(),
+          endDate: new Date(endDate).toISOString(),
+        },
+      }
+    );
     if (response.data.data && response.data.data.length > 0) {
       setVerifyResult({ guests: response.data.data });
     } else {
@@ -574,14 +577,18 @@ function AccessControl() {
     const response = await axiosInstance.get(
       `/access-control/?&search=${searchQuery}&${filterQuery}`
     );
-    exportToCSV(response.data.data, `${unit.unitNumber}_access_controls`);
+    exportToCSV(response.data.data, `${unit?.unitNumber}_access_controls`);
   };
 
   const fetchAccess = async () => {
     const response = await axiosInstance.get(
-      `/access-control/?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
+      `/access-control/?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}&unitId=${unit?.id}`
     );
-    setAllAccess(response.data.data);
+
+    const filteredAccess = response.data.data.map(
+      ({ unitId, userId, ...rest }) => rest
+    );
+    setAllAccess(filteredAccess);
   };
 
   // Component Map for modal content (restored as you preferred)
@@ -638,8 +645,8 @@ function AccessControl() {
   }, [pagination.currentPage, showFilter, filterQuery, searchQuery]);
 
   const tabs = [
-    "Access Codes",
     "Reports",
+    "Access Codes",
     "Generate Code",
     "Verify Code",
     "Guest Log",
@@ -897,7 +904,7 @@ function AccessControl() {
 
   return (
     <DashboardLayout
-      title={`${unit?.unitNumber} - Access Control`}
+      title={`${unit?.unitNumber || "---"} - Access Control`}
       detail="Manage all access control operations"
       dynamic
       getTitle={() =>
