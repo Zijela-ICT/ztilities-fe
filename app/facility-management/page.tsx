@@ -17,9 +17,11 @@ import FundWallet from "@/components/transaction/fund-wallet";
 import CreateBulk from "@/components/user-management/create-bulk";
 import Payouts from "@/components/transaction/payout";
 import exportToCSV from "@/utils/exportCSV";
+import PermissionGuardApi from "@/components/auth/permission-protected-api";
 
 function FacilityManagement() {
   const axiosInstance = createAxiosInstance();
+  const { callGuardedEndpoint } = PermissionGuardApi();
   const {
     user,
     pagination,
@@ -67,8 +69,11 @@ function FacilityManagement() {
 
   // Fetch data functions
   const getUsers = async () => {
-    const response = await axiosInstance.get("/users");
-    setUsers(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: `/users`,
+      requiredPermissions: ["read_users"],
+    });
+    setUsers(response?.data);
   };
 
   const getFacilitiesForExport = async () => {

@@ -30,6 +30,7 @@ import PermissionGuard from "@/components/auth/permission-protected-components";
 import { useParams } from "next/navigation";
 import { MyLoaderFinite } from "@/components/loader-components";
 import exportToCSV from "@/utils/exportCSV";
+import PermissionGuardApi from "@/components/auth/permission-protected-api";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -44,6 +45,7 @@ ChartJS.register(
 
 function Transactions() {
   const axiosInstance = createAxiosInstance();
+  const { callGuardedEndpoint } = PermissionGuardApi();
   const {
     user,
     pagination,
@@ -104,16 +106,27 @@ function Transactions() {
   };
 
   const getUsers = async () => {
-    const response = await axiosInstance.get("/users");
-    setUsers(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: `/users`,
+      requiredPermissions: ["read_users"],
+    });
+    setUsers(response?.data);
   };
   const getVendors = async () => {
-    const response = await axiosInstance.get("/users/vendor-users/all");
-    setVendors(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: `/users/vendor-users/all`,
+      requiredPermissions: ["read_users:vendor-users/all"],
+    });
+
+    setVendors(response?.data);
   };
   const getTechnicians = async () => {
-    const response = await axiosInstance.get("/users/technician-users/all");
-    setTechnicians(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: `/users/technician-users/all`,
+      requiredPermissions: ["read_users:technician-users/all"],
+    });
+
+    setTechnicians(response?.data);
   };
   const getFacilities = async () => {
     const response = await axiosInstance.get("/facilities");

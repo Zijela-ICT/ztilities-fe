@@ -36,6 +36,7 @@ import FundOtherWallet from "@/components/transaction/fund-other-wallet";
 import Payouts from "@/components/transaction/payout";
 import moment from "moment";
 import ManagePin from "@/components/transaction/create-pin";
+import PermissionGuardApi from "@/components/auth/permission-protected-api";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -50,6 +51,7 @@ ChartJS.register(
 
 function Transactions() {
   const axiosInstance = createAxiosInstance();
+  const { callGuardedEndpoint } = PermissionGuardApi();
   const {
     user,
     centralState,
@@ -132,16 +134,27 @@ function Transactions() {
   };
 
   const getUsers = async () => {
-    const response = await axiosInstance.get("/users");
-    setUsers(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: `/users`,
+      requiredPermissions: ["read_users"],
+    });
+    setUsers(response?.data);
   };
   const getVendors = async () => {
-    const response = await axiosInstance.get("/users/vendor-users/all");
-    setVendors(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: `/users/vendor-users/all`,
+      requiredPermissions: ["read_users:vendor-users/all"],
+    });
+
+    setVendors(response?.data);
   };
   const getTechnicians = async () => {
-    const response = await axiosInstance.get("/users/technician-users/all");
-    setTechnicians(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: `/users/technician-users/all`,
+      requiredPermissions: ["read_users:technician-users/all"],
+    });
+
+    setTechnicians(response?.data);
   };
   const getFacilities = async () => {
     const response = await axiosInstance.get("/facilities");
@@ -149,10 +162,12 @@ function Transactions() {
   };
 
   const getMyTransactions = async () => {
-    const response = await axiosInstance.get(
-      `/transactions/my-transactions/all`
-    );
-    setFilteredTransactions(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: `/transactions/my-transactions/all`,
+      requiredPermissions: ["read_transactions:my-transactions/all"],
+    });
+
+    setFilteredTransactions(response?.data);
   };
 
   const getAUserTransactions = async () => {

@@ -11,9 +11,11 @@ import withPermissions from "@/components/auth/permission-protected-routes";
 import createAxiosInstance from "@/utils/api";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import PermissionGuard from "@/components/auth/permission-protected-components";
+import PermissionGuardApi from "@/components/auth/permission-protected-api";
 
 function Settings() {
   const axiosInstance = createAxiosInstance();
+  const { callGuardedEndpoint } = PermissionGuardApi();
   const router = useRouter();
 
   const {
@@ -34,41 +36,50 @@ function Settings() {
   });
 
   const toggleMapping: Record<
-    keyof typeof settings,
-    { patchEndpoint: string; getEndpoint: string }
-  > = {
-    isPushNotificationEnabled: {
-      patchEndpoint: "/app-settings/auto-debit",
-      getEndpoint: "/app-settings/get-setting-by-key/autoDebit",
-    },
-    isBiometricLoginEnabled: {
-      patchEndpoint: "/app-settings/auto-apportion",
-      getEndpoint: "/app-settings/get-setting-by-key/autoApportion",
-    },
+  keyof typeof settings,
+  { patchEndpoint: string; getEndpoint: string; permission: string }
+> = {
+  isPushNotificationEnabled: {
+    patchEndpoint: "/app-settings/auto-debit",
+    getEndpoint: "/app-settings/get-setting-by-key/autoDebit",
+    permission: "read_app-settings:/get-setting-by-key/key",
+  },
+  isBiometricLoginEnabled: {
+    patchEndpoint: "/app-settings/auto-apportion",
+    getEndpoint: "/app-settings/get-setting-by-key/autoApportion",
+    permission: "read_app-settings:/get-setting-by-key/key",
+  },
+};
+
+useEffect(() => {
+  const fetchToggleSettings = async () => {
+    try {
+      const responses = await Promise.all(
+        Object.keys(toggleMapping).map((key) =>
+          callGuardedEndpoint({
+            endpoint: toggleMapping[key as keyof typeof settings].getEndpoint,
+            requiredPermissions: [
+              toggleMapping[key as keyof typeof settings].permission,
+            ],
+          })
+        )
+      );
+
+      const newSettings: Partial<typeof settings> = {};
+      Object.keys(toggleMapping).forEach((key, index) => {
+        newSettings[key as keyof typeof settings] =
+          responses[index]?.data?.value;
+      });
+
+      setSettings((prev) => ({ ...prev, ...newSettings }));
+    } catch (error) {
+      console.error("Error fetching toggle settings", error);
+    }
   };
 
-  useEffect(() => {
-    const fetchToggleSettings = async () => {
-      try {
-        const responses = await Promise.all(
-          Object.keys(toggleMapping).map((key) =>
-            axiosInstance.get(
-              toggleMapping[key as keyof typeof settings].getEndpoint
-            )
-          )
-        );
-        const newSettings: Partial<typeof settings> = {};
-        Object.keys(toggleMapping).forEach((key, index) => {
-          newSettings[key as keyof typeof settings] =
-            responses[index].data.data.value;
-        });
-        setSettings((prev) => ({ ...prev, ...newSettings }));
-      } catch (error) {
-        console.error("Error fetching toggle settings", error);
-      }
-    };
-    fetchToggleSettings();
-  }, []);
+  fetchToggleSettings();
+}, []);
+
 
   useEffect(() => {
     getMe();
@@ -85,15 +96,24 @@ function Settings() {
   };
 
   const [wrlimit, setWrLimit] = useState();
+  const [wolimit, setWoLimit] = useState();
+
   const getWRLimit = async () => {
-    const response = await axiosInstance.get(`/app-settings/wr-overdue-limit`);
-    setWrLimit(response.data.data.value);
+    const response = await callGuardedEndpoint({
+      endpoint: "/app-settings/wr-overdue-limit",
+      requiredPermissions: ["read_app-settings:wr-overdue-limit"],
+    });
+
+    setWrLimit(response?.data?.value);
   };
 
-  const [wolimit, setWoLimit] = useState();
   const getWOLimit = async () => {
-    const response = await axiosInstance.get(`/app-settings/wo-overdue-limit`);
-    setWoLimit(response.data.data.value);
+    const response = await callGuardedEndpoint({
+      endpoint: "/app-settings/wo-overdue-limit",
+      requiredPermissions: ["read_app-settings:wo-overdue-limit"],
+    });
+
+    setWoLimit(response?.data?.value);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,30 +156,33 @@ function Settings() {
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         fetchResource={() =>
-          axiosInstance
-            .get(`/app-settings/wo-overdue-limit`)
-            .then((res) => res.data.data)
+          callGuardedEndpoint({
+            endpoint: "/app-settings/wo-overdue-limit",
+            requiredPermissions: ["read_app-settings:wo-overdue-limit"],
+          }).then((res) => res?.data)
         }
       />
     ),
     wroverduelimit: (
       <DynamicCreateForm
-        inputs={[
-          { name: "value", label: "Value", type: "text" },
-          { name: "description", label: "Descriptiom", type: "textarea" },
-        ]}
-        selects={[]}
-        title="Work request overdue limit"
-        apiEndpoint="/app-settings/wr-overdue-limit"
-        activeRowId={"5"}
-        setModalState={setCentralState}
-        setSuccessState={setSuccessState}
-        fetchResource={() =>
-          axiosInstance
-            .get(`/app-settings/wr-overdue-limit`)
-            .then((res) => res.data.data)
-        }
-      />
+      inputs={[
+        { name: "value", label: "Value", type: "text" },
+        { name: "description", label: "Description", type: "textarea" },
+      ]}
+      selects={[]}
+      title="Work request overdue limit"
+      apiEndpoint="/app-settings/wr-overdue-limit"
+      activeRowId={"5"}
+      setModalState={setCentralState}
+      setSuccessState={setSuccessState}
+      fetchResource={() =>
+        callGuardedEndpoint({
+          endpoint: "/app-settings/wr-overdue-limit",
+          requiredPermissions: ["read_app-settings:wr-overdue-limit"],
+        }).then((res) => res?.data)
+      }
+    />
+    
     ),
   };
 

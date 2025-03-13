@@ -288,7 +288,15 @@ export default function Navigation() {
         >
           {navItems.map((item) => {
             // Optionally skip work-orders for tenant roles
-            if (item.href === "/work-orders" && hasTenantRole) return null;
+            // if (item.href === "/work-orders" && hasTenantRole) return null;
+            if (
+              (item.href === "/work-orders" && hasTenantRole) ||
+              (item.href === "/user-management" && hasTenantRole) ||
+              (item.href === "/approvers" && hasTenantRole)
+            ) {
+              return null;
+            }
+
             return (
               hasPermissionForRoute(item.permissions) && (
                 <li

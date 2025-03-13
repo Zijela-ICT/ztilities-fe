@@ -17,9 +17,11 @@ import createAxiosInstance from "@/utils/api";
 import MyLoader from "@/components/loader-components";
 import formatCurrency from "@/utils/formatCurrency";
 import PermissionGuard from "@/components/auth/permission-protected-components";
+import PermissionGuardApi from "@/components/auth/permission-protected-api";
 
 function Dashboard() {
   const axiosInstance = createAxiosInstance();
+  const { callGuardedEndpoint } = PermissionGuardApi();
   const router = useRouter();
   const {
     user,
@@ -66,10 +68,6 @@ function Dashboard() {
     setUserPermissions(uniquePermissions);
   };
 
-  const getWallet = async () => {
-    const response = await axiosInstance.get("/wallets/user-wallets");
-  };
-
   const loading = !(user && userPermissions);
 
   const [purchaseOrders, setPurchaseOrders] = useState<any>();
@@ -80,41 +78,57 @@ function Dashboard() {
   const [initiatedWorkRequests, setInitiatedWorkRequests] = useState<any>();
 
   const getPurchaseOrders = async () => {
-    const response = await axiosInstance.get(
-      "/dashboards/purchase-orders-raised"
-    );
-    setPurchaseOrders(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: "/dashboards/purchase-orders-raised",
+      requiredPermissions: ["read_dashboards:purchase-orders-raised"],
+    });
+
+    setPurchaseOrders(response?.data);
   };
 
   const getOverdueWorkOrders = async () => {
-    const response = await axiosInstance.get("/dashboards/overdue-work-order");
-    setOverdueWorkOrders(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: "/dashboards/overdue-work-order",
+      requiredPermissions: ["read_dashboards:overdue-work-order"],
+    });
+
+    setOverdueWorkOrders(response?.data);
   };
 
   const getPendingWorkOrders = async () => {
-    const response = await axiosInstance.get("/dashboards/pending-work-order");
-    setPendingWorkOrders(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: "/dashboards/pending-work-order",
+      requiredPermissions: ["read_dashboards:pending-work-order"],
+    });
+
+    setPendingWorkOrders(response?.data);
   };
 
   const getOverdueWorkRequests = async () => {
-    const response = await axiosInstance.get(
-      "/dashboards/overdue-work-request"
-    );
-    setOverdueWorkRequests(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: "/dashboards/overdue-work-request",
+      requiredPermissions: ["read_dashboards:overdue-work-request"],
+    });
+
+    setOverdueWorkRequests(response?.data);
   };
 
   const getPendingWorkRequests = async () => {
-    const response = await axiosInstance.get(
-      "/dashboards/pending-work-request"
-    );
-    setPendingWorkRequests(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: "/dashboards/pending-work-request",
+      requiredPermissions: ["read_dashboards:pending-work-request"],
+    });
+
+    setPendingWorkRequests(response?.data);
   };
 
   const getInitiatedWorkRequests = async () => {
-    const response = await axiosInstance.get(
-      "/dashboards/initiated-work-request"
-    );
-    setInitiatedWorkRequests(response.data.data);
+    const response = await callGuardedEndpoint({
+      endpoint: "/dashboards/initiated-work-request",
+      requiredPermissions: ["read_dashboards:initiated-work-request"],
+    });
+
+    setInitiatedWorkRequests(response?.data);
   };
 
   const data = [
@@ -205,7 +219,6 @@ function Dashboard() {
         getPendingWorkRequests(),
         getInitiatedWorkRequests(),
         getMe(),
-        getWallet(),
       ]);
     };
 
@@ -213,7 +226,6 @@ function Dashboard() {
 
     const interval = setInterval(() => {
       getMe();
-      getWallet();
     }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
