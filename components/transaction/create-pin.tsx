@@ -7,7 +7,7 @@ import { useDataPermission } from "@/context";
 
 interface ManagePinProps {
   setModalState: (state: any) => void;
-  activeRowId: number | string;
+  activeRowId?: number | string;
   setSuccessState?: (state: any) => void;
   type?: string;
 }
@@ -52,7 +52,7 @@ export default function ManagePin({
 
     // Validation: Check if PIN and its confirmation match
     if (selectedMethod === "create" && formData.pin !== formData.confirmPin) {
-      toast.error("PINs do not match");
+      toast.warning("PINs do not match");
       return;
     }
 
@@ -60,7 +60,7 @@ export default function ManagePin({
       selectedMethod === "change" &&
       formData.newPin !== formData.confirmNewPin
     ) {
-      toast.error("New PINs do not match");
+      toast.warning("New PINs do not match");
       return;
     }
 

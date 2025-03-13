@@ -106,18 +106,14 @@ export default function NotificationCard({ onClose }: NotificationCardProps) {
             {latestNotifications.map((notification) => (
               <li
                 key={notification.id}
-                className="flex items-center border-b py-2 cursor-pointer"
-                // onClick={() => {
-                //   setCentralState("viewNotif");
-                //   setActiveRowId(notification.id);
-                // }}
+                className="flex items-center border-b py-2 "
               >
                 <span
-                  className={`w-2 h-2 rounded-full mr-2 transition-colors duration-300 ${
+                  className={`w-2 h-2 rounded-full flex-shrink-0 mr-2 transition-colors duration-300 ${
                     notification.isRead ? "bg-green-500" : "bg-blue-500"
                   }`}
                 ></span>
-                <div>
+                <div className="flex-1">
                   <div className="text-sm font-medium">
                     {notification.content}
                   </div>

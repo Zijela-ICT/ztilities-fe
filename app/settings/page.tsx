@@ -12,6 +12,7 @@ import createAxiosInstance from "@/utils/api";
 import DynamicCreateForm from "@/components/dynamic-create-form";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import PermissionGuardApi from "@/components/auth/permission-protected-api";
+import ManagePin from "@/components/transaction/create-pin";
 
 function Settings() {
   const axiosInstance = createAxiosInstance();
@@ -36,50 +37,49 @@ function Settings() {
   });
 
   const toggleMapping: Record<
-  keyof typeof settings,
-  { patchEndpoint: string; getEndpoint: string; permission: string }
-> = {
-  isPushNotificationEnabled: {
-    patchEndpoint: "/app-settings/auto-debit",
-    getEndpoint: "/app-settings/get-setting-by-key/autoDebit",
-    permission: "read_app-settings:/get-setting-by-key/key",
-  },
-  isBiometricLoginEnabled: {
-    patchEndpoint: "/app-settings/auto-apportion",
-    getEndpoint: "/app-settings/get-setting-by-key/autoApportion",
-    permission: "read_app-settings:/get-setting-by-key/key",
-  },
-};
-
-useEffect(() => {
-  const fetchToggleSettings = async () => {
-    try {
-      const responses = await Promise.all(
-        Object.keys(toggleMapping).map((key) =>
-          callGuardedEndpoint({
-            endpoint: toggleMapping[key as keyof typeof settings].getEndpoint,
-            requiredPermissions: [
-              toggleMapping[key as keyof typeof settings].permission,
-            ],
-          })
-        )
-      );
-
-      const newSettings: Partial<typeof settings> = {};
-      Object.keys(toggleMapping).forEach((key, index) => {
-        newSettings[key as keyof typeof settings] =
-          responses[index]?.data?.value;
-      });
-
-      setSettings((prev) => ({ ...prev, ...newSettings }));
-    } catch (error) {
-      console.error("Error fetching toggle settings", error);
-    }
+    keyof typeof settings,
+    { patchEndpoint: string; getEndpoint: string; permission: string }
+  > = {
+    isPushNotificationEnabled: {
+      patchEndpoint: "/app-settings/auto-debit",
+      getEndpoint: "/app-settings/get-setting-by-key/autoDebit",
+      permission: "read_app-settings:/get-setting-by-key/key",
+    },
+    isBiometricLoginEnabled: {
+      patchEndpoint: "/app-settings/auto-apportion",
+      getEndpoint: "/app-settings/get-setting-by-key/autoApportion",
+      permission: "read_app-settings:/get-setting-by-key/key",
+    },
   };
 
-  fetchToggleSettings();
-}, []);
+  useEffect(() => {
+    const fetchToggleSettings = async () => {
+      try {
+        const responses = await Promise.all(
+          Object.keys(toggleMapping).map((key) =>
+            callGuardedEndpoint({
+              endpoint: toggleMapping[key as keyof typeof settings].getEndpoint,
+              requiredPermissions: [
+                toggleMapping[key as keyof typeof settings].permission,
+              ],
+            })
+          )
+        );
 
+        const newSettings: Partial<typeof settings> = {};
+        Object.keys(toggleMapping).forEach((key, index) => {
+          newSettings[key as keyof typeof settings] =
+            responses[index]?.data?.value;
+        });
+
+        setSettings((prev) => ({ ...prev, ...newSettings }));
+      } catch (error) {
+        console.error("Error fetching toggle settings", error);
+      }
+    };
+
+    fetchToggleSettings();
+  }, []);
 
   useEffect(() => {
     getMe();
@@ -137,6 +137,8 @@ useEffect(() => {
         return "Work request overdue limit";
       case "wooverduelimit":
         return "Work order overdue limit";
+      case "managePin":
+        return "Manage Pin";
     }
     return "Zijela";
   };
@@ -165,24 +167,31 @@ useEffect(() => {
     ),
     wroverduelimit: (
       <DynamicCreateForm
-      inputs={[
-        { name: "value", label: "Value", type: "text" },
-        { name: "description", label: "Description", type: "textarea" },
-      ]}
-      selects={[]}
-      title="Work request overdue limit"
-      apiEndpoint="/app-settings/wr-overdue-limit"
-      activeRowId={"5"}
-      setModalState={setCentralState}
-      setSuccessState={setSuccessState}
-      fetchResource={() =>
-        callGuardedEndpoint({
-          endpoint: "/app-settings/wr-overdue-limit",
-          requiredPermissions: ["read_app-settings:wr-overdue-limit"],
-        }).then((res) => res?.data)
-      }
-    />
-    
+        inputs={[
+          { name: "value", label: "Value", type: "text" },
+          { name: "description", label: "Description", type: "textarea" },
+        ]}
+        selects={[]}
+        title="Work request overdue limit"
+        apiEndpoint="/app-settings/wr-overdue-limit"
+        activeRowId={"5"}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        fetchResource={() =>
+          callGuardedEndpoint({
+            endpoint: "/app-settings/wr-overdue-limit",
+            requiredPermissions: ["read_app-settings:wr-overdue-limit"],
+          }).then((res) => res?.data)
+        }
+      />
+    ),
+    managePin: (
+      <>
+        <ManagePin
+          setModalState={setCentralState}
+          setSuccessState={setSuccessState}
+        />
+      </>
     ),
   };
 
@@ -253,6 +262,20 @@ useEffect(() => {
 
         <div className="md:w-[62%] mt-6 md:mt-0 bg-white shadow-sm rounded-xl p-6">
           <h3 className="text-base text-gray-800 mb-4">Update settings</h3>
+          {user.wallets.length > 0 && (
+            <PermissionGuard requiredPermissions={[]}>
+              <div
+                onClick={() => setCentralState("managePin")}
+                className="flex items-center cursor-pointer justify-between mb-4 py-4 px-6 border rounded-xl border-gray-200"
+              >
+                <div className="text-gray-800">Manage Pin</div>
+                <div className="flex items-center space-x-8">
+                  <ArrowRightIcon />
+                </div>
+              </div>
+            </PermissionGuard>
+          )}
+
           <PermissionGuard
             requiredPermissions={["create_app-settings:wr-overdue-limit"]}
           >

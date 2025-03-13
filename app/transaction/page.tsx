@@ -501,12 +501,12 @@ function Transactions() {
                 >
                   Payout
                 </button>
-                <button
+                {/* <button
                   onClick={() => setCentralState("managePin")}
                   className="px-3 py-1 rounded bg-white text-black"
                 >
                   Manage PIN
-                </button>
+                </button> */}
               </div>
             )}
             <div className="flex justify-between items-center pb-2">

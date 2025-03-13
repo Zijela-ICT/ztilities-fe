@@ -160,6 +160,42 @@ export default function CreateWorkRequest({
     }
   };
 
+  // Added interface for additional file objects.
+  interface AdditionalFile {
+    file: File | null;
+    preview: string;
+  }
+
+  // ----- Added for Multiple File Upload using FileInputComponent -----
+  const [additionalFiles, setAdditionalFiles] = useState<AdditionalFile[]>([]);
+
+  // Adds a new (empty) additional file input field.
+  const handleAddAdditionalFile = () => {
+    setAdditionalFiles([...additionalFiles, { file: null, preview: "" }]);
+  };
+
+  // Handles file change for an additional file input.
+  const handleAdditionalFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const { files } = e.target;
+    if (files && files.length) {
+      const newFile = files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        const preview = reader.result as string;
+        setAdditionalFiles((prev) => {
+          const updated = [...prev];
+          updated[index] = { file: newFile, preview };
+          return updated;
+        });
+      };
+      reader.readAsDataURL(newFile);
+    }
+  };
+  // ---------------------------------------------------------------------
+
   const handleSelectChange = (fieldName: string) => (selected: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -175,6 +211,14 @@ export default function CreateWorkRequest({
       files: [file],
       category: formData.category.toString(),
     };
+
+    // Combine the original file with any additional file previews if using manual funding.
+    const additionalPreviews = additionalFiles
+      .map((af) => af.preview)
+      .filter((preview) => preview);
+    payload.files = [file, ...additionalPreviews].filter((f) => f);
+    // -----------------
+
     if (activeRowId) {
       await axiosInstance.patch(`/work-requests/${activeRowId}`, payload);
     } else {
@@ -404,6 +448,28 @@ export default function CreateWorkRequest({
                 uploadedFile={uploadedFile}
               />
             </div>
+            {/* ----- New Section for Multiple File Upload using FileInputComponent ----- */}
+            <div className="mt-4">
+              <label className="block mb-2 font-medium"></label>
+              {additionalFiles.map((fileObj, index) => (
+                <div key={index} className="mb-2">
+                  <FileInputComponent
+                    name={`additionalFile-${index}`}
+                    onChange={(e) => handleAdditionalFileChange(e, index)}
+                    label={`Additional document ${index + 1}`}
+                    uploadedFile={fileObj.file}
+                  />
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={handleAddAdditionalFile}
+                className="text-[#A8353A] mt-2"
+              >
+                + Add
+              </button>
+            </div>
+            {/* -------------------------------------------------------------------------- */}
           </>
         )}
 

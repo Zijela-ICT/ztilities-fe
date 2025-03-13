@@ -125,6 +125,12 @@ export default function Navigation() {
     //   permissions: ["tv", "internet", "airtime", "electricity"],
     //   icon: <WorkRequestIcon />,
     // },
+        {
+      href: "/access-control",
+      label: "Access Control",
+      permissions: ["access-control"],
+      icon: <WorkRequestIcon />,
+    },
     {
       href: "/vendor-management",
       label: "Vendor & Tech Management",

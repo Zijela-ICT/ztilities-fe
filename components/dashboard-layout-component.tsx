@@ -65,17 +65,9 @@ export default function DashboardLayout({
   } = useDataPermission();
   const pathname = usePathname();
   const router = useRouter();
-  //const [centralState, setCentralState] = useState<string>();
+
   const [selectedWallet, setSelectedWallet] = useState<any>();
   const [showNotifications, setShowNotifications] = useState(false);
-
-  // const [successState, setSuccessState] = useState({
-  //   title: "",
-  //   detail: "",
-  //   status: false,
-  // });
-  // const [centralState, setCentralState] = useState<string>();
-  // const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   useEffect(() => {
     setSelectedWallet(user?.wallets[0]);
@@ -87,7 +79,7 @@ export default function DashboardLayout({
     const roles = response.data.data?.roles || [];
     setUserRoles(roles);
     const allPermissions = roles
-      .map((role: any) => role.permissions || []) // Extract permissions from each role
+      .map((role: any) => role.permissions || []) // Extract permissions from each role, you get ?
       .flat(); // Flatten the array of arrays
     // Remove duplicate permissions using a Set
     const uniquePermissions: Permission[] = Array.from(new Set(allPermissions));
@@ -107,7 +99,7 @@ export default function DashboardLayout({
     if (selected) setSelectedWallet(selected);
   };
 
-  // If 'nowrap' is true, directly render children without wrapping them in the layout
+  // If 'nowrap' is true, directly render children without wrapping them in the layout. feel me ?
   if (nowrap) {
     return <>{children}</>;
   }
