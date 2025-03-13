@@ -19,28 +19,33 @@ import DynamicCreateForm from "@/components/dynamic-create-form";
 
 function Funding() {
   const axiosInstance = createAxiosInstance();
-  const { user, setUser, setUserPermissions } = useDataPermission();
+  const {
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    clearSearchAndPagination,
+    setShowFilter,
+    showFilter,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
+  } = useDataPermission();
   const router = useRouter();
   const { id } = useParams();
 
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
-
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
   const [payment, setPayment] = useState<any>();
 
   console.log(payment);
   const approveFunding = async () => {
-    await axiosInstance.patch(`/payments/manual-fund/${activeRowId}/verify`);
+    await axiosInstance.patch(`/payments/manual-fund/${id}/verify`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully approved this power charge",
+      detail: "You have successfully approved thiis funding",
       status: true,
     });
   };
@@ -83,7 +88,7 @@ function Funding() {
         ]}
         selects={[]}
         title="Reject fund"
-        apiEndpoint={`/payments/manual-fund/${activeRowId}/reject`}
+        apiEndpoint={`/payments/manual-fund/${id}/reject`}
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
@@ -111,38 +116,13 @@ function Funding() {
       detail="Pending Funds Details"
       dynamic
       onclick={() => router.back()}
+      getTitle={() => getTitle()}
+      getDetail={() => getDetail()}
+      componentMap={componentMap}
+      takeAction={
+        centralStateDelete === "approveFunding" ? approveFunding : null
+      }
     >
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-
-      <ActionModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={
-          centralStateDelete === "approveFunding" ? approveFunding : null
-        }
-      ></ActionModalCompoenent>
-
-      <ModalCompoenent
-        title={getTitle()}
-        detail={getDetail()}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setActiveRowId(null);
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
       <div className="relative bg-white rounded-2xl p-8 ">
         <FacilityDetails facility={payment} title="Payments" />
 
