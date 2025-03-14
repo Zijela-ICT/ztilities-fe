@@ -113,9 +113,9 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   // Normalize the status to lowercase for consistency
   const rawStatus = status?.toString().toLowerCase() || "";
 
-  // Check if the user has the TENANT_ROLE
+  // Check if the user has the RESIDENT_ROLE
   const hasTenantRole = userRoles.some(
-    (role: Role) => role.name === "TENANT_ROLE" || role.name === "VENDOR_ROLE"
+    (role: Role) => role.name === "RESIDENT_ROLE" || role.name === "VENDOR_ROLE"
   );
 
   let finalStatus: { text: string; className: string };

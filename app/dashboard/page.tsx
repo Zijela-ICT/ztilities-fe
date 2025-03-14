@@ -42,7 +42,7 @@ function Dashboard() {
   };
 
   const hasNoTenantRole = userRoles.some(
-    (role: Role) => role.name !== "TENANT_ROLE"
+    (role: Role) => role.name !== "RESIDENT_ROLE"
   );
 
   const [workRequests, setWorkRequests] = useState<any>();
