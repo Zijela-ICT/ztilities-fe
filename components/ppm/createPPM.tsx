@@ -204,8 +204,11 @@ export default function CreatePPM({
     { value: "WEEKLY", label: "Weekly" },
     { value: "MONTHLY", label: "Monthly" },
     { value: "YEARLY", label: "Yearly" },
+    { value: "HOURLY", label: "Hourly" },
+    { value: "MINUTELY", label: "Minutely" },
+    { value: "SECONDLY", label: "Secondly" },
   ];
-
+  
   const byWeekDayOptions = [
     { value: "MONDAY", label: "Monday" },
     { value: "TUESDAY", label: "Tuesday" },
