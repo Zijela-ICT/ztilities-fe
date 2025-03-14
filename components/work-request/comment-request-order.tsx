@@ -21,10 +21,10 @@ export default function CommentWorkRequestOrder({
   const axiosInstance = createAxiosInstance();
   const { userRoles } = useDataPermission();
 
-  // Check if the user has the RESIDENT_ROLE
+  // Check if the user has the TENANT_ROLE 
   const hasThisRole = userRoles.some(
     (role: Role) =>
-      role.name === "RESIDENT_ROLE" ||
+      role.name === "TENANT_ROLE " ||
       role.name === "VENDOR_ROLE" ||
       role.name === "TECHNICIAN_ROLE"
   );

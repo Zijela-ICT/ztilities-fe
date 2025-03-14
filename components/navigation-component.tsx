@@ -61,7 +61,7 @@ export default function Navigation() {
   };
 
   const hasTenantRole = userRoles.some(
-    (role: Role) => role.name === "RESIDENT_ROLE"
+    (role: Role) => role.name === "TENANT_ROLE "
   );
 
   const navItems = [
