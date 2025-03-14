@@ -44,6 +44,8 @@ export default function CreatePPM({
     vendor: "",
     technician: "",
     amount: "",
+    interval: "",
+    byweekday: [],
   });
 
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -113,12 +115,16 @@ export default function CreatePPM({
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSelectChange = (fieldName: string) => (selected: any) => {
-    setFormData({
-      ...formData,
-      [fieldName]: selected?.value || "",
-    });
-  };
+  const handleSelectChange =
+    (fieldName: string, isMulti = false) =>
+    (selected: any) => {
+      setFormData({
+        ...formData,
+        [fieldName]: isMulti
+          ? selected.map((option: any) => option.value)
+          : selected?.value || "",
+      });
+    };
 
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
@@ -145,10 +151,15 @@ export default function CreatePPM({
 
     const updatedPayload = {
       ...payload,
-
+      interval: Number(formData.interval),
+      byweekday: formData.interval ? formData.byweekday : "",
+      startDate: new Date(formData.startDate).toISOString(),
+      endDate: formData.endDate
+        ? new Date(formData.endDate).toISOString()
+        : null,
       file,
     };
-
+    console.log(updatedPayload);
     if (activeRowId) {
       await axiosInstance.patch(`/ppms/${activeRowId}`, updatedPayload);
     } else {
@@ -169,6 +180,8 @@ export default function CreatePPM({
       vendor: "",
       technician: "",
       amount: "",
+      interval: "",
+      byweekday: [],
     });
     setModalState("");
     setSuccessState({
@@ -191,6 +204,16 @@ export default function CreatePPM({
     { value: "WEEKLY", label: "Weekly" },
     { value: "MONTHLY", label: "Monthly" },
     { value: "YEARLY", label: "Yearly" },
+  ];
+
+  const byWeekDayOptions = [
+    { value: "MONDAY", label: "Monday" },
+    { value: "TUESDAY", label: "Tuesday" },
+    { value: "WEDNESDAY", label: "Wednesday" },
+    { value: "THURSDAY", label: "Thursday" },
+    { value: "FRIDAY", label: "Friday" },
+    { value: "SATURDAY", label: "Saturday" },
+    { value: "SUNDAY", label: "Sunday" },
   ];
 
   const unitOptions = (user.units || myUnits)?.map((unit: Unit) => ({
@@ -287,6 +310,7 @@ export default function CreatePPM({
           value={formData.title}
           onChange={handleChange}
           label="Title"
+          required
         />
 
         {/* Description */}
@@ -297,6 +321,7 @@ export default function CreatePPM({
           value={formData.description}
           onChange={handleChange}
           label="Description"
+          required
         />
 
         {/* Start Date */}
@@ -323,6 +348,29 @@ export default function CreatePPM({
             />
           </div>
         </div>
+        <LabelInputComponent
+          type="number"
+          name="interval"
+          value={formData.interval}
+          onChange={handleChange}
+          label="Interval (Optional)"
+        />
+
+        {formData.interval && (
+          <div className="relative w-full mt-6">
+            <Select
+              options={byWeekDayOptions}
+              value={byWeekDayOptions?.filter((option) =>
+                formData.byweekday?.includes(option.value)
+              )}
+              isMulti
+              onChange={handleSelectChange("byweekday", true)}
+              styles={multiSelectStyle}
+              placeholder="By Week Day"
+              required={formData.interval !== ""}
+            />
+          </div>
+        )}
 
         {/* End Date */}
 
@@ -405,30 +453,6 @@ export default function CreatePPM({
               />
             </div>
 
-            {/* <div className="relative w-full mt-6 flex items-center">
-              <input
-                type="checkbox"
-                id="showUserSelection"
-                checked={showUserSelection}
-                onChange={() => {
-                  setShowUserSelection(!showUserSelection);
-                  // If turning off, reset user-related fields
-                  if (showUserSelection) {
-                    setFormData((prev) => ({
-                      ...prev,
-                      userType: "",
-                      vendor: "",
-                      technician: "",
-                    }));
-                  }
-                }}
-                className="mr-2"
-              />
-              <label htmlFor="showUserSelection" className="text-sm">
-                Is there an existing contract?
-              </label>
-            </div> */}
-
             <div className="relative w-full mt-6 flex items-center">
               <label
                 htmlFor="showUserSelection"
@@ -440,7 +464,7 @@ export default function CreatePPM({
                   checked={showUserSelection}
                   onChange={() => {
                     setShowUserSelection(!showUserSelection);
-                    // If turning off, reset user-related fields
+                    // If turning off, reset user-related fields, feel me ?
                     if (showUserSelection) {
                       setFormData((prev) => ({
                         ...prev,

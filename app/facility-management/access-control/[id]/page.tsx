@@ -80,14 +80,7 @@ function AccessControl() {
     "Guest Log",
   ]);
 
-  // const tabs = [
-  //   "Reports",
-  //   "Access Codes",
-  //   "Generate Code",
-  //   "Verify Code",
-  //   "Guest Log",
-  //   // "Guests still inside",
-  // ];
+
   // API Calls
   const generateAccessCode = async () => {
     const payload = {
@@ -182,12 +175,6 @@ function AccessControl() {
       ({ unitId, userId, ...rest }) => rest
     );
     setVerifyResultArray(filteredAccess);
-    // setTabs((prevTabs) => {
-    //   if (!prevTabs.includes("Guests still inside")) {
-    //     return [...prevTabs, "Guests still inside"];
-    //   }
-    //   return prevTabs;
-    // });
     setTitle("Expired Guest still inside");
     setSelectedTab("Guests still inside");
 

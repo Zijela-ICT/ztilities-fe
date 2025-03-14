@@ -28,3 +28,28 @@
 //     required
 //   />
 // </div>;
+
+
+{/* <div className="relative w-full mt-6 flex items-center">
+              <input
+                type="checkbox"
+                id="showUserSelection"
+                checked={showUserSelection}
+                onChange={() => {
+                  setShowUserSelection(!showUserSelection);
+                  // If turning off, reset user-related fields
+                  if (showUserSelection) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      userType: "",
+                      vendor: "",
+                      technician: "",
+                    }));
+                  }
+                }}
+                className="mr-2"
+              />
+              <label htmlFor="showUserSelection" className="text-sm">
+                Is there an existing contract?
+              </label>
+            </div> */}

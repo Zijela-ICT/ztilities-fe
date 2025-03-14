@@ -267,6 +267,10 @@ export default function DynamicCreateForm({
         setFormData(dynamicProcessedData);
       });
     }
+
+    if (title === "Add Quotation") {
+      formData.entity = "Vendor";
+    }
   }, [activeRowId, fetchResource, selects]);
 
   return (

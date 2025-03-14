@@ -142,7 +142,19 @@ function WorkOrders({ nowrap }: Props) {
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
-      detail: "You have successfully approved work order",
+      detail: "You have successfully approved quotation",
+      status: true,
+    });
+  };
+
+  const rejectQuotation = async () => {
+    await axiosInstance.patch(
+      `/work-orders/${activeRowId}/quotations/reject-quotation/tenant`
+    );
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully rejected quotation",
       status: true,
     });
   };
@@ -256,6 +268,8 @@ function WorkOrders({ nowrap }: Props) {
         return "Apportion Cost";
       case "approveQuotation":
         return "Approve Quotation";
+      case "rejectQuotation":
+        return "Rejected Quotation";
       case "acceptWorkOrder":
         return "Accept Work Order";
       case "requestquotationsselection":
@@ -313,6 +327,8 @@ function WorkOrders({ nowrap }: Props) {
         return "You want to request this quotation for selection";
       case "approveQuotation":
         return "You want to approve this quuotation";
+      case "rejectQuotation":
+        return "You want to reject this quuotation";
       case "acceptWorkOrder":
         return "Are you sure you want to accept this work order";
       case "raisePaymentOrder":
@@ -611,6 +627,8 @@ function WorkOrders({ nowrap }: Props) {
           ? requestQuotationSelection
           : centralStateDelete === "approveQuotation"
           ? approveWorkOrder
+          : centralStateDelete === "rejectQuotation"
+          ? rejectQuotation
           : centralStateDelete === "acceptWorkOrder"
           ? acceptWorkOrder
           : centralStateDelete === "raisePaymentOrder"

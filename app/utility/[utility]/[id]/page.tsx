@@ -22,7 +22,7 @@ function WorkRequests() {
   const axiosInstance = createAxiosInstance();
   const { user, setUser, setUserPermissions } = useDataPermission();
   const router = useRouter();
-  const { utility, id } = useParams();
+  const { utility, id }: any = useParams();
 
   const [successState, setSuccessState] = useState({
     title: "",
@@ -201,6 +201,19 @@ function WorkRequests() {
     ),
   };
 
+  // colors for our stuff
+  const providerColors = {
+    GLO: "#008000", // Green
+    MTN: "#FFCC00", // Yellow
+    AIRTEL: "#E30613", // Red
+    "9MOBILE": "#0A7E07", // Dark Green
+
+    DSTV: "#005BAC", // Blue
+    SHOWMAX: "#000000", // Black
+    STARTIMES: "#FF6600", // Orange
+    GOTV: "#CE1126", // Red
+  };
+
   return (
     <DashboardLayout
       title={`${id} ${utility === "internet" ? "plans" : "packages"}`}
@@ -267,7 +280,7 @@ function WorkRequests() {
       </ModalCompoenent>
 
       <div className="p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="max-h-[100vh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {sub?.map((sub, index) => {
             const { providerLogoUrl, name, amount } = sub;
             return (
@@ -284,7 +297,10 @@ function WorkRequests() {
                 }}
                 className="bg-white border border-gray-200 rounded-xl shadow-sm cursor-pointer transition duration-300 ease-in-out"
               >
-                <div className="bg-[#A8353A] rounded-t-xl h-10 pt-3">
+                <div
+                  className={`rounded-t-xl h-10 pt-3`}
+                  style={{ backgroundColor: providerColors[id] || "#A8353A" }}
+                >
                   <p className="text-white text-xs ml-6">
                     Amount: ₦ {formatCurrency(amount)}
                   </p>
