@@ -82,9 +82,8 @@ function Transactions() {
     useState<Transaction[]>();
 
   const myFormattedTransactions = filteredTransactions?.map(
-    ({ category, ...rest }) => ({ category, ...rest })
+    ({ category, isProcessed, ...rest }) => ({ category, ...rest })
   );
-
   const filterOptions = [
     {
       label: "User",

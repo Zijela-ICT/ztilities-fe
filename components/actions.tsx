@@ -791,6 +791,45 @@ const Actions: React.FC<UserActionsProps> = ({
             )}
           </div>
         </>
+      ) : type === "ppms" ? (
+        <>
+          <div className="relative">
+            {/* Button */}
+            <PermissionGuard
+              requiredPermissions={[
+                "read_ppms",
+                "read_ppms:id",
+                "update_ppms:id",
+              ]}
+            >
+              <button
+                onClick={() => toggleActions(row.id)}
+                className="text-blue-500 hover:text-blue-700"
+              >
+                <TripleDotsIcon />
+              </button>
+            </PermissionGuard>
+
+            {/* Dropdown Menu */}
+            {activeRowId === row.id && (
+              <ActionDropdownComponent
+                toggleActions={() => toggleActions(null)}
+                contextMenuedActions={() => contextMenuedActions(null)}
+                contextMenued={contextMenued}
+              >
+                <ul className="py-2">
+                  <li>
+                    <DropdownButtonComponent
+                      text="View"
+                      onClick={() => router.push(`/ppm/${row.id}`)}
+                      permissions={["read_ppms:id"]}
+                    />
+                  </li>
+                </ul>
+              </ActionDropdownComponent>
+            )}
+          </div>
+        </>
       ) : type === "approvefunding" ? (
         <>
           <div className="relative">

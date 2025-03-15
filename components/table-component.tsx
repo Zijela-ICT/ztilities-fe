@@ -82,8 +82,15 @@ export default function TableComponent({
     "nonProcurementLimit",
     "apportionmentMetric",
     "noOfSQM",
+    "interval",
   ];
-  const dateFilterKeys = ["paidAt", "createdAt", "expiresAt"];
+  const dateFilterKeys = [
+    "paidAt",
+    "createdAt",
+    "expiresAt",
+    "startDate",
+    "endDate",
+  ];
 
   const filterColumns = [
     // "isDeactivated",
@@ -94,6 +101,9 @@ export default function TableComponent({
     "paidAt",
     "createdAt",
     "expiresAt",
+    "startDate",
+    "endDate",
+    "interval",
     "status",
     "consideredEntity",
     "type",
@@ -337,6 +347,8 @@ export default function TableComponent({
                   ? "w-full"
                   : type === "accesscontrol"
                   ? "w-full"
+                  : type === "ppms"
+                  ? "w-full"
                   : type === "transactions"
                   ? "sm:w-full"
                   : type === "approvefunding"
@@ -477,24 +489,27 @@ export default function TableComponent({
                           type === "categories" ||
                           type === "accesscontrol" ||
                           type === "approvefunding" ||
+                          type === "ppms" ||
                           type === "powers" ? (
                             row[column]?.length
                           ) : (
                             row[column]
                               ?.map((item: any) =>
-                                [
-                                  "name",
-                                  "blockNumber",
-                                  "unitNumber",
-                                  "assetName",
-                                  "firstName",
-                                  "lastName",
-                                  "subCategoryName",
-                                  "categoryName",
-                                ]
-                                  .map((prop) => item?.[prop])
-                                  .filter(Boolean)
-                                  .join(", ")
+                                typeof item === "object" && item !== null
+                                  ? [
+                                      "name",
+                                      "blockNumber",
+                                      "unitNumber",
+                                      "assetName",
+                                      "firstName",
+                                      "lastName",
+                                      "subCategoryName",
+                                      "categoryName",
+                                    ]
+                                      .map((prop) => item?.[prop])
+                                      .filter(Boolean)
+                                      .join(", ")
+                                  : item
                               )
                               .join(", ")
                           )
@@ -546,6 +561,8 @@ export default function TableComponent({
                           </span>
                         ) : column === "paidAt" ||
                           column === "createdAt" ||
+                          column === "startDate" ||
+                          column === "endDate" ||
                           column === "expiresAt" ? (
                           row[column] && moment.utc(row[column]).format("ll")
                         ) : column === "avatar" ? (

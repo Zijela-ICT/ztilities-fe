@@ -134,6 +134,7 @@ interface Transaction {
   type: string;
   category: "INFLOW" | "OUTFLOW";
   description: string;
+  isProcessed :boolean
   createdAt: string;
   updatedAt: string;
   facility: Facility;

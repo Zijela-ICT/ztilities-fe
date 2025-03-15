@@ -229,6 +229,7 @@ export default function FacilityDetails({
 
                                   <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
                                     {item.action ??
+                                      item ??
                                       item.assetName ??
                                       item.walletType ??
                                       item.guestName ??

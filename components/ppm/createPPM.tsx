@@ -5,6 +5,7 @@ import { FileInputComponent, LabelInputComponent } from "../input-container";
 import { multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import createAxiosInstance from "@/utils/api";
+import PermissionGuardApi from "../auth/permission-protected-api";
 
 export default function CreatePPM({
   setModalState,
@@ -21,13 +22,14 @@ export default function CreatePPM({
 }) {
   const axiosInstance = createAxiosInstance();
   const { user } = useDataPermission();
-
+  const { callGuardedEndpoint } = PermissionGuardApi();
   const [facility, setAFacility] = useState<Facility>();
   const [block, setABlock] = useState<Block>();
   const [unit, setAUnit] = useState<Unit>();
   const [myFacilities, setMyFacilities] = useState<Facility[]>([]);
   const [myBlocks, setMyBlocks] = useState<Block[]>([]);
   const [myUnits, setMyUnits] = useState<Unit[]>([]);
+  const [assets, setAssets] = useState<Asset[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -64,6 +66,15 @@ export default function CreatePPM({
         description: data.description,
       });
     }
+  };
+
+  const getAssets = async () => {
+    const response = await callGuardedEndpoint({
+      endpoint: `/assets`,
+      requiredPermissions: ["read_assets"],
+    });
+
+    setAssets(response?.data);
   };
 
   const getMyFacilities = async () => {
@@ -208,7 +219,7 @@ export default function CreatePPM({
     { value: "MINUTELY", label: "Minutely" },
     { value: "SECONDLY", label: "Secondly" },
   ];
-  
+
   const byWeekDayOptions = [
     { value: "MONDAY", label: "Monday" },
     { value: "TUESDAY", label: "Tuesday" },
@@ -234,23 +245,27 @@ export default function CreatePPM({
     label: facility.name,
   }));
 
-  const assetOptions =
-    formData.entity === "unit"
-      ? unit?.assets?.map((asset: Asset) => ({
-          value: asset.id.toString(),
-          label: asset.assetName,
-        }))
-      : formData.entity === "facility"
-      ? facility?.assets?.map((asset: Asset) => ({
-          value: asset.id.toString(),
-          label: asset.assetName,
-        }))
-      : formData.entity === "block"
-      ? block?.assets?.map((asset: Asset) => ({
-          value: asset.id.toString(),
-          label: asset.assetName,
-        }))
-      : [];
+  const assetOptions = assets.map((vendor: Asset) => ({
+    value: vendor.id.toString(),
+    label: vendor.assetName, // adjust as needed
+  }));
+  // const assetOptions =
+  //   formData.entity === "unit"
+  //     ? unit?.assets?.map((asset: Asset) => ({
+  //         value: asset.id.toString(),
+  //         label: asset.assetName,
+  //       }))
+  //     : formData.entity === "facility"
+  //     ? facility?.assets?.map((asset: Asset) => ({
+  //         value: asset.id.toString(),
+  //         label: asset.assetName,
+  //       }))
+  //     : formData.entity === "block"
+  //     ? block?.assets?.map((asset: Asset) => ({
+  //         value: asset.id.toString(),
+  //         label: asset.assetName,
+  //       }))
+  //     : [];
 
   // Options for userType select
   const userTypeOptions = [
@@ -279,6 +294,7 @@ export default function CreatePPM({
     getMyFacilities();
     getMyUnits();
     getMyBlocks();
+    getAssets();
   }, []);
 
   useEffect(() => {
@@ -359,21 +375,19 @@ export default function CreatePPM({
           label="Interval (Optional)"
         />
 
-        {formData.interval && (
-          <div className="relative w-full mt-6">
-            <Select
-              options={byWeekDayOptions}
-              value={byWeekDayOptions?.filter((option) =>
-                formData.byweekday?.includes(option.value)
-              )}
-              isMulti
-              onChange={handleSelectChange("byweekday", true)}
-              styles={multiSelectStyle}
-              placeholder="By Week Day"
-              required={formData.interval !== ""}
-            />
-          </div>
-        )}
+        <div className="relative w-full mt-6">
+          <Select
+            options={byWeekDayOptions}
+            value={byWeekDayOptions?.filter((option) =>
+              formData.byweekday?.includes(option.value)
+            )}
+            isMulti
+            onChange={handleSelectChange("byweekday", true)}
+            styles={multiSelectStyle}
+            placeholder="By Week Day"
+            required={formData.interval !== ""}
+          />
+        </div>
 
         {/* End Date */}
 

@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { LabelInputComponent } from "../input-container";
 import createAxiosInstance from "@/utils/api";
 import { MyLoaderFinite } from "../loader-components";
@@ -27,6 +27,7 @@ export default function ManagePin({
   );
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [forgotPinSuccess, setForgotPinSuccess] = useState<boolean>(false);
 
   // Common form state for all PIN methods.
   // Only relevant fields will be used based on selectedMethod.
@@ -40,7 +41,13 @@ export default function ManagePin({
     confirmNewPin: "",
     // For forgot PIN
     email: "",
+    forgotNewPin: "",
+    token: "",
   });
+
+  useEffect(() => {
+    setFormData({ ...formData, email: user.email });
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -77,6 +84,7 @@ export default function ManagePin({
           detail: `Pin created successfully`,
           status: true,
         });
+        setModalState("");
       } else if (selectedMethod === "change") {
         const payload = {
           oldPin: formData.oldPin,
@@ -88,19 +96,35 @@ export default function ManagePin({
           detail: `Pin changed successfully`,
           status: true,
         });
+        setModalState("");
       } else if (selectedMethod === "forgot") {
-        // Payload for recovering a forgotten PIN
-        const payload = {
-          email: formData.email,
-        };
-        await axiosInstance.post(`/users/pin/forgot`, payload);
-        setSuccessState?.({
-          title: "Successful",
-          detail: `Waiting for instructions`,
-          status: true,
-        });
+        if (forgotPinSuccess) {
+          // Payload for recovering a forgotten PIN
+          const payload = {
+            pin: formData.forgotNewPin,
+            token: formData.token,
+          };
+          const response = await axiosInstance.patch(
+            `/users/pin/reset`,
+            payload
+          );
+
+          setSuccessState?.({
+            title: "Successful",
+            detail: `${response.data.message}`,
+            status: true,
+          });
+          setModalState("");
+        } else {
+          const response = await axiosInstance.patch(`/users/pin/forget`);
+          setForgotPinSuccess(true);
+          setSuccessState?.({
+            title: "Successful",
+            detail: `${response.data.message}`,
+            status: true,
+          });
+        }
       }
-      setModalState("");
     } catch (error) {
       console.error(error);
       // Optionally, you could show another toast for the error.
@@ -214,15 +238,39 @@ export default function ManagePin({
             )}
 
             {selectedMethod === "forgot" && (
-              //   <LabelInputComponent
-              //     type="email"
-              //     name="email"
-              //     value={formData.email}
-              //     onChange={handleChange}
-              //     label="Enter your Email"
-              //     required
-              //   />\
-              <></>
+              <>
+                <LabelInputComponent
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  label="Enter your Email"
+                  readOnly
+                  required
+                />
+
+                {forgotPinSuccess && (
+                  <>
+                    <LabelInputComponent
+                      type="password"
+                      name="forgotNewPin"
+                      value={formData.forgotNewPin}
+                      onChange={handleChange}
+                      label="New PIN"
+                      maxLength={4}
+                      required
+                    />
+                    <LabelInputComponent
+                      type="text"
+                      name="token"
+                      value={formData.token}
+                      onChange={handleChange}
+                      label="Enter token you got from your email"
+                      required
+                    />
+                  </>
+                )}
+              </>
             )}
 
             <div className="mt-10 flex w-full justify-end">
