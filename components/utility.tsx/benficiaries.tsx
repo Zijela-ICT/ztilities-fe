@@ -27,7 +27,6 @@ export default function Beneficiaries({
   // Initialize activeTab using the passed in utility (if any) or default to "airtime"
   const [activeTab, setActiveTab] = useState(utility || "airtime");
 
-  console.log(utility,"here boy")
   // If the utility prop ever changes, update the activeTab accordingly.
   useEffect(() => {
     if (utility && utility !== activeTab) {

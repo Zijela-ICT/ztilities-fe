@@ -20,20 +20,25 @@ import Benfeciaries from "@/components/utility.tsx/benficiaries";
 
 function WorkRequests() {
   const axiosInstance = createAxiosInstance();
-  const { user, setUser, setUserPermissions } = useDataPermission();
+  const {
+    user,
+    pagination,
+    setPagination,
+    searchQuery,
+    filterQuery,
+    setShowFilter,
+    showFilter,
+    clearSearchAndPagination,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
+  } = useDataPermission();
   const router = useRouter();
   const { utility, id }: any = useParams();
 
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
-
   const [activeUtility, setActiveUtility] = useState<string>();
-
-  const [centralState, setCentralState] = useState<string>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   const [activeBeneficiary, setActiveBeneficiary] = useState<any>(null);
   const [beneficiaryState, setBeneficiaryState] = useState<string>();
@@ -220,40 +225,29 @@ function WorkRequests() {
       detail={`Select a ${id} ${utility === "internet" ? "plans" : "packages"}`}
       dynamic
       onclick={() => router.back()}
+      getTitle={() =>
+        centralStateDelete
+          ? "Delete beneficiary"
+          : centralState
+          ? `${id}`
+          : null
+      }
+      getDetail={() =>
+        centralStateDelete
+          ? "Do you want to delete this beneficiary?"
+          : centralState
+          ? `Pay for your utilities your ${utility} ${
+              utility === "internet" ? "plan " : "package"
+            } here`
+          : null
+      }
+      takeAction={
+        centralStateDelete === "deleteBeneficiary" ? deleteABeneficiary : null
+      }
+      componentMap={componentMap}
+      setABeneficiary={setABeneficiary}
     >
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-
-      <ActionModalCompoenent
-        title={"Delete beneficiary"}
-        detail={"Do you want to delete this beneficiary?"}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={
-          centralStateDelete === "deleteBeneficiary" ? deleteABeneficiary : null
-        }
-      ></ActionModalCompoenent>
-
-      <ModalCompoenent
-        title={`${id} `}
-        detail={`Pay for your utilities your ${utility} ${
-          utility === "internet" ? "plan " : "package"
-        } here`}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setABeneficiary("");
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
+      {/* custom */}
       <ModalCompoenent
         width="max-w-sm"
         title={"Enter your PIN"}

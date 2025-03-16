@@ -26,16 +26,17 @@ function UtilityManagement() {
     setPagination,
     searchQuery,
     filterQuery,
+    setShowFilter,
+    showFilter,
     clearSearchAndPagination,
+    centralState,
+    setCentralState,
+    centralStateDelete,
+    setCentralStateDelete,
+    setSuccessState,
   } = useDataPermission();
   const router = useRouter();
   const tabs = ["Electricity", "Airtime", "Internet", "TV Subscription"];
-
-  const [successState, setSuccessState] = useState({
-    title: "",
-    detail: "",
-    status: false,
-  });
 
   const [electricity, setElectricity] = useState<any[]>([]);
   const [airtime, setAirtime] = useState<any[]>([]);
@@ -45,14 +46,12 @@ function UtilityManagement() {
   const [beneficiaryObj, setABeneficiary] = useState<any>(null);
 
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
-  const [centralState, setCentralState] = useState<string>();
 
   const [activeBeneficiary, setActiveBeneficiary] = useState<any>(null);
   const [beneficiaryState, setBeneficiaryState] = useState<string>();
 
   const [activeUtility, setActiveUtility] = useState<string>();
   const [utility, setUtility] = useState<any>();
-  const [centralStateDelete, setCentralStateDelete] = useState<string>();
 
   const getElectricity = async () => {
     const response = await axiosInstance.get(`/electricity/providers`);
@@ -251,39 +250,31 @@ function UtilityManagement() {
   }, [selectedTab]);
 
   return (
-    <DashboardLayout title="Utilities" detail="Manage all utilities here">
-      <SuccessModalCompoenent
-        title={successState.title}
-        detail={successState.detail}
-        modalState={successState.status}
-        setModalState={(state: boolean) =>
-          setSuccessState((prevState) => ({ ...prevState, status: state }))
-        }
-      ></SuccessModalCompoenent>
-
-      <ActionModalCompoenent
-        title={"Delete beneficiary"}
-        detail={"Do you want to delete this beneficiary?"}
-        modalState={centralStateDelete}
-        setModalState={setCentralStateDelete}
-        takeAction={
-          centralStateDelete === "deleteBeneficiary" ? deleteABeneficiary : null
-        }
-      ></ActionModalCompoenent>
-
-      <ModalCompoenent
-        title={"Utilities"}
-        detail={"Pay for your utilities here"}
-        modalState={centralState}
-        setModalState={() => {
-          setCentralState("");
-          setABeneficiary("");
-          setActiveRowId(null);
-        }}
-      >
-        {componentMap[centralState]}
-      </ModalCompoenent>
-
+    <DashboardLayout
+      title="Utilities"
+      detail="Manage all utilities here"
+      getTitle={() =>
+        centralStateDelete
+          ? "Delete beneficiary"
+          : centralState
+          ? "Utilities"
+          : null
+      }
+      getDetail={() =>
+        centralStateDelete
+          ? "Do you want to delete this beneficiary?"
+          : centralState
+          ? "Pay for your utilities here"
+          : null
+      }
+      takeAction={
+        centralStateDelete === "deleteBeneficiary" ? deleteABeneficiary : null
+      }
+      componentMap={componentMap}
+      setActiveRowId={setActiveRowId}
+      setABeneficiary={setABeneficiary}
+    >
+      {/* custom */}
       <ModalCompoenent
         width="max-w-sm"
         title={"Enter your PIN"}
@@ -309,6 +300,7 @@ function UtilityManagement() {
       >
         {componentMap[beneficiaryState]}
       </ModalCompoenent>
+      {/* custom */}
 
       <PermissionGuard
         requiredPermissions={[

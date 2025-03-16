@@ -36,6 +36,7 @@ export default function DashboardLayout({
   componentMap,
   takeAction,
   setActiveRowId,
+  setABeneficiary,
 }: {
   children: any;
   title: string;
@@ -49,6 +50,7 @@ export default function DashboardLayout({
   componentMap?: any;
   takeAction?: any;
   setActiveRowId?: (id: any) => void;
+  setABeneficiary?: (id: any) => void;
 }) {
   const axiosInstance = createAxiosInstance();
   const {
@@ -145,6 +147,9 @@ export default function DashboardLayout({
           setCentralState("");
           if (setActiveRowId) {
             setActiveRowId(null);
+          }
+          if (setABeneficiary) {
+            setABeneficiary("");
           }
         }}
       >
