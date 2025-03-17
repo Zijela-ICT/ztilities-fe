@@ -228,27 +228,26 @@ export default function FacilityDetails({
                                     )}
 
                                   <summary className="flex justify-between items-center text-base font-semibold cursor-pointer">
-                                    {item.action ??
-                                      // item ??
-                                      item.assetName ??
-                                      item.walletType ??
-                                      item.guestName ??
-                                      item.unit?.unitNumber ??
-                                      item?.vendor?.vendorName ??
-                                      item?.subCategoryName ??
-                                      item?.technician?.technicianName ??
-                                      (item.user?.firstName &&
-                                        item.user?.lastName &&
-                                        item.user?.firstName +
+                                    {typeof item === "string"
+                                      ? item
+                                      : item.action ??
+                                        item.assetName ??
+                                        item.walletType ??
+                                        item.guestName ??
+                                        item.unit?.unitNumber ??
+                                        item?.vendor?.vendorName ??
+                                        item?.subCategoryName ??
+                                        item?.technician?.technicianName ??
+                                        (item.user?.firstName &&
+                                          item.user?.lastName &&
+                                          `${item.user.firstName} ${item.user.lastName}`) ??
+                                        key
+                                          .replace(/([a-z])([A-Z])/g, "$1 $2")
+                                          .replace(/^./, (str) =>
+                                            str.toUpperCase()
+                                          ) +
                                           " " +
-                                          item.user?.lastName) ??
-                                      key
-                                        .replace(/([a-z])([A-Z])/g, "$1 $2")
-                                        .replace(/^./, (str) =>
-                                          str.toUpperCase()
-                                        ) +
-                                        " " +
-                                        (idx + 1)}
+                                          (idx + 1)}
                                     <span className="transform transition-transform duration-100 group-open:rotate-180">
                                       <DropDownArrow />
                                     </span>
