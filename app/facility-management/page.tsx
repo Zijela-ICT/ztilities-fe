@@ -356,6 +356,10 @@ function FacilityManagement() {
       case "payoutUnits":
       case "payoutFacilities":
         return "Transfer";
+      case "createApiKeyFacility":
+        return "Create Api key";
+      case "updateApiKeyFacility":
+        return "Update Api key";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -421,6 +425,10 @@ function FacilityManagement() {
         return "Assign User to a block";
       case "assignUserToUnit":
         return "Assign User to a unit";
+      case "createApiKeyFacility":
+        return "Create Api key for this facility";
+      case "updateApiKeyFacility":
+        return "Update Api key for this facility";
     }
     switch (centralStateDelete) {
       case "deleteFacility":
@@ -948,6 +956,40 @@ function FacilityManagement() {
       <div className="p-4">
         <FacilityDetails facility={category} title="Category" />
       </div>
+    ),
+
+    createApiKeyFacility: (
+      <DynamicCreateForm
+        inputs={[
+          { name: "apikey", label: "Api key", type: "text" },
+        ]}
+        selects={[]}
+        title="Create api Key"
+        apiEndpoint={`/units/${activeRowId}/assign/officers`}
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
+        }
+      />
+    ),
+
+    updateApiKeyFacility: (
+      <DynamicCreateForm
+        inputs={[
+          { name: "apikey", label: "Api key", type: "text" },
+        ]}
+        selects={[]}
+        title="Update api Key"
+        apiEndpoint={`/units/${activeRowId}/assign/officers`}
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+        fetchResource={(id) =>
+          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
+        }
+      />
     ),
   };
 

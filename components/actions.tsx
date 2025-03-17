@@ -262,6 +262,24 @@ const Actions: React.FC<UserActionsProps> = ({
                         permissions={["delete_facilities:id"]}
                       />
                     )}
+
+                    {row.isDeactivated === false ? (
+                      <DropdownButtonComponent
+                        text="Create APi key"
+                        onClick={() =>
+                          setModalState("createApiKeyFacility")
+                        }
+                        permissions={["delete_facilities:id"]}
+                      />
+                    ) : (
+                      <DropdownButtonComponent
+                        text="Update Api key"
+                        onClick={() =>
+                          setModalState("updateApiKeyFacility")
+                        }
+                        permissions={["delete_facilities:id"]}
+                      />
+                    )}
                   </li>
                 </ul>
               </ActionDropdownComponent>
@@ -798,7 +816,7 @@ const Actions: React.FC<UserActionsProps> = ({
             <PermissionGuard
               requiredPermissions={[
                 "read_ppms",
-                "read_ppms:id",
+                "read_ppms:/id",
                 "update_ppms:id",
               ]}
             >
@@ -822,7 +840,7 @@ const Actions: React.FC<UserActionsProps> = ({
                     <DropdownButtonComponent
                       text="View"
                       onClick={() => router.push(`/ppm/${row.id}`)}
-                      permissions={["read_ppms:id"]}
+                      permissions={["read_ppms:/id"]}
                     />
                   </li>
                 </ul>

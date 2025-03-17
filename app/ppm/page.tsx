@@ -210,7 +210,7 @@ export default function Ppm() {
 
   const tabPermissions: { [key: string]: string[] } = {
     Calender: ["read_ppms"],
-    PPMs: ["read_ppms"],
+    PPMs: ["read_ppms:/all-ppms"],
   };
 
   const { userPermissions } = useDataPermission();
@@ -290,7 +290,9 @@ export default function Ppm() {
         </div>
       </PermissionGuard>
 
-      <PermissionGuard requiredPermissions={["read_ppms"]}>
+      <PermissionGuard
+        requiredPermissions={["read_ppms", "read_ppms:/all-ppms"]}
+      >
         <div className="relative bg-white rounded-2xl p-4 mt-4">
           {selectedTab === "Calender" && (
             <>
@@ -377,16 +379,20 @@ export default function Ppm() {
                       </div>
                     </div>
                   </div>
-                  <ButtonComponent
-                    text="Add New PPM"
-                    onClick={() => setCentralState("createPPM")}
-                    className="flex-1 px-4 py-3 text-white bg-[#A8353A]"
-                  />
-                  <ButtonComponent
-                    text="Bulk PPM"
-                    onClick={() => setCentralState("createBulkPPM")}
-                    className="flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]"
-                  />
+                  <PermissionGuard requiredPermissions={["create_ppms"]}>
+                    <ButtonComponent
+                      text="Add New PPM"
+                      onClick={() => setCentralState("createPPM")}
+                      className="flex-1 px-4 py-3 text-white bg-[#A8353A]"
+                    />
+                  </PermissionGuard>
+                  <PermissionGuard requiredPermissions={["create_ppms"]}>
+                    <ButtonComponent
+                      text="Bulk PPM"
+                      onClick={() => setCentralState("createBulkPPM")}
+                      className="flex-1 px-4 py-3 text-[#A8353A] bg-white border border-[#A8353A]"
+                    />
+                  </PermissionGuard>
                 </div>
               </div>
 
