@@ -162,8 +162,8 @@ export default function CreatePPM({
 
     const updatedPayload = {
       ...payload,
-      interval: Number(formData.interval),
-      byweekday: formData.byweekday ,
+      interval: formData.interval ? Number(formData.interval) : null,
+      byweekday: formData.byweekday.length >0 ? formData.byweekday : null ,
       startDate: new Date(formData.startDate).toISOString(),
       endDate: formData.endDate
         ? new Date(formData.endDate).toISOString()
@@ -351,6 +351,7 @@ export default function CreatePPM({
           value={formData.startDate}
           onChange={handleChange}
           label="Start Date"
+          required
         />
 
         {/* Frequency */}
