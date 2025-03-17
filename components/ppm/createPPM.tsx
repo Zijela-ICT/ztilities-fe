@@ -163,7 +163,7 @@ export default function CreatePPM({
     const updatedPayload = {
       ...payload,
       interval: Number(formData.interval),
-      byweekday: formData.interval ? formData.byweekday : "",
+      byweekday: formData.byweekday ,
       startDate: new Date(formData.startDate).toISOString(),
       endDate: formData.endDate
         ? new Date(formData.endDate).toISOString()
@@ -286,7 +286,7 @@ export default function CreatePPM({
 
   useEffect(() => {
     if (activeRowId) {
-      getWorkRequest();
+      // getWorkRequest();
     }
   }, [activeRowId]);
 
