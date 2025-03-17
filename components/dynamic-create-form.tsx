@@ -183,12 +183,14 @@ export default function DynamicCreateForm({
           "Work Request",
           "Work request overdue limit",
           "Work order overdue limit",
+          "Create api Key"
         ].includes(title)
       ) {
         if (activeRowId) {
           if (
             title === "Work request overdue limit" ||
-            title === "Work order overdue limit"
+            title === "Work order overdue limit" ||
+            title === "Create api Key"
           ) {
             await axiosInstance.post(apiEndpoint, updatedFormData);
           } else {

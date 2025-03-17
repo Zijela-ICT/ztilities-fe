@@ -960,35 +960,25 @@ function FacilityManagement() {
 
     createApiKeyFacility: (
       <DynamicCreateForm
-        inputs={[
-          { name: "apikey", label: "Api key", type: "text" },
-        ]}
+        inputs={[{ name: "apikey", label: "Api key", type: "text" }]}
         selects={[]}
         title="Create api Key"
-        apiEndpoint={`/units/${activeRowId}/assign/officers`}
+        apiEndpoint={`/facilities/${activeRowId}/set-api-key`}
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-        fetchResource={(id) =>
-          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
-        }
       />
     ),
 
     updateApiKeyFacility: (
       <DynamicCreateForm
-        inputs={[
-          { name: "apikey", label: "Api key", type: "text" },
-        ]}
+        inputs={[{ name: "apikey", label: "Api key", type: "text" }]}
         selects={[]}
-        title="Update api Key"
-        apiEndpoint={`/units/${activeRowId}/assign/officers`}
+        title="Create api Key"
+        apiEndpoint={`/facilities/${activeRowId}/set-api-key`}
         activeRowId={activeRowId}
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
-        fetchResource={(id) =>
-          axiosInstance.get(`/facilities/${id}`).then((res) => res.data.data)
-        }
       />
     ),
   };

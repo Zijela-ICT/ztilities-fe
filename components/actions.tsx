@@ -263,21 +263,17 @@ const Actions: React.FC<UserActionsProps> = ({
                       />
                     )}
 
-                    {row.isDeactivated === false ? (
+                    {row.hasPaymentKey === false ? (
                       <DropdownButtonComponent
                         text="Create APi key"
-                        onClick={() =>
-                          setModalState("createApiKeyFacility")
-                        }
-                        permissions={["delete_facilities:id"]}
+                        onClick={() => setModalState("createApiKeyFacility")}
+                        permissions={["create_facilities:id/set-api-key"]}
                       />
                     ) : (
                       <DropdownButtonComponent
                         text="Update Api key"
-                        onClick={() =>
-                          setModalState("updateApiKeyFacility")
-                        }
-                        permissions={["delete_facilities:id"]}
+                        onClick={() => setModalState("updateApiKeyFacility")}
+                        permissions={["create_facilities:id/set-api-key"]}
                       />
                     )}
                   </li>
