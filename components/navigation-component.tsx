@@ -37,6 +37,7 @@ export default function Navigation() {
 
   const logout = async () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     localStorage.removeItem("userPermissions");
     localStorage.removeItem("userRoles");
@@ -125,7 +126,7 @@ export default function Navigation() {
     //   permissions: ["tv", "internet", "airtime", "electricity"],
     //   icon: <WorkRequestIcon />,
     // },
-        {
+    {
       href: "/access-control",
       label: "Access Control",
       permissions: ["access-control"],

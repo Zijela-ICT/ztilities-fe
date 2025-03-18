@@ -362,6 +362,9 @@ const createAxiosInstance = (): AxiosInstance => {
                   toast.error("Session expired. Redirecting to login...");
                   localStorage.removeItem("authToken");
                   localStorage.removeItem("refreshToken");
+                  localStorage.removeItem("user");
+                  localStorage.removeItem("userPermissions");
+                  localStorage.removeItem("userRoles");
                   window.location.href = "/";
                   reject(err);
                 })
@@ -373,6 +376,9 @@ const createAxiosInstance = (): AxiosInstance => {
             toast.error("Session expired. Redirecting to login...");
             localStorage.removeItem("authToken");
             localStorage.removeItem("refreshToken");
+            localStorage.removeItem("user");
+            localStorage.removeItem("userPermissions");
+            localStorage.removeItem("userRoles");
             window.location.href = "/";
           }
         } else {
