@@ -27,6 +27,8 @@ function NotificationPage() {
     clearSearchAndPagination,
     centralState,
     setCentralState,
+    notificationState,
+    setNotificationState,
   } = useDataPermission();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notification, setANotification] = useState<Notification>();
@@ -49,7 +51,8 @@ function NotificationPage() {
     const response = await axiosInstance.get(
       `/notifications/my-notifications/${endpoint}?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
-    setNotifications(response.data.data || []);
+    setNotifications(response.data?.data || []);
+
     const extra = response.data.extra;
     if (extra) {
       setPagination({
@@ -59,6 +62,14 @@ function NotificationPage() {
         totalPages: extra.totalPages,
       });
     }
+  };
+
+  const getNotificationsUnread = async () => {
+    const response = await axiosInstance.get(
+      `/notifications/my-notifications/all/unread`
+    );
+    const notifications = response.data?.data;
+    setNotificationState(notifications?.length || 0);
   };
 
   const getANotif = async () => {
@@ -80,6 +91,7 @@ function NotificationPage() {
     if (centralState === "viewNotif") {
       getANotif();
     }
+    getNotificationsUnread();
   }, [centralState]);
 
   const handleNext = () => {

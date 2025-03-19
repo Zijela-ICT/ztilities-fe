@@ -47,6 +47,9 @@ interface ContextType {
   centralStateDelete: string;
   setCentralStateDelete: React.Dispatch<React.SetStateAction<string>>;
 
+  notificationState: any;
+  setNotificationState: React.Dispatch<React.SetStateAction<any>>;
+
   successState: {
     title: string;
     detail: string;
@@ -82,6 +85,7 @@ export const DataPermissionProvider = ({
   const [user, setUser] = useState<AuthUser | null>(null);
   const [userPermissions, setUserPermissions] = useState<Permission[]>([]);
   const [userRoles, setUserRoles] = useState<any[]>([]);
+  const [notificationState, setNotificationState] = useState<any>();
 
   // Keep loading and pagination in memory (do not persist)
   const [loading, setLoading] = useState<boolean>(false);
@@ -172,6 +176,9 @@ export const DataPermissionProvider = ({
 
         centralStateDelete,
         setCentralStateDelete,
+
+        notificationState,
+        setNotificationState
       }}
     >
       {children}

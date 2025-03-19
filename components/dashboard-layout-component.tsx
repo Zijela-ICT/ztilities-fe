@@ -64,6 +64,8 @@ export default function DashboardLayout({
     setCentralStateDelete,
     successState,
     setSuccessState,
+    notificationState,
+    setNotificationState,
   } = useDataPermission();
   const pathname = usePathname();
   const router = useRouter();
@@ -93,6 +95,17 @@ export default function DashboardLayout({
       getMe();
     }
   }, [pathname]);
+
+  const getNotifications = async () => {
+    const response = await axiosInstance.get(
+      `/notifications/my-notifications/all/unread`
+    );
+    const notifications = response.data?.data;
+    setNotificationState(notifications?.length || 0);
+  };
+  useEffect(() => {
+    getNotifications();
+  }, []);
 
   const handleWalletChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = user.wallets.find(
@@ -226,11 +239,19 @@ export default function DashboardLayout({
                   <SettingUserIcon />
                 </Link>
                 <div
+                  className="relative cursor-pointer"
                   onClick={handleNotificationClick}
-                  className="cursor-pointer"
                 >
                   <NotifIcon />
+
+                  {/* Notification Badge */}
+                  {notificationState > 0 && (
+                    <div className="absolute -top-1 -right-1 bg-red-700 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                      {notificationState > 99 ? "99+" : notificationState}
+                    </div>
+                  )}
                 </div>
+
                 {showNotifications && (
                   <NotificationCard
                     onClose={() => {
