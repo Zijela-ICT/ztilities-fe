@@ -115,7 +115,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
 
   // Check if the user has the TENANT_ROLE 
   const hasTenantRole = userRoles.some(
-    (role: Role) => role.name === "TENANT_ROLE " || role.name === "VENDOR_ROLE"
+    (role: Role) => role.name === "TENANT_ROLE" || role.name === "VENDOR_ROLE"
   );
 
   let finalStatus: { text: string; className: string };

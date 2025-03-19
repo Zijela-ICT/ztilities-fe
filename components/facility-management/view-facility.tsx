@@ -29,12 +29,12 @@ export default function FacilityDetails({
 }: FacilityDetailsProps) {
   const { user, userRoles } = useDataPermission();
   const hasTenantRole = userRoles.some(
-    (role: Role) => role.name === "TENANT_ROLE "
+    (role: Role) => role.name === "TENANT_ROLE"
   );
 
   const hasThisRole = userRoles.some(
     (role: Role) =>
-      role.name === "TENANT_ROLE " ||
+      role.name === "TENANT_ROLE" ||
       role.name === "VENDOR_ROLE" ||
       role.name === "TECHNICIAN_ROLE"
   );

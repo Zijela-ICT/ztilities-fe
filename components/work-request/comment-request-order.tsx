@@ -24,7 +24,7 @@ export default function CommentWorkRequestOrder({
   // Check if the user has the TENANT_ROLE 
   const hasThisRole = userRoles.some(
     (role: Role) =>
-      role.name === "TENANT_ROLE " ||
+      role.name === "TENANT_ROLE" ||
       role.name === "VENDOR_ROLE" ||
       role.name === "TECHNICIAN_ROLE"
   );
