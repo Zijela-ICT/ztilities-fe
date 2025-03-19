@@ -47,7 +47,7 @@ function WorkRequests({ nowrap }: Props) {
   } = useDataPermission();
 
   const hasTenantRole = userRoles.some(
-    (role: Role) => role.name === "TENANT_ROLE " || role.name === "VENDOR_ROLE"
+    (role: Role) => role.name === "TENANT_ROLE" || role.name === "VENDOR_ROLE"
   );
 
   const tabs = ["All Work Request", "My Work Request"];
