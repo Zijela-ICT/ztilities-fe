@@ -63,9 +63,10 @@ export default function Navigation() {
   };
 
   const hasTenantRole = userRoles.some(
-    (role: Role) => role.name === "TENANT_ROLE "
+    (role: Role) => role.name === "TENANT_ROLE"
   );
 
+  console.log(userRoles, hasTenantRole);
   const navItems = [
     {
       href: "/dashboard",
@@ -298,9 +299,13 @@ export default function Navigation() {
             // Optionally skip work-orders for tenant roles
             // if (item.href === "/work-orders" && hasTenantRole) return null;
             if (
-              (item.href === "/work-orders" && hasTenantRole) ||
-              (item.href === "/user-management" && hasTenantRole) ||
-              (item.href === "/approvers" && hasTenantRole)
+              hasTenantRole &&
+              [
+                "/work-orders",
+                "/user-management",
+                "/approvers",
+                "/access-control",
+              ].includes(item.href)
             ) {
               return null;
             }
