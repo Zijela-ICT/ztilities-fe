@@ -17,6 +17,7 @@ import { useCallback, useState } from "react";
 import ModalCompoenent from "./modal-component";
 import ButtonComponent from "./button-component";
 import PermissionGuard from "./auth/permission-protected-components";
+import { formatRoleName } from "@/utils/formatRoleNames";
 
 const Logo = "/assets/logo.png";
 
@@ -204,7 +205,7 @@ export default function Navigation() {
               key={role.name}
               className="text-xs mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm"
             >
-              <p>{role.name}</p>
+              <p>{formatRoleName(role.name)}</p>
             </div>
           ))}
           <ButtonComponent
@@ -285,7 +286,7 @@ export default function Navigation() {
               {user?.firstName} {user?.lastName}
             </p>
             <div className="text-xs mt-2 bg-white text-[#A8353A] px-3 py-1 rounded-full shadow-sm">
-              {userRoles[0]?.name}
+              {formatRoleName(userRoles[0]?.name)}
             </div>
           </div>
         )}

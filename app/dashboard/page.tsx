@@ -42,7 +42,7 @@ function Dashboard() {
   };
 
   const hasNoTenantRole = userRoles.some(
-    (role: Role) => role.name !== "TENANT_ROLE "
+    (role: Role) => role.name !== "TENANT_ROLE"
   );
 
   const [workRequests, setWorkRequests] = useState<any>();
@@ -76,7 +76,6 @@ function Dashboard() {
   const [overdueWorkRequests, setOverdueWorkRequests] = useState<any>();
   const [pendingWorkRequests, setPendingWorkRequests] = useState<any>();
   const [initiatedWorkRequests, setInitiatedWorkRequests] = useState<any>();
-
   const [requestForQuotationSubmitted, setRequestForQuotationSubmitted] =
     useState<any>();
   const [
@@ -480,7 +479,13 @@ function Dashboard() {
                         ) : item.title !== "Wallet Balance" ? (
                           <div>
                             <p className="text-3xl font-bold text-gray-800 mb-3">
-                              {item.number}
+                              {item.title ===
+                                "Purchase Orders (Total Cost Value)" &&
+                                "₦"}{" "}
+                              {item.title ===
+                              "Purchase Orders (Total Cost Value)"
+                                ? formatCurrency(item.number)
+                                : item.number}
                             </p>
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500"></span>

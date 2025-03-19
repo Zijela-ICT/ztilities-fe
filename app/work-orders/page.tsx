@@ -137,8 +137,18 @@ function WorkOrders({ nowrap }: Props) {
     });
   };
 
-  const approveWorkOrder = async () => {
-    await axiosInstance.patch(`/work-orders/${activeRowId}/status/approve`);
+  const approveQuotation = async () => {
+    await axiosInstance.patch(`/work-orders/${activeRowId}/quotations/approve-quotation`);
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully approved quotation",
+      status: true,
+    });
+  };
+
+  const approveQuotationTenant = async () => {
+    await axiosInstance.patch(`/work-orders/${activeRowId}/quotations/approve-quotation/tenant`);
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
@@ -148,6 +158,18 @@ function WorkOrders({ nowrap }: Props) {
   };
 
   const rejectQuotation = async () => {
+    await axiosInstance.patch(
+      `/work-orders/${activeRowId}/quotations/reject-quotation`
+    );
+    setCentralStateDelete("");
+    setSuccessState({
+      title: "Successful",
+      detail: "You have successfully rejected quotation",
+      status: true,
+    });
+  };
+
+  const rejectQuotationTenant = async () => {
     await axiosInstance.patch(
       `/work-orders/${activeRowId}/quotations/reject-quotation/tenant`
     );
@@ -267,9 +289,11 @@ function WorkOrders({ nowrap }: Props) {
       case "apportionServiceCharge":
         return "Apportion Cost";
       case "approveQuotation":
+        case "approveQuotationTenant":
         return "Approve Quotation";
       case "rejectQuotation":
-        return "Rejected Quotation";
+      case "rejectQuotationTenant":
+        return "Reject Quotation";
       case "acceptWorkOrder":
         return "Accept Work Order";
       case "requestquotationsselection":
@@ -326,8 +350,10 @@ function WorkOrders({ nowrap }: Props) {
       case "requestquotationsselection":
         return "You want to request this quotation for selection";
       case "approveQuotation":
+        case "approveQuotationTenant":
         return "You want to approve this quuotation";
       case "rejectQuotation":
+      case "rejectQuotationTenant":
         return "You want to reject this quuotation";
       case "acceptWorkOrder":
         return "Are you sure you want to accept this work order";
@@ -626,7 +652,11 @@ function WorkOrders({ nowrap }: Props) {
           : centralStateDelete === "requestquotationsselection"
           ? requestQuotationSelection
           : centralStateDelete === "approveQuotation"
-          ? approveWorkOrder
+          ? approveQuotation
+          : centralStateDelete === "approveQuotationTenant"
+          ? approveQuotationTenant
+          : centralStateDelete === "rejectQuotationTenant"
+          ? rejectQuotationTenant
           : centralStateDelete === "rejectQuotation"
           ? rejectQuotation
           : centralStateDelete === "acceptWorkOrder"

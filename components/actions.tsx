@@ -1110,6 +1110,17 @@ const Actions: React.FC<UserActionsProps> = ({
                       onClick={() => setModalStateDelete("approveQuotation")}
                       permissions={[
                         "update_work-orders:id/quotations/approve-quotation",
+                      ]}
+                    />
+                  </li>
+
+                  <li>
+                    <DropdownButtonComponent
+                      text="Approve Quotation"
+                      onClick={() =>
+                        setModalStateDelete("approveQuotationTenant")
+                      }
+                      permissions={[
                         "update_work-orders:id/quotations/approve-quotation/tenant",
                       ]}
                     />
@@ -1119,6 +1130,18 @@ const Actions: React.FC<UserActionsProps> = ({
                     <DropdownButtonComponent
                       text="Reject Quotation"
                       onClick={() => setModalStateDelete("rejectQuotation")}
+                      permissions={[
+                        "update_work-orders:id/quotations/reject-quotation",
+                      ]}
+                    />
+                  </li>
+
+                  <li>
+                    <DropdownButtonComponent
+                      text="Reject Quotation"
+                      onClick={() =>
+                        setModalStateDelete("rejectQuotationTenant")
+                      }
                       permissions={[
                         "update_work-orders:id/quotations/reject-quotation/tenant",
                       ]}

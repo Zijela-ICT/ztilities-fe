@@ -784,7 +784,7 @@ function FacilityManagement() {
           {
             name: "userId",
             label: "Client",
-            placeholder: "Assign Unit to a Tenant",
+            placeholder: "Assign Unit to a Resident",
             options: users?.map((user: User) => ({
               value: user.id,
               label: `${user.firstName} ${user.lastName}`,

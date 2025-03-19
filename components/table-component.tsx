@@ -341,7 +341,7 @@ export default function TableComponent({
                   ? "sm:w-[30%]"
                   : type === "bills"
                   ? "w-full"
-                  : type === "apportionmentDetails"
+                  : type === "apportionmentDetails" || type === "approvers"
                   ? "w-full"
                   : type === "auditlogs"
                   ? "w-full"
@@ -564,7 +564,7 @@ export default function TableComponent({
                           column === "startDate" ||
                           column === "endDate" ||
                           column === "expiresAt" ? (
-                          row[column] && moment.utc(row[column]).format("ll")
+                          row[column] && moment(row[column]).format("ll")
                         ) : column === "avatar" ? (
                           row?.avatar ? (
                             <Image
