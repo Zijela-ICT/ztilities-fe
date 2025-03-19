@@ -80,7 +80,6 @@ function AccessControl() {
     "Guest Log",
   ]);
 
-
   // API Calls
   const generateAccessCode = async () => {
     const payload = {
@@ -101,6 +100,16 @@ function AccessControl() {
   const verifyAccessDetails = async () => {
     const response = await axiosInstance.get(
       `/access-control/verify/${accessCodeVerify || activeRowId}`
+    );
+    const { userId, unitId, ...filteredData } = response.data.data;
+    setVerifyResult(filteredData);
+    setCentralState("viewAccessCodeDetails");
+    setAccessCodeVerify("");
+  };
+
+  const verifyAccessDetailsTenant = async () => {
+    const response = await axiosInstance.get(
+      `/access-control/tenant-verify/${accessCodeVerify || activeRowId}`
     );
     const { userId, unitId, ...filteredData } = response.data.data;
     setVerifyResult(filteredData);
@@ -302,7 +311,10 @@ function AccessControl() {
   const tabPermissions: { [key: string]: string[] } = {
     "Access Codes": ["read_access-control"],
     "Generate Code": ["create_access-control:generate"],
-    "Verify Code": ["read_access-control:verify/accessCode"],
+    "Verify Code": [
+      "read_access-control:verify/accessCode",
+      "read_access-control:tenant-verify/accessCode",
+    ],
     "Guest Log": [
       "update_access-control:entry/accessCode",
       "update_access-control:exit/accessCode",
@@ -476,26 +488,69 @@ function AccessControl() {
         );
       case "Verify Code":
         return (
-          <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                verifyAccessDetails();
-              }}
+          <>
+            <PermissionGuard
+              requiredPermissions={["read_access-control:verify/accessCode"]}
             >
-              <h2 className="text-2xl font-bold mb-4">Verify Access Code</h2>
-              <LabelInputComponent
-                type="text"
-                name="accessCode"
-                value={accessCodeVerify}
-                onChange={(e) => setAccessCodeVerify(e.target.value)}
-                label="Access Code"
-              />
-              <div className="w-32 mt-4">
-                <ButtonComponent text="Verify Code" className="text-white " />
+              <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow mb-4">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    verifyAccessDetails();
+                  }}
+                >
+                  <h2 className="text-2xl font-bold mb-4">
+                    Verify Access Code
+                  </h2>
+                  <LabelInputComponent
+                    type="text"
+                    name="accessCode"
+                    value={accessCodeVerify}
+                    onChange={(e) => setAccessCodeVerify(e.target.value)}
+                    label="Access Code"
+                  />
+                  <div className="w-32 mt-4">
+                    <ButtonComponent
+                      text="Verify Code"
+                      className="text-white "
+                    />
+                  </div>
+                </form>
               </div>
-            </form>
-          </div>
+            </PermissionGuard>
+
+            <PermissionGuard
+              requiredPermissions={[
+                "read_access-control:tenant-verify/accessCode",
+              ]}
+            >
+              <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    verifyAccessDetailsTenant();
+                  }}
+                >
+                  <h2 className="text-2xl font-bold mb-4">
+                    Verify Access Code
+                  </h2>
+                  <LabelInputComponent
+                    type="text"
+                    name="accessCode"
+                    value={accessCodeVerify}
+                    onChange={(e) => setAccessCodeVerify(e.target.value)}
+                    label="Access Code"
+                  />
+                  <div className="w-32 mt-4">
+                    <ButtonComponent
+                      text="Verify Code"
+                      className="text-white "
+                    />
+                  </div>
+                </form>
+              </div>
+            </PermissionGuard>
+          </>
         );
       case "Guest Log":
         return (
@@ -646,6 +701,7 @@ function AccessControl() {
         requiredPermissions={[
           "create_access-control:generate",
           "read_access-control:verify/accessCode",
+          "read_access-control:tenant-verify/accessCode",
           "update_access-control:entry/accessCode",
           "update_access-control:exit/accessCode",
           "read_access-control:guests/still-inside",
