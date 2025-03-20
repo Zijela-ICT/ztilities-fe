@@ -960,7 +960,7 @@ function FacilityManagement() {
 
     createApiKeyFacility: (
       <DynamicCreateForm
-        inputs={[{ name: "apikey", label: "Api key", type: "text" }]}
+        inputs={[{ name: "apiKey", label: "Api key", type: "text" }]}
         selects={[]}
         title="Create api Key"
         apiEndpoint={`/facilities/${activeRowId}/set-api-key`}
@@ -972,7 +972,7 @@ function FacilityManagement() {
 
     updateApiKeyFacility: (
       <DynamicCreateForm
-        inputs={[{ name: "apikey", label: "Api key", type: "text" }]}
+        inputs={[{ name: "apiKey", label: "Api key", type: "text" }]}
         selects={[]}
         title="Create api Key"
         apiEndpoint={`/facilities/${activeRowId}/set-api-key`}
