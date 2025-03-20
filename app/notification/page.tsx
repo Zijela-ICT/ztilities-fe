@@ -31,7 +31,7 @@ function NotificationPage() {
     setNotificationState,
   } = useDataPermission();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [notification, setANotification] = useState<Notification>();
+  const [notification, setANotification] = useState<Notification>(null);
   const [activeRowId, setActiveRowId] = useState<number | null>(null);
 
   const [notificationFilter, setNotificationFilter] = useState("all");
@@ -158,6 +158,7 @@ function NotificationPage() {
       getDetail={() => "Read notiication"}
       componentMap={componentMap}
       setActiveRowId={setActiveRowId}
+      setANotification = {setANotification}
     >
       <div className="relative bg-white rounded-2xl p-8">
         <div className="mb-4">

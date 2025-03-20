@@ -37,6 +37,7 @@ export default function DashboardLayout({
   takeAction,
   setActiveRowId,
   setABeneficiary,
+  setANotification,
 }: {
   children: any;
   title: string;
@@ -51,6 +52,7 @@ export default function DashboardLayout({
   takeAction?: any;
   setActiveRowId?: (id: any) => void;
   setABeneficiary?: (id: any) => void;
+  setANotification?: (any:any) => void
 }) {
   const axiosInstance = createAxiosInstance();
   const {
@@ -163,6 +165,9 @@ export default function DashboardLayout({
           }
           if (setABeneficiary) {
             setABeneficiary("");
+          }
+          if (setANotification) {
+            setANotification(null);
           }
         }}
       >
