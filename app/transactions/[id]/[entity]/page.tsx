@@ -23,7 +23,7 @@ import {
 import Link from "next/link";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import createAxiosInstance from "@/utils/api";
-import { chartOptions } from "@/utils/ojects";
+import { chartOptions, multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import TableComponent from "@/components/table-component";
 import PermissionGuard from "@/components/auth/permission-protected-components";
@@ -31,6 +31,7 @@ import { useParams } from "next/navigation";
 import { MyLoaderFinite } from "@/components/loader-components";
 import exportToCSV from "@/utils/exportCSV";
 import PermissionGuardApi from "@/components/auth/permission-protected-api";
+import Select from "react-select";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -98,10 +99,13 @@ function Transactions() {
   ];
 
   const handleFilterChange = (label, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
+    setFilters({
+      User: null,
+      Facility: null,
+      Vendor: null,
+      Technician: null,
       [label]: value,
-    }));
+    });
   };
 
   const getUsers = async () => {
@@ -352,21 +356,21 @@ function Transactions() {
     fetchFilteredTransactions();
   }, [filters]);
 
-  useEffect(() => {
-    if (
-      filters.User ||
-      filters.Vendor ||
-      filters.Technician ||
-      filters.Facility
-    ) {
-      setFilters({
-        User: "",
-        Facility: "",
-        Vendor: "",
-        Technician: "",
-      });
-    }
-  }, [filters]);
+  // useEffect(() => {
+  //   if (
+  //     filters.User ||
+  //     filters.Vendor ||
+  //     filters.Technician ||
+  //     filters.Facility
+  //   ) {
+  //     setFilters({
+  //       User: "",
+  //       Facility: "",
+  //       Vendor: "",
+  //       Technician: "",
+  //     });
+  //   }
+  // }, [filters]);
 
   const monthlyData = {
     INFLOW: Array(12).fill(0), // For January to December
@@ -436,25 +440,42 @@ function Transactions() {
 
                 const requiredPermissions = permissionMap[filter.label] || [];
 
+                // Map filter options to the format expected by react-select
+                const mappedOptions =
+                  filter?.options?.map((option) => ({
+                    value: option.id,
+                    label:
+                      (option.firstName && option.lastName
+                        ? `${option.firstName} ${option.lastName}`
+                        : option.name) || "",
+                  })) || [];
+
+                // Find the selected option based on your current filters value
+                const selectedOption = mappedOptions.find(
+                  (option) => option.value === filters[filter.label]
+                );
+
                 return (
                   <PermissionGuard
                     key={index}
                     requiredPermissions={requiredPermissions}
                   >
-                    <select
-                      className="border border-gray-300 rounded-md p-2"
-                      value={filters[filter.label]?.id}
-                      onChange={(e) =>
-                        handleFilterChange(filter.label, e.target.value)
-                      }
-                    >
-                      <option value="">{`Filter by ${filter.label}`}</option>
-                      {filter?.options?.map((option, idx) => (
-                        <option key={idx} value={option.id}>
-                          {option.firstName + option.lastName || option.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative w-full mt-6">
+                      <Select
+                        key={`${filter.label}-${
+                          filters[filter.label] || "empty"
+                        }`}
+                        options={mappedOptions}
+                        value={selectedOption}
+                        onChange={(selected) => {
+                          handleFilterChange(filter.label, selected?.value);
+                        }}
+                        placeholder={`Filter by ${filter.label}`}
+                        styles={multiSelectStyle}
+                        isClearable
+                        required
+                      />
+                    </div>
                   </PermissionGuard>
                 );
               })}
