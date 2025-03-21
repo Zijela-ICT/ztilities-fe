@@ -345,7 +345,9 @@ function Dashboard() {
   const [showBalance, setShowBalance] = useState(true);
 
   useEffect(() => {
-    const fetchAllData = async () => {
+    const fetchData = async () => {
+      await getMe();
+
       await Promise.all([
         getPurchaseOrders(),
         getOverdueWorkOrders(),
@@ -361,11 +363,10 @@ function Dashboard() {
         getPurchaseOrdersTotalCost(),
         getWorkOrdersNew(),
         getWorkOrdersAwaitingApproval(),
-        getMe(),
       ]);
     };
 
-    fetchAllData();
+    fetchData();
 
     const interval = setInterval(() => {
       getMe();
