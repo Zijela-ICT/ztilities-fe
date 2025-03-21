@@ -23,7 +23,7 @@ import {
 import Link from "next/link";
 import withPermissions from "@/components/auth/permission-protected-routes";
 import createAxiosInstance from "@/utils/api";
-import { chartOptions } from "@/utils/ojects";
+import { chartOptions, multiSelectStyle } from "@/utils/ojects";
 import { useDataPermission } from "@/context";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import { MyLoaderFinite } from "@/components/loader-components";
@@ -37,6 +37,7 @@ import Payouts from "@/components/transaction/payout";
 import moment from "moment";
 import ManagePin from "@/components/transaction/create-pin";
 import PermissionGuardApi from "@/components/auth/permission-protected-api";
+import Select from "react-select";
 
 // Register required components in Chart.js
 ChartJS.register(
@@ -96,10 +97,10 @@ function Transactions() {
 
   const handleFilterChange = (label, value) => {
     setFilters({
-      User: "",
-      Facility: "",
-      Vendor: "",
-      Technician: "",
+      User: null,
+      Facility: null,
+      Vendor: null,
+      Technician: null,
       [label]: value,
     });
   };
@@ -402,8 +403,8 @@ function Transactions() {
           ]}
         >
           <div className="relative bg-white rounded-2xl p-4 mb-4">
-            <div className="overflow-x-auto whitespace-nowrap pb-2">
-              <div className="flex md:justify-end items-center space-x-4 ">
+            <div className=" whitespace-nowrap pb-2">
+              <div className="flex flex-col sm:flex-row items-center gap-3">
                 {user.wallets.length > 0 && (
                   <PermissionGuard
                     requiredPermissions={[
@@ -429,28 +430,44 @@ function Transactions() {
 
                   const requiredPermissions = permissionMap[filter.label] || [];
 
+                  // Map filter options to the format expected by react-select
+                  const mappedOptions =
+                    filter?.options?.map((option) => ({
+                      value: option.id,
+                      label:
+                        (option.firstName && option.lastName
+                          ? `${option.firstName} ${option.lastName}`
+                          : option.name) || "",
+                    })) || [];
+
+                  // Find the selected option based on your current filters value
+                  const selectedOption = mappedOptions.find(
+                    (option) => option.value === filters[filter.label]
+                  );
+
                   return (
                     <PermissionGuard
                       key={index}
                       requiredPermissions={requiredPermissions}
                     >
-                      <select
-                        className="border border-gray-300 rounded-md p-2"
-                        // value={filters[filter.label]?.id}
-                        value={filters[filter.label]}
-                        onChange={(e) => {
-                          handleFilterChange(filter.label, e.target.value);
-                          setTransactionId(e.target.value);
-                          setEntity(filter.label);
-                        }}
-                      >
-                        <option value="">{`Filter by ${filter.label}`}</option>
-                        {filter?.options?.map((option, idx) => (
-                          <option key={idx} value={option.id}>
-                            {option.firstName + option.lastName || option.name}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="relative w-full mt-6">
+                        <Select
+                          key={`${filter.label}-${
+                            filters[filter.label] || "empty"
+                          }`}
+                          options={mappedOptions}
+                          value={selectedOption}
+                          onChange={(selected) => {
+                            handleFilterChange(filter.label, selected?.value);
+                            setTransactionId(selected?.value);
+                            setEntity(filter.label);
+                          }}
+                          placeholder={`Filter by ${filter.label}`}
+                          styles={multiSelectStyle}
+                          isClearable
+                          required
+                        />
+                      </div>
                     </PermissionGuard>
                   );
                 })}

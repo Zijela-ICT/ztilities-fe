@@ -269,7 +269,7 @@ export default function DashboardLayout({
             </div>
 
             {/* Children content */}
-            <div className="bg-gray-100 h-full text-sm p-6">{children}</div>
+            <div className="bg-gray-100 h-full text-sm p-6 relative">{children}</div>
           </div>
         </div>
       </ProtectedRoute>
