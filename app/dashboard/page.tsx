@@ -409,7 +409,7 @@ function Dashboard() {
               {componentMap[centralState]}
             </ModalCompoenent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
-              {data.map((item, index) =>
+              {data?.map((item, index) =>
                 (item.title === "Wallet Balance" &&
                   user?.wallets?.length > 0) ||
                 item.title !== "Wallet Balance" ? (
