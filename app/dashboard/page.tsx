@@ -345,35 +345,38 @@ function Dashboard() {
   const [showBalance, setShowBalance] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await getMe();
-
-      await Promise.all([
-        getPurchaseOrders(),
-        getOverdueWorkOrders(),
-        getPendingWorkOrders(),
-        getOverdueWorkRequests(),
-        getPendingWorkRequests(),
-        getInitiatedWorkRequests(),
-        getRequestForQuotationSubmitted(),
-        getRequestForQuotationAwaitingApproval(),
-        getProcurementRequestSubmitted(),
-        getProcurementRequestApproved(),
-        getProcurementRequestAwaitingPoRfq(),
-        getPurchaseOrdersTotalCost(),
-        getWorkOrdersNew(),
-        getWorkOrdersAwaitingApproval(),
-      ]);
-    };
-
-    fetchData();
-
+    getMe();
     const interval = setInterval(() => {
       getMe();
     }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (userPermissions) {
+      const fetchAllData = async () => {
+        await Promise.all([
+          getPurchaseOrders(),
+          getOverdueWorkOrders(),
+          getPendingWorkOrders(),
+          getOverdueWorkRequests(),
+          getPendingWorkRequests(),
+          getInitiatedWorkRequests(),
+          getRequestForQuotationSubmitted(),
+          getRequestForQuotationAwaitingApproval(),
+          getProcurementRequestSubmitted(),
+          getProcurementRequestApproved(),
+          getProcurementRequestAwaitingPoRfq(),
+          getPurchaseOrdersTotalCost(),
+          getWorkOrdersNew(),
+          getWorkOrdersAwaitingApproval(),
+        ]);
+      };
+
+      fetchAllData();
+    }
+  }, [userPermissions]);
 
   return (
     <>
