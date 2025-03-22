@@ -68,16 +68,16 @@ function UserManagement() {
       );
       const roles = response.data.data;
 
-      // Fetch additional details for each role
-      const rolesWithPermissions = await Promise.all(
-        roles.map(async (role) => {
-          const roleDetails = await axiosInstance.get(`/roles/${role.id}`);
-          return { ...role, permissions: roleDetails.data.data.permissions };
-        })
-      );
-
+      // incase shit hits the fans
+      // // Fetch additional details for each role
+      // const rolesWithPermissions = await Promise.all(
+      //   roles.map(async (role) => {
+      //     const roleDetails = await axiosInstance.get(`/roles/${role.id}`);
+      //     return { ...role, permissions: roleDetails.data.data.permissions };
+      //   })
+      // );
       // Export roles with permissions to CSV
-      exportToCSV(rolesWithPermissions, "roles");
+      exportToCSV(roles, "roles");
     } catch (error) {
       console.error("Error fetching roles:", error);
     }
@@ -87,7 +87,9 @@ function UserManagement() {
     const response = await axiosInstance.get(
       `/roles?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
-    setRoles(response.data.data);
+
+    const filteredRoles = response.data.data.map(({ permissions, ...rest }) => rest);
+    setRoles(filteredRoles);
     const extra = response.data.extra;
     if (extra) {
       setPagination({

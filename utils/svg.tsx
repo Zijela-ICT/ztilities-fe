@@ -436,6 +436,26 @@ export const FilterIcon = () => {
   );
 };
 
+export const ExportIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-6 h-6 text-gray-600"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <rect x="4" y="8" width="16" height="12" rx="2" ry="2" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M12 4v8m0 0l-4-4m4 4l4-4"
+      />
+    </svg>
+  );
+};
+
 export const UploadIcon = () => {
   return (
     <svg

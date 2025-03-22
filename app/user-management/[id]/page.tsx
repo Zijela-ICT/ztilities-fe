@@ -113,6 +113,7 @@ function UserManagement() {
     if (showFilter === "export") {
       getARoleUsersUnPaginated();
     }
+    setShowFilter("");
   }, [setShowFilter, filterQuery]);
 
   // Dynamic title logic

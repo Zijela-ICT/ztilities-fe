@@ -1,5 +1,6 @@
 "use client";
 import {
+  ExportIcon,
   FilterIcon,
   IncomingIcon,
   OutgoingIcon,
@@ -274,12 +275,6 @@ export default function TableComponent({
     setFilterQuery(queryString);
   };
 
-  // useEffect(() => {
-  //   if (queryString && showFilter === "export") {
-  //     exportToCSV(data, type);
-  //   }
-  // }, [queryString, showFilter]);
-
   // Pagination logic remains the same…
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -305,16 +300,6 @@ export default function TableComponent({
   const contextMenuedActions = (rowId: string) => {
     setContextMenued((prevId) => (prevId === rowId ? null : rowId));
   };
-
-  /* --- Added Loading State --- */
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const [csvState, setCSVState] = useState<string>();
 
@@ -389,21 +374,7 @@ export default function TableComponent({
               }
               className="flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-gray-200 cursor-pointer"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6 text-gray-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <rect x="4" y="8" width="16" height="12" rx="2" ry="2" />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 4v8m0 0l-4-4m4 4l4-4"
-                />
-              </svg>
+              <ExportIcon />
             </div>
             {tableMainButtonConfigs[type]?.map((button, index) => (
               <ButtonComponent
@@ -443,7 +414,7 @@ export default function TableComponent({
 
       {/* Table rendering with Loading Indicator */}
       <div className="overflow-x-auto bg-white rounded-lg border border-gray-100 min-h-[40vh]">
-        {isLoading ? (
+        {!data ? (
           <div className="flex flex-col items-center justify-center w-full h-[40vh]">
             <MyLoaderFinite />
           </div>
