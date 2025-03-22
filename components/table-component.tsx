@@ -108,6 +108,7 @@ export default function TableComponent({
     "status",
     "consideredEntity",
     "type",
+    "frequency",
     "nonProcurementLimit",
     "apportionmentMetric",
     "noOfSQM",
