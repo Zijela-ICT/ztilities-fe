@@ -131,7 +131,7 @@ export default function NotificationCard({ onClose }: NotificationCardProps) {
         {latestNotifications.length > 0 && (
           <div className="mt-2 text-center">
             <Link href="/notification">
-              <p className="text-[#A8353A] ">See all notifications</p>
+              <p className="text-[#A8353A] ">Read notifications</p>
             </Link>
           </div>
         )}
