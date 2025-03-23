@@ -231,6 +231,7 @@ export default function FacilityDetails({
                                     {typeof item === "string"
                                       ? item
                                       : item.action ??
+                                      item.entity ??
                                         item.assetName ??
                                         item.walletType ??
                                         item.guestName ??

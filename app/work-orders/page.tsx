@@ -23,6 +23,7 @@ import CommentWorkRequestOrder from "@/components/work-request/comment-request-o
 import RequestQuotationApproval from "@/components/work-order/request-quotation-approval";
 import CreateBulk from "@/components/user-management/create-bulk";
 import exportToCSV from "@/utils/exportCSV";
+import Rate from "@/components/work-request/rate";
 
 interface Props {
   nowrap: boolean;
@@ -138,7 +139,9 @@ function WorkOrders({ nowrap }: Props) {
   };
 
   const approveQuotation = async () => {
-    await axiosInstance.patch(`/work-orders/${activeRowId}/quotations/approve-quotation`);
+    await axiosInstance.patch(
+      `/work-orders/${activeRowId}/quotations/approve-quotation`
+    );
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
@@ -148,7 +151,9 @@ function WorkOrders({ nowrap }: Props) {
   };
 
   const approveQuotationTenant = async () => {
-    await axiosInstance.patch(`/work-orders/${activeRowId}/quotations/approve-quotation/tenant`);
+    await axiosInstance.patch(
+      `/work-orders/${activeRowId}/quotations/approve-quotation/tenant`
+    );
     setCentralStateDelete("");
     setSuccessState({
       title: "Successful",
@@ -276,6 +281,8 @@ function WorkOrders({ nowrap }: Props) {
         return "Request quotation approval";
       case "attachFile":
         return "Upload File";
+      case "rateWorkOrder":
+        return "Rate Work Order";
     }
     switch (centralStateDelete) {
       case "deactivateWorkOrder":
@@ -289,7 +296,7 @@ function WorkOrders({ nowrap }: Props) {
       case "apportionServiceCharge":
         return "Apportion Cost";
       case "approveQuotation":
-        case "approveQuotationTenant":
+      case "approveQuotationTenant":
         return "Approve Quotation";
       case "rejectQuotation":
       case "rejectQuotationTenant":
@@ -335,6 +342,8 @@ function WorkOrders({ nowrap }: Props) {
         return "";
       case "attachFile":
         return "Upload a file here";
+      case "rateWorkOrder":
+        return "Rate Work Order here";
     }
     switch (centralStateDelete) {
       case "activateWorkOrder":
@@ -350,7 +359,7 @@ function WorkOrders({ nowrap }: Props) {
       case "requestquotationsselection":
         return "You want to request this quotation for selection";
       case "approveQuotation":
-        case "approveQuotationTenant":
+      case "approveQuotationTenant":
         return "You want to approve this quuotation";
       case "rejectQuotation":
       case "rejectQuotationTenant":
@@ -555,6 +564,13 @@ function WorkOrders({ nowrap }: Props) {
           className="text-white my-8"
         />
       </div>
+    ),
+    rateWorkOrder: (
+      <Rate
+        activeRowId={activeRowId}
+        setModalState={setCentralState}
+        setSuccessState={setSuccessState}
+      />
     ),
   };
 

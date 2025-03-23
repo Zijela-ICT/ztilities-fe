@@ -200,7 +200,7 @@ export default function ApportionPower({
         <div className="p-6">
           <h3 className="font-semibold text-base mb-4">Units</h3>
           <div className="overflow-x-auto border rounded-md">
-            <table className="table-auto w-full text-left border-collapse">
+            <table className="table-auto w-full text-left text-sm border-collapse">
               <thead className="bg-gray-100">
                 <tr>
                   <th className="px-4 py-2 border">ID</th>
@@ -256,16 +256,15 @@ export default function ApportionPower({
         onSubmit={handleSubmit}
         className="mt-12 px-6 max-w-full sm:mt-6 pb-12"
       >
-     
-          <LabelInputComponent
-            type="number"
-            name="amount"
-            value={formData.amount}
-            onChange={handleChange}
-            label="Amount"
-            required
-          />
-      
+        <LabelInputComponent
+          type="number"
+          name="amount"
+          value={formData.amount}
+          onChange={handleChange}
+          label="Amount"
+          required
+        />
+
         <div className="relative w-full mt-6">
           <Select
             options={entityOptions}

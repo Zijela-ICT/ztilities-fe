@@ -1168,6 +1168,14 @@ const Actions: React.FC<UserActionsProps> = ({
                     />
                   </li>
 
+                  <li>
+                    <DropdownButtonComponent
+                      text="Rate"
+                      onClick={() => setModalState("rateWorkOrder")}
+                      permissions={["update_work-orders:id/rate"]}
+                    />
+                  </li>
+
                   {row.amount > 0 && (
                     <>
                       <li>
