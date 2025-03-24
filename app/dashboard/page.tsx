@@ -253,7 +253,6 @@ function Dashboard() {
       permisssion: ["read_dashboards:purchase-orders-raised"],
       path: "/dashboard",
     },
-    ///
     {
       title: "Request for Quotation (Submitted)",
       number: requestForQuotationSubmitted?.totalWorkOrderWithUploadedQuotation,

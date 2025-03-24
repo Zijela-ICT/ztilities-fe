@@ -100,7 +100,7 @@ export default function FundOtherWallet({
       const response = await axiosInstance.get(`/wallets/wallet/${walletId}`);
       setWalletDetails(response.data.data);
     } catch (error) {
-      console.log(error);
+  
       toast.warning(error.response.data.message);
     }
   };

@@ -131,7 +131,6 @@ export default function Payouts({
         bank_name: response.data.data?.account_name,
       }));
     } catch (error) {
-      console.log(error);
       toast.warning(error.response.data.message);
     }
   };
@@ -146,7 +145,7 @@ export default function Payouts({
         pin: joinCode,
         //   amount: Number(formData.amount) || 0,
       };
-      console.log(payload);
+  
       await axiosInstance.post(
         `/payments/payout/bank-transfer/${formData.myWalletId}`,
         payload

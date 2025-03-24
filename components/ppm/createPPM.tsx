@@ -170,7 +170,7 @@ export default function CreatePPM({
         : null,
       file,
     };
-    console.log(updatedPayload);
+
     if (activeRowId) {
       await axiosInstance.patch(`/ppms/${activeRowId}`, updatedPayload);
     } else {

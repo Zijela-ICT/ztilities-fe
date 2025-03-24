@@ -171,7 +171,7 @@ export default function Ppm() {
       />
     ),
     showAll: (
-      <div className="bg-white p-4 rounded-lg shadow-md">
+      <div className="bg-white p-4 rounded-lg shadow-md max-h-60 overflow-y-auto">
         {showAll.map((work, index) => {
           const statusColor =
             work.status === "Initiated"
@@ -253,9 +253,7 @@ export default function Ppm() {
     <DashboardLayout
       title="PPM"
       detail="View Work Calendar"
-      getTitle={() =>
-        centralState === "showAll" ? "Show PPMs" : "Create PPMs"
-      }
+      getTitle={() => (centralState === "showAll" ? "PPMs" : "Create PPMs")}
       getDetail={() =>
         centralState === "createBulkPPM" ? "Import CSV/Excel file" : ""
       }

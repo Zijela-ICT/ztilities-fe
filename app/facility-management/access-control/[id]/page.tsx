@@ -68,7 +68,7 @@ function AccessControl() {
   ///
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const toggleActions = (rowId: string) => {
-    console.log(rowId);
+
     setActiveRowId((prevId) => (prevId === rowId ? null : rowId));
   };
 

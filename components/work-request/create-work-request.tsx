@@ -43,7 +43,7 @@ export default function CreateWorkRequest({
 
   const [assetCategories, setAssetCategories] = useState<any[]>([]);
   const [theAssetCategory, setTheAssetCategory] = useState<any>();
-  console.log(theAssetCategory);
+
   // Fetch work request if activeRowId exists
   const getWorkRequest = async () => {
     if (activeRowId) {

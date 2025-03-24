@@ -39,7 +39,7 @@ function Funding() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null); // Track active row
   const [payment, setPayment] = useState<any>();
 
-  console.log(payment);
+
   const approveFunding = async () => {
     await axiosInstance.patch(`/payments/manual-fund/${id}/verify`);
     setCentralStateDelete("");

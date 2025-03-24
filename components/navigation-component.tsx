@@ -66,7 +66,6 @@ export default function Navigation() {
     (role: Role) => role.name === "TENANT_ROLE"
   );
 
-  console.log(userRoles, hasTenantRole);
   const navItems = [
     {
       href: "/dashboard",
