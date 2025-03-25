@@ -9,11 +9,17 @@ import { toast } from "react-toastify";
 
 interface BulkProps {
   type?: string;
+  bulkExample?: any;
   setModalState?: any;
   setSuccessState?: any;
   activeRowId?: any;
 }
-export default function CreateBulk({ type }: BulkProps) {
+export default function CreateBulk({
+  type,
+  bulkExample,
+  setModalState,
+  setSuccessState,
+}: BulkProps) {
   const axiosInstance = createAxiosInstance();
   const [formData, setFormData] = useState({ name: "" });
   const [csvData, setCsvData] = useState<any[]>([]);
@@ -157,22 +163,23 @@ export default function CreateBulk({ type }: BulkProps) {
       endpoint = "/technicians/bulk";
     }
 
-    // if (type === " Users") {
-    //   await axiosInstance.post("/users/pre-register/bulk", csvData);
-    // } else if (type === "Facilities") {
-    //   await axiosInstance.post("/facilities/bulk", csvData);
-    // } else if (type === "Blocks") {
-    //   await axiosInstance.post("/blocks/bulk", csvData);
-    // } else if (type === "Units") {
-    //   await axiosInstance.post("/units/bulk", csvData);
-    // }
-
     // Batch send CSV data in chunks of 5
     const batchSize = 5;
     for (let i = 0; i < csvData.length; i += batchSize) {
       const batch = csvData.slice(i, i + batchSize);
       await axiosInstance.post(endpoint, batch);
     }
+
+    setFileName(null);
+    setFileSize(null);
+    setCsvData([]);
+    setHeaders([]);
+    setModalState("");
+    setSuccessState({
+      title: "Successful",
+      detail: `You successful created in bulk`,
+      status: true,
+    });
 
     console.log("Form Data:", formData);
     console.log("CSV Data:", csvData);
@@ -185,7 +192,9 @@ export default function CreateBulk({ type }: BulkProps) {
           <div className="flex items-center space-x-2">
             <DownloadIcon />
             <span className="text-md font-thin text-gray-600">
-              Download Sample file format for uploading
+              <a href={bulkExample} rel="noopener noreferrer">
+                Download Sample file format for uploading
+              </a>
             </span>
           </div>
           <DownloadArrow />

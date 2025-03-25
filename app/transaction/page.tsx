@@ -215,6 +215,7 @@ function Transactions() {
       setTimeout(() => setLoading(false), 1500);
     };
 
+    //doesnt have wallet, so no call for transactions
     if (user.wallets.length > 0) {
       fetchTransactions();
     }

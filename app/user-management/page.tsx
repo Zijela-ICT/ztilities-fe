@@ -35,6 +35,7 @@ function UserManagement() {
   const tabs = ["All Users", "Roles", "Permissions"];
 
   const [users, setUsers] = useState<User[]>();
+  const [usersBulkExample, setUsersBulkExample] = useState<any>();
   const [roles, setRoles] = useState<Role[]>();
   const [role, setRole] = useState<RoleData>();
   const [permissions, setPermissions] = useState<Permission[]>([]);
@@ -52,6 +53,7 @@ function UserManagement() {
     );
     setUsers(response.data.data);
     const extra = response.data.extra;
+    setUsersBulkExample(response.data.extra);
     setPagination({
       currentPage: extra.page,
       pageSize: extra.pageSize,
@@ -88,7 +90,9 @@ function UserManagement() {
       `/roles?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
     );
 
-    const filteredRoles = response.data.data.map(({ permissions, ...rest }) => rest);
+    const filteredRoles = response.data.data.map(
+      ({ permissions, ...rest }) => rest
+    );
     setRoles(filteredRoles);
     const extra = response.data.extra;
     if (extra) {
@@ -252,6 +256,7 @@ function UserManagement() {
         setModalState={setCentralState}
         setSuccessState={setSuccessState}
         activeRowId={activeRowId}
+        bulkExample={usersBulkExample?.bulkFile}
       />
     ),
     createRole: (

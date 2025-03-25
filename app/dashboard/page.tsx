@@ -18,6 +18,7 @@ import MyLoader from "@/components/loader-components";
 import formatCurrency from "@/utils/formatCurrency";
 import PermissionGuard from "@/components/auth/permission-protected-components";
 import PermissionGuardApi from "@/components/auth/permission-protected-api";
+import DashboardSection from "@/components/dashboard/dashboard-box";
 
 function Dashboard() {
   const axiosInstance = createAxiosInstance();
@@ -526,6 +527,8 @@ function Dashboard() {
                 ) : null
               )}
             </div>
+
+            {/* <DashboardSection/> */}
 
             {/* {workOrders?.length < 1 ? (
               <div className=" w-full rounded-lg bg-white my-8 flex flex-col items-center justify-center px-6 py-10">

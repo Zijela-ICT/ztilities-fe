@@ -145,7 +145,7 @@ export default function Payouts({
         pin: joinCode,
         //   amount: Number(formData.amount) || 0,
       };
-  
+
       await axiosInstance.post(
         `/payments/payout/bank-transfer/${formData.myWalletId}`,
         payload
