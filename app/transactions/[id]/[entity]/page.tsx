@@ -356,21 +356,6 @@ function Transactions() {
     fetchFilteredTransactions();
   }, [filters]);
 
-  // useEffect(() => {
-  //   if (
-  //     filters.User ||
-  //     filters.Vendor ||
-  //     filters.Technician ||
-  //     filters.Facility
-  //   ) {
-  //     setFilters({
-  //       User: "",
-  //       Facility: "",
-  //       Vendor: "",
-  //       Technician: "",
-  //     });
-  //   }
-  // }, [filters]);
 
   const monthlyData = {
     INFLOW: Array(12).fill(0), // For January to December

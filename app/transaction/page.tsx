@@ -215,7 +215,9 @@ function Transactions() {
       setTimeout(() => setLoading(false), 1500);
     };
 
-    fetchTransactions();
+    if (user.wallets.length > 0) {
+      fetchTransactions();
+    }
   }, []);
 
   useEffect(() => {
@@ -605,7 +607,7 @@ function Transactions() {
           </div>
         )}
 
-        {filteredTransactions?.length < 1 ? (
+        {filteredTransactions?.length < 1 || !filteredTransactions ? (
           <>
             <div className="flex flex-col items-center justify-center h-64 bg-white mt-4">
               <TransactionIcon width="71" height="71" />
