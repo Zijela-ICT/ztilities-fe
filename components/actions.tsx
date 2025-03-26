@@ -439,36 +439,8 @@ const Actions: React.FC<UserActionsProps> = ({
                         permissions={["delete_units:id"]}
                       />
                     )}
-                    {/* for access-control */}
+                    {/* for access-control */}             
                     {/* <li>
-                      <DropdownButtonComponent
-                        text="Generate access code"
-                        onClick={() => setModalState("generateAccessCode")}
-                        permissions={[]}
-                      />
-                    </li> */}
-                    {/* <li>
-                      <DropdownButtonComponent
-                        text="Verify access code"
-                        onClick={() => setModalState("verifyAccessCode")}
-                        permissions={[]}
-                      />
-                    </li> */}
-                    {/* <li>
-                      <DropdownButtonComponent
-                        text="Log guest in"
-                        onClick={() => setModalState("logGuestEntry")}
-                        permissions={[]}
-                      />
-                    </li> */}
-                    {/* <li>
-                      <DropdownButtonComponent
-                        text="Exit guest"
-                        onClick={() => setModalState("logGuestExit")}
-                        permissions={[]}
-                      />
-                    </li> */}
-                    <li>
                       <DropdownButtonComponent
                         text="Manage access control"
                         onClick={() =>
@@ -488,7 +460,7 @@ const Actions: React.FC<UserActionsProps> = ({
                           "read_access-control",
                         ]}
                       />
-                    </li>
+                    </li> */}
                   </li>
                 </ul>
               </ActionDropdownComponent>
