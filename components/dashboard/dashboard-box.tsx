@@ -38,7 +38,7 @@ export default function DashboardSection({
     "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 z-50";
 
   return (
-    <div className="container mx-auto mt-8 relative">
+    <div className="container mx-auto mb-8 relative">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Open Work Order by Categories Card */}
         <div
@@ -69,7 +69,7 @@ export default function DashboardSection({
             {workOrderCategories?.map((item, index) => (
               <li key={index} className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-xs font-medium text-gray-700">
+                  <p className="text-sm font-medium text-gray-700">
                     {item.name} ({item.openCount})
                   </p>
                 </div>

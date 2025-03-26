@@ -434,6 +434,10 @@ function Dashboard() {
             >
               {componentMap[centralState]}
             </ModalCompoenent>
+            <DashboardSection
+              notClosedByCat={notClosedByCat}
+              overDueByDate={overDueByDate}
+            />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
               {data?.map((item, index) =>
                 (item.title === "Wallet Balance" &&
@@ -561,10 +565,7 @@ function Dashboard() {
               )}
             </div>
 
-            <DashboardSection
-              notClosedByCat={notClosedByCat}
-              overDueByDate={overDueByDate}
-            />
+
 
             {/* {workOrders?.length < 1 ? (
               <div className=" w-full rounded-lg bg-white my-8 flex flex-col items-center justify-center px-6 py-10">
