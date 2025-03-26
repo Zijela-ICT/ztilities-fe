@@ -212,12 +212,14 @@ function Transactions() {
     const fetchTransactions = async () => {
       setLoading(true);
       await getMyTransactions();
-      setTimeout(() => setLoading(false), 1500);
+      setLoading(false);
     };
 
     //doesnt have wallet, so no call for transactions
     if (user.wallets.length > 0) {
       fetchTransactions();
+    } else {
+      setFilteredTransactions([]);
     }
   }, []);
 
@@ -608,88 +610,88 @@ function Transactions() {
           </div>
         )}
 
-        {filteredTransactions?.length < 1 || !filteredTransactions ? (
-          <>
-            <div className="flex flex-col items-center justify-center h-64 bg-white mt-4">
-              <TransactionIcon width="71" height="71" />
-
-              <p className="mt-4 text-gray-600 text-lg font-medium">
-                No Transactions Found
-              </p>
-              <p className="text-sm text-gray-500">
-                You haven't made any transactions yet.
-              </p>
-            </div>
-          </>
+        {!filteredTransactions ? (
+          // Loading state
+          <div className="flex flex-col items-center justify-center h-64 bg-white mt-4">
+            <MyLoaderFinite />
+          </div>
+        ) : filteredTransactions.length < 1 ? (
+          // No transactions state
+          <div className="flex flex-col items-center justify-center h-64 bg-white mt-4">
+            <TransactionIcon width="71" height="71" />
+            <p className="mt-4 text-gray-600 text-lg font-medium">
+              No Transactions Found
+            </p>
+            <p className="text-sm text-gray-500">
+              You haven't made any transactions yet.
+            </p>
+          </div>
         ) : (
-          <>
-            <div className="flex flex-col md:flex-row w-full h-auto space-y-4 md:space-y-0 md:space-x-4 mt-4">
-              {/* Left Section (Graph) */}
-              <div className="w-full md:w-3/5 bg-white rounded-lg  p-6">
-                <h2 className="text-base font-semibold mb-4 text-black">
-                  Transaction Trend
-                </h2>
-                <div className="h-full ">
-                  {/* Placeholder for the Graph */}
-
-                  <Line data={chartData} options={chartOptions} />
-                </div>
-              </div>
-
-              {/* Right Section (Simple List) */}
-              <div className="w-full md:w-2/5 bg-white p-4 rounded-lg">
-                <div className="flex items-baseline text-base justify-between mb-6">
-                  <h2 className="font-semibold text-black">
-                    Recent Transactions
-                  </h2>
-                  <h2 className="font-medium text-[#A8353A] flex items-center space-x-1 cursor-pointer">
-                    <Link
-                      href={`/transactions/${transactionId || "*"}/${
-                        entity || "*"
-                      }`}
-                    >
-                      See all
-                    </Link>
-                    <div className="rotate-180">
-                      <ArrowLeft />
-                    </div>
-                  </h2>
-                </div>
-                <ul>
-                  {filteredTransactions?.slice(0, 6).map((log, index) => (
-                    <li
-                      key={log.id}
-                      className="flex justify-between items-start mb-4 border-b text-sm border-gray-100 last:border-b-0 pb-4"
-                    >
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                          {log.category === "INFLOW" ? (
-                            <IncomingIcon />
-                          ) : (
-                            <OutgoingIcon />
-                          )}
-                        </div>
-                        <div className="ml-4 flex flex-col">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-semibold text-gray-700">
-                              {log.description}
-                            </span>
-                          </div>
-                          <p className="text-gray-700 mt-1 font-thin ">
-                            {moment.utc(log.createdAt).format("ll")}
-                          </p>
-                        </div>
-                      </div>
-                      {/* Price or additional information */}
-                      <span className="text-gray-600 font-medium whitespace-nowrap">
-                        ₦ {formatCurrency(log.amount)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+          // Transactions exist: render Graph and Transactions List
+          <div className="flex flex-col md:flex-row w-full h-auto space-y-4 md:space-y-0 md:space-x-4 mt-4">
+            {/* Left Section (Graph) */}
+            <div className="w-full md:w-3/5 bg-white rounded-lg p-6">
+              <h2 className="text-base font-semibold mb-4 text-black">
+                Transaction Trend
+              </h2>
+              <div className="h-full">
+                {/* Graph Placeholder */}
+                <Line data={chartData} options={chartOptions} />
               </div>
             </div>
-          </>
+
+            {/* Right Section (Simple List) */}
+            <div className="w-full md:w-2/5 bg-white p-4 rounded-lg">
+              <div className="flex items-baseline text-base justify-between mb-6">
+                <h2 className="font-semibold text-black">
+                  Recent Transactions
+                </h2>
+                <h2 className="font-medium text-[#A8353A] flex items-center space-x-1 cursor-pointer">
+                  <Link
+                    href={`/transactions/${transactionId || "*"}/${
+                      entity || "*"
+                    }`}
+                  >
+                    See all
+                  </Link>
+                  <div className="rotate-180">
+                    <ArrowLeft />
+                  </div>
+                </h2>
+              </div>
+              <ul>
+                {filteredTransactions.slice(0, 6).map((log) => (
+                  <li
+                    key={log.id}
+                    className="flex justify-between items-start mb-4 border-b text-sm border-gray-100 last:border-b-0 pb-4"
+                  >
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0">
+                        {log.category === "INFLOW" ? (
+                          <IncomingIcon />
+                        ) : (
+                          <OutgoingIcon />
+                        )}
+                      </div>
+                      <div className="ml-4 flex flex-col">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-semibold text-gray-700">
+                            {log.description}
+                          </span>
+                        </div>
+                        <p className="text-gray-700 mt-1 font-thin">
+                          {moment.utc(log.createdAt).format("ll")}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-gray-600 font-medium whitespace-nowrap">
+                      ₦ {formatCurrency(log.amount)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         )}
       </>
     </DashboardLayout>

@@ -1,67 +1,39 @@
 import { useState } from "react";
 
-export default function DashboardSection() {
+interface NotClosedByCat {
+  result: any[];
+}
+interface DashboardSectionProps {
+  notClosedByCat?: NotClosedByCat;
+  overDueByDate?: any[];
+}
+export default function DashboardSection({
+  notClosedByCat,
+  overDueByDate,
+}: DashboardSectionProps) {
   const [expandedCard, setExpandedCard] = useState(null);
+  const workOrderCategories = notClosedByCat?.result.map((item) => ({
+    name: item.category,
+    openCount: item.count,
+    percent: parseFloat(item.percentage),
+    barWidth: item.percentage,
+  }));
 
-  // Array for "Open work order by categories"
-  const workOrderCategories = [
-    {
-      id: 1,
-      name: "HEAT, VENTILATION(HVAC)",
-      openCount: 38,
-      percent: 16,
-      barWidth: "16%",
-    },
-    {
-      id: 2,
-      name: "ENVIRONMENTAL - CLEANING",
-      openCount: 24,
-      percent: 10,
-      barWidth: "10%",
-    },
-    {
-      id: 3,
-      name: "ELECTRICAL SYSTEM",
-      openCount: 15,
-      percent: 8,
-      barWidth: "8%",
-    },
-    {
-      id: 4,
-      name: "HEAT, VENTILATION (HVAC)",
-      openCount: 38,
-      percent: 16,
-      barWidth: "16%",
-    },
-    {
-      id: 5,
-      name: "ENVIRONMENTAL - CLEANING",
-      openCount: 24,
-      percent: 10,
-      barWidth: "10%",
-    },
-    {
-      id: 6,
-      name: "ELECTRICAL SYSTEM",
-      openCount: 15,
-      percent: 8,
-      barWidth: "8%",
-    },
-  ];
+  const getRandomColor = () =>
+    `#${Math.floor(Math.random() * 16777215)
+      .toString(16)
+      .padStart(6, "0")}`;
 
-  // Array for "Overdue work order by duration"
-  const overdueWorkOrders = [
-    { id: 1, duration: "<3months", count: 105, percent: 7, color: "#E63946" },
-    { id: 2, duration: "3-6months", count: 1, percent: 7, color: "#F4A261" },
-    { id: 3, duration: "1-2weeks", count: 7, percent: 7, color: "#2A9D8F" },
-    { id: 4, duration: ">1days", count: 20, percent: 7, color: "#264653" },
-  ];
+  const overdueWorkOrders = overDueByDate?.map((item) => ({
+    duration: item.range,
+    count: item.count,
+    percent: parseFloat(item.percentage),
+    color: getRandomColor(),
+  }));
 
-  // Common classes for both cards
   const baseCardClasses =
     "bg-white rounded-lg shadow p-6  transform transition-all duration-500";
 
-  // Classes applied when card is expanded to center in the middle of the screen.
   const expandedClasses =
     "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 z-50";
 
@@ -94,8 +66,8 @@ export default function DashboardSection() {
             </div>
           </div>
           <ul className="space-y-4 bg-gray-100 rounded-lg p-5 max-h-64 overflow-y-auto">
-            {workOrderCategories.map((item) => (
-              <li key={item.id} className="flex items-center justify-between">
+            {workOrderCategories?.map((item, index) => (
+              <li key={index} className="flex items-center justify-between">
                 <div className="flex-1">
                   <p className="text-xs font-medium text-gray-700">
                     {item.name} ({item.openCount})
@@ -171,8 +143,8 @@ export default function DashboardSection() {
                 </tr>
               </thead>
               <tbody className="text-gray-700 text-xs">
-                {overdueWorkOrders.map((item) => (
-                  <tr key={item.id} className="h-8 bg-gray-100">
+                {overdueWorkOrders?.map((item, index) => (
+                  <tr key={index} className="h-8 bg-gray-100">
                     <td
                       className="py-4 pr-4 pl-4 font-medium"
                       style={{ borderLeft: `4px solid ${item.color}` }}

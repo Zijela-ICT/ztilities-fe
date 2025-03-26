@@ -33,14 +33,14 @@ function Power() {
 
   const getPaymentsUnPaginated = async () => {
     const response = await axiosInstance.get(
-      `/payments/?search=${searchQuery}&&${filterQuery}`
+      `/payments/?search=${searchQuery}&&filters[type]=MANUAL_FUNDING`
     );
     exportToCSV(response.data.data, "payments");
   };
 
   const getPayments = async () => {
     const response = await axiosInstance.get(
-      `/payments/?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&${filterQuery}`
+      `/payments/?page=${pagination.currentPage}&&paginate=true&&search=${searchQuery}&&filters[type]=MANUAL_FUNDING`
     );
     setPayments(response.data.data);
     const extra = response.data.extra;

@@ -74,7 +74,8 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
 
           const customOptionsMap = {
             approvefunding: {
-              type: ["MANUAL_FUNDING", "PAYOUT", "FUND"],
+              // type: ["MANUAL_FUNDING", "PAYOUT", "FUND"],
+              type: ["MANUAL_FUNDING"],
               status: ["pending", "success"],
             },
             users: {

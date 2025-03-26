@@ -217,6 +217,25 @@ function Dashboard() {
     setWorkOrdersAwaitingApproval(response?.data);
   };
 
+  //for flow
+  const [notClosedByCat, setClosedByCat] = useState<any>();
+  const [overDueByDate, setOverdueByDate] = useState<any>();
+  const getWorkOrdersNotClosedByCat = async () => {
+    const response = await callGuardedEndpoint({
+      endpoint: "/dashboards/work-order-not-closed-by-cat",
+      requiredPermissions: ["read_dashboards:work-order-not-closed-by-cat"],
+    });
+    setClosedByCat(response?.data);
+  };
+
+  const getWorkOrdersOverdueByDate = async () => {
+    const response = await callGuardedEndpoint({
+      endpoint: "/dashboards/workorder-overdue-by-daterange",
+      requiredPermissions: ["read_dashboards:workorder-overdue-by-daterange"],
+    });
+    setOverdueByDate(response?.data);
+  };
+
   const data = [
     {
       title: "Initiated Work Requests",
@@ -371,7 +390,11 @@ function Dashboard() {
           getPurchaseOrdersTotalCost(),
           getWorkOrdersNew(),
           getWorkOrdersAwaitingApproval(),
-        ]);
+          getWorkOrdersNotClosedByCat(),
+          getWorkOrdersOverdueByDate(),
+        ]).then(() => {
+          console.log(data);
+        });
       };
 
       fetchAllData();
@@ -483,14 +506,24 @@ function Dashboard() {
                         ) : item.title !== "Wallet Balance" ? (
                           <div>
                             <p className="text-3xl font-bold text-gray-800 mb-3">
-                              {item.title ===
-                                "Purchase Orders (Total Cost Value)" &&
-                                "₦"}{" "}
-                              {item.title ===
-                              "Purchase Orders (Total Cost Value)"
-                                ? formatCurrency(item.number)
-                                : item.number}
+                              {item.number === undefined ||
+                              item.number === null ? (
+                                <span className="animate-pulse text-sm text-gray-500">
+                                  Loading...
+                                </span>
+                              ) : (
+                                <>
+                                  {item.title ===
+                                    "Purchase Orders (Total Cost Value)" &&
+                                    "₦"}{" "}
+                                  {item.title ===
+                                  "Purchase Orders (Total Cost Value)"
+                                    ? formatCurrency(item.number)
+                                    : item.number}
+                                </>
+                              )}
                             </p>
+
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500"></span>
                             </div>
@@ -528,7 +561,10 @@ function Dashboard() {
               )}
             </div>
 
-            {/* <DashboardSection/> */}
+            <DashboardSection
+              notClosedByCat={notClosedByCat}
+              overDueByDate={overDueByDate}
+            />
 
             {/* {workOrders?.length < 1 ? (
               <div className=" w-full rounded-lg bg-white my-8 flex flex-col items-center justify-center px-6 py-10">
