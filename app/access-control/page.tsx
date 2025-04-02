@@ -1,22 +1,22 @@
 "use client";
 
-import { JSX, useEffect, useState } from "react";
-import DashboardLayout from "@/components/dashboard-layout-component";
-import withPermissions from "@/components/auth/permission-protected-routes";
-import { useRouter, useParams } from "next/navigation";
-import createAxiosInstance from "@/utils/api";
-import ButtonComponent from "@/components/button-component";
-import { LabelInputComponent } from "@/components/input-container";
-import { useDataPermission } from "@/context";
-import Image from "next/image";
-import { CopyIcon } from "@/utils/svg";
 import PermissionGuard from "@/components/auth/permission-protected-components";
+import withPermissions from "@/components/auth/permission-protected-routes";
+import ButtonComponent from "@/components/button-component";
+import DashboardLayout from "@/components/dashboard-layout-component";
 import FacilityDetails from "@/components/facility-management/view-facility";
+import { LabelInputComponent } from "@/components/input-container";
 import TableComponent from "@/components/table-component";
+import { useDataPermission } from "@/context";
+import createAxiosInstance from "@/utils/api";
 import exportToCSV from "@/utils/exportCSV";
+import { CopyIcon } from "@/utils/svg";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { JSX, useEffect, useState } from "react";
 
-import Select from "react-select";
 import { multiSelectStyle } from "@/utils/ojects";
+import Select from "react-select";
 
 function AccessControl() {
   const axiosInstance = createAxiosInstance();
@@ -33,7 +33,7 @@ function AccessControl() {
     setCentralState,
     centralStateDelete,
     setCentralStateDelete,
-    setSuccessState,
+    setSuccessState, 
   } = useDataPermission();
   const router = useRouter();
 
@@ -78,7 +78,6 @@ function AccessControl() {
     setUnits(response.data.data);
   };
 
-  ///
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const toggleActions = (rowId: string) => {
 
