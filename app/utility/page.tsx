@@ -1,27 +1,26 @@
 "use client";
 
-import { JSX, useEffect, useState } from "react";
-import DashboardLayout from "@/components/dashboard-layout-component";
-import ModalCompoenent, {
-  ActionModalCompoenent,
-  SuccessModalCompoenent,
-} from "@/components/modal-component";
-import withPermissions from "@/components/auth/permission-protected-routes";
 import PermissionGuard from "@/components/auth/permission-protected-components";
+import withPermissions from "@/components/auth/permission-protected-routes";
+import DashboardLayout from "@/components/dashboard-layout-component";
+import ModalCompoenent from "@/components/modal-component";
+import AirtimeFlow from "@/components/utility.tsx/airtime-prgress-form";
+import Benfeciaries from "@/components/utility.tsx/benficiaries";
+import ElectricityFlow from "@/components/utility.tsx/electricity-prgress-form";
+import UtilityCardContainer from "@/components/utility.tsx/utility-cards";
 import { useDataPermission } from "@/context";
 import createAxiosInstance from "@/utils/api";
-import UtilityCardContainer from "@/components/utility.tsx/utility-cards";
-import ElectricityFlow from "@/components/utility.tsx/electricity-prgress-form";
-import AirtimeFlow from "@/components/utility.tsx/airtime-prgress-form";
-import InternetFlow from "@/components/utility.tsx/internet-prgress-form";
-import TVFlow from "@/components/utility.tsx/tv-prgress-form";
-import Benfeciaries from "@/components/utility.tsx/benficiaries";
 import { useRouter } from "next/navigation";
+import { JSX, useEffect, useState } from "react";
 
 function UtilityManagement() {
   const axiosInstance = createAxiosInstance();
   const {
     user,
+    setUser,
+    setUserRoles,
+    setUserPermissions,
+    userPermissions,
     pagination,
     setPagination,
     searchQuery,
@@ -52,6 +51,21 @@ function UtilityManagement() {
 
   const [activeUtility, setActiveUtility] = useState<string>();
   const [utility, setUtility] = useState<any>();
+
+  const getMe = async () => {
+    const response = await axiosInstance.get("/auth/me");
+    setUser(response.data.data.user);
+    const roles = response.data.data?.roles || [];
+    setUserRoles(roles);
+    const allPermissions = roles
+      .map((role: any) => role.permissions || []) // Extract permissions from each role
+      .flat(); // Flatten the array of arrays
+    // Remove duplicate permissions using a Set
+    const uniquePermissions: Permission[] = Array.from(new Set(allPermissions));
+    setUserPermissions(uniquePermissions);
+  };
+
+  const loading = !(user && userPermissions);
 
   const getElectricity = async () => {
     const response = await axiosInstance.get(`/electricity/providers`);
@@ -185,6 +199,15 @@ function UtilityManagement() {
 
   useEffect(() => {}, [centralStateDelete]);
 
+    useEffect(() => {
+    getMe();
+    const interval = setInterval(() => {
+      getMe();
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const tabPermissions = {
     Electricity: ["read_electricity:providers"],
     Airtime: ["read_airtime:telcos"],
@@ -192,7 +215,7 @@ function UtilityManagement() {
     "TV Subscription": ["read_tv:providers"],
   };
 
-  const { userPermissions } = useDataPermission();
+
 
   const getDefaultTab = () => {
     const userPermissionStrings = userPermissions.map(

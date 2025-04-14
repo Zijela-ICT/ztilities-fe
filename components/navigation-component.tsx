@@ -1,23 +1,13 @@
 import { useDataPermission } from "@/context";
-import {
-  FacilityMIcon,
-  HomeIcon,
-  LogoutIcon,
-  PPMIcon,
-  TransactionMIcon,
-  UserMIcon,
-  VendorIcon,
-  WorkOrderIcon,
-  WorkRequestIcon,
-} from "@/utils/svg";
+import { formatRoleName } from "@/utils/formatRoleNames";
+import { LogoutIcon, TransactionMIcon, WorkRequestIcon } from "@/utils/svg";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
-import ModalCompoenent from "./modal-component";
-import ButtonComponent from "./button-component";
 import PermissionGuard from "./auth/permission-protected-components";
-import { formatRoleName } from "@/utils/formatRoleNames";
+import ButtonComponent from "./button-component";
+import ModalCompoenent from "./modal-component";
 
 const Logo = "/assets/logo.png";
 
@@ -67,64 +57,70 @@ export default function Navigation() {
   );
 
   const navItems = [
+    // {
+    //   href: "/dashboard",
+    //   label: "Dashboard",
+    //   permissions: [""],
+    //   icon: <HomeIcon />,
+    // },
+    // {
+    //   href: "/facility-management",
+    //   label: "Facility Management",
+    //   permissions: ["units", "blocks", "facilities"],
+    //   icon: <FacilityMIcon />,
+    // },
+    // {
+    //   href: "/work-requests",
+    //   label: "Work Request",
+    //   permissions: ["work-requests"],
+    //   icon: <WorkRequestIcon />,
+    // },
+    // {
+    //   href: "/work-orders",
+    //   label: "Work Order",
+    //   permissions: ["work-orders"],
+    //   icon: <WorkOrderIcon />,
+    // },
+    // {
+    //   href: "/power",
+    //   label: "Power",
+    //   permissions: ["power-charges"],
+    //   icon: <WorkRequestIcon />,
+    // },
+    // {
+    //   href: "/bills",
+    //   label: "Bills",
+    //   permissions: ["units"],
+    //   icon: <WorkRequestIcon />,
+    // },
+    // {
+    //   href: "/approvers",
+    //   label: "Approvers",
+    //   permissions: ["users"],
+    //   icon: <WorkRequestIcon />,
+    // },
+    // {
+    //   href: "/ppm",
+    //   label: "PPM",
+    //   permissions: ["ppms"],
+    //   icon: <PPMIcon />,
+    // },
+    // {
+    //   href: "/audit",
+    //   label: "Audit Logs",
+    //   permissions: ["audit"],
+    //   icon: <WorkRequestIcon />,
+    // },
     {
-      href: "/dashboard",
-      label: "Dashboard",
-      permissions: [""],
-      icon: <HomeIcon />,
-    },
-    {
-      href: "/facility-management",
-      label: "Facility Management",
-      permissions: ["units", "blocks", "facilities"],
-      icon: <FacilityMIcon />,
-    },
-    {
-      href: "/work-requests",
-      label: "Work Request",
-      permissions: ["work-requests"],
-      icon: <WorkRequestIcon />,
-    },
-    {
-      href: "/work-orders",
-      label: "Work Order",
-      permissions: ["work-orders"],
-      icon: <WorkOrderIcon />,
-    },
-    {
-      href: "/power",
-      label: "Power",
-      permissions: ["power-charges"],
-      icon: <WorkRequestIcon />,
-    },
-    {
-      href: "/bills",
-      label: "Bills",
-      permissions: ["units"],
-      icon: <WorkRequestIcon />,
-    },
-    {
-      href: "/approvers",
-      label: "Approvers",
-      permissions: ["users"],
-      icon: <WorkRequestIcon />,
-    },
-    {
-      href: "/ppm",
-      label: "PPM",
-      permissions: ["ppms"],
-      icon: <PPMIcon />,
-    },
-    {
-      href: "/audit",
-      label: "Audit Logs",
-      permissions: ["audit"],
+      href: "/utility",
+      label: "Utilities",
+      permissions: ["tv", "internet", "airtime", "electricity"],
       icon: <WorkRequestIcon />,
     },
     // {
-    //   href: "/utility",
-    //   label: "Utilities",
-    //   permissions: ["tv", "internet", "airtime", "electricity"],
+    //   href: "/challenge",
+    //   label: "Challenges",
+    //   permissions: ["challenge"],
     //   icon: <WorkRequestIcon />,
     // },
     // {
@@ -133,22 +129,22 @@ export default function Navigation() {
     //   permissions: ["access-control"],
     //   icon: <WorkRequestIcon />,
     // },
-    {
-      href: "/vendor-management",
-      label: "Vendor & Tech Management",
-      permissions: ["vendors"],
-      icon: <VendorIcon />,
-    },
-    {
-      href: "/user-management",
-      label: "User Management",
-      permissions: ["roles", "users", "permissions", "auth"],
-      icon: <UserMIcon />,
-    },
+    // {
+    //   href: "/vendor-management",
+    //   label: "Vendor & Tech Management",
+    //   permissions: ["vendors"],
+    //   icon: <VendorIcon />,
+    // },
+    // {
+    //   href: "/user-management",
+    //   label: "User Management",
+    //   permissions: ["roles", "users", "permissions", "auth"],
+    //   icon: <UserMIcon />,
+    // },
     {
       href: "/transaction",
       label: "Transactions",
-      permissions: ["transactions", "users"],
+      permissions: [],
       icon: <TransactionMIcon />,
       children: [
         {

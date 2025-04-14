@@ -4,8 +4,8 @@ import ButtonComponent from "@/components/button-component";
 import FooterComponent from "@/components/footer-component";
 import InputComponent from "@/components/input-container";
 import Image from "next/image";
-import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FormEvent, useEffect, useState } from "react";
 
 import UnprotectedRoute from "@/components/auth/unprotected-routes";
 import { SuccessModalCompoenent } from "@/components/modal-component";
@@ -59,7 +59,7 @@ export default function LogIn() {
     if (response.data.message === "User login successful") {
       localStorage.setItem("authToken", response.data.data.access_token);
       localStorage.setItem("refreshToken", response.data.data.refresh_token);
-      router.push("/dashboard");
+      router.push("/utility");
     } else {
       setUserId(response.data?.data?.userId);
       setMessage(response.data?.message);
@@ -124,6 +124,11 @@ export default function LogIn() {
                 className="mt-12 text-white"
               />
             </form>
+            <ButtonComponent
+                text={"Sign Up"}
+                className="mt-0 text-[#A8353A] bg-white"
+                onClick={()=> router.push("/signup")}
+              />
           </div>
           <div className="flex-1 bg-[#FBC2B61A] rounded-2xl min-h-full flex justify-center items-center ">
             <Image
